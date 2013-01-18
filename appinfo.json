@@ -1,9 +1,9 @@
 {
-	"title": "Settings",
-	"id": "org.webosports.app.settings",
-	"version": "0.2.0",
+	"title": "Phone",
+	"id": "com.palm.app.phone",
+	"version": "0.1.0",
 	"vendor": "WebOS Ports",
-	"vendor_url": "https://github.com/webOS-ports/com.palm.app.settings",
+	"vendor_url": "https://github.com/webOS-ports/org.webosports.app.phone",
 	"type": "web",
 	"main": "index.html",
 	"icon": "icon.png",
