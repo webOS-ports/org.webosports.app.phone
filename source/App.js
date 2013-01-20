@@ -88,10 +88,10 @@ enyo.kind({
 				{content: "0", style: "border-radius: 0;"},
 				{content: "#", style: "border-radius: 0 0 16px 0;"},
 			]},
-			{name: "DialButton",
+			{name: "OkButton",
 			kind: "onyx.Button",
 			style: "width: 80%; height: 48px; margin-left: 10%; border-radius: 16px; margin-top: 10px; text-align: center; color: lightgreen; background-color: green; font-size: 24px; font-weight: bold;",
-			content: "☏"}
+			content: "Ok"}
 		]},
 		{name: "History",
 		layoutKind: "FittableRowsLayout",
