@@ -136,7 +136,7 @@ enyo.kind({
 });
 
 enyo.kind({
-	name: "App",
+	name: "PhoneApp",
 	layoutKind: "FittableRowsLayout",
 	components: [
 		{kind: "Signals",
