@@ -22,6 +22,39 @@
 				alert('No application build found, redirecting to debug.html.');
 				location = 'debug.html';
 			}
+
+			window.phoneAppCard = null;
+
+			function onApplicationRelaunch() {
+				if (window.phoneAppCard && phoneAppCard.PalmSystem && phoneAppCard.hidden) {
+					console.log("Bringing PhoneApp to foreground ...");
+					window.phoneAppCard.PalmSystem.activate();
+					window.phoneAppCard.PalmSystem.show();
+					window.phoneAppCard.hidden = false;
+				}
+			};
+
+			function onDeviceReady() {
+				var launchArguments = parseUrlArgs(location.search.slice(1));
+				console.log("launchArguments.mode = " + launchArguments.mode);
+				if (launchArguments.mode) {
+					if (launchArguments.mode == "phoneapp") {
+						console.log("Rendering phoneapp ...");
+						new PhoneApp().renderInto(document.body);
+					}
+				}
+				else {
+					console.log("Launching the first time; preparing everything ...");
+
+					// We're launched the first time so install all necessary handlers
+					document.addEventListener("relaunch", onApplicationRelaunch, false);
+
+					window.phoneAppCard = navigator.window.newCard('index.html?mode=phoneapp');
+					window.phoneAppCard.hidden = true;
+				}
+			}
+
+			document.addEventListener("deviceready", onDeviceReady, false);
 		</script>
 	</body>
 </html>
