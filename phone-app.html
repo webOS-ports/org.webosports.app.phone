@@ -12,32 +12,13 @@
 		<link href="build/enyo.css" rel="stylesheet"/>
 		<link href="build/app.css" rel="stylesheet"/>
 		<!-- js -->
-		<script src="cordova.js"></script>
+		<script src="cordova.js"></script> 
 		<script src="build/enyo.js"></script>
 		<script src="build/app.js"></script>
 	</head>
 	<body class="enyo-unselectable">
 		<script>
-			window.phoneAppCard = null;
-
-			function onApplicationRelaunch() {
-				if (window.phoneAppCard && phoneAppCard.PalmSystem) {
-					console.log("Phone App already present, bringing to foreground...");
-					window.phoneAppCard.PalmSystem.activate();
-				}
-				else {
-					console.log("No Phone App present, opening...");
-					window.phoneAppCard = navigator.window.newCard('phone-app.html')
-				}
-			};
-
-			console.log("Launching the first time; preparing everything ...");
-
-			//We're launched the first time so install all necessary handlers
-			document.addEventListener("relaunch", onApplicationRelaunch, false);
-			
-			//Create the backend service handler
-			new Backend();
+			new PhoneApp().renderInto(document.body);
 		</script>
 	</body>
 </html>

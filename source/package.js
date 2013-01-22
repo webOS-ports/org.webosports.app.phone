@@ -4,6 +4,8 @@ enyo.depends(
 	//"Theme.less",	// uncomment this line, and follow the steps described in Theme.less
 	"$lib/webos-ports-lib",
 	"utils.js",
+	//Backend Service Handler
+	"Backend.js",
 	//Main App
 	"PhoneApp.css",
 	"PhoneApp.js"
