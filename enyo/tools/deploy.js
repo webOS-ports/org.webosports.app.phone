@@ -184,8 +184,13 @@ process.chdir(sourceDir);
 // Deploy / Copy
 
 shell.mkdir('-p', path.join(outDir, 'lib'));
-shell.cp(path.join(sourceDir, 'index.html'), path.join(sourceDir, 'icon.png'), outDir);
+shell.ls(path.join(sourceDir, '*.html')).forEach(function (file) {
+    if (file != path.join(sourceDir, "debug.html")) {
+        shell.cp(file, outDir);
+    }
+});
 shell.cp('-r', buildDir, outDir);
+
 
 var assetsSrcDir = path.join(sourceDir, 'assets');
 if(shell.test('-d', assetsSrcDir)) {
