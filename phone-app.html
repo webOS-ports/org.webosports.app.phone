@@ -19,6 +19,10 @@
 	<body class="enyo-unselectable">
 		<script>
 			new PhoneApp().renderInto(document.body);
+
+			// Somehow WebAppManager does not forward the application keep alive status to
+			// possible child applications so we have to set it here manually
+			PalmSystem.keepAlive(true);
 		</script>
 	</body>
 </html>
