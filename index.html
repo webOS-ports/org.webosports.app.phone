@@ -19,6 +19,7 @@
 	<body class="enyo-unselectable">
 		<script>
 			window.phoneAppCard = null;
+			window.phoneBackend = null;
 
 			function onApplicationRelaunch() {
 				if (window.phoneAppCard && phoneAppCard.PalmSystem) {
@@ -27,17 +28,17 @@
 				}
 				else {
 					console.log("No Phone App present, opening...");
-					window.phoneAppCard = navigator.window.newCard('phone-app.html')
+					window.phoneAppCard = navigator.window.newCard('phone-app.html');
 				}
 			};
 
 			console.log("Launching the first time; preparing everything ...");
 
-			//We're launched the first time so install all necessary handlers
+			// We're launched the first time so install all necessary handlers
 			document.addEventListener("relaunch", onApplicationRelaunch, false);
-			
-			//Create the backend service handler
-			new Backend();
+
+			// Create the backend service handler
+			window.phoneBackend = new Backend();
 		</script>
 	</body>
 </html>
