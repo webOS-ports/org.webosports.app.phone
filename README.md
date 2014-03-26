@@ -1,4 +1,4 @@
-org.webosports.app.phone2
-=========================
+org.webosports.app.phone
+========================
 
 Phone App for WebOS Ports using QML
