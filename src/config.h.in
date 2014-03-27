@@ -14,16 +14,25 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "phoneapplication.h"
-#include "config.h"
+#ifndef CONFIG_H_
+#define CONFIG_H_
 
-int main(int argc, char **argv)
+#include <QString>
+#include <QDir>
+#include <QCoreApplication>
+
+inline bool isRunningInstalled()
 {
-    PhoneApplication::setApplicationName("Phone App");
-    PhoneApplication application(argc, argv);
-
-    if (!application.setup(QString("%1/main.qml").arg(phoneAppDirectory())))
-        return 0;
-
-    return application.exec();
+	static bool installed = (QCoreApplication::applicationDirPath() ==
+							 QDir(("@APP_DIR@")).canonicalPath());
+	return installed;
 }
+
+inline QString phoneAppDirectory()
+{
+	if (isRunningInstalled())
+		return QString("@APP_DIR@/qml");
+	return QString("@CMAKE_SOURCE_DIR@/src/qml");
+}
+
+#endif

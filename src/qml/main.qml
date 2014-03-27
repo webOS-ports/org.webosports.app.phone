@@ -7,7 +7,7 @@ import QtQuick.Controls.Styles 1.1
 import QtQuick.Layouts 1.0
 
 
-Rectangle {
+Window {
     id: main
     //width: Screen.width
     //height: Screen.height
@@ -29,6 +29,10 @@ Rectangle {
     //function operatorPressed(operator) { CalcEngine.operatorPressed(operator) }
 
     //function keyPressed(digit) { console.log(digit) }
+
+    Component.onCompleted: {
+        __window.show();
+    }
 
     property VoiceCallManager manager: VoiceCallManager{
         id: manager
@@ -84,6 +88,4 @@ Rectangle {
     PhoneTabView {id: tabView}
 
     PeopleModel {id:people}
-
-
 }

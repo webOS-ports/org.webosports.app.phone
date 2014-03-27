@@ -14,16 +14,24 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "phoneapplication.h"
-#include "config.h"
+#ifndef PHONEAPPLICATION_H
+#define PHONEAPPLICATION_H
 
-int main(int argc, char **argv)
+#include <QObject>
+#include <QQmlEngine>
+#include <QGuiApplication>
+
+class PhoneApplication : public QGuiApplication
 {
-    PhoneApplication::setApplicationName("Phone App");
-    PhoneApplication application(argc, argv);
+    Q_OBJECT
+public:
+    explicit PhoneApplication(int& argc, char **argv);
+    virtual ~PhoneApplication();
 
-    if (!application.setup(QString("%1/main.qml").arg(phoneAppDirectory())))
-        return 0;
+    bool setup(const QString& path);
 
-    return application.exec();
-}
+private:
+    QQmlEngine mEngine;
+};
+
+#endif // PHONEAPPLICATION_H
