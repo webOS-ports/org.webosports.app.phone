@@ -24,11 +24,15 @@
 class PhoneApplication : public QGuiApplication
 {
     Q_OBJECT
+    Q_PROPERTY(QString launchParameters READ launchParameters)
+
 public:
     explicit PhoneApplication(int& argc, char **argv);
     virtual ~PhoneApplication();
 
     bool setup(const QString& path);
+
+    QString launchParameters() const;
 
     static void onRelaunch(const char *parameters, void *user_data);
 
@@ -40,6 +44,7 @@ private:
 
 private:
     QQmlEngine mEngine;
+    QString mLaunchParameters;
 };
 
 #endif // PHONEAPPLICATION_H

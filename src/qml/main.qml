@@ -31,13 +31,19 @@ Window {
     //function keyPressed(digit) { console.log(digit) }
 
     Component.onCompleted: {
-        __window.show();
+        var params = JSON.parse(application.launchParameters);
+        if (!params.launchedAtBoot)
+            __window.show();
     }
 
-    Connection {
+    Connections {
         target: application
         onRelaunched: {
             console.log("DEBUG: Relaunched with parameters: " + parameters);
+            // If we're launched at boot time we're not yet visible so bring our window
+            // to the foreground
+            if (!__window.visible)
+                __window.show();
         }
     }
 

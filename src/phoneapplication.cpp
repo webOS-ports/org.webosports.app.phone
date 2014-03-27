@@ -14,6 +14,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <QDebug>
+#include <QStringList>
 #include <QQmlEngine>
 #include <QQmlContext>
 #include <QQuickItem>
@@ -32,16 +34,28 @@ struct webos_application_event_handlers event_handlers = {
 };
 
 PhoneApplication::PhoneApplication(int& argc, char **argv) :
-    QGuiApplication(argc, argv)
+    QGuiApplication(argc, argv),
+    mLaunchParameters("{}")
 {
     webos_application_init("org.webosports.app.phone", &event_handlers, this);
     webos_application_attach(g_main_loop_new(g_main_context_default(), TRUE));
 
     setApplicationName("PhoneApp");
+    setQuitOnLastWindowClosed(false);
+
+    if (arguments().size() == 2) {
+        mLaunchParameters = arguments().at(1);
+        qDebug() << "Launched with parameters: " << mLaunchParameters;
+    }
 }
 
 PhoneApplication::~PhoneApplication()
 {
+}
+
+QString PhoneApplication::launchParameters() const
+{
+    return mLaunchParameters;
 }
 
 bool PhoneApplication::setup(const QString& path)

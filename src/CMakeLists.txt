@@ -19,3 +19,5 @@ target_link_libraries(org.webosports.app.phone
 install(TARGETS org.webosports.app.phone DESTINATION ${APP_DIR})
 
 install(DIRECTORY qml DESTINATION ${APP_DIR})
+
+webos_build_system_bus_files()
