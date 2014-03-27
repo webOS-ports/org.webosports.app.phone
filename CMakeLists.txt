@@ -17,6 +17,9 @@ find_package(Qt5Quick REQUIRED)
 
 find_package(PkgConfig "0.22" REQUIRED)
 
+pkg_check_modules(GLIB2 glib-2.0 REQUIRED)
+pkg_check_modules(WEBOS_APPLICATION webos-application REQUIRED)
+
 set(APP_DIR ${WEBOS_INSTALL_WEBOS_APPLICATIONSDIR}/org.webosports.app.phone)
 
 add_subdirectory(data)

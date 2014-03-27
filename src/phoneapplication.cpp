@@ -18,11 +18,25 @@
 #include <QQmlContext>
 #include <QQuickItem>
 
+#include <glib.h>
+#include <webos_application.h>
+
 #include "phoneapplication.h"
+
+struct webos_application_event_handlers event_handlers = {
+    .activate = NULL,
+    .deactivate = NULL,
+    .suspend = NULL,
+    .relaunch = PhoneApplication::onRelaunch,
+    .lowmemory = NULL
+};
 
 PhoneApplication::PhoneApplication(int& argc, char **argv) :
     QGuiApplication(argc, argv)
 {
+    webos_application_init("org.webosports.app.phone", &event_handlers, this);
+    webos_application_attach(g_main_loop_new(g_main_context_default(), TRUE));
+
     setApplicationName("PhoneApp");
 }
 
@@ -36,6 +50,8 @@ bool PhoneApplication::setup(const QString& path)
         qWarning() << "Invalid app path:" << path;
         return false;
     }
+
+    mEngine.rootContext()->setContextProperty("application", this);
 
     QQmlComponent appComponent(&mEngine, QUrl(path));
     if (appComponent.isError()) {
@@ -54,4 +70,15 @@ bool PhoneApplication::setup(const QString& path)
     appComponent.completeCreate();
 
     return true;
+}
+
+void PhoneApplication::onRelaunch(const char *parameters, void *user_data)
+{
+    PhoneApplication *app = static_cast<PhoneApplication*>(user_data);
+    app->relaunch(parameters);
+}
+
+void PhoneApplication::relaunch(const char *parameters)
+{
+    emit relaunched(QString(parameters));
 }

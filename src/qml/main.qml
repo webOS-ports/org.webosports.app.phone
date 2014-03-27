@@ -34,6 +34,13 @@ Window {
         __window.show();
     }
 
+    Connection {
+        target: application
+        onRelaunched: {
+            console.log("DEBUG: Relaunched with parameters: " + parameters);
+        }
+    }
+
     property VoiceCallManager manager: VoiceCallManager{
         id: manager
 

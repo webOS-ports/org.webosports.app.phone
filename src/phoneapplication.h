@@ -30,6 +30,14 @@ public:
 
     bool setup(const QString& path);
 
+    static void onRelaunch(const char *parameters, void *user_data);
+
+signals:
+    void relaunched(const QString& parameters);
+
+private:
+    void relaunch(const char *parameters);
+
 private:
     QQmlEngine mEngine;
 };
