@@ -1,12 +1,13 @@
 import QtQuick 2.0
+import "../model"
 
-Item {
-
-    property Person john: Person{displayLabel: "John Smith"}
-    property Person steve: Person{displayLabel: "Steve Brown"}
-    property Person tom: Person{displayLabel: "Tom Slater"}
+QtObject {
+    property Contact john: Contact{displayLabel: "John Smith"}
+    property Contact steve: Contact{displayLabel: "Steve Brown"}
+    property Contact tom: Contact{displayLabel: "Tom Slater"}
 
     function personByPhoneNumber(remoteUid){
+        console.log("Looking up Contact for remoteID: " + remoteUid)
         switch(remoteUid){
         case "1234567890":
             return john

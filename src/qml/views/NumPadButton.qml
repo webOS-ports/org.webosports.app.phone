@@ -34,7 +34,7 @@ Item {
                 }
 
                 onClicked: {
-                    if(waitingForDoubleClick && numpad.entryTarget.__previousCharacter == model.key && model.alt) {
+                    if(waitingForDoubleClick && numpad.entryTarget.__previousCharacter === model.key && model.alt) {
                         numpad.entryTarget.backspace();
                         numpad.entryTarget.insertChar(model.alt);
                         waitingForDoubleClick = false;
@@ -52,10 +52,10 @@ Item {
 
                 // Audio feedback.
                 onPressed: {
-                    main.manager.startDtmfTone(model.key);
+                    numpad.onPressed(model.key);
                 }
                 onReleased: {
-                    main.manager.stopDtmfTone();
+                    numpad.onReleased();
                 }
             }
 }

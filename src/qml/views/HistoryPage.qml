@@ -1,5 +1,6 @@
 import QtQuick 2.0
 import QtQuick.Controls 1.1
+import "../model"
 
 Rectangle {
     anchors.fill: parent
@@ -11,11 +12,11 @@ Rectangle {
             anchors.fill: parent
             spacing:4
             clip:true
-            model: CommCallModel {}
+            model: CallHistory {}
 
             delegate: Item {
                 width:parent.width;height:72
-                property Person contact: Person{}
+                property Contact contact: Contact{}
 
                 Component.onCompleted: contact = people.personByPhoneNumber(model.remoteUid);
 

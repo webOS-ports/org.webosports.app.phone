@@ -7,7 +7,9 @@ TabView {
     Tab { title: "Dial" ;  Item {
        Dialer {id: pDialPage; anchors.horizontalCenter: parent.horizontalCenter }
         }}
-    Tab { title: "Video" ; Item {}}
+    Tab { title: "Video" ; Item {
+
+        }}
     Tab { title: "Favorites" ; Item {}}
     Tab { title: "Call Log" ; Item {
             HistoryPage{id: history}

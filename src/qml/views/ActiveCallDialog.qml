@@ -2,8 +2,8 @@ import QtQuick 2.0
 
 Rectangle {
     id: root
-    width: 500
-    height: 800
+    width: appTheme.appWidth
+    height: appTheme.appHeight
     color: main.appTheme.backgroundColor
     z: 10
 
@@ -25,21 +25,29 @@ Rectangle {
 
     function open(){
         root.visible = true
+        tLineId.text = main.activeVoiceCallPerson ? main.activeVoiceCallPerson.displayLabel : (manager.activeVoiceCall ? manager.activeVoiceCall.lineId : '');
     }
 
     function close(){
         root.visible = false
+        if(root.dtmfKeypadDialog) {
+            root.dtmfKeypadDialog.visible = false
+            root.dtmfKeypadDialog.destroy()
+        }
+        tLineId.text = ''
+
     }
 
     Component {
         id:numPadDialog
 
-        Item {
-            width:parent.width;height:parent.height
-            //width: parent.width
-            //height: 300
+        Rectangle {
+            y: 70
+            //width:parent.width;height:parent.height
+            width: parent.width
+            height: 500
 
-            //color: main.appTheme.backgroundColor
+            color: main.appTheme.backgroundColor
 
 
             NumPad {
@@ -48,10 +56,9 @@ Rectangle {
                     horizontalCenter:parent.horizontalCenter
                     //topMargin: 300
                     bottom:parent.bottom
-                    bottomMargin:400
                 }
                 mode:'dtmf'
-                //entryTarget:numentry
+                entryTarget: tLineId
                 width:parent.width - 50;height:childrenRect.height
             }
 
@@ -63,12 +70,14 @@ Rectangle {
 
     Column {
         Column {
-            width:root.width
+            width:root.width -10
             anchors.horizontalCenter: parent.horizontalCenter
+
+            Item {width:parent.width;height:10}
 
             Text {
                 id:tLineId
-                width:parent.width; height:paintedHeight
+                width:parent.width; height:90
                 color:main.appTheme.foregroundColor
                 horizontalAlignment:Text.Center
 
@@ -88,9 +97,19 @@ Rectangle {
                     while(paintedWidth < width)
                         if(++font.pixelSize >= 38) break;
                 }
+
+                function insertChar(character) {
+
+                    if(text.length === 0 || (main.activeVoiceCallPerson && text === main.activeVoiceCallPerson.displayLabel)) {
+                        text = character
+                    } else{
+                        text = text + character;
+                    }
+
+                }
             }
 
-            // Spacer
+           // Spacer
             Item {width:parent.width;height:10}
 
             Image {
@@ -122,7 +141,7 @@ Rectangle {
             }
 
             // Spacer
-            Item {width:parent.width;height:215}
+            Item {width:parent.width; height:300}
 
             Row {
                 id:rVoiceCallTools
@@ -133,7 +152,7 @@ Rectangle {
                     visible:root.state == 'active'
                     iconSource:'images/icon-m-telephony-volume.svg'
                     onClicked: {
-                        manager.audioMode = manager.audioMode === 'ihf' ? 'earpiece' : 'ihf';
+                        manager.setAudioMode(manager.audioMode === 'ihf' ? 'earpiece' : 'ihf');
                     }
                 }
 
@@ -142,9 +161,9 @@ Rectangle {
                     iconSource:'images/icon-m-telephony-volume-off.svg'
                     onClicked: {
                         if(root.state == 'incoming') { // TODO: Take in to account unmuting audio when call is answered.
-                            //manager.setMuteSpeaker(true);
+                            manager.setMuteSpeaker(true);
                         } else {
-                            manager.setMuteMicrophone(manager.muteMicrophone ? false : true);
+                            manager.setMuteMicrophone(manager.isMicrophoneMuted ? false : true);
                         }
                     }
                 }
