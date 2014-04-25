@@ -24,7 +24,7 @@ Rectangle {
 
             Text {
                 id: label
-                text: "Enter PIN to unlock SIM. 3 attempts remaining."
+                text: "Enter PIN to unlock SIM. "  + ofono.retries().pin + " attempts remaining."
                 font.pixelSize: 20
                 color: main.appTheme.headerTip
                 anchors.horizontalCenter:parent.horizontalCenter
@@ -59,6 +59,15 @@ Rectangle {
                     function checkPin(){
                         if(ofono.unlockPin("pin", pin.text)){
                             simPin.visible = false
+                        } else {
+                            pin.text = ""
+                            if(ofono.retries().pin >0){
+                               label.text = "Invalid PIN. Enter PIN to unlock SIM. " + ofono.retries().pin + " attempts remaining."
+                            } else{
+                                  label.text = "Invalid PIN. Max retries exceeded."
+                            }
+
+
                         }
                     }
                 }
@@ -70,40 +79,6 @@ Rectangle {
         }
 
     }
-
-    /*TextEdit {
-        id:pin
-        width:parent.width; height:90
-        color:main.appTheme.foregroundColor
-        anchors.top: header.bottom
-        anchors.topMargin: 50
-        horizontalAlignment:Text.Center
-
-
-        onTextChanged: resizeText();
-
-        Component.onCompleted: resizeText();
-
-        function resizeText() {
-            if(paintedWidth < 0 || paintedHeight < 0) return;
-            while(paintedWidth > width)
-                if(--font.pixelSize <= 0) break;
-
-            while(paintedWidth < width)
-                if(++font.pixelSize >= 38) break;
-        }
-
-        function insertChar(character) {
-
-            if(text.length === 0) {
-                text = character
-            } else{
-                text = text + character;
-            }
-
-        }
-    }
-    */
 
     NumberEntry {
         id:pin

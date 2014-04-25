@@ -12,6 +12,7 @@ QtObject{
     property string mobileCountryCode: "UK"
     property string mobileNetworkCode: "Vodaphone"
     property string pinRequired: "none"
+    property int pinRetry: 3
 
     function changePin(type, oldPin, newPin){
 
@@ -32,12 +33,19 @@ QtObject{
     function unlockPin(type, pin){
         if(type === "pin" && pin === "111"){
             console.log("SIM PIN Unlocked")
+            pinRetry = 3
             return true
         }else{
             console.log("Invalid PIN")
+            --pinRetry
             return false
         }
     }
+
+    function retries(){
+        return {pin: pinRetry}
+    }
+
 
 }
 

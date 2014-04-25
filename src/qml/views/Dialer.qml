@@ -9,34 +9,11 @@ Rectangle {
 
     property alias numberEntryText: numentry.text
 
-    /*TextField {
-        id: phoneNumber
-        y: 10
-        height: 30
-        anchors.horizontalCenter: parent.horizontalCenter
-        text: qsTr("")
-        font.pixelSize: 12
-
-
-    }
-    */
-
-    Rectangle {
-           id:bProviderSelect
-           //text: main.providerLabel
-           color: "#228B22"
-
-           MouseArea {
-               anchors.fill: parent
-               onClicked: dProviderSelect.open();
-           }
-       }
-
     NumberEntry {
             id:numentry
             anchors {
-                top:bProviderSelect.bottom
-                bottom:numpad.top
+                top: pDialPage.top
+                topMargin: 70
                 left:parent.left
                 right:parent.right
             }
@@ -45,16 +22,21 @@ Rectangle {
 
     NumPad {
          id:numpad
-         width:main.width
+         width: main.appTheme.keypadWidth
          height:childrenRect.height
-         anchors {bottom:rCallActions.top;margins:20}
+         anchors {
+             top: numentry.bottom
+             margins:20
+             horizontalCenter:parent.horizontalCenter
+         }
          entryTarget:numentry
      }
 
     Row {
             id:rCallActions
-            width:childrenRect.width;height:childrenRect.height
-            anchors {bottom:parent.bottom;horizontalCenter:parent.horizontalCenter;margins:30}
+            width:childrenRect.width
+            height:childrenRect.height
+            anchors {bottom: parent.bottom; horizontalCenter:parent.horizontalCenter;margins:30}
 
             AcceptButton {
                 id:bCallNumber

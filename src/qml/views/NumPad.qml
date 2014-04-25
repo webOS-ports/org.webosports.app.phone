@@ -7,7 +7,7 @@ GridView {
     property Item entryTarget
 
     cellWidth:width / 3
-    cellHeight:cellWidth * 0.6
+    cellHeight: cellWidth * 0.6
 
     interactive:false
 

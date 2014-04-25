@@ -1,4 +1,5 @@
 import QtQuick 2.0
+import QtQuick.Layouts 1.0
 
 Rectangle {
     id: root
@@ -30,23 +31,22 @@ Rectangle {
 
     function close(){
         root.visible = false
-        if(root.dtmfKeypadDialog) {
-            root.dtmfKeypadDialog.visible = false
-            root.dtmfKeypadDialog.destroy()
-        }
+        //if(root.dtmfKeypadDialog) {
+        //    root.dtmfKeypadDialog.visible = false
+        //    root.dtmfKeypadDialog.destroy()
+        //}
         tLineId.text = ''
 
     }
 
-    Component {
+   /* Component {
         id:numPadDialog
 
         Rectangle {
-            y: 70
+            y: 90
             //width:parent.width;height:parent.height
             width: parent.width
             height: 500
-
             color: main.appTheme.backgroundColor
 
 
@@ -66,19 +66,33 @@ Rectangle {
 
         }
     }
+    */
 
 
-    Column {
-        Column {
-            width:root.width -10
-            anchors.horizontalCenter: parent.horizontalCenter
+    ColumnLayout {
+        width:parent.width -10
+        anchors {
+            horizontalCenter: parent.horizontalCenter
+            fill: parent
+        }
 
-            Item {width:parent.width;height:10}
+        ColumnLayout {
+
+            anchors {
+                horizontalCenter: parent.horizontalCenter
+                top: parent.top
+            }
 
             Text {
                 id:tLineId
-                width:parent.width; height:90
+                Layout.fillWidth: true
+                height:90
                 color:main.appTheme.foregroundColor
+                font.pixelSize: 40
+                anchors{
+                  horizontalCenter: parent.horizontalCenter
+                  top: parent.top
+                }
                 horizontalAlignment:Text.Center
 
                 text:main.activeVoiceCallPerson
@@ -91,8 +105,11 @@ Rectangle {
 
                 function resizeText() {
                     if(paintedWidth < 0 || paintedHeight < 0) return;
-                    while(paintedWidth > width)
+                    while(paintedWidth > width) {
+                        //console.log("paintedWidth=" + paintedWidth + " width=" + width)
+                        //console.log(font.pixelSize)
                         if(--font.pixelSize <= 0) break;
+                    }
 
                     while(paintedWidth < width)
                         if(++font.pixelSize >= 38) break;
@@ -110,12 +127,17 @@ Rectangle {
             }
 
            // Spacer
-            Item {width:parent.width;height:10}
+            //Item {width:parent.width;height:10}
 
             Image {
                 id:iAvatar
-                anchors.horizontalCenter:parent.horizontalCenter
-                width:196;height:width
+                anchors{
+                    top: tLineId.bottom
+                    topMargin: 5
+                    horizontalCenter:parent.horizontalCenter
+                }
+
+                width:500; height:500
                 asynchronous:true
                 fillMode:Image.PreserveAspectFit
                 smooth:true
@@ -141,11 +163,43 @@ Rectangle {
             }
 
             // Spacer
-            Item {width:parent.width; height:300}
+            Item {
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+            }
 
-            Row {
+            Item {
+                id: numPadDialog
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+                //width:parent.width;height:parent.height
+                //width: parent.width
+                //height: 500
+                visible: false
+                //color: 'red' //main.appTheme.backgroundColor
+
+                NumPad {
+                    id:dtmfpad
+                    anchors {
+                        horizontalCenter:parent.horizontalCenter
+                        //topMargin: 300
+                        bottom:parent.bottom
+                    }
+                    mode:'dtmf'
+                    entryTarget: tLineId
+                    width:parent.width - 300
+                    height:childrenRect.height
+                }
+
+
+
+            }
+
+            RowLayout {
                 id:rVoiceCallTools
                 anchors.horizontalCenter:parent.horizontalCenter
+                anchors.bottom: parent.bottom
+                anchors.bottomMargin: 20
                 spacing:5
 
                 CallDialogToolButton {
@@ -178,11 +232,16 @@ Rectangle {
                     visible:root.state == 'active'
                     iconSource:'images/icon-m-telephony-numpad.svg'
                     onClicked: {
-                        if(!root.dtmfKeypadDialog) {
-                            root.dtmfKeypadDialog = numPadDialog.createObject(root);
+                        //if(!root.dtmfKeypadDialog) {
+                        //    root.dtmfKeypadDialog = numPadDialog.createObject(root);
+                        //} else{
+                        //    root.dtmfKeypadDialog.visible = false
+                        //    root.dtmfKeypadDialog.destroy()
+                        //}
+                        if(numPadDialog.visible){
+                            numPadDialog.visible = false
                         } else{
-                            root.dtmfKeypadDialog.visible = false
-                            root.dtmfKeypadDialog.destroy()
+                             numPadDialog.visible = true
                         }
 
                         // TODO: toggle this
@@ -192,8 +251,10 @@ Rectangle {
                 }
             }
 
+
+
             // Spacer
-            Item {width:parent.width;height:5}
+            //Item {width:parent.width;height:5}
 
             /*
             Item {
@@ -209,26 +270,40 @@ Rectangle {
             */
         }
 
-        // Spacer
-        Item {width:parent.width;height:100}
-
-        AcceptButton {
-            visible:root.state === 'incoming'
-            onClicked: if(manager.activeVoiceCall) manager.activeVoiceCall.answer();
-        }
 
         // Spacer
-        Item {width:parent.width;height:5}
+        //Item {width:parent.width;height:100}
+        RowLayout {
+            id: buttonRow
+            width:500
+            anchors{
+                bottom: parent.bottom
+                horizontalCenter:parent.horizontalCenter
+                bottomMargin: 10
+            }
+            spacing:200
 
-        RejectButton {
-            onClicked: {
-                if(manager.activeVoiceCall) {
-                    manager.activeVoiceCall.hangup();
-                } else {
-                    root.close();
+            AcceptButton {
+                width:200
+                visible:true //root.state === 'incoming'
+                onClicked: if(manager.activeVoiceCall) manager.activeVoiceCall.answer();
+            }
+
+            // Spacer
+            //Item {width:parent.width;height:5}
+
+            RejectButton {
+                width:200
+                onClicked: {
+                    if(manager.activeVoiceCall) {
+                        manager.activeVoiceCall.hangup();
+                    } else {
+                        root.close();
+                    }
                 }
             }
         }
+
     }
 
 }
