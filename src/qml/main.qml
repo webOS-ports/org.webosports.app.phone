@@ -1,6 +1,8 @@
 import QtQuick 2.0
 import QtQuick.Window 2.0
-import "content"
+import "views"
+import "services"
+import "model"
 import QtQuick.Controls 1.1
 import QtQuick.Controls.Styles 1.1
 //import QtQuick.Particles 2.0
@@ -9,10 +11,8 @@ import QtQuick.Layouts 1.0
 
 Window {
     id: main
-    //width: Screen.width
-    //height: Screen.height
-    width: 500
-    height: 800
+    width: appTheme.appWidth
+    height: appTheme.appHeight
     color: appTheme.backgroundColor
 
     property alias __window: main
@@ -20,21 +20,18 @@ Window {
     property PhoneUiTheme appTheme: PhoneUiTheme {}
 
     property string activationReason: 'invoked'
+    property Contact activeVoiceCallPerson
 
     property string providerId: "sim1"
     property string providerType: "GSM"
     property string providerLabel: "Vodaphone"
-
-
-    //function operatorPressed(operator) { CalcEngine.operatorPressed(operator) }
-
-    //function keyPressed(digit) { console.log(digit) }
 
     Component.onCompleted: {
         var params = JSON.parse(application.launchParameters);
         if (!params.launchedAtBoot)
             __window.show();
     }
+
 
     Connections {
         target: application
@@ -52,7 +49,7 @@ Window {
 
         onActiveVoiceCallChanged: {
             if(activeVoiceCall) {
-                //main.activeVoiceCallPerson = people.personByPhoneNumber(activeVoiceCall.lineId);
+                main.activeVoiceCallPerson = people.personByPhoneNumber(activeVoiceCall.lineId);
                 manager.activeVoiceCall.statusText = "active"
 
                 dActiveCall.open();
@@ -69,7 +66,7 @@ Window {
 
                 dActiveCall.close();
 
-                //main.activeVoiceCallPerson = null;
+                main.activeVoiceCallPerson = null;
 
                 if(main.activationReason != "invoked")
                 {
@@ -83,7 +80,14 @@ Window {
 
 
     function dial(msisdn) {
-        manager.dial(providerId, msisdn);
+        if(msisdn === "999") {
+         simPin.visible = true
+        } else {
+         manager.dial(providerId, msisdn);
+        }
+
+
+
     }
 
     function secondsToTimeString(seconds) {
@@ -100,5 +104,9 @@ Window {
 
     PhoneTabView {id: tabView}
 
-    PeopleModel {id:people}
+    ContactManager {id:people}
+
+    OfonoManager {id: ofono}
+
+    SIMPin {id: simPin}
 }

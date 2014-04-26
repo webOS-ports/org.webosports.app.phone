@@ -3,11 +3,11 @@ import QtQuick 2.0
 GridView {
     id:numpad
 
-    property string mode: 'dial' // or dtmf
-    property NumberEntry entryTarget
+    property string mode: 'dial' // dial | dtmf | sim
+    property Item entryTarget
 
     cellWidth:width / 3
-    cellHeight:cellWidth * 0.6
+    cellHeight: cellWidth * 0.6
 
     interactive:false
 
@@ -27,4 +27,17 @@ GridView {
     }
 
     delegate: NumPadButton {}
+
+    // Audio feedback.
+    function onPressed(key) {
+        if(mode === 'dial' || mode === 'dtmf'){
+           main.manager.startDtmfTone(key);
+        }
+    }
+
+    function onReleased() {
+        if(mode === 'dial' || mode === 'dtmf'){
+            main.manager.stopDtmfTone();
+        }
+    }
 }
