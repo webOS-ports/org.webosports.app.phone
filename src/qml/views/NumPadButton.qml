@@ -2,9 +2,10 @@ import QtQuick 2.0
 
 Item {
    id:root
-   width:numpad.cellWidth;height:numpad.cellHeight
+   width:numpad.cellWidth
+   height:numpad.cellHeight
 
-    Text {
+        Text {
             id:tKeyText
             anchors.centerIn:parent
             color:main.appTheme.foregroundColor
@@ -19,6 +20,17 @@ Item {
             font.pixelSize:18
             text:model.sub ? model.sub : ''
         }
+
+        /*
+          TODO: Key Border
+
+        Rectangle {
+            anchors.fill:parent
+            border {color:main.appTheme.foregroundColor;width:0.5}
+            radius:10
+            color:'#00000000'
+        }
+        */
 
         MouseArea {
                 anchors.fill:parent

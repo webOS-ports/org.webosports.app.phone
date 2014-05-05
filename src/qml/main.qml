@@ -1,5 +1,4 @@
 import QtQuick 2.0
-import QtQuick.Window 2.0
 import "views"
 import "services"
 import "model"
@@ -7,6 +6,7 @@ import QtQuick.Controls 1.1
 import QtQuick.Controls.Styles 1.1
 //import QtQuick.Particles 2.0
 import QtQuick.Layouts 1.0
+import QtQuick.Window 2.1
 
 
 Window {
@@ -28,8 +28,9 @@ Window {
 
     Component.onCompleted: {
         var params = JSON.parse(application.launchParameters);
-        if (!params.launchedAtBoot)
+        if (!params.launchedAtBoot) {
             __window.show();
+        }
     }
 
 

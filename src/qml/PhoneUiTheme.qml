@@ -2,7 +2,7 @@ import QtQuick 2.0
 
 QtObject {
     property int appWidth: 1024 //720
-    property int appHeight: 768// 1280
+    property int appHeight: 750// 1280
     property int keypadWidth: 720
     property color foregroundColor:'white'
     property color backgroundColor:'#1E1E1E'
