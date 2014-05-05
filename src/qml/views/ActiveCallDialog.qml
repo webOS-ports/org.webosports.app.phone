@@ -1,5 +1,7 @@
 import QtQuick 2.0
 import QtQuick.Layouts 1.0
+import QtQuick.Window 2.1
+
 
 Rectangle {
     id: root
@@ -27,6 +29,10 @@ Rectangle {
     function open(){
         root.visible = true
         tLineId.text = main.activeVoiceCallPerson ? main.activeVoiceCallPerson.displayLabel : (manager.activeVoiceCall ? manager.activeVoiceCall.lineId : '');
+        console.log("Screen Width: " + Screen.width)
+        console.log("Screen Height: " + Screen.height)
+        console.log("Screen desktopAvailableHeight: " + Screen.desktopAvailableHeight)
+        console.log("Screen desktopAvailableWidth: " + Screen.desktopAvailableWidth)
     }
 
     function close(){
@@ -81,6 +87,7 @@ Rectangle {
             anchors {
                 horizontalCenter: parent.horizontalCenter
                 top: parent.top
+                bottom: buttonRow.top
             }
 
             Text {
@@ -166,12 +173,16 @@ Rectangle {
             Item {
                 Layout.fillWidth: true
                 Layout.fillHeight: true
+                MouseArea {
+                    anchors.fill: parent
+                }
             }
 
             Item {
                 id: numPadDialog
                 Layout.fillWidth: true
-                Layout.fillHeight: true
+                Layout.fillHeight: true           
+
                 //width:parent.width;height:parent.height
                 //width: parent.width
                 //height: 500
@@ -183,11 +194,11 @@ Rectangle {
                     anchors {
                         horizontalCenter:parent.horizontalCenter
                         //topMargin: 300
-                        bottom:parent.bottom
+                        bottom: parent.bottom
                     }
                     mode:'dtmf'
                     entryTarget: tLineId
-                    width:parent.width - 300
+                    width:(main.height -300) * 1.25
                     height:childrenRect.height
                 }
 
@@ -200,7 +211,7 @@ Rectangle {
                 anchors.horizontalCenter:parent.horizontalCenter
                 anchors.bottom: parent.bottom
                 anchors.bottomMargin: 20
-                spacing:5
+                spacing: 10
 
                 CallDialogToolButton {
                     visible:root.state == 'active'
@@ -279,7 +290,7 @@ Rectangle {
             anchors{
                 bottom: parent.bottom
                 horizontalCenter:parent.horizontalCenter
-                bottomMargin: 10
+                margins: 30
             }
             spacing:200
 

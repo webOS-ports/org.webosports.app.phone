@@ -1,6 +1,7 @@
 import QtQuick 2.0
 import QtQuick.Controls 1.1
 import QtQuick.Controls.Styles 1.1
+import QtQuick.Window 2.1
 
 Rectangle {
     id: pDialPage
@@ -22,7 +23,7 @@ Rectangle {
 
     NumPad {
          id:numpad
-         width: main.appTheme.keypadWidth
+         width: (main.height -300) * 1.25
          height:childrenRect.height
          anchors {
              top: numentry.bottom
@@ -36,7 +37,11 @@ Rectangle {
             id:rCallActions
             width:childrenRect.width
             height:childrenRect.height
-            anchors {bottom: parent.bottom; horizontalCenter:parent.horizontalCenter;margins:30}
+            anchors {
+                bottom: parent.bottom;
+                horizontalCenter:parent.horizontalCenter;
+                margins:30
+            }
 
             AcceptButton {
                 id:bCallNumber
