@@ -18,12 +18,12 @@
 import QtQuick 2.0
 import QtQuick.Layouts 1.0
 import QtQuick.Window 2.1
-
+import LunaNext.Common 0.1
 
 Rectangle {
     id: root
-    width: appTheme.appWidth
-    height: appTheme.appHeight
+    width: Settings.displayWidth
+    height: Settings.displayHeight - Units.gu(15)
     color: main.appTheme.backgroundColor
     z: 10
 
@@ -46,8 +46,8 @@ Rectangle {
     function open(){
         root.visible = true
         tLineId.text = main.activeVoiceCallPerson ? main.activeVoiceCallPerson.displayLabel : (manager.activeVoiceCall ? manager.activeVoiceCall.lineId : '');
-        console.log("Screen Width: " + Screen.width)
-        console.log("Screen Height: " + Screen.height)
+        console.log("Settings.displayWidth: " + Settings.displayWidth)
+        console.log("Settings.displayHeight: " + Settings.displayHeight)
         console.log("Screen desktopAvailableHeight: " + Screen.desktopAvailableHeight)
         console.log("Screen desktopAvailableWidth: " + Screen.desktopAvailableWidth)
     }
@@ -110,7 +110,7 @@ Rectangle {
             Text {
                 id:tLineId
                 Layout.fillWidth: true
-                height:90
+                height: Units.gu(5)
                 color:main.appTheme.foregroundColor
                 font.pixelSize: 40
                 anchors{
@@ -215,7 +215,7 @@ Rectangle {
                     }
                     mode:'dtmf'
                     entryTarget: tLineId
-                    width:(main.height -300) * 1.25
+                    width: Units.gu(50)
                     height:childrenRect.height
                 }
 
@@ -303,16 +303,16 @@ Rectangle {
         //Item {width:parent.width;height:100}
         RowLayout {
             id: buttonRow
-            width:500
+            width: Units.gu(30)
             anchors{
                 bottom: parent.bottom
                 horizontalCenter:parent.horizontalCenter
-                margins: 30
+                margins: Units.gu(2)
             }
-            spacing:200
+            spacing:Units.gu(12)
 
             AcceptButton {
-                width:200
+                width: Units.gu(12)
                 visible:true //root.state === 'incoming'
                 onClicked: if(manager.activeVoiceCall) manager.activeVoiceCall.answer();
             }
@@ -321,7 +321,7 @@ Rectangle {
             //Item {width:parent.width;height:5}
 
             RejectButton {
-                width:200
+                width: Units.gu(12)
                 onClicked: {
                     if(manager.activeVoiceCall) {
                         manager.activeVoiceCall.hangup();

@@ -18,6 +18,7 @@
 import QtQuick 2.0
 import QtQuick.Controls.Styles 1.1
 import QtQuick.Layouts 1.0
+import LunaNext.Common 0.1
 
 TabViewStyle {
     frameOverlap: 1
@@ -25,15 +26,15 @@ TabViewStyle {
         color: styleData.selected ? main.appTheme.backgroundColor : main.appTheme.unselectedTabColor
         border.color:  main.appTheme.backgroundColor
         implicitWidth: tabView.width/5
-        implicitHeight: 50
+        implicitHeight: Units.gu(5)
         radius: 2
         ColumnLayout{
             anchors.fill: parent
 
             Image{
                 id: icon
-                width: 32
-                height: 32
+                width: Units.gu(4)
+                height: Units.gu(4)
                 source: tabView.getIcon(styleData.title)
                 anchors.horizontalCenter: parent.horizontalCenter
             }

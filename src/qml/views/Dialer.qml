@@ -19,6 +19,7 @@ import QtQuick 2.0
 import QtQuick.Controls 1.1
 import QtQuick.Controls.Styles 1.1
 import QtQuick.Window 2.1
+import LunaNext.Common 0.1
 
 Rectangle {
     id: pDialPage
@@ -31,7 +32,7 @@ Rectangle {
             id:numentry
             anchors {
                 top: pDialPage.top
-                topMargin: 70
+                topMargin: Units.gu(3)
                 left:parent.left
                 right:parent.right
             }
@@ -40,11 +41,11 @@ Rectangle {
 
     NumPad {
          id:numpad
-         width: (main.height -300) * 1.25
+         width:  Units.gu(50)
          height:childrenRect.height
          anchors {
              top: numentry.bottom
-             margins:20
+             margins: Units.gu(1)
              horizontalCenter:parent.horizontalCenter
          }
          entryTarget:numentry
@@ -57,7 +58,7 @@ Rectangle {
             anchors {
                 bottom: parent.bottom;
                 horizontalCenter:parent.horizontalCenter;
-                margins:30
+                margins:Units.gu(2)
             }
 
             AcceptButton {

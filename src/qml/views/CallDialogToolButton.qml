@@ -18,9 +18,11 @@
 import QtQuick 2.0
 import QtQuick.Controls 1.1
 import QtQuick.Controls.Styles 1.1
+import LunaNext.Common 0.1
 
 Button {
-     width:72;height:72
+     width: Units.gu(5)
+     height: Units.gu(5)
 
     style: ButtonStyle {
         background: BorderImage {
