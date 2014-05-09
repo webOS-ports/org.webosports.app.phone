@@ -1,12 +1,29 @@
+/*
+ * Copyright (C) 2014 Roshan Gunasekara <roshan@mobileteck.com>
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>
+ */
+
 import QtQuick 2.0
 import QtQuick.Layouts 1.0
 import QtQuick.Window 2.1
-
+import LunaNext.Common 0.1
 
 Rectangle {
     id: root
-    width: appTheme.appWidth
-    height: appTheme.appHeight
+    width: Settings.displayWidth
+    height: Settings.displayHeight - Units.gu(15)
     color: main.appTheme.backgroundColor
     z: 10
 
@@ -29,8 +46,8 @@ Rectangle {
     function open(){
         root.visible = true
         tLineId.text = main.activeVoiceCallPerson ? main.activeVoiceCallPerson.displayLabel : (manager.activeVoiceCall ? manager.activeVoiceCall.lineId : '');
-        console.log("Screen Width: " + Screen.width)
-        console.log("Screen Height: " + Screen.height)
+        console.log("Settings.displayWidth: " + Settings.displayWidth)
+        console.log("Settings.displayHeight: " + Settings.displayHeight)
         console.log("Screen desktopAvailableHeight: " + Screen.desktopAvailableHeight)
         console.log("Screen desktopAvailableWidth: " + Screen.desktopAvailableWidth)
     }
@@ -93,7 +110,7 @@ Rectangle {
             Text {
                 id:tLineId
                 Layout.fillWidth: true
-                height:90
+                height: Units.gu(5)
                 color:main.appTheme.foregroundColor
                 font.pixelSize: 40
                 anchors{
@@ -198,7 +215,7 @@ Rectangle {
                     }
                     mode:'dtmf'
                     entryTarget: tLineId
-                    width:(main.height -300) * 1.25
+                    width: Units.gu(50)
                     height:childrenRect.height
                 }
 
@@ -286,16 +303,16 @@ Rectangle {
         //Item {width:parent.width;height:100}
         RowLayout {
             id: buttonRow
-            width:500
+            width: Units.gu(30)
             anchors{
                 bottom: parent.bottom
                 horizontalCenter:parent.horizontalCenter
-                margins: 30
+                margins: Units.gu(2)
             }
-            spacing:200
+            spacing:Units.gu(12)
 
             AcceptButton {
-                width:200
+                width: Units.gu(12)
                 visible:true //root.state === 'incoming'
                 onClicked: if(manager.activeVoiceCall) manager.activeVoiceCall.answer();
             }
@@ -304,7 +321,7 @@ Rectangle {
             //Item {width:parent.width;height:5}
 
             RejectButton {
-                width:200
+                width: Units.gu(12)
                 onClicked: {
                     if(manager.activeVoiceCall) {
                         manager.activeVoiceCall.hangup();

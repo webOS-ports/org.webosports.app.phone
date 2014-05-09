@@ -1,6 +1,24 @@
+/*
+ * Copyright (C) 2014 Roshan Gunasekara <roshan@mobileteck.com>
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>
+ */
+
 import QtQuick 2.0
 import QtQuick.Controls.Styles 1.1
 import QtQuick.Layouts 1.0
+import LunaNext.Common 0.1
 
 TabViewStyle {
     frameOverlap: 1
@@ -8,15 +26,15 @@ TabViewStyle {
         color: styleData.selected ? main.appTheme.backgroundColor : main.appTheme.unselectedTabColor
         border.color:  main.appTheme.backgroundColor
         implicitWidth: tabView.width/5
-        implicitHeight: 50
+        implicitHeight: Units.gu(5)
         radius: 2
         ColumnLayout{
             anchors.fill: parent
 
             Image{
                 id: icon
-                width: 32
-                height: 32
+                width: Units.gu(4)
+                height: Units.gu(4)
                 source: tabView.getIcon(styleData.title)
                 anchors.horizontalCenter: parent.horizontalCenter
             }
