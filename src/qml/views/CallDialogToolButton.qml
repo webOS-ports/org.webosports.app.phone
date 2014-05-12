@@ -26,7 +26,11 @@ Button {
 
     style: ButtonStyle {
         background: BorderImage {
+         width: Units.gu(5)
+         height: Units.gu(5)
          source: control.pressed ? "images/meegotouch-toolbar-button-background.png" : "images/meegotouch-toolbar-button-background.png"
+         horizontalTileMode: BorderImage.Stretch
+         verticalTileMode : BorderImage.Stretch
         }
     }
 

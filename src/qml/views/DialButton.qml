@@ -34,7 +34,6 @@ Button {
                 x: 0
                 y: control.pressed ? -198: 0
                 source: "images/dial-button.png"
-
             }
         }
     }

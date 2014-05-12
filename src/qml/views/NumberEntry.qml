@@ -16,6 +16,7 @@
  */
 
 import QtQuick 2.0
+import LunaNext.Common 0.1
 
 Item {
     id:root
@@ -78,7 +79,15 @@ Item {
     Image {
         id:backspace
 
-        anchors {verticalCenter:parent.verticalCenter;right:parent.right; margins:34}
+        width: Units.gu(5)
+        height: Units.gu(3)
+        fillMode: Image.PreserveAspectFit
+
+        anchors {
+            verticalCenter:parent.verticalCenter
+            right:parent.right
+            margins:Units.gu(3)
+        }
         source: 'images/icon-m-common-backspace.svg'
 
         MouseArea {

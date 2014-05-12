@@ -23,15 +23,16 @@ import QtQuick.Controls 1.1
 import QtQuick.Controls.Styles 1.1
 import QtQuick.Layouts 1.0
 import QtQuick.Window 2.1
-
+import LunaNext.Common 0.1
 
 Window {
     id: main
-    width: appTheme.appWidth
-    height: appTheme.appHeight
+    width: Settings.displayWidth
+    height: Settings.displayHeight
     color: appTheme.backgroundColor
 
     property alias __window: main
+    property alias stackView: stackView
 
     property PhoneUiTheme appTheme: PhoneUiTheme {}
 
@@ -56,8 +57,46 @@ Window {
             console.log("DEBUG: Relaunched with parameters: " + parameters);
             // If we're launched at boot time we're not yet visible so bring our window
             // to the foreground
-            if (!__window.visible)
+            if (!__window.visible){
                 __window.show();
+            }
+
+            // default to the main screen.
+            stackView.pop(tabView);
+
+            // TODO: Close active Call when the App is closed.
+            if(manager.activeVoiceCall){
+             manager.activeVoiceCall.hangup();
+            }
+            tabView.pDialPage.numberEntryText = '';
+        }
+    }
+
+    StackView {
+        id: stackView
+        anchors.fill: main
+        initialItem: tabView
+
+        delegate: StackViewDelegate {
+            function transitionFinished(properties)
+            {
+                properties.exitItem.opacity = 1
+            }
+
+            property Component pushTransition: StackViewTransition {
+                PropertyAnimation {
+                    target: enterItem
+                    property: "opacity"
+                    from: 0
+                    to: 1
+                }
+                PropertyAnimation {
+                    target: exitItem
+                    property: "opacity"
+                    from: 1
+                    to: 0
+                }
+            }
         }
     }
 
@@ -65,12 +104,13 @@ Window {
         id: manager
 
         onActiveVoiceCallChanged: {
+
             if(activeVoiceCall) {
+                console.log("Active Call")
                 main.activeVoiceCallPerson = people.personByPhoneNumber(activeVoiceCall.lineId);
                 manager.activeVoiceCall.statusText = "active"
 
-                dActiveCall.open();
-
+                stackView.push(Qt.resolvedUrl("views/ActiveCallDialog.qml"))
                 if(!__window.visible)
                 {
                     main.activationReason = 'activeVoiceCallChanged';
@@ -81,7 +121,7 @@ Window {
             {
                 //tabView.pDialPage.numberEntryText = '';
 
-                dActiveCall.close();
+                stackView.pop()
 
                 main.activeVoiceCallPerson = null;
 
@@ -98,9 +138,11 @@ Window {
 
     function dial(msisdn) {
         if(msisdn === "999") {
-         simPin.visible = true
+            //stackView.push(simPin)
+            stackView.push(Qt.resolvedUrl("views/SIMPin.qml"))
+            //simPin.visible = true
         } else {
-         manager.dial(providerId, msisdn);
+            manager.dial(providerId, msisdn);
         }
 
 
@@ -117,7 +159,7 @@ Window {
         return '' + h + ':' + m + ':' + s;
     }
 
-    ActiveCallDialog {id:dActiveCall}
+    //ActiveCallDialog {id:dActiveCall}
 
     PhoneTabView {id: tabView}
 
@@ -125,5 +167,5 @@ Window {
 
     OfonoManager {id: ofono}
 
-    SIMPin {id: simPin}
+    //SIMPin {id: simPin}
 }

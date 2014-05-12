@@ -23,15 +23,13 @@ import LunaNext.Common 0.1
 Rectangle {
     id: root
     width: Settings.displayWidth
-    height: Settings.displayHeight - Units.gu(15)
+    height: Settings.displayHeight
     color: main.appTheme.backgroundColor
-    z: 10
-
-    visible: false
 
     property Item dtmfKeypadDialog
 
     state: manager.activeVoiceCall ? manager.activeVoiceCall.statusText : 'disconnected'
+
 
     states {
         State {name:'active'}
@@ -54,284 +52,274 @@ Rectangle {
 
     function close(){
         root.visible = false
-        //if(root.dtmfKeypadDialog) {
-        //    root.dtmfKeypadDialog.visible = false
-        //    root.dtmfKeypadDialog.destroy()
-        //}
         tLineId.text = ''
+    }
+
+
+    Rectangle {
+        id: topStatusBar
+        width: Settings.displayWidth
+        anchors.left: parent.left
+        anchors.right: parent.right
+        color: main.appTheme.headerColor
+        radius: 10
+        height: Units.gu(5)
+
+        Text {
+            id:tLineId
+            Layout.fillWidth: true
+            height: Units.gu(5)
+            color:main.appTheme.foregroundColor
+            font.pixelSize: Units.dp(30)
+            anchors{
+                horizontalCenter: parent.horizontalCenter
+                top: parent.top
+            }
+            horizontalAlignment:Text.Center
+
+            text:main.activeVoiceCallPerson
+                 ? main.activeVoiceCallPerson.displayLabel
+                 : (manager.activeVoiceCall ? manager.activeVoiceCall.lineId : '');
+
+            onTextChanged: resizeText();
+
+            Component.onCompleted: resizeText();
+
+            function resizeText() {
+                if(paintedWidth < 0 || paintedHeight < 0) return;
+                while(paintedWidth > width) {
+                    //console.log("paintedWidth=" + paintedWidth + " width=" + width)
+                    //console.log(font.pixelSize)
+                    if(--font.pixelSize <= 0) break;
+                }
+
+                while(paintedWidth < width)
+                    if(++font.pixelSize >= 38) break;
+            }
+
+            function insertChar(character) {
+
+                if(text.length === 0 || (main.activeVoiceCallPerson && text === main.activeVoiceCallPerson.displayLabel)) {
+                    text = character
+                } else{
+                    text = text + character;
+                }
+
+            }
+        }
 
     }
 
-   /* Component {
-        id:numPadDialog
 
-        Rectangle {
-            y: 90
-            //width:parent.width;height:parent.height
-            width: parent.width
-            height: 500
-            color: main.appTheme.backgroundColor
+    Text {
+        id:tVoiceCallDuration
+        anchors{
+            top: topStatusBar.bottom
+            topMargin: 5
+            horizontalCenter:parent.horizontalCenter
+        }
 
+        color:main.appTheme.foregroundColor
+        font.pixelSize: Units.dp(15)
+        text:manager.activeVoiceCall ? main.secondsToTimeString(manager.activeVoiceCall.duration) : '00:00:00'
+    }
+
+
+    Flipable {
+        id: flipable
+        height:Units.gu(35)
+
+        anchors{
+            top: tVoiceCallDuration.bottom
+            topMargin: 5
+            horizontalCenter:parent.horizontalCenter
+        }
+
+        property bool flipped: false
+
+        transform: Rotation {
+            id: rotation
+            origin.x: flipable.width/2
+            origin.y: flipable.height/2
+            axis.x: 1; axis.y: 0; axis.z: 0     // set axis.y to 1 to rotate around y-axis
+            angle: 0    // the default angle
+        }
+
+        states: State {
+            name: "back"
+            PropertyChanges { target: rotation; angle: 180 }
+            when: flipable.flipped
+        }
+
+        transitions: Transition {
+            NumberAnimation { target: rotation; property: "angle"; duration: 10 }
+        }
+
+        front:  Image {
+            id:iAvatar
+            anchors {
+                horizontalCenter:parent.horizontalCenter
+            }
+
+            width: Units.gu(30)
+            height:Units.gu(30)
+            asynchronous:true
+            fillMode:Image.PreserveAspectFit
+            smooth:true
+
+            Rectangle {
+                anchors.fill:parent
+                border {color:main.appTheme.foregroundColor;width:2}
+                radius:10
+                color:'#00000000'
+            }
+
+            source: main.activeVoiceCallPerson
+                    ? main.activeVoiceCallPerson.avatarPath
+                    : 'images/icon-m-telephony-contact-avatar.svg';
+        }
+
+        back:  Item {
+            id: numPadDialog
+            anchors {
+                horizontalCenter: parent.horizontalCenter
+                fill: parent
+            }
 
             NumPad {
                 id:dtmfpad
                 anchors {
+                    bottom: parent.disconnectBtn
                     horizontalCenter:parent.horizontalCenter
-                    //topMargin: 300
-                    bottom:parent.bottom
+                    topMargin: Units.gu(3)
+
                 }
                 mode:'dtmf'
                 entryTarget: tLineId
-                width:parent.width - 50;height:childrenRect.height
+                //width: Units.gu(50)
+                //height:childrenRect.height
             }
 
-
-
         }
+
+
     }
-    */
 
-
-    ColumnLayout {
-        width:parent.width -10
+    DisconnectButton {
+        id: disconnectBtn
+        height: 99
         anchors {
-            horizontalCenter: parent.horizontalCenter
-            fill: parent
+            top: flipable.bottom
+            horizontalCenter:parent.horizontalCenter
+            margins:Units.gu(2)
         }
-
-        ColumnLayout {
-
-            anchors {
-                horizontalCenter: parent.horizontalCenter
-                top: parent.top
-                bottom: buttonRow.top
-            }
-
-            Text {
-                id:tLineId
-                Layout.fillWidth: true
-                height: Units.gu(5)
-                color:main.appTheme.foregroundColor
-                font.pixelSize: 40
-                anchors{
-                  horizontalCenter: parent.horizontalCenter
-                  top: parent.top
-                }
-                horizontalAlignment:Text.Center
-
-                text:main.activeVoiceCallPerson
-                     ? main.activeVoiceCallPerson.displayLabel
-                     : (manager.activeVoiceCall ? manager.activeVoiceCall.lineId : '');
-
-                onTextChanged: resizeText();
-
-                Component.onCompleted: resizeText();
-
-                function resizeText() {
-                    if(paintedWidth < 0 || paintedHeight < 0) return;
-                    while(paintedWidth > width) {
-                        //console.log("paintedWidth=" + paintedWidth + " width=" + width)
-                        //console.log(font.pixelSize)
-                        if(--font.pixelSize <= 0) break;
-                    }
-
-                    while(paintedWidth < width)
-                        if(++font.pixelSize >= 38) break;
-                }
-
-                function insertChar(character) {
-
-                    if(text.length === 0 || (main.activeVoiceCallPerson && text === main.activeVoiceCallPerson.displayLabel)) {
-                        text = character
-                    } else{
-                        text = text + character;
-                    }
-
-                }
-            }
-
-           // Spacer
-            //Item {width:parent.width;height:10}
-
-            Image {
-                id:iAvatar
-                anchors{
-                    top: tLineId.bottom
-                    topMargin: 5
-                    horizontalCenter:parent.horizontalCenter
-                }
-
-                width:500; height:500
-                asynchronous:true
-                fillMode:Image.PreserveAspectFit
-                smooth:true
-
-                Rectangle {
-                    anchors.fill:parent
-                    border {color:main.appTheme.foregroundColor;width:2}
-                    radius:10
-                    color:'#00000000'
-                }
-
-                source: main.activeVoiceCallPerson
-                        ? main.activeVoiceCallPerson.avatarPath
-                        : 'images/icon-m-telephony-contact-avatar.svg';
-            }
-
-            Text {
-                id:tVoiceCallDuration
-                anchors.horizontalCenter:parent.horizontalCenter
-                color:main.appTheme.foregroundColor
-                font.pixelSize:18
-                text:manager.activeVoiceCall ? main.secondsToTimeString(manager.activeVoiceCall.duration) : '00:00:00'
-            }
-
-            // Spacer
-            Item {
-                Layout.fillWidth: true
-                Layout.fillHeight: true
-                MouseArea {
-                    anchors.fill: parent
-                }
-            }
-
-            Item {
-                id: numPadDialog
-                Layout.fillWidth: true
-                Layout.fillHeight: true           
-
-                //width:parent.width;height:parent.height
-                //width: parent.width
-                //height: 500
-                visible: false
-                //color: 'red' //main.appTheme.backgroundColor
-
-                NumPad {
-                    id:dtmfpad
-                    anchors {
-                        horizontalCenter:parent.horizontalCenter
-                        //topMargin: 300
-                        bottom: parent.bottom
-                    }
-                    mode:'dtmf'
-                    entryTarget: tLineId
-                    width: Units.gu(50)
-                    height:childrenRect.height
-                }
-
-
-
-            }
-
-            RowLayout {
-                id:rVoiceCallTools
-                anchors.horizontalCenter:parent.horizontalCenter
-                anchors.bottom: parent.bottom
-                anchors.bottomMargin: 20
-                spacing: 10
-
-                CallDialogToolButton {
-                    visible:root.state == 'active'
-                    iconSource:'images/icon-m-telephony-volume.svg'
-                    onClicked: {
-                        manager.setAudioMode(manager.audioMode === 'ihf' ? 'earpiece' : 'ihf');
-                    }
-                }
-
-                CallDialogToolButton {
-                    visible:root.state == 'incoming' || root.state == 'active'
-                    iconSource:'images/icon-m-telephony-volume-off.svg'
-                    onClicked: {
-                        if(root.state == 'incoming') { // TODO: Take in to account unmuting audio when call is answered.
-                            manager.setMuteSpeaker(true);
-                        } else {
-                            manager.setMuteMicrophone(manager.isMicrophoneMuted ? false : true);
-                        }
-                    }
-                }
-
-                CallDialogToolButton {
-                    visible:root.state == 'active'
-                    iconSource:'images/icon-m-telephony-pause.svg'
-                    onClicked: manager.activeVoiceCall.hold();
-                }
-
-                CallDialogToolButton {
-                    visible:root.state == 'active'
-                    iconSource:'images/icon-m-telephony-numpad.svg'
-                    onClicked: {
-                        //if(!root.dtmfKeypadDialog) {
-                        //    root.dtmfKeypadDialog = numPadDialog.createObject(root);
-                        //} else{
-                        //    root.dtmfKeypadDialog.visible = false
-                        //    root.dtmfKeypadDialog.destroy()
-                        //}
-                        if(numPadDialog.visible){
-                            numPadDialog.visible = false
-                        } else{
-                             numPadDialog.visible = true
-                        }
-
-                        // TODO: toggle this
-                        //root.dtmfKeypadDialog.visible ^= root.dtmfKeypadDialog.visible;
-
-                    }
-                }
-            }
-
-
-
-            // Spacer
-            //Item {width:parent.width;height:5}
-
-            /*
-            Item {
-                width:parent.width;height:childrenRect.height
-                Text {
-                    id:tVoiceCallStatus
-                    anchors.right:parent.right
-                    color:main.appTheme.foregroundColor
-                    font.pixelSize:18
-                    text:qsTr(manager.activeVoiceCall ? manager.activeVoiceCall.statusText : 'disconnected')
-                }
-            }
-            */
-        }
-
-
-        // Spacer
-        //Item {width:parent.width;height:100}
-        RowLayout {
-            id: buttonRow
-            width: Units.gu(30)
-            anchors{
-                bottom: parent.bottom
-                horizontalCenter:parent.horizontalCenter
-                margins: Units.gu(2)
-            }
-            spacing:Units.gu(12)
-
-            AcceptButton {
-                width: Units.gu(12)
-                visible:true //root.state === 'incoming'
-                onClicked: if(manager.activeVoiceCall) manager.activeVoiceCall.answer();
-            }
-
-            // Spacer
-            //Item {width:parent.width;height:5}
-
-            RejectButton {
-                width: Units.gu(12)
-                onClicked: {
-                    if(manager.activeVoiceCall) {
-                        manager.activeVoiceCall.hangup();
-                    } else {
-                        root.close();
-                    }
-                }
+        onClicked: {
+            if(manager.activeVoiceCall) {
+                manager.activeVoiceCall.hangup();
+            } else {
+                root.close();
             }
         }
-
     }
+
+
+
+    Row {
+        id:rVoiceCallTools
+        height: Units.gu(7)
+        anchors {
+            bottom: parent.bottom
+            horizontalCenter:parent.horizontalCenter
+        }
+
+        spacing: Units.gu(4)
+
+        //                SpeakerButton {
+        //                    visible:root.state == 'active'
+        //                    onClicked: {
+        //                        manager.setAudioMode(manager.audioMode === 'ihf' ? 'earpiece' : 'ihf');
+        //                    }
+        //                }
+
+        //                MuteButton {
+        //                    visible:root.state == 'active'
+        //                    onClicked: {
+        //                        if(root.state == 'incoming') { // TODO: Take in to account unmuting audio when call is answered.
+        //                            manager.setMuteSpeaker(true);
+        //                        } else {
+        //                            manager.setMuteMicrophone(manager.isMicrophoneMuted ? false : true);
+        //                        }
+        //                    }
+        //                }
+
+
+        CallDialogToolButton {
+            visible:root.state == 'active'
+            iconSource:'images/icon-m-telephony-volume.svg'
+            onClicked: {
+                manager.setAudioMode(manager.audioMode === 'ihf' ? 'earpiece' : 'ihf');
+            }
+        }
+
+        CallDialogToolButton {
+            visible:root.state == 'incoming' || root.state == 'active'
+            iconSource:'images/icon-m-telephony-volume-off.svg'
+            onClicked: {
+                if(root.state == 'incoming') { // TODO: Take in to account unmuting audio when call is answered.
+                    manager.setMuteSpeaker(true);
+                } else {
+                    manager.setMuteMicrophone(manager.isMicrophoneMuted ? false : true);
+                }
+            }
+        }
+
+        CallDialogToolButton {
+            visible:root.state == 'active'
+            iconSource:'images/icon-m-telephony-pause.svg'
+            onClicked: manager.activeVoiceCall.hold();
+        }
+
+        CallDialogToolButton {
+            visible:root.state == 'active'
+            iconSource:'images/icon-m-telephony-numpad.svg'
+            onClicked: {
+                console.log("Numpad Button tapped")
+                flipable.flipped = !flipable.flipped
+            }
+        }
+    }
+
+    //        RowLayout {
+    //            id: buttonRow
+    //            width: Units.gu(30)
+    //            anchors{
+    //                bottom: parent.bottom
+    //                horizontalCenter:parent.horizontalCenter
+    //                margins: Units.gu(2)
+    //            }
+    //            spacing:Units.gu(12)
+
+    //            AcceptButton {
+    //                width: Units.gu(12)
+    //                visible:true //root.state === 'incoming'
+    //                onClicked: if(manager.activeVoiceCall) manager.activeVoiceCall.answer();
+    //            }
+
+    //            // Spacer
+    //            //Item {width:parent.width;height:5}
+
+    //            DisconnectButton {
+    //                //width: Units.gu(12)
+    //                onClicked: {
+    //                    if(manager.activeVoiceCall) {
+    //                        manager.activeVoiceCall.hangup();
+    //                    } else {
+    //                        root.close();
+    //                    }
+    //                }
+    //            }
+    //        }
+
+    // }
 
 }
