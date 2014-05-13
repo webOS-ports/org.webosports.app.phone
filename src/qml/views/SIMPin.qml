@@ -18,31 +18,32 @@
 import QtQuick 2.0
 import QtQuick.Controls 1.1
 import QtQuick.Layouts 1.0
+import QtQuick.Window 2.1
+import LunaNext.Common 0.1
 
 Rectangle {
     id: simPin
-    width: appTheme.appWidth
-    height: appTheme.appHeight
+    width: Settings.displayWidth
+    height: Settings.displayHeight
     color: main.appTheme.backgroundColor
-    z: 10
-    visible: false
-
 
     Rectangle {
         id: header
-        width: appTheme.appWidth
+        width: Settings.displayWidth
+        anchors.left: parent.left
+        anchors.right: parent.right
         color: main.appTheme.headerColor
         radius: 2
-        height: 100
+        height: Units.gu(10)
         ColumnLayout{
             anchors.fill:parent
             anchors.margins: 8
-            spacing: 16
+            spacing: Units.gu(2)
 
             Text {
                 id: label
                 text: "Enter PIN to unlock SIM. "  + ofono.retries().pin + " attempts remaining."
-                font.pixelSize: 20
+                font.pixelSize: Units.dp(12)
                 color: main.appTheme.headerTip
                 anchors.horizontalCenter:parent.horizontalCenter
             }
@@ -55,14 +56,15 @@ Rectangle {
                 Button {
                     text: "Cancel"
                     anchors.left: parent.left
-                    anchors.leftMargin: 50
-                    onClicked: simPin.visible = false
+                    anchors.leftMargin: Units.gu(3)
+                    width: Units.gu(5)
+                    onClicked: stackView.pop()
                 }
 
                 Text {
                     id: title
                     text: "SIM PIN"
-                    font.pixelSize: 30
+                    font.pixelSize: Units.dp(18)
                     color: main.appTheme.headerTitle
                     anchors.horizontalCenter:parent.horizontalCenter
                 }
@@ -70,12 +72,13 @@ Rectangle {
                 Button {
                     text: "Done"
                     anchors.right: parent.right
-                    anchors.rightMargin: 50
+                    anchors.rightMargin: Units.gu(3)
                     onClicked: checkPin()
 
                     function checkPin(){
                         if(ofono.unlockPin("pin", pin.text)){
-                            simPin.visible = false
+                            //simPin.visible = false
+                            stackView.pop()
                         } else {
                             pin.text = ""
                             if(ofono.retries().pin >0){
@@ -111,26 +114,11 @@ Rectangle {
         anchors {
             horizontalCenter:parent.horizontalCenter
             top: pin.bottom
-            bottom:parent.bottom
+            topMargin: Units.gu(3)
         }
         mode:'sim'
         entryTarget: pin
-        width:parent.width - 50;height:childrenRect.height
-        model: ListModel {
-            ListElement {key:'1';sub:''}
-            ListElement {key:'2';sub:'abc'}
-            ListElement {key:'3';sub:'def'}
-            ListElement {key:'4';sub:'ghi'}
-            ListElement {key:'5';sub:'jkl'}
-            ListElement {key:'6';sub:'mno'}
-            ListElement {key:'7';sub:'pqrs'}
-            ListElement {key:'8';sub:'tuv'}
-            ListElement {key:'9';sub:'wxyz'}
-            ListElement {key:''}
-            ListElement {key:'0';sub:'';alt:''}
-            ListElement {key:'';alt:''}
-        }
+       // width:parent.width - 50;height:childrenRect.height
     }
-
 
 }

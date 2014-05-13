@@ -37,7 +37,7 @@ QtObject{
 
     function dial(providerId, msisdn){
        console.log("Dialing  " + msisdn)
-        call.lineId = msisdn
+       call.lineId = msisdn
        activeVoiceCall = call
        call.lineId = msisdn
     }

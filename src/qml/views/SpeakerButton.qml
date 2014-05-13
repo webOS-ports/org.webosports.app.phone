@@ -19,23 +19,24 @@ import QtQuick 2.0
 import QtQuick.Controls 1.1
 import QtQuick.Controls.Styles 1.1
 
+
 Button {
-    width:480
-    height:99
+    width:61
+    height:61
 
     style: ButtonStyle {
         background: Item {
             clip: true
             anchors.horizontalCenter: parent.horizontalCenter
             anchors.verticalCenter: parent.verticalCenter
-            width: 480
-            height: 99
+            width: 61
+            height: 61
             Image{
                 x: 0
-                y: control.pressed ? -198: 0
-                source: "images/dial-button.png"
-
+                y: control.pressed ? -123: 0
+                source: "images/button-sprite.png"
             }
         }
+
     }
 }

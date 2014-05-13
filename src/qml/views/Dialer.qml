@@ -29,49 +29,44 @@ Rectangle {
     property alias numberEntryText: numentry.text
 
     NumberEntry {
-            id:numentry
-            anchors {
-                top: pDialPage.top
-                topMargin: Units.gu(3)
-                left:parent.left
-                right:parent.right
-            }
-            color:'#ffffff'
-   }
+        id:numentry
+        anchors {
+            top: pDialPage.top
+            topMargin: Units.gu(5)
+            left:parent.left
+            right:parent.right
+        }
+        color:'#ffffff'
+    }
 
     NumPad {
-         id:numpad
-         width:  Units.gu(50)
-         height:childrenRect.height
-         anchors {
-             top: numentry.bottom
-             margins: Units.gu(1)
-             horizontalCenter:parent.horizontalCenter
-         }
-         entryTarget:numentry
-     }
+        id:numpad
+        //width:  Units.gu(50)
+        //height:childrenRect.height
+        anchors {
+            bottom: bCallNumber.top
+            topMargin: Units.gu(3)
+            //margins: Units.gu(1)
+            horizontalCenter:parent.horizontalCenter
+        }
+        entryTarget:numentry
+    }
 
-    Row {
-            id:rCallActions
-            width:childrenRect.width
-            height:childrenRect.height
-            anchors {
-                bottom: parent.bottom;
-                horizontalCenter:parent.horizontalCenter;
-                margins:Units.gu(2)
-            }
-
-            AcceptButton {
-                id:bCallNumber
-                width:numpad.width * 0.66
-                onClicked: {
-                    if(numentry.text.length > 0) {
-                        main.dial(numentry.text);
-                    } else {
-                        console.log('*** QML *** VCI WARNING: Number entry is blank.');
-                    }
-                }
+    DialButton {
+        id:bCallNumber
+        anchors {
+            bottom: parent.bottom;
+            horizontalCenter:parent.horizontalCenter;
+            margins:Units.gu(2)
+        }
+        //width:numpad.width
+        onClicked: {
+            if(numentry.text.length > 0) {
+                main.dial(numentry.text);
+            } else {
+                console.log('*** QML *** VCI WARNING: Number entry is blank.');
             }
         }
+    }
 
 }

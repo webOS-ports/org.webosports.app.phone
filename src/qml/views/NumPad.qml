@@ -16,39 +16,62 @@
  */
 
 import QtQuick 2.0
+import LunaNext.Common 0.1
 
-GridView {
+
+
+Item {
     id:numpad
 
     property string mode: 'dial' // dial | dtmf | sim
     property Item entryTarget
 
-    cellWidth:width / 3
-    cellHeight: cellWidth * 0.6
+    property int fontPixelSize: Units.dp(43)
+    property int keysWidth: Units.gu(11)
+    property int keysHeight: Units.gu(8)
 
-    interactive:false
+    width: keys.width
+    height: keys.height
 
-    model: ListModel {
-        ListElement {key:'1';sub:'voicemail'}
-        ListElement {key:'2';sub:'abc'}
-        ListElement {key:'3';sub:'def'}
-        ListElement {key:'4';sub:'ghi'}
-        ListElement {key:'5';sub:'jkl'}
-        ListElement {key:'6';sub:'mno'}
-        ListElement {key:'7';sub:'pqrs'}
-        ListElement {key:'8';sub:'tuv'}
-        ListElement {key:'9';sub:'wxyz'}
-        ListElement {key:'*'}
-        ListElement {key:'0';sub:'+';alt:'+'}
-        ListElement {key:'#';alt:'p'}
+
+    signal keyPressed(int keycode, string label)
+
+    Grid {
+        id: keys
+
+        rows: 4
+        columns: 3
+        spacing: Units.gu(1)
+
+        anchors {
+            horizontalCenter:parent.horizontalCenter
+        }
+
+        NumPadButton {key:'1';sub: (mode === "sim") ? '': 'voicemail'}
+        NumPadButton {key:'2';sub:'abc'}
+        NumPadButton {key:'3';sub:'def'}
+        NumPadButton {key:'4';sub:'ghi'}
+        NumPadButton {key:'5';sub:'jkl'}
+        NumPadButton {key:'6';sub:'mno'}
+        NumPadButton {key:'7';sub:'pqrs'}
+        NumPadButton {key:'8';sub:'tuv'}
+        NumPadButton {key:'9';sub:'wxyz'}
+        NumPadButton {key: (mode === "sim") ? '': '*'}
+        NumPadButton {key:'0';sub: (mode === "sim") ? '': '+';alt: (mode === "sim") ? '': '+'}
+        NumPadButton {key:(mode === "sim") ? '': '#';alt: (mode === "sim") ? '': 'p'}
     }
 
-    delegate: NumPadButton {}
+    Rectangle {
+        anchors.fill:parent
+        border {color:main.appTheme.foregroundColor;width:0.5}
+        radius:10
+        color:'#00000000'
+    }
 
     // Audio feedback.
     function onPressed(key) {
         if(mode === 'dial' || mode === 'dtmf'){
-           main.manager.startDtmfTone(key);
+            main.manager.startDtmfTone(key);
         }
     }
 

@@ -24,30 +24,35 @@ TabViewStyle {
     frameOverlap: 1
     tab: Rectangle {
         color: styleData.selected ? main.appTheme.backgroundColor : main.appTheme.unselectedTabColor
-        border.color:  main.appTheme.backgroundColor
-        implicitWidth: tabView.width/5
+        border.color:  'white' //main.appTheme.backgroundColor
+        implicitWidth: tabView.width/4
         implicitHeight: Units.gu(5)
         radius: 2
-        ColumnLayout{
-            anchors.fill: parent
 
+        Item {
+            id: tabIcon
+            clip: true
+            anchors.horizontalCenter: parent.horizontalCenter
+            anchors.verticalCenter: parent.verticalCenter
+            width: styleData.title === "Voicemail" ? 72: 48
+            height: 48
             Image{
                 id: icon
-                width: Units.gu(4)
-                height: Units.gu(4)
+                x: 0
+                y: styleData.selected ? -48: 0
                 source: tabView.getIcon(styleData.title)
-                anchors.horizontalCenter: parent.horizontalCenter
             }
 
-            Text {
-                  id: text
-                  anchors.top: icon.bottom
-                  anchors.horizontalCenter: parent.horizontalCenter
-                  text: styleData.title
-                  color: styleData.selected ? main.appTheme.foregroundColor : main.appTheme.foregroundColor
-                 }
         }
 
+
+        //Text {
+        //      id: text
+        //      anchors.top: icon.bottom
+        //      anchors.horizontalCenter: parent.horizontalCenter
+        //      text: styleData.title
+        //      color: styleData.selected ? main.appTheme.foregroundColor : main.appTheme.foregroundColor
+        //}
 
     }
     frame: Rectangle { color: main.appTheme.backgroundColor }}

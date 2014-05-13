@@ -16,18 +16,25 @@
  */
 
 import QtQuick 2.0
+import LunaNext.Common 0.1
 
 Item {
    id:root
-   width:numpad.cellWidth
-   height:numpad.cellHeight
+   //width:numpad.cellWidth
+   //height:numpad.cellHeight
+   width: Units.gu(11)
+   height: Units.gu(8)
+
+   property string sub: ""
+   property string key: ""
+   property string alt: ""
 
         Text {
             id:tKeyText
             anchors.centerIn:parent
             color:main.appTheme.foregroundColor
             font.pixelSize:42
-            text:model.key
+            text: key
         }
 
         Text {
@@ -35,19 +42,19 @@ Item {
             anchors {horizontalCenter:parent.horizontalCenter;top:tKeyText.bottom}
             color:main.appTheme.subForegroundColor
             font.pixelSize:18
-            text:model.sub ? model.sub : ''
+            text: sub ? sub : ''
         }
 
         /*
           TODO: Key Border
-
+        */
         Rectangle {
             anchors.fill:parent
             border {color:main.appTheme.foregroundColor;width:0.5}
             radius:10
             color:'#00000000'
         }
-        */
+
 
         MouseArea {
                 anchors.fill:parent
@@ -63,25 +70,25 @@ Item {
                 }
 
                 onClicked: {
-                    if(waitingForDoubleClick && numpad.entryTarget.__previousCharacter === model.key && model.alt) {
+                    if(waitingForDoubleClick && numpad.entryTarget.__previousCharacter === key && alt) {
                         numpad.entryTarget.backspace();
-                        numpad.entryTarget.insertChar(model.alt);
+                        numpad.entryTarget.insertChar(alt);
                         waitingForDoubleClick = false;
                         clickTimer.stop();
                     } else {
-                        numpad.entryTarget.insertChar(model.key);
+                        numpad.entryTarget.insertChar(key);
                         waitingForDoubleClick = true;
                         clickTimer.start();
                     }
                 }
 
                 onPressAndHold: {
-                    numpad.entryTarget.insertChar(model.alt || model.key);
+                    numpad.entryTarget.insertChar(alt || key);
                 }
 
                 // Audio feedback.
                 onPressed: {
-                    numpad.onPressed(model.key);
+                    numpad.onPressed(key);
                 }
                 onReleased: {
                     numpad.onReleased();
