@@ -25,49 +25,39 @@ Rectangle {
     color: main.appTheme.backgroundColor
 
     ListView {
-        id:historyList
-        anchors {/*top:parent.bottom;bottom:parent.bottom;*/margins:5;horizontalCenter:parent.horizontalCenter}
+        id:favouriteList
+        anchors {margins:5;horizontalCenter:parent.horizontalCenter}
         anchors.fill: parent
-        spacing:4
+        spacing:10
         clip:true
-        model: CallHistory {}
+        model: Favouites{}
 
         delegate: Item {
             width:parent.width
-            height:Units.gu(5)
+            height:Units.gu(10)
+            anchors { margins: 20}
 
-            property Contact contact: Contact{}
-
-            Component.onCompleted: contact = people.personByPhoneNumber(model.remoteUid);
-
+            Rectangle {
+                anchors.fill:parent
+                border {color:main.appTheme.foregroundColor;width: 1.5}
+                radius:20
+                color:'#00000000'
+            }
 
             Row {
                 anchors {left:parent.left; leftMargin:10; verticalCenter:parent.verticalCenter}
                 spacing:10
 
-                Item {
-                    clip: true
-                    anchors.verticalCenter: parent.verticalCenter
-                    width: 22
-                    height: 22
-                    Image{
-                        x: 0
-                        y: model.isMissedCall ? 0 : ((model.direction === "inbound") ? -22 : -44)
-                        source: 'images/call-log-list-sprite.png'
-                    }
-
-                }
-
-                Column {
+            Column {
                     Text {
                         color:model.isMissedCall ? 'red' : 'white'
                         font.pixelSize:Units.dp(20)
-                        text:contact ? contact.displayLabel : model.remoteUid
+                        text: model.name
                     }
                     Text {
                         color:'grey'
-                        font.pixelSize:Units.dp(10)
-                        text:Qt.formatDateTime(model.startTime, Qt.DefaultLocaleShortDate)
+                        font.pixelSize:Units.dp(15)
+                        text: model.remoteUid
                     }
                 }
             }
@@ -81,18 +71,18 @@ Rectangle {
                 spacing:10
                 Button {
                     width:Units.gu(5);height:Units.gu(5)
-                    iconSource:'images/icon-m-telephony-accept.svg'
+                    iconSource:'images/icon-m-telephony-contact-avatar.svg'
                     onClicked:main.dial(model.remoteUid);
                 }
             }
         }
 
         Rectangle {
-            visible: historyList.count === 0
+            visible: favouriteList.count === 0
             Text {
                 color: "white"
                 font.pixelSize:Units.dp(20)
-                text: "No calls yet"
+                text: "No favourites yet"
             }
         }
     }

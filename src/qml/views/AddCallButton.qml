@@ -24,29 +24,39 @@ Button {
     width: Units.gu(5)
     height:Units.gu(5)
 
-    property bool btnActive: false
-
     style: ButtonStyle {
+
         background: Rectangle{
-            color: btnActive ? main.appTheme.callActionBtnFgColorActive : main.appTheme.callActionBtnFgColor
+            color: control.pressed ? main.appTheme.callActionBtnFgColorActive : main.appTheme.callActionBtnFgColor
             border.color:  'white'
             implicitWidth: Units.gu(5)
             implicitHeight: Units.gu(5)
             radius: 10
 
             Item {
+                id: icon
                 clip: true
                 anchors.horizontalCenter: parent.horizontalCenter
                 anchors.verticalCenter: parent.verticalCenter
-                width: 36
-                height: 66
+                width: 48
+                height: 48
                 Image{
                     x: 0
-                    y: control.pressed ? -132: 10
-                    source: "images/mute_on_off.png"
+                    y: control.pressed ? -48: 0
+                    source: "images/menu-icon-addcall.png"
                 }
             }
         }
+
+
+
+        //        label: Text {
+        //                     id: text
+        //                     //anchors.top: parent.bottom
+        //                     anchors.horizontalCenter: parent.horizontalCenter
+        //                     text: "Add Call"
+        //                     color: 'white'
+        //               }
 
     }
 }

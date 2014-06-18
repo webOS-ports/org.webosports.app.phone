@@ -38,12 +38,12 @@ Button {
                 clip: true
                 anchors.horizontalCenter: parent.horizontalCenter
                 anchors.verticalCenter: parent.verticalCenter
-                width: 36
-                height: 66
+                width: 48
+                height: 48
                 Image{
                     x: 0
-                    y: control.pressed ? -132: 10
-                    source: "images/mute_on_off.png"
+                    y: control.pressed ? -48: 0
+                    source: "images/menu-icon-dtmfpad.png"
                 }
             }
         }

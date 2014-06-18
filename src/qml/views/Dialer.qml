@@ -69,4 +69,8 @@ Rectangle {
         }
     }
 
+    function clear() {
+        numentry.clear();
+    }
+
 }

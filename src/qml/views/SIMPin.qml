@@ -19,6 +19,7 @@ import QtQuick 2.0
 import QtQuick.Controls 1.1
 import QtQuick.Layouts 1.0
 import QtQuick.Window 2.1
+import QtQuick.Controls.Styles 1.1
 import LunaNext.Common 0.1
 
 Rectangle {
@@ -56,9 +57,11 @@ Rectangle {
                 Button {
                     text: "Cancel"
                     anchors.left: parent.left
-                    anchors.leftMargin: Units.gu(3)
-                    width: Units.gu(5)
+                    anchors.leftMargin: Units.gu(5)
+                    width: Units.gu(10)
                     onClicked: stackView.pop()
+
+                    style: CustomButtonStyle {}
                 }
 
                 Text {
@@ -82,14 +85,16 @@ Rectangle {
                         } else {
                             pin.text = ""
                             if(ofono.retries().pin >0){
-                               label.text = "Invalid PIN. Enter PIN to unlock SIM. " + ofono.retries().pin + " attempts remaining."
+                                label.text = "Invalid PIN. Enter PIN to unlock SIM. " + ofono.retries().pin + " attempts remaining."
                             } else{
-                                  label.text = "Invalid PIN. Max retries exceeded."
+                                label.text = "Invalid PIN. Max retries exceeded."
                             }
 
 
                         }
                     }
+
+                    style: CustomButtonStyle {}
                 }
 
 
@@ -118,7 +123,7 @@ Rectangle {
         }
         mode:'sim'
         entryTarget: pin
-       // width:parent.width - 50;height:childrenRect.height
+        // width:parent.width - 50;height:childrenRect.height
     }
 
 }

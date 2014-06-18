@@ -222,8 +222,6 @@ Rectangle {
         }
     }
 
-
-
     Row {
         id:rVoiceCallTools
         height: Units.gu(7)
@@ -234,37 +232,18 @@ Rectangle {
 
         spacing: Units.gu(4)
 
-        //                SpeakerButton {
-        //                    visible:root.state == 'active'
-        //                    onClicked: {
-        //                        manager.setAudioMode(manager.audioMode === 'ihf' ? 'earpiece' : 'ihf');
-        //                    }
-        //                }
-
-        //                MuteButton {
-        //                    visible:root.state == 'active'
-        //                    onClicked: {
-        //                        if(root.state == 'incoming') { // TODO: Take in to account unmuting audio when call is answered.
-        //                            manager.setMuteSpeaker(true);
-        //                        } else {
-        //                            manager.setMuteMicrophone(manager.isMicrophoneMuted ? false : true);
-        //                        }
-        //                    }
-        //                }
-
-
-        CallDialogToolButton {
+        SpeakerButton {
             visible:root.state == 'active'
-            iconSource:'images/icon-m-telephony-volume.svg'
             onClicked: {
                 manager.setAudioMode(manager.audioMode === 'ihf' ? 'earpiece' : 'ihf');
+                btnActive = !btnActive
             }
         }
 
-        CallDialogToolButton {
-            visible:root.state == 'incoming' || root.state == 'active'
-            iconSource:'images/icon-m-telephony-volume-off.svg'
+        MuteButton {
+            visible:root.state == 'active'
             onClicked: {
+                btnActive = !btnActive
                 if(root.state == 'incoming') { // TODO: Take in to account unmuting audio when call is answered.
                     manager.setMuteSpeaker(true);
                 } else {
@@ -273,53 +252,23 @@ Rectangle {
             }
         }
 
-        CallDialogToolButton {
+        KeypadButton {
             visible:root.state == 'active'
-            iconSource:'images/icon-m-telephony-pause.svg'
-            onClicked: manager.activeVoiceCall.hold();
-        }
-
-        CallDialogToolButton {
-            visible:root.state == 'active'
-            iconSource:'images/icon-m-telephony-numpad.svg'
             onClicked: {
-                console.log("Numpad Button tapped")
-                flipable.flipped = !flipable.flipped
+                btnActive = !btnActive
+                console.log("Numpad Button tapped");
+                flipable.flipped = !flipable.flipped;
             }
         }
+
+        AddCallButton {
+            visible:root.state == 'active'
+            onClicked: {
+                console.log("Add Call not implemented yet !");
+
+            }
+        }
+
+
     }
-
-    //        RowLayout {
-    //            id: buttonRow
-    //            width: Units.gu(30)
-    //            anchors{
-    //                bottom: parent.bottom
-    //                horizontalCenter:parent.horizontalCenter
-    //                margins: Units.gu(2)
-    //            }
-    //            spacing:Units.gu(12)
-
-    //            AcceptButton {
-    //                width: Units.gu(12)
-    //                visible:true //root.state === 'incoming'
-    //                onClicked: if(manager.activeVoiceCall) manager.activeVoiceCall.answer();
-    //            }
-
-    //            // Spacer
-    //            //Item {width:parent.width;height:5}
-
-    //            DisconnectButton {
-    //                //width: Units.gu(12)
-    //                onClicked: {
-    //                    if(manager.activeVoiceCall) {
-    //                        manager.activeVoiceCall.hangup();
-    //                    } else {
-    //                        root.close();
-    //                    }
-    //                }
-    //            }
-    //        }
-
-    // }
-
 }
