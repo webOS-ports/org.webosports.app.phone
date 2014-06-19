@@ -33,6 +33,12 @@ Rectangle {
         model: CallHistory {}
 
         delegate: Item {
+        
+            MouseArea {
+                anchors.fill: parent
+                onClicked:main.dial(model.remoteUid);
+            }
+
             width:parent.width
             height:Units.gu(5)
 
@@ -82,7 +88,6 @@ Rectangle {
                 Button {
                     width:Units.gu(5);height:Units.gu(5)
                     iconSource:'images/icon-m-telephony-accept.svg'
-                    onClicked:main.dial(model.remoteUid);
                 }
             }
         }
