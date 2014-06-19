@@ -63,7 +63,6 @@ Item {
     }
 
     function clear() {
-
         resetCursor();
         textedit.text = '';
     }

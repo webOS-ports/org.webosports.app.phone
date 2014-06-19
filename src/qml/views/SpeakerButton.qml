@@ -18,23 +18,33 @@
 import QtQuick 2.0
 import QtQuick.Controls 1.1
 import QtQuick.Controls.Styles 1.1
-
+import LunaNext.Common 0.1
 
 Button {
-    width:61
-    height:61
+    width: Units.gu(5)
+    height:Units.gu(5)
+
+    property bool btnActive: false
 
     style: ButtonStyle {
-        background: Item {
-            clip: true
-            anchors.horizontalCenter: parent.horizontalCenter
-            anchors.verticalCenter: parent.verticalCenter
-            width: 61
-            height: 61
-            Image{
-                x: 0
-                y: control.pressed ? -123: 0
-                source: "images/button-sprite.png"
+        background: Rectangle{
+            color: btnActive ? main.appTheme.callActionBtnFgColorActive : main.appTheme.callActionBtnFgColor
+            border.color:  'white'
+            implicitWidth: Units.gu(5)
+            implicitHeight: Units.gu(5)
+            radius: 10
+
+            Item {
+                clip: true
+                anchors.horizontalCenter: parent.horizontalCenter
+                anchors.verticalCenter: parent.verticalCenter
+                width: 61
+                height: 61
+                Image{
+                    x: 0
+                    y: control.pressed ? -123: 0
+                    source: "images/button-sprite.png"
+                }
             }
         }
 

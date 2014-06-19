@@ -43,10 +43,20 @@ Window {
     property string providerType: "GSM"
     property string providerLabel: "Vodaphone"
 
+
     Component.onCompleted: {
+        console.log("Parsing Launch Params: " + application.launchParameters);
         var params = JSON.parse(application.launchParameters);
+
+        console.log(JSON.stringify(params));
+
         if (!params.launchedAtBoot) {
             __window.show();
+        }
+
+
+        if(params.incommingCall){
+           main.activationReason = "incomming";
         }
     }
 
@@ -63,12 +73,18 @@ Window {
 
             // default to the main screen.
             stackView.pop(tabView);
+        }
+    }
 
-            // TODO: Close active Call when the App is closed.
-            if(manager.activeVoiceCall){
-             manager.activeVoiceCall.hangup();
-            }
-            tabView.pDialPage.numberEntryText = '';
+    /**
+     * When PhoneApp is closed, hang up any active calls.
+     */
+    onVisibleChanged: {
+        if(!visible) {
+            console.log("Window not active - Cleaning up");
+            main.hangup();
+            tabView.pDialer.clear();
+
         }
     }
 
@@ -98,6 +114,14 @@ Window {
                 }
             }
         }
+
+         Component.onCompleted: {
+          console.log("Tab loaded");
+
+             if(main.activationReason === "incomming"){
+                main.incommingCall();
+             }
+         }
     }
 
     property VoiceCallManager manager: VoiceCallManager{
@@ -119,9 +143,15 @@ Window {
             }
             else
             {
-                //tabView.pDialPage.numberEntryText = '';
 
+                tabView.pDialer.clear();
                 stackView.pop()
+
+                // console.log("TabIndex" + tabView.currentIndex);
+                // If we were going back to Voicemail tab, go to first tab instead
+                if(tabView.currentIndex == 3) {
+                    tabView.currentIndex = 0;
+                }
 
                 main.activeVoiceCallPerson = null;
 
@@ -138,15 +168,37 @@ Window {
 
     function dial(msisdn) {
         if(msisdn === "999") {
-            //stackView.push(simPin)
             stackView.push(Qt.resolvedUrl("views/SIMPin.qml"))
-            //simPin.visible = true
+        } else if(msisdn === "111") {
+            main.activationReason = "incomming";
+            main.incommingCall();
         } else {
             manager.dial(providerId, msisdn);
         }
+    }
 
+    function incommingCall() {
+        console.log("Incomming Call");
+        stackView.push(Qt.resolvedUrl("views/IncommingCallDialog.qml"));
+    }
 
+    function accept() {
+       stackView.pop();
+       manager.dial(providerId, "11111");
+    }
 
+    function hangup() {
+        if(manager.activeVoiceCall) {
+            manager.activeVoiceCall.hangup();
+        }
+    }
+
+    function reject() {
+        console.log("rejecting Call");
+        main.hangup();
+        stackView.pop();
+        main.activationReason = 'invoked'; // reset for next time
+        __window.close();
     }
 
     function secondsToTimeString(seconds) {
@@ -159,13 +211,10 @@ Window {
         return '' + h + ':' + m + ':' + s;
     }
 
-    //ActiveCallDialog {id:dActiveCall}
-
     PhoneTabView {id: tabView}
 
     ContactManager {id:people}
 
     OfonoManager {id: ofono}
 
-    //SIMPin {id: simPin}
 }

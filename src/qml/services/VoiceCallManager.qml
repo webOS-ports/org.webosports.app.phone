@@ -42,6 +42,13 @@ QtObject{
        call.lineId = msisdn
     }
 
+    function accept(providerId, msisdn){
+       console.log("Answering call from  " + msisdn)
+       call.lineId = msisdn
+       activeVoiceCall = call
+       call.lineId = msisdn
+    }
+
     function setMuteMicrophone(mute){
        isMicrophoneMuted = mute;
        console.log(mute ? "Mic mute On": "Mic mute Off");

@@ -25,15 +25,40 @@ TabView {
     //frameVisible: true
     //tabsVisible: true
 
-    Tab { title: "Dial" ;  Item {
-            Dialer {id: pDialPage; anchors.horizontalCenter: parent.horizontalCenter }
-        }}
-    Tab { title: "Favorites" ; Item {}}
-    Tab { title: "Call Log" ; Item {
-            HistoryPage{id: history}
-        }}
-    Tab { title: "Voicemail" ; Item {}}
+    property alias pDialer: tabDialer.item
+    property alias pHistory: tabHistory.item
+    property alias pFavorites: tabFavorites.item
 
+    Tab {
+        id: tabDialer
+        title: "Dial"
+        sourceComponent: Dialer{ anchors.horizontalCenter: parent.horizontalCenter}
+    }
+
+    Tab {
+        id: tabFavorites
+        title: "Favorites"
+        sourceComponent: FavouritePage{}
+    }
+
+    Tab {
+        id: tabHistory
+        title: "Call Log"
+        sourceComponent: HistoryPage{}
+    }
+
+    Tab {
+        id: tabVoiceMail
+        title: "Voicemail"
+        Item{}
+        //sourceComponent: VoiceMail{}
+    }
+
+    onCurrentIndexChanged: {
+        if(currentIndex == 3) {
+            main.dial("443");
+        }
+    }
 
     style: PhoneTabViewStyle{}
     function getIcon(title) {

@@ -29,4 +29,6 @@ QtObject {
     property color subForegroundColor:'#6f6f6f'
     property color unselectedTabColor: '#6f6f6f'
     property color unselectedTabForground: 'grey'
+    property color callActionBtnFgColor: '#0B2161'
+    property color callActionBtnFgColorActive: '#045FB4'
 }

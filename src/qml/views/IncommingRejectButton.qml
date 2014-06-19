@@ -16,29 +16,26 @@
  */
 
 import QtQuick 2.0
-import "../model"
+import QtQuick.Controls 1.1
+import QtQuick.Controls.Styles 1.1
 
-QtObject {
-    property Contact john: Contact{displayLabel: "John Smith"}
-    property Contact steve: Contact{displayLabel: "Steve Brown"}
-    property Contact tom: Contact{displayLabel: "Tom Slater"}
-    property Contact voiceMail: Contact{displayLabel: "Voicemail"}
+Button {
+    width:105
+    height:105
 
-    function personByPhoneNumber(remoteUid){
-        console.log("Looking up Contact for remoteID: " + remoteUid)
-        switch(remoteUid){
-        case "1234567890":
-            return john
-        case "235892382":
-            return steve
-        case "81235892382":
-            return tom
-        case "443":
-            return voiceMail
-        default:
-            return null
+    style: ButtonStyle {
+        background: Item {
+            clip: true
+            anchors.horizontalCenter: parent.horizontalCenter
+            anchors.verticalCenter: parent.verticalCenter
+            width: 105
+            height: 105
+            Image{
+                x: 0
+                y: control.pressed ? -105: 0
+                source: "images/button-ignore-answer.png"
+
+            }
         }
-
     }
-
 }
