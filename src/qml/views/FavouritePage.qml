@@ -36,6 +36,12 @@ Rectangle {
             width:parent.width
             height:Units.gu(10)
             anchors { margins: 20}
+            
+            MouseArea {
+                anchors.fill: parent
+                onClicked:main.dial(model.remoteUid);
+            }
+
 
             Rectangle {
                 anchors.fill:parent
@@ -72,7 +78,6 @@ Rectangle {
                 Button {
                     width:Units.gu(5);height:Units.gu(5)
                     iconSource:'images/icon-m-telephony-contact-avatar.svg'
-                    onClicked:main.dial(model.remoteUid);
                 }
             }
         }
