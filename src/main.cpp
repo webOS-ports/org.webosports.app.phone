@@ -14,6 +14,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "qfont.h"
 #include "phoneapplication.h"
 #include "config.h"
 
@@ -21,6 +22,7 @@ int main(int argc, char **argv)
 {
     PhoneApplication::setApplicationName("Phone App");
     PhoneApplication application(argc, argv);
+    application.setFont(QFont("Prelude"));
 
     if (!application.setup(QString("%1/main.qml").arg(phoneAppDirectory())))
         return 0;

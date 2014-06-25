@@ -161,8 +161,8 @@ Rectangle {
                 horizontalCenter:parent.horizontalCenter
             }
 
-            width: Units.gu(30)
-            height:Units.gu(30)
+            width: Units.gu(35)
+            height:Units.gu(35)
             asynchronous:true
             fillMode:Image.PreserveAspectFit
             smooth:true
