@@ -20,7 +20,7 @@ import QtQuick.Controls 1.1
 import QtQuick.Controls.Styles 1.1
 
 Button {
-    width:480
+    width:630
     height:99
 
     style: ButtonStyle {
@@ -28,7 +28,7 @@ Button {
             clip: true
             anchors.horizontalCenter: parent.horizontalCenter
             anchors.verticalCenter: parent.verticalCenter
-            width: 480
+            width: 630
             height: 99
             Image{
                 x: 0
