@@ -43,6 +43,7 @@ Window {
     property string providerType: "GSM"
     property string providerLabel: "Vodaphone"
 
+    property string pinRequired: "no-pin"
 
     Component.onCompleted: {
         console.log("Parsing Launch Params: " + application.launchParameters);
@@ -55,8 +56,8 @@ Window {
         }
 
 
-        if(params.incommingCall){
-           main.activationReason = "incomming";
+        if(params.incomingCall){
+            main.activationReason = "incoming";
         }
     }
 
@@ -90,7 +91,7 @@ Window {
 
     StackView {
         id: stackView
-        anchors.fill: main
+        anchors.fill: parent
         initialItem: tabView
 
         delegate: StackViewDelegate {
@@ -115,26 +116,32 @@ Window {
             }
         }
 
-         Component.onCompleted: {
-          console.log("Tab loaded");
-
-             if(main.activationReason === "incomming"){
-                main.incommingCall();
-             }
-         }
+        Component.onCompleted: {
+            if(main.activationReason === "incoming"){
+                main.incomingCall();
+            }
+        }
     }
 
     property VoiceCallManager manager: VoiceCallManager{
         id: manager
+        modemPath: telephonyManager.getModemPath()
 
         onActiveVoiceCallChanged: {
 
             if(activeVoiceCall) {
-                console.log("Active Call")
-                main.activeVoiceCallPerson = people.personByPhoneNumber(activeVoiceCall.lineId);
-                manager.activeVoiceCall.statusText = "active"
 
-                stackView.push(Qt.resolvedUrl("views/ActiveCallDialog.qml"))
+                console.log("Active Call Status: ",activeVoiceCall.state)
+
+                main.activeVoiceCallPerson = people.personByPhoneNumber(activeVoiceCall.lineId)
+                //manager.activeVoiceCall.statusText = "active"
+
+                if(main.activationReason === "incoming"){
+                    incomingCall()
+                } else {
+                    activeCallDialog()
+                }
+
                 if(!__window.visible)
                 {
                     main.activationReason = 'activeVoiceCallChanged';
@@ -143,6 +150,7 @@ Window {
             }
             else
             {
+                console.log("No activeVoiceCall")
 
                 tabView.pDialer.clear();
                 stackView.pop()
@@ -168,29 +176,38 @@ Window {
 
     function dial(msisdn) {
         if(msisdn === "999") {
-            stackView.push(Qt.resolvedUrl("views/SIMPin.qml"))
+            showSIMPinDialog()
         } else if(msisdn === "111") {
-            main.activationReason = "incomming";
-            main.incommingCall();
+            main.activationReason = "incoming";
+            main.incomingCall();
         } else {
             manager.dial(providerId, msisdn);
+            telephonyManager.dial(msisdn)
         }
     }
 
-    function incommingCall() {
-        console.log("Incomming Call");
+    function showSIMPinDialog(){
+        stackView.push(Qt.resolvedUrl("views/SIMPin.qml"))
+    }
+
+    function activeCallDialog(){
+        console.log("Showing Active Call Dialog")
+        stackView.push(Qt.resolvedUrl("views/ActiveCallDialog.qml"))
+    }
+
+    function incomingCall() {
+        console.log("Showing Incoming Call Dialog");
         stackView.push(Qt.resolvedUrl("views/IncommingCallDialog.qml"));
     }
 
     function accept() {
-       stackView.pop();
-       manager.dial(providerId, "11111");
+        stackView.pop();
+        manager.accept()
+        activeCallDialog()
     }
 
     function hangup() {
-        if(manager.activeVoiceCall) {
-            manager.activeVoiceCall.hangup();
-        }
+        manager.hangup()
     }
 
     function reject() {
@@ -211,10 +228,27 @@ Window {
         return '' + h + ':' + m + ':' + s;
     }
 
-    PhoneTabView {id: tabView}
+    PhoneTabView {
+        id: tabView
+    }
 
-    ContactManager {id:people}
+    ContactManager {
+        id:people
+    }
 
-    OfonoManager {id: ofono}
+    TelephonyManager {
+        id: telephonyManager
+    }
+
+    onPinRequiredChanged: {
+        if (telephonyManager.pinRequired) {
+            console.log("SIM PIN is required");
+            if (!__window.visible)
+                __window.show();
+            showSIMPinDialog()
+        }
+        else
+            console.log("SIM PIN is not required");
+    }
 
 }

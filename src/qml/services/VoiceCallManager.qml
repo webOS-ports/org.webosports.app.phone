@@ -15,17 +15,54 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>
  */
 import QtQuick 2.0
+import MeeGo.QOfono 0.2
 
+Item {
 
-QtObject{
+    id: voiceCallManager
 
-    property VoiceCall call: VoiceCall{}
+    property VoiceCall voiceCall: VoiceCall{}
     property VoiceCall activeVoiceCall: null
 
     property string audioMode: "earpiece"
     property bool isAudioRouted: false
     property bool isMicrophoneMuted: false
     property bool isSpeakerMuted: false
+
+    property string modemPath: null
+
+    onModemPathChanged: {
+        callManager.modemPath = voiceCallManager.modemPath
+    }
+
+    OfonoVoiceCallManager {
+        id: callManager
+
+
+        Component.onCompleted: {
+            console.log("voiceCallManager init")
+        }
+
+        onCallAdded: {
+            console.log("Call Added" , arguments[0])
+            voiceCall.voiceCallPath = arguments[0]
+
+            if(main.activationReason !== "dialing"){
+                main.activationReason = "incoming"
+            }
+
+            activeVoiceCall = voiceCall
+        }
+
+        onCallRemoved: {
+            console.log("Call Removed",arguments[0])
+            if(activeVoiceCall) {
+                activeVoiceCall.hangup();
+            }
+            activeVoiceCall = null
+        }
+
+    }
 
     function startDtmfTone(key) {
         console.log("Dial Tone for key: " + key)
@@ -36,22 +73,26 @@ QtObject{
     }
 
     function dial(providerId, msisdn){
-       console.log("Dialing  " + msisdn)
-       call.lineId = msisdn
-       activeVoiceCall = call
-       call.lineId = msisdn
+        console.log("Dialing: ", msisdn)
+        main.activationReason = "dialing"
+        callManager.dial(msisdn)
     }
 
     function accept(providerId, msisdn){
-       console.log("Answering call from  " + msisdn)
-       call.lineId = msisdn
-       activeVoiceCall = call
-       call.lineId = msisdn
+        console.log("Accepting call from: ", msisdn)
+        activeVoiceCall.answer()
+    }
+
+    function hangup() {
+        console.log("Hanging Up Call", activeVoiceCall)
+        if(activeVoiceCall) {
+            activeVoiceCall.hangup();
+        }
     }
 
     function setMuteMicrophone(mute){
-       isMicrophoneMuted = mute;
-       console.log(mute ? "Mic mute On": "Mic mute Off");
+        isMicrophoneMuted = mute;
+        console.log(mute ? "Mic mute On": "Mic mute Off");
     }
 
     function setMuteSpeaker(mute) {
@@ -63,6 +104,8 @@ QtObject{
         audioMode = mode;
         console.log("audioMode: " + audioMode)
     }
+
+
 
 }
 

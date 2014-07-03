@@ -16,13 +16,31 @@
  */
 
 import QtQuick 2.0
+import MeeGo.QOfono 0.2
 
 Item {
 
-    property string lineId: ""
+    id: voiceCall
+
     property string statusText: ""
     property int duration: 0;
 
+    property string voiceCallPath: ""
+
+    property alias state: call.state
+    property alias lineId: call.lineIdentification
+
+    onVoiceCallPathChanged: {
+        call.voiceCallPath = voiceCallPath
+    }
+
+    OfonoVoiceCall {
+        id: call
+
+        onStateChanged: {
+            console.log("VoiceCall status changed to: ", call.state)
+        }
+    }
 
     Timer {
         id:callTimer
@@ -44,17 +62,18 @@ Item {
 
     function answer(){
         console.log("answered call")
+        call.answer()
         statusText = "active"
-
     }
 
     function hangup(){
         console.log("hangup call")
+        if(statusText === "active"){
+            console.log("voicecall->hangup()")
+            call.hangup()
+        }
         statusText = "inactive"
-
-        main.manager.activeVoiceCall = null
         duration = 0
-        call.lineId = ""
 
     }
 
