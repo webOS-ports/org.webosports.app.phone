@@ -27,10 +27,10 @@ Item {
 
     property bool present: true
 
-    property string subscriberIdentity: "1234-5678-9012-3456"
-    property string mobileCountryCode: "UK"
-    property string mobileNetworkCode: "Vodaphone"
-    property string pinRequired: "no-pin"
+    property string subscriberIdentity: ""
+    property string mobileCountryCode: ""
+    property string mobileNetworkCode: ""
+    property bool pinRequired: false
 
     property int pinRetry: 3
 
@@ -88,6 +88,16 @@ Item {
 
     function getModemPath() {
         return modemManager.modems[0]
+    }
+
+    onPinRequiredChanged: {
+        if (telephonyManager.pinRequired) {
+            console.log("SIM PIN is required");
+            main.showSIMPinDialog()
+        }
+        else {
+            console.log("SIM PIN is not required");
+        }
     }
 
     OfonoManager {

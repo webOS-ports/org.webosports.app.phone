@@ -23,7 +23,9 @@ import QtQuick.Controls 1.1
 import QtQuick.Controls.Styles 1.1
 import QtQuick.Layouts 1.0
 import QtQuick.Window 2.1
+import QtMultimedia 5.0
 import LunaNext.Common 0.1
+
 
 Window {
     id: main
@@ -84,8 +86,9 @@ Window {
         if(!visible) {
             console.log("Window not active - Cleaning up");
             main.hangup();
-            tabView.pDialer.clear();
-
+            if(tabView.pDialer) {
+                tabView.pDialer.clear();
+            }
         }
     }
 
@@ -134,7 +137,7 @@ Window {
                 console.log("Active Call Status: ",activeVoiceCall.state)
 
                 main.activeVoiceCallPerson = people.personByPhoneNumber(activeVoiceCall.lineId)
-                //manager.activeVoiceCall.statusText = "active"
+                manager.activeVoiceCall.statusText = "active"
 
                 if(main.activationReason === "incoming"){
                     incomingCall()
@@ -181,12 +184,13 @@ Window {
             main.activationReason = "incoming";
             main.incomingCall();
         } else {
-            manager.dial(providerId, msisdn);
-            telephonyManager.dial(msisdn)
+            manager.dial(msisdn);
         }
     }
 
     function showSIMPinDialog(){
+        if (!__window.visible)
+            __window.show();
         stackView.push(Qt.resolvedUrl("views/SIMPin.qml"))
     }
 
@@ -197,11 +201,13 @@ Window {
 
     function incomingCall() {
         console.log("Showing Incoming Call Dialog");
+        ringTone.play()
         stackView.push(Qt.resolvedUrl("views/IncommingCallDialog.qml"));
     }
 
     function accept() {
-        stackView.pop();
+        stackView.pop()
+        ringTone.stop()
         manager.accept()
         activeCallDialog()
     }
@@ -212,10 +218,11 @@ Window {
 
     function reject() {
         console.log("rejecting Call");
-        main.hangup();
-        stackView.pop();
+        ringTone.stop()
+        main.hangup()
+        stackView.pop()
         main.activationReason = 'invoked'; // reset for next time
-        __window.close();
+        __window.close()
     }
 
     function secondsToTimeString(seconds) {
@@ -240,15 +247,12 @@ Window {
         id: telephonyManager
     }
 
-    onPinRequiredChanged: {
-        if (telephonyManager.pinRequired) {
-            console.log("SIM PIN is required");
-            if (!__window.visible)
-                __window.show();
-            showSIMPinDialog()
-        }
-        else
-            console.log("SIM PIN is not required");
+    Audio {
+        id: ringTone
+        source: "assets/ringtone_buzz.wav"
+        loops: Audio.Infinite
     }
+
+
 
 }

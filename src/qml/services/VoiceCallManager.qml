@@ -56,9 +56,7 @@ Item {
 
         onCallRemoved: {
             console.log("Call Removed",arguments[0])
-            if(activeVoiceCall) {
-                activeVoiceCall.hangup();
-            }
+            callManager.hangupAll()
             activeVoiceCall = null
         }
 
@@ -66,16 +64,17 @@ Item {
 
     function startDtmfTone(key) {
         console.log("Dial Tone for key: " + key)
+        //callManager.sendTones(key)
     }
 
     function stopDtmfTone() {
         console.log("Stop DialTone")
     }
 
-    function dial(providerId, msisdn){
+    function dial(msisdn){
         console.log("Dialing: ", msisdn)
         main.activationReason = "dialing"
-        callManager.dial(msisdn)
+        callManager.dial(msisdn, "")
     }
 
     function accept(providerId, msisdn){
@@ -84,10 +83,8 @@ Item {
     }
 
     function hangup() {
-        console.log("Hanging Up Call", activeVoiceCall)
-        if(activeVoiceCall) {
-            activeVoiceCall.hangup();
-        }
+        console.log("Hanging Up Calls")
+        callManager.hangupAll()
     }
 
     function setMuteMicrophone(mute){
