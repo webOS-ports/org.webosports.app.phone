@@ -214,11 +214,8 @@ Rectangle {
             margins:Units.gu(2)
         }
         onClicked: {
-            if(manager.activeVoiceCall) {
-                manager.activeVoiceCall.hangup();
-            } else {
-                root.close();
-            }
+           manager.hangup()
+           root.close();
         }
     }
 
