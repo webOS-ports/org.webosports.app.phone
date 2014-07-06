@@ -42,7 +42,7 @@ Rectangle {
 
         spacing: Units.gu(2)
 
-        IncommingAcceptButton {
+        IncomingAcceptButton {
             height: 105
             width: 105
             onClicked: {
@@ -73,7 +73,7 @@ Rectangle {
 
                         source: main.activeVoiceCallPerson
                                 ? main.activeVoiceCallPerson.avatarPath
-                                : 'images/icon-m-telephony-contact-avatar.svg';
+                                : 'images/generic-details-view-avatar.png';
             }
 
             Text {
@@ -89,7 +89,7 @@ Rectangle {
 
 
 
-        IncommingRejectButton {
+        IncomingRejectButton {
             height: 105
             width: 105
             onClicked: {
