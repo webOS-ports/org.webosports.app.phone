@@ -41,12 +41,6 @@ Window {
     property string activationReason: 'invoked'
     property Contact activeVoiceCallPerson
 
-    property string providerId: "sim1"
-    property string providerType: "GSM"
-    property string providerLabel: "Vodaphone"
-
-    property string pinRequired: "no-pin"
-
     Component.onCompleted: {
         console.log("Parsing Launch Params: " + application.launchParameters);
         var params = JSON.parse(application.launchParameters);
@@ -57,12 +51,7 @@ Window {
             __window.show();
         }
 
-
-        if(params.incomingCall){
-            main.activationReason = "incoming";
-        }
     }
-
 
     Connections {
         target: application
@@ -119,11 +108,6 @@ Window {
             }
         }
 
-        Component.onCompleted: {
-            if(main.activationReason === "incoming"){
-                main.incomingCall();
-            }
-        }
     }
 
     property VoiceCallManager manager: VoiceCallManager{
@@ -201,8 +185,19 @@ Window {
 
     function incomingCall() {
         console.log("Showing Incoming Call Dialog");
+
+
+        console.log("hasAudio: " , ringTone.hasAudio)
+        console.log("errorString: " , ringTone.errorString)
+        console.log("bufferProgress: " , ringTone.bufferProgress)
+        console.log("duration: " , ringTone.duration)
+        console.log("metaData.audioCodec: " , ringTone.metaData.audioCodec)
+        console.log("metaData.audioBitRate: " , ringTone.metaData.audioBitRate)
+        console.log("metaData.mediaType: " , ringTone.metaData.mediaType)
+        console.log("metaData.status: " , ringTone.status)
+
         ringTone.play()
-        stackView.push(Qt.resolvedUrl("views/IncommingCallDialog.qml"));
+        stackView.push(Qt.resolvedUrl("views/IncomingCallDialog.qml"));
     }
 
     function accept() {
@@ -247,10 +242,24 @@ Window {
         id: telephonyManager
     }
 
-    Audio {
+    MediaPlayer {
         id: ringTone
         source: "assets/ringtone_buzz.wav"
-        loops: Audio.Infinite
+        //source: "/usr/palm/sounds/ringtone.mp3"
+        volume: 0.5
+        loops: MediaPlayer.Infinite
+
+        Component.onCompleted: {
+            console.log("hasAudio: " , ringTone.hasAudio)
+            console.log("errorString: " , ringTone.errorString)
+            console.log("metaData.audioCodec: " , ringTone.metaData.audioCodec)
+            console.log("metaData.audioBitRate: " , ringTone.metaData.audioBitRate)
+            console.log("metaData.mediaType: " , ringTone.metaData.mediaType)
+            console.log("metaData.status: " , ringTone.status)
+
+
+        }
+
     }
 
 

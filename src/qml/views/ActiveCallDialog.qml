@@ -176,7 +176,7 @@ Rectangle {
 
             source: main.activeVoiceCallPerson
                     ? main.activeVoiceCallPerson.avatarPath
-                    : 'images/icon-m-telephony-contact-avatar.svg';
+                    : 'images/generic-details-view-avatar.png';
         }
 
         back:  Item {
