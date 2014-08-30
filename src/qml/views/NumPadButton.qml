@@ -28,12 +28,14 @@ Item {
    property string sub: ""
    property string key: ""
    property string alt: ""
+   property int size: 25
 
         Text {
             id:tKeyText
             anchors.centerIn:parent
             color:main.appTheme.foregroundColor
-            font.pixelSize:42
+            font.pixelSize: Units.dp(size)
+            font.bold: true
             text: key
         }
 
@@ -41,7 +43,7 @@ Item {
             id:tSubText
             anchors {horizontalCenter:parent.horizontalCenter;top:tKeyText.bottom}
             color:main.appTheme.subForegroundColor
-            font.pixelSize:18
+            font.pixelSize: Units.dp(10)
             text: sub ? sub : ''
         }
 

@@ -51,13 +51,16 @@ Item {
     }
 
     onStatusTextChanged: {
-
         if(statusText === "active") {
             callTimer.start()
         } else if(statusText === "inactive") {
             callTimer.stop()
         }
 
+    }
+
+    function resetCall(){
+        duration = 0
     }
 
     function answer(){
@@ -73,7 +76,6 @@ Item {
             call.hangup()
         }
         statusText = "inactive"
-        duration = 0
 
     }
 
