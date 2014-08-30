@@ -20,19 +20,19 @@ import QtQuick.Controls 1.1
 import QtQuick.Controls.Styles 1.1
 
 Button {
-    width:105
-    height:105
+    width:210
+    height:210
 
     style: ButtonStyle {
         background: Item {
             clip: true
             anchors.horizontalCenter: parent.horizontalCenter
             anchors.verticalCenter: parent.verticalCenter
-            width: 105
-            height: 105
+            width: 210
+            height: 210
             Image{
                 x: 0
-                y: control.pressed ? -105: 0
+                y: control.pressed ? -210: 0
                 source: "images/button-ignore-answer.png"
 
             }

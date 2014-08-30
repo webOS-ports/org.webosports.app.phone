@@ -54,11 +54,11 @@ Rectangle {
                 Item {
                     clip: true
                     anchors.verticalCenter: parent.verticalCenter
-                    width: 22
-                    height: 22
+                    width: 44
+                    height: 44
                     Image{
                         x: 0
-                        y: model.isMissedCall ? 0 : ((model.direction === "inbound") ? -22 : -44)
+                        y: model.isMissedCall ? 0 : ((model.direction === "inbound") ? -44 : -88)
                         source: 'images/call-log-list-sprite.png'
                     }
 
@@ -87,7 +87,7 @@ Rectangle {
                 spacing:10
                 Button {
                     width:Units.gu(5);height:Units.gu(5)
-                    iconSource:'images/generic-details-view-avatar.png'
+                    iconSource:'images/generic-details-view-avatar-small.png'
                 }
             }
         }

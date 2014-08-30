@@ -48,15 +48,15 @@ Item {
         }
 
         NumPadButton {key:'1';sub: (mode === "sim") ? '': 'voicemail'}
-        NumPadButton {key:'2';sub:'abc'}
-        NumPadButton {key:'3';sub:'def'}
-        NumPadButton {key:'4';sub:'ghi'}
-        NumPadButton {key:'5';sub:'jkl'}
-        NumPadButton {key:'6';sub:'mno'}
-        NumPadButton {key:'7';sub:'pqrs'}
-        NumPadButton {key:'8';sub:'tuv'}
-        NumPadButton {key:'9';sub:'wxyz'}
-        NumPadButton {key: (mode === "sim") ? '': '*'}
+        NumPadButton {key:'2';sub:'ABC'}
+        NumPadButton {key:'3';sub:'DEF'}
+        NumPadButton {key:'4';sub:'GHI'}
+        NumPadButton {key:'5';sub:'JKL'}
+        NumPadButton {key:'6';sub:'MNO'}
+        NumPadButton {key:'7';sub:'PQRS'}
+        NumPadButton {key:'8';sub:'TUV'}
+        NumPadButton {key:'9';sub:'WXYZ'}
+        NumPadButton {key: (mode === "sim") ? '': '\u002A'; size: 40}
         NumPadButton {key:'0';sub: (mode === "sim") ? '': '+';alt: (mode === "sim") ? '': '+'}
         NumPadButton {key:(mode === "sim") ? '': '#';alt: (mode === "sim") ? '': 'p'}
     }

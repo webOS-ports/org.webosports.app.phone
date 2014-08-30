@@ -50,7 +50,7 @@ Item {
             if(main.activationReason !== "dialing"){
                 main.activationReason = "incoming"
             }
-
+            voiceCall.resetCall()
             activeVoiceCall = voiceCall
         }
 

@@ -77,7 +77,7 @@ Rectangle {
                 spacing:10
                 Button {
                     width:Units.gu(5);height:Units.gu(5)
-                    iconSource:'images/generic-details-view-avatar.png'
+                    iconSource:'images/generic-details-view-avatar-small.png'
                 }
             }
         }

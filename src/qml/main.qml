@@ -208,12 +208,12 @@ Window {
     }
 
     function hangup() {
+        ringTone.stop()
         manager.hangup()
     }
 
     function reject() {
         console.log("rejecting Call");
-        ringTone.stop()
         main.hangup()
         stackView.pop()
         main.activationReason = 'invoked'; // reset for next time
@@ -246,7 +246,7 @@ Window {
         id: ringTone
         source: "assets/ringtone_buzz.wav"
         //source: "/usr/palm/sounds/ringtone.mp3"
-        volume: 0.5
+        volume: 0.1
         loops: MediaPlayer.Infinite
 
         Component.onCompleted: {

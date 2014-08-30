@@ -24,79 +24,87 @@ import LunaNext.Common 0.1
 Rectangle {
     id: incommingCallDialog
     width: Settings.displayWidth
-    height: Units.gu(20)
+    height: Settings.displayHeight
     color: main.appTheme.backgroundColor
     radius: 10
 
-    anchors {
-        bottom: parent.bottom
-        horizontalCenter:parent.horizontalCenter
+    //anchors {
+    //    bottom: parent.bottom
+    //    horizontalCenter:parent.horizontalCenter
+    //}
+
+    Image {
+        id:iAvatar
+        anchors {
+            top: parent.top
+            horizontalCenter:parent.horizontalCenter
+            topMargin: Units.gu(3)
+        }
+
+        width: Units.gu(35)
+        height:Units.gu(35)
+        asynchronous:true
+        fillMode:Image.PreserveAspectFit
+        smooth:true
+
+        Rectangle {
+            anchors.fill:parent
+            border {color:main.appTheme.foregroundColor;width:2}
+            radius:10
+            color:'#00000000'
+        }
+
+        source: main.activeVoiceCallPerson
+                ? main.activeVoiceCallPerson.avatarPath
+                : 'images/generic-details-view-avatar.png';
     }
 
+    Text {
+
+        anchors {
+            bottom: answerRejectBtns.top
+            bottomMargin: Units.gu(5)
+            horizontalCenter:parent.horizontalCenter
+        }
+
+        id: title
+        font.pixelSize: Units.dp(20)
+        color: main.appTheme.headerTitle
+        text:main.activeVoiceCallPerson
+             ? main.activeVoiceCallPerson.displayLabel
+             : (manager.activeVoiceCall ? manager.activeVoiceCall.lineId : 'Unknown Number');
+
+    }
+
+
+
+
     Row {
-        height: Units.gu(10)
+        id: answerRejectBtns
+        height: Units.gu(12)
         anchors {
             bottom: parent.bottom
             horizontalCenter:parent.horizontalCenter
         }
 
-        spacing: Units.gu(2)
+        spacing: Units.gu(16)
 
         IncomingAcceptButton {
-            height: 105
-            width: 105
+            height: 215
+            width: 215
             onClicked: {
                 main.accept();
             }
 
         }
 
-        Column{
-            Image {
-                        id:iAvatar
-                        anchors {
-                            horizontalCenter:parent.horizontalCenter
-                        }
-
-                        width: Units.gu(5)
-                        height:Units.gu(5)
-                        asynchronous:true
-                        fillMode:Image.PreserveAspectFit
-                        smooth:true
-
-                        Rectangle {
-                            anchors.fill:parent
-                            border {color:main.appTheme.foregroundColor;width:2}
-                            radius:10
-                            color:'#00000000'
-                        }
-
-                        source: main.activeVoiceCallPerson
-                                ? main.activeVoiceCallPerson.avatarPath
-                                : 'images/generic-details-view-avatar.png';
-            }
-
-            Text {
-                id: title
-                font.pixelSize: Units.dp(20)
-                color: main.appTheme.headerTitle
-                text:main.activeVoiceCallPerson
-                     ? main.activeVoiceCallPerson.displayLabel
-                     : (manager.activeVoiceCall ? manager.activeVoiceCall.lineId : 'unknown number');
-
-            }
-        }
-
-
-
         IncomingRejectButton {
-            height: 105
-            width: 105
+            height: 210
+            width: 210
             onClicked: {
                 main.reject();
             }
         }
-
 
     }
 
