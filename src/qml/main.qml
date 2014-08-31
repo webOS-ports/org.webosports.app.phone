@@ -159,8 +159,6 @@ Window {
         }
     }
 
-
-
     function dial(msisdn) {
         if(msisdn === "999") {
             showSIMPinDialog()
@@ -185,22 +183,12 @@ Window {
 
     function incomingCall() {
         console.log("Showing Incoming Call Dialog");
-
-
-        console.log("hasAudio: " , ringTone.hasAudio)
-        console.log("errorString: " , ringTone.errorString)
-        console.log("bufferProgress: " , ringTone.bufferProgress)
-        console.log("duration: " , ringTone.duration)
-        console.log("metaData.audioCodec: " , ringTone.metaData.audioCodec)
-        console.log("metaData.audioBitRate: " , ringTone.metaData.audioBitRate)
-        console.log("metaData.mediaType: " , ringTone.metaData.mediaType)
-        console.log("metaData.status: " , ringTone.status)
-
         ringTone.play()
         stackView.push(Qt.resolvedUrl("views/IncomingCallDialog.qml"));
     }
 
     function accept() {
+        console.log("accepting Call")
         stackView.pop()
         ringTone.stop()
         manager.accept()
@@ -208,12 +196,13 @@ Window {
     }
 
     function hangup() {
+        console.log("hanging up Call")
         ringTone.stop()
         manager.hangup()
     }
 
     function reject() {
-        console.log("rejecting Call");
+        console.log("rejecting Call")
         main.hangup()
         stackView.pop()
         main.activationReason = 'invoked'; // reset for next time
@@ -244,24 +233,26 @@ Window {
 
     MediaPlayer {
         id: ringTone
-        source: "assets/ringtone_buzz.wav"
-        //source: "/usr/palm/sounds/ringtone.mp3"
-        volume: 0.1
+        source: "/usr/palm/sounds/ringtone.mp3"
+        volume: 0.5
         loops: MediaPlayer.Infinite
 
-        Component.onCompleted: {
-            console.log("hasAudio: " , ringTone.hasAudio)
-            console.log("errorString: " , ringTone.errorString)
-            console.log("metaData.audioCodec: " , ringTone.metaData.audioCodec)
-            console.log("metaData.audioBitRate: " , ringTone.metaData.audioBitRate)
-            console.log("metaData.mediaType: " , ringTone.metaData.mediaType)
-            console.log("metaData.status: " , ringTone.status)
+        onStatusChanged: {
+            if(ringTone.status == 3){
+                console.log("RingTone Loaded....")
+                console.log("hasAudio: " , ringTone.hasAudio)
+                console.log("errorString: " , ringTone.errorString)
+                console.log("metaData.audioCodec: " , ringTone.metaData.audioCodec)
+                console.log("metaData.audioBitRate: " , ringTone.metaData.audioBitRate)
+                console.log("metaData.mediaType: " , ringTone.metaData.mediaType)
+                console.log("metaData.status: " , ringTone.status)
+            }
+        }
 
-
+        onPlaybackStateChanged: {
+             console.log("PlaybackState: ", ringTone.playbackState)
         }
 
     }
-
-
 
 }
