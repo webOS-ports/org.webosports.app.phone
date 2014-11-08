@@ -17,6 +17,7 @@
 
 import QtQuick 2.0
 import LunaNext.Common 0.1
+import "PhoneNumberFormatter.js" as PhoneNumberFormatter
 
 Item {
     id:root
@@ -36,8 +37,8 @@ Item {
             textedit.text = character
             textedit.cursorPosition = textedit.text.length
         } else {
-            textedit.text = text.slice(0, cpos) + character + text.slice(cpos,text. length);
-            textedit.cursorPosition = cpos + 1;
+            textedit.text = PhoneNumberFormatter.formatPhoneNumber(text.slice(0, cpos) + character + text.slice(cpos,text. length));
+            textedit.cursorPosition = cpos + (textedit.text.length - text.length);
         }
 
         root.__previousCharacter = character;
@@ -50,8 +51,8 @@ Item {
 
         if(text.length == 0) return;
 
-        textedit.text = text.slice(0, cpos - 1) + text.slice(cpos, text.length)
-        textedit.cursorPosition = cpos - 1;
+        textedit.text = PhoneNumberFormatter.formatPhoneNumber(text.slice(0, cpos - 1) + text.slice(cpos, text.length));
+        textedit.cursorPosition = cpos - (text.length - textedit.text.length);
 
         root.__previousCharacter = '';
         interactionTimeout.restart();
@@ -67,9 +68,17 @@ Item {
         textedit.text = '';
     }
 
+    function getPhoneNumber(){
+        if(numentry.text.length > 0) {
+            return numentry.text.replace(/\D/g, '');
+        } else {
+            return ''
+        }
+    }
+
     Timer {
         id:interactionTimeout
-        interval:4000
+        interval:10000
         running:false
         repeat:false
         onTriggered:root.resetCursor();
@@ -109,12 +118,13 @@ Item {
         activeFocusOnPress: false
         cursorVisible:false
         inputMethodHints:Qt.ImhDialableCharactersOnly
-        font.pixelSize:64//TODO:Theme
+        font.pixelSize:64 //TODO:Theme
         horizontalAlignment:TextEdit.AlignRight
 
         onTextChanged:__resizeText();
 
         function __resizeText() {
+
             if(paintedWidth < 0 || paintedHeight < 0) return;
 
             while(paintedWidth > width) {
@@ -127,6 +137,7 @@ Item {
                 font.pixelSize++;
             }
         }
+
     }
 
     MouseArea {

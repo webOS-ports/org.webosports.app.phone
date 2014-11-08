@@ -20,8 +20,6 @@ import LunaNext.Common 0.1
 
 Item {
    id:root
-   //width:numpad.cellWidth
-   //height:numpad.cellHeight
    width: Units.gu(11)
    height: Units.gu(8)
 
@@ -51,10 +49,12 @@ Item {
           TODO: Key Border
         */
         Rectangle {
+            id: box
             anchors.fill:parent
             border {color:main.appTheme.foregroundColor;width:0.5}
             radius:10
             color:'#00000000'
+            z: -10
         }
 
 
@@ -91,9 +91,11 @@ Item {
                 // Audio feedback.
                 onPressed: {
                     numpad.onPressed(key);
+                    box.color = '#6495ed'
                 }
                 onReleased: {
                     numpad.onReleased();
+                    box.color = '#00000000'
                 }
             }
 }

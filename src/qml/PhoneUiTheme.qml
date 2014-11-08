@@ -22,7 +22,7 @@ QtObject {
     property int appHeight: 750// 1280
     property int keypadWidth: 720
     property color foregroundColor:'white'
-    property color backgroundColor:'#1E1E1E'
+    property color backgroundColor:'black'
     property color headerColor:'#6f6f6f'
     property color headerTitle: 'white'
     property color headerTip: 'black'

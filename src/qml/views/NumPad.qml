@@ -41,7 +41,7 @@ Item {
 
         rows: 4
         columns: 3
-        spacing: Units.gu(1)
+        //spacing: Units.gu(1)
 
         anchors {
             horizontalCenter:parent.horizontalCenter
