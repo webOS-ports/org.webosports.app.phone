@@ -15,26 +15,20 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>
  */
 
-import QtQuick 2.0
-import QtQuick.Controls 1.1
-import QtQuick.Controls.Styles 1.1
+.pragma library
 
-Button {
-    width:612
-    height:99
+/*
+ * A simple phone number formatter. Doesn't take into account different locales etc.
+ * (123) 456 - 7890
+ */
+function formatPhoneNumber(number) {
 
-    style: ButtonStyle {
-        background: Item {
-            clip: true
-            anchors.horizontalCenter: parent.horizontalCenter
-            anchors.verticalCenter: parent.verticalCenter
-            width: 612
-            height: 99
-            Image{
-                x: 0
-                y: control.pressed ? -198: 0
-                source: "images/dial-button.png"
-            }
-        }
+    var numbers = number.replace(/\D/g, '');
+    var c = { 0:'(', 3:') ', 6: ' - '};
+    var result = '';
+    for (var i = 0; i < numbers.length; i++) {
+        result += (c[i]||'') + numbers[i];
     }
+
+    return result;
 }

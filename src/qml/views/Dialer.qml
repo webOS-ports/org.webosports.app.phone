@@ -41,12 +41,9 @@ Rectangle {
 
     NumPad {
         id:numpad
-        //width:  Units.gu(50)
-        //height:childrenRect.height
         anchors {
             bottom: bCallNumber.top
             topMargin: Units.gu(3)
-            //margins: Units.gu(1)
             horizontalCenter:parent.horizontalCenter
         }
         entryTarget:numentry
@@ -59,12 +56,11 @@ Rectangle {
             horizontalCenter:parent.horizontalCenter;
             margins:Units.gu(2)
         }
-        //width:numpad.width
         onClicked: {
             if(numentry.text.length > 0) {
-                main.dial(numentry.text);
+                main.dial(numentry.getPhoneNumber());
             } else {
-                console.log('*** QML *** VCI WARNING: Number entry is blank.');
+                console.log('Number entry is blank.');
             }
         }
     }
