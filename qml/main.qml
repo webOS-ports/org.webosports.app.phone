@@ -23,7 +23,6 @@ import QtQuick.Controls 1.1
 import QtQuick.Controls.Styles 1.1
 import QtQuick.Layouts 1.0
 import QtQuick.Window 2.1
-import QtMultimedia 5.0
 import LunaNext.Common 0.1
 
 
@@ -183,21 +182,18 @@ Window {
 
     function incomingCall() {
         console.log("Showing Incoming Call Dialog");
-        ringTone.play()
         stackView.push(Qt.resolvedUrl("views/IncomingCallDialog.qml"));
     }
 
     function accept() {
         console.log("accepting Call")
         stackView.pop()
-        ringTone.stop()
         manager.accept()
         activeCallDialog()
     }
 
     function hangup() {
         console.log("hanging up Call")
-        ringTone.stop()
         manager.hangup()
     }
 
@@ -230,29 +226,4 @@ Window {
     TelephonyManager {
         id: telephonyManager
     }
-
-    MediaPlayer {
-        id: ringTone
-        source: "/usr/palm/sounds/ringtone.mp3"
-        volume: 0.5
-        loops: MediaPlayer.Infinite
-
-        onStatusChanged: {
-            if(ringTone.status == 3){
-                console.log("RingTone Loaded....")
-                console.log("hasAudio: " , ringTone.hasAudio)
-                console.log("errorString: " , ringTone.errorString)
-                console.log("metaData.audioCodec: " , ringTone.metaData.audioCodec)
-                console.log("metaData.audioBitRate: " , ringTone.metaData.audioBitRate)
-                console.log("metaData.mediaType: " , ringTone.metaData.mediaType)
-                console.log("metaData.status: " , ringTone.status)
-            }
-        }
-
-        onPlaybackStateChanged: {
-             console.log("PlaybackState: ", ringTone.playbackState)
-        }
-
-    }
-
 }
