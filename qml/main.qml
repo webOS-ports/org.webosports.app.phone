@@ -27,7 +27,7 @@ import LunaNext.Common 0.1
 import LuneOS.Application 1.0
 
 ApplicationWindow {
-    id: main
+    id: window
 
     keepAlive: true
     loadingAnimationDisabled: true
@@ -36,35 +36,31 @@ ApplicationWindow {
     height: Settings.displayHeight
     color: appTheme.backgroundColor
 
-    property alias __window: main
-    property alias stackView: stackView
-
-    property PhoneUiTheme appTheme: PhoneUiTheme {}
-
     property string activationReason: 'invoked'
     property Contact activeVoiceCallPerson
+
+    property alias main: window
+    property alias appTheme: phoneUiAppPhome
 
     Component.onCompleted: {
         console.log("Parsing Launch Params: " + application.launchParameters);
         var params = JSON.parse(application.launchParameters);
 
-        console.log(JSON.stringify(params));
-
-        if (!params.launchedAtBoot) {
-            __window.show();
-        }
-
+        if (!params.launchedAtBoot)
+            window.show();
     }
+
+    PhoneUiTheme { id: phoneUiAppPhome }
 
     Connections {
         target: application
         onRelaunched: {
             console.log("DEBUG: Relaunched with parameters: " + parameters);
+
             // If we're launched at boot time we're not yet visible so bring our window
             // to the foreground
-            if (!__window.visible){
-                __window.show();
-            }
+            if (!window.visible)
+                window.show();
 
             // default to the main screen.
             stackView.pop(tabView);
@@ -78,9 +74,8 @@ ApplicationWindow {
         if(!visible) {
             console.log("Window not active - Cleaning up");
             main.hangup();
-            if(tabView.pDialer) {
+            if (tabView.pDialer)
                 tabView.pDialer.clear();
-            }
         }
     }
 
@@ -90,27 +85,15 @@ ApplicationWindow {
         initialItem: tabView
 
         delegate: StackViewDelegate {
-            function transitionFinished(properties)
-            {
+            function transitionFinished(properties) {
                 properties.exitItem.opacity = 1
             }
 
-            property Component pushTransition: StackViewTransition {
-                PropertyAnimation {
-                    target: enterItem
-                    property: "opacity"
-                    from: 0
-                    to: 1
-                }
-                PropertyAnimation {
-                    target: exitItem
-                    property: "opacity"
-                    from: 1
-                    to: 0
-                }
+            pushTransition: StackViewTransition {
+                PropertyAnimation { target: enterItem; property: "opacity"; from: 0; to: 1 }
+                PropertyAnimation { target: exitItem; property: "opacity"; from: 1; to: 0 }
             }
         }
-
     }
 
     VoiceCallManager {
@@ -118,68 +101,61 @@ ApplicationWindow {
         modemPath: telephonyManager.getModemPath()
 
         onActiveVoiceCallChanged: {
-
-            if(activeVoiceCall) {
-
+            if (activeVoiceCall) {
                 console.log("Active Call Status: ",activeVoiceCall.state)
 
                 main.activeVoiceCallPerson = people.personByPhoneNumber(activeVoiceCall.lineId)
                 manager.activeVoiceCall.statusText = "active"
 
-                if(main.activationReason === "incoming"){
+                if (main.activationReason === "incoming")
                     incomingCall()
-                } else {
+                else
                     activeCallDialog()
-                }
 
-                if(!__window.visible)
-                {
+                if (!window.visible) {
                     main.activationReason = 'activeVoiceCallChanged';
-                    __window.show();
+                    window.show();
                 }
             }
-            else
-            {
+            else {
                 console.log("No activeVoiceCall")
 
                 tabView.pDialer.clear();
                 stackView.pop()
 
-                // console.log("TabIndex" + tabView.currentIndex);
                 // If we were going back to Voicemail tab, go to first tab instead
-                if(tabView.currentIndex == 3) {
+                if (tabView.currentIndex == 3)
                     tabView.currentIndex = 0;
-                }
 
                 main.activeVoiceCallPerson = null;
 
-                if(main.activationReason != "invoked")
-                {
-                    main.activationReason = 'invoked'; // reset for next time
-                    __window.close();
+                if (main.activationReason !== "invoked") {
+                    // reset for next time
+                    main.activationReason = 'invoked';
+                    window.close();
                 }
             }
         }
     }
 
-    function dial(msisdn) {
-        if(msisdn === "999") {
+    function dial(number) {
+        if (number === "999")
             showSIMPinDialog()
-        } else if(msisdn === "111") {
+        else if (number === "111") {
             main.activationReason = "incoming";
             main.incomingCall();
-        } else {
-            manager.dial(msisdn);
         }
+        else
+            manager.dial(number);
     }
 
-    function showSIMPinDialog(){
-        if (!__window.visible)
-            __window.show();
+    function showSIMPinDialog() {
+        if (!window.visible)
+            window.show();
         stackView.push(Qt.resolvedUrl("views/SIMPin.qml"))
     }
 
-    function activeCallDialog(){
+    function activeCallDialog() {
         console.log("Showing Active Call Dialog")
         stackView.push(Qt.resolvedUrl("views/ActiveCallDialog.qml"))
     }
@@ -206,7 +182,7 @@ ApplicationWindow {
         main.hangup()
         stackView.pop()
         main.activationReason = 'invoked'; // reset for next time
-        __window.close()
+        window.close()
     }
 
     function secondsToTimeString(seconds) {
@@ -224,7 +200,7 @@ ApplicationWindow {
     }
 
     ContactManager {
-        id:people
+        id: people
     }
 
     TelephonyManager {
