@@ -24,10 +24,14 @@ import QtQuick.Controls.Styles 1.1
 import QtQuick.Layouts 1.0
 import QtQuick.Window 2.1
 import LunaNext.Common 0.1
+import LuneOS.Application 1.0
 
-
-Window {
+ApplicationWindow {
     id: main
+
+    keepAlive: true
+    loadingAnimationDisabled: true
+
     width: Settings.displayWidth
     height: Settings.displayHeight
     color: appTheme.backgroundColor
@@ -109,7 +113,7 @@ Window {
 
     }
 
-    property VoiceCallManager manager: VoiceCallManager{
+    VoiceCallManager {
         id: manager
         modemPath: telephonyManager.getModemPath()
 
