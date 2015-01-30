@@ -8,6 +8,6 @@
 	"main": "qml/main.qml",
 	"icon": "icon.png",
 	"uiRevision": "2",
-	"keywords": [ "Dial" ],
+	"keywords": [ "Dial" ]
 }
 
