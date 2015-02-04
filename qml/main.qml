@@ -84,6 +84,13 @@ ApplicationWindow {
         anchors.fill: parent
         initialItem: tabView
 
+        function openPage(name) {
+            var pageName = "views/" + name + "Page.qml";
+            // FIXME: check if we already have the page on the stack and
+            // if put it into the foreground
+            stackView.push(Qt.resolvedUrl(pageName));
+        }
+
         delegate: StackViewDelegate {
             function transitionFinished(properties) {
                 properties.exitItem.opacity = 1
@@ -152,17 +159,17 @@ ApplicationWindow {
     function showSIMPinDialog() {
         if (!window.visible)
             window.show();
-        stackView.push(Qt.resolvedUrl("views/SIMPin.qml"))
+        stackView.openPage("SIMLocked");
     }
 
     function activeCallDialog() {
         console.log("Showing Active Call Dialog")
-        stackView.push(Qt.resolvedUrl("views/ActiveCallDialog.qml"))
+        stackView.openPage("ActiveCall");
     }
 
     function incomingCall() {
         console.log("Showing Incoming Call Dialog");
-        stackView.push(Qt.resolvedUrl("views/IncomingCallDialog.qml"));
+        stackView.openPage("IncomingCall");
     }
 
     function accept() {

@@ -28,11 +28,6 @@ Rectangle {
     color: main.appTheme.backgroundColor
     radius: 10
 
-    //anchors {
-    //    bottom: parent.bottom
-    //    horizontalCenter:parent.horizontalCenter
-    //}
-
     Image {
         id:iAvatar
         anchors {

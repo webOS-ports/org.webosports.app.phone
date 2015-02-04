@@ -32,7 +32,7 @@ TabView {
     Tab {
         id: tabDialer
         title: "Dial"
-        sourceComponent: Dialer{ anchors.horizontalCenter: parent.horizontalCenter}
+        sourceComponent: DialerPage { anchors.horizontalCenter: parent.horizontalCenter}
     }
 
     Tab {
@@ -74,7 +74,5 @@ TabView {
         if(title === "Voicemail") {
             return "images/menu-icon-voicemail.png"
         }
-
-
     }
 }
