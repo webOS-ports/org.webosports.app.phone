@@ -16,10 +16,17 @@
  */
 
 import QtQuick 2.0
+import LuneOS.Application 1.0
 
-ListModel {
+Db8Model {
+    id: model
 
-    ListElement{ name: "John Smith"; remoteUid: "1234567890"}
-    ListElement{ name: "Steve Brown"; remoteUid: "235892382"}
-    ListElement{ name: "Tom Slater"; remoteUid: "81235892382"}
+    kind: "com.palm.person:1"
+    watch: true
+    query: {
+        "where": [
+            { "prop": "favorite", "op": "=", "val": true }
+        ],
+        "orderBy": "sortKey"
+    }
 }

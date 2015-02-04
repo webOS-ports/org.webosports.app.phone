@@ -24,13 +24,24 @@ Rectangle {
     anchors.fill: parent
     color: main.appTheme.backgroundColor
 
+    FavoritesModel {
+        id: favoritesModel
+    }
+
+    function getPrimaryPhoneNumber(person) {
+        if (person.phoneNumbers && person.phoneNumbers.length > 0) {
+            return person.phoneNumbers[0].value;
+        }
+        return "";
+    }
+
     ListView {
         id:favouriteList
         anchors {margins:5;horizontalCenter:parent.horizontalCenter}
         anchors.fill: parent
         spacing:10
         clip:true
-        model: Favouites{}
+        model: favoritesModel
 
         delegate: Item {
             width:parent.width
@@ -39,13 +50,15 @@ Rectangle {
             
             MouseArea {
                 anchors.fill: parent
-                onClicked:main.dial(model.remoteUid);
+                // onClicked: main.dial(model.remoteUid);
             }
-
 
             Rectangle {
                 anchors.fill:parent
-                border {color:main.appTheme.foregroundColor;width: 1.5}
+                border {
+                    color:main.appTheme.foregroundColor
+                    width: 1.5
+                }
                 radius:20
                 color:'#00000000'
             }
@@ -56,14 +69,16 @@ Rectangle {
 
             Column {
                     Text {
-                        color:model.isMissedCall ? 'red' : 'white'
+                        // color:model.isMissedCall ? 'red' : 'white'
+                        color: "white"
                         font.pixelSize:Units.dp(20)
-                        text: model.name
+                        text: name.familyName
                     }
                     Text {
                         color:'grey'
                         font.pixelSize:Units.dp(15)
-                        text: model.remoteUid
+                        // text: model.remoteUid
+                        text: getPrimaryPhoneNumber(model);
                     }
                 }
             }
