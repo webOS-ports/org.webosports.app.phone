@@ -20,82 +20,47 @@ import LunaNext.Common 0.1
 
 Item {
    id:root
-   width: Units.gu(11)
-   height: Units.gu(8)
 
-   property string sub: ""
-   property string key: ""
+   property alias label: label.text
+   property alias sublabel: sublabel.text
+   property int keycode
    property string alt: ""
+
    property int size: 25
 
-        Text {
-            id:tKeyText
-            anchors.centerIn:parent
-            color:main.appTheme.foregroundColor
-            font.pixelSize: Units.dp(size)
-            font.bold: true
-            text: key
-        }
+   signal keyPressed
+   signal keyPressAndHold
 
-        Text {
-            id:tSubText
-            anchors {horizontalCenter:parent.horizontalCenter;top:tKeyText.bottom}
-            color:main.appTheme.subForegroundColor
-            font.pixelSize: Units.dp(10)
-            text: sub ? sub : ''
-        }
+    Text {
+        id: label
+        anchors.centerIn: parent
+        color: main.appTheme.foregroundColor
+        font.pixelSize: Units.dp(size)
+        font.bold: true
+    }
 
-        /*
-          TODO: Key Border
-        */
-        Rectangle {
-            id: box
-            anchors.fill:parent
-            border {color:main.appTheme.foregroundColor;width:0.5}
-            radius:10
-            color:'#00000000'
-            z: -10
-        }
+    Text {
+        id: sublabel
+        anchors.horizontalCenter: parent.horizontalCenter
+        anchors.top:label.bottom
+        color:main.appTheme.subForegroundColor
+        font.pixelSize: Units.dp(10)
+    }
 
+    Rectangle {
+        id: box
+        anchors.fill: parent
+        border { color:main.appTheme.foregroundColor; width:0.5}
+        radius: 10
+        color: mouseArea.pressed ? '#6495ed' : '#000000'
+        z: -10
+    }
 
-        MouseArea {
-                anchors.fill:parent
-
-                property bool waitingForDoubleClick: false
-
-                Timer {
-                    id:clickTimer
-                    interval:520
-                    running:false
-                    repeat:false
-                    onTriggered:parent.waitingForDoubleClick = false;
-                }
-
-                onClicked: {
-                    if(waitingForDoubleClick && numpad.entryTarget.__previousCharacter === key && alt) {
-                        numpad.entryTarget.backspace();
-                        numpad.entryTarget.insertChar(alt);
-                        waitingForDoubleClick = false;
-                        clickTimer.stop();
-                    } else {
-                        numpad.entryTarget.insertChar(key);
-                        waitingForDoubleClick = true;
-                        clickTimer.start();
-                    }
-                }
-
-                onPressAndHold: {
-                    numpad.entryTarget.insertChar(alt || key);
-                }
-
-                // Audio feedback.
-                onPressed: {
-                    numpad.onPressed(key);
-                    box.color = '#6495ed'
-                }
-                onReleased: {
-                    numpad.onReleased();
-                    box.color = '#00000000'
-                }
-            }
+    MouseArea {
+        id: mouseArea
+        anchors.fill:parent
+        onPressed: keyPressed()
+        onPressAndHold: keyPressAndHold()
+    }
 }
+

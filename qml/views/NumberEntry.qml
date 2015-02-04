@@ -29,7 +29,7 @@ Item {
 
     property string __previousCharacter
 
-    function insertChar(character) {
+    function insert(character) {
         var text = textedit.text
         var cpos = textedit.cursorPosition;
 
@@ -69,8 +69,8 @@ Item {
     }
 
     function getPhoneNumber(){
-        if(numentry.text.length > 0) {
-            return numentry.text.replace(/\D/g, '');
+        if(numEntry.text.length > 0) {
+            return numEntry.text.replace(/\D/g, '');
         } else {
             return ''
         }

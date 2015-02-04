@@ -18,66 +18,142 @@
 import QtQuick 2.0
 import LunaNext.Common 0.1
 
-
-
 Item {
-    id:numpad
+    id: numPad
 
     property string mode: 'dial' // dial | dtmf | sim
-    property Item entryTarget
-
-    property int fontPixelSize: Units.dp(43)
-    property int keysWidth: Units.gu(11)
-    property int keysHeight: Units.gu(8)
-
-    width: keys.width
-    height: keys.height
-
 
     signal keyPressed(int keycode, string label)
+    signal keyPressAndHold(int keycode, string label)
+
+    property int keysWidth: Units.gu(11)
+    property int keysHeight: Units.gu(8)
 
     Grid {
         id: keys
 
         rows: 4
         columns: 3
-        //spacing: Units.gu(1)
+        columnSpacing: Units.gu(2.0)
+        rowSpacing: Units.gu(0.5)
+        anchors.centerIn: parent
 
-        anchors {
-            horizontalCenter:parent.horizontalCenter
+        NumPadButton {
+            width: keysWidth
+            height: keysHeight
+            label:'1'
+            sublabel: (mode === "sim") ? '': 'voicemail'
+            keycode: Qt.Key_1
+            onKeyPressed: numPad.keyPressed(keycode, label)
+            onKeyPressAndHold: numPad.keyPressAndHold(keycode, label)
         }
 
-        NumPadButton {key:'1';sub: (mode === "sim") ? '': 'voicemail'}
-        NumPadButton {key:'2';sub:'ABC'}
-        NumPadButton {key:'3';sub:'DEF'}
-        NumPadButton {key:'4';sub:'GHI'}
-        NumPadButton {key:'5';sub:'JKL'}
-        NumPadButton {key:'6';sub:'MNO'}
-        NumPadButton {key:'7';sub:'PQRS'}
-        NumPadButton {key:'8';sub:'TUV'}
-        NumPadButton {key:'9';sub:'WXYZ'}
-        NumPadButton {key: (mode === "sim") ? '': '\u002A'; size: 40}
-        NumPadButton {key:'0';sub: (mode === "sim") ? '': '+';alt: (mode === "sim") ? '': '+'}
-        NumPadButton {key:(mode === "sim") ? '': '#';alt: (mode === "sim") ? '': 'p'}
-    }
-
-    Rectangle {
-        anchors.fill:parent
-        border {color:main.appTheme.foregroundColor;width:0.5}
-        radius:10
-        color:'#00000000'
-    }
-
-    // Audio feedback.
-    function onPressed(key) {
-        if(mode === 'dial' || mode === 'dtmf'){
-            main.manager.startDtmfTone(key);
+        NumPadButton {
+            width: keysWidth
+            height: keysHeight
+            label:'2'
+            sublabel: 'ABC'
+            keycode: Qt.Key_2
+            onKeyPressed: numPad.keyPressed(keycode, label)
+            onKeyPressAndHold: numPad.keyPressAndHold(keycode, label)
         }
-    }
 
-    function onReleased() {
-        if(mode === 'dial' || mode === 'dtmf'){
-            main.manager.stopDtmfTone();
+        NumPadButton {
+            width: keysWidth
+            height: keysHeight
+            label:'3'
+            sublabel: 'DEF'
+            keycode: Qt.Key_3
+            onKeyPressed: numPad.keyPressed(keycode, label)
+            onKeyPressAndHold: numPad.keyPressAndHold(keycode, label)
+        }
+
+        NumPadButton {
+            width: keysWidth
+            height: keysHeight
+            label:'4'
+            sublabel: 'GHI'
+            keycode: Qt.Key_4
+            onKeyPressed: numPad.keyPressed(keycode, label)
+            onKeyPressAndHold: numPad.keyPressAndHold(keycode, label)
+        }
+
+        NumPadButton {
+            width: keysWidth
+            height: keysHeight
+            label:'5'
+            sublabel: 'JKL'
+            keycode: Qt.Key_5
+            onKeyPressed: numPad.keyPressed(keycode, label)
+            onKeyPressAndHold: numPad.keyPressAndHold(keycode, label)
+        }
+
+        NumPadButton {
+            width: keysWidth
+            height: keysHeight
+            label:'6'
+            sublabel: 'MNO'
+            keycode: Qt.Key_6
+            onKeyPressed: numPad.keyPressed(keycode, label)
+            onKeyPressAndHold: numPad.keyPressAndHold(keycode, label)
+        }
+
+        NumPadButton {
+            width: keysWidth
+            height: keysHeight
+            label:'7'
+            sublabel: 'PQRS'
+            keycode: Qt.Key_7
+            onKeyPressed: numPad.keyPressed(keycode, label)
+            onKeyPressAndHold: numPad.keyPressAndHold(keycode, label)
+        }
+
+        NumPadButton {
+            width: keysWidth
+            height: keysHeight
+            label:'8'
+            sublabel: 'TUV'
+            keycode: Qt.Key_8
+            onKeyPressed: numPad.keyPressed(keycode, label)
+            onKeyPressAndHold: numPad.keyPressAndHold(keycode, label)
+        }
+
+        NumPadButton {
+            width: keysWidth
+            height: keysHeight
+            label:'9'
+            sublabel: 'WXYZ'
+            keycode: Qt.Key_9
+            onKeyPressed: numPad.keyPressed(keycode, label)
+            onKeyPressAndHold: numPad.keyPressAndHold(keycode, label)
+        }
+
+        NumPadButton {
+            width: keysWidth
+            height: keysHeight
+            label:'*'
+            keycode: Qt.Key_Asterisk
+            onKeyPressed: numPad.keyPressed(keycode, label)
+            onKeyPressAndHold: numPad.keyPressAndHold(keycode, label)
+        }
+
+        NumPadButton {
+            width: keysWidth
+            height: keysHeight
+            label: '0'
+            sublabel: '+'
+            keycode: Qt.Key_0
+            onKeyPressed: numPad.keyPressed(keycode, label)
+            onKeyPressAndHold: numPad.keyPressAndHold(keycode, label)
+        }
+
+        NumPadButton {
+            width: keysWidth
+            height: keysHeight
+            label: '#'
+            keycode: Qt.Key_ssharp
+            onKeyPressed: numPad.keyPressed(keycode, label)
+            onKeyPressAndHold: numPad.keyPressAndHold(keycode, label)
         }
     }
 }

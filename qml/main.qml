@@ -75,7 +75,7 @@ ApplicationWindow {
             console.log("Window not active - Cleaning up");
             main.hangup();
             if (tabView.pDialer)
-                tabView.pDialer.clear();
+                tabView.pDialer.reset();
         }
     }
 

@@ -23,50 +23,58 @@ import LunaNext.Common 0.1
 
 Rectangle {
     id: pDialPage
+
+    property alias number: numEntry.text
+
+    function reset() {
+        numEntry.text = "";
+    }
+
     anchors.fill: parent
     color: main.appTheme.backgroundColor
 
-    property alias numberEntryText: numentry.text
-
     NumberEntry {
-        id:numentry
+        id: numEntry
+
         anchors {
             top: pDialPage.top
             topMargin: Units.gu(5)
             left:parent.left
             right:parent.right
         }
+
         color:'#ffffff'
     }
 
     NumPad {
-        id:numpad
+        id: numPad
         anchors {
-            bottom: bCallNumber.top
-            topMargin: Units.gu(3)
-            horizontalCenter:parent.horizontalCenter
+            top: numEntry.bottom
+            bottom: dialButton.top
+            topMargin: Units.gu(2)
+            horizontalCenter: parent.horizontalCenter
         }
-        entryTarget:numentry
+
+        onKeyPressed: {
+            numEntry.insert(label);
+        }
     }
 
     DialButton {
-        id:bCallNumber
+        id: dialButton
+
         anchors {
             bottom: parent.bottom;
-            horizontalCenter:parent.horizontalCenter;
-            margins:Units.gu(2)
+            horizontalCenter: parent.horizontalCenter;
+            margins: Units.gu(2)
         }
+
         onClicked: {
-            if(numentry.text.length > 0) {
-                main.dial(numentry.getPhoneNumber());
+            if(numEntry.text.length > 0) {
+                main.dial(numEntry.getPhoneNumber());
             } else {
                 console.log('Number entry is blank.');
             }
         }
     }
-
-    function clear() {
-        numentry.clear();
-    }
-
 }

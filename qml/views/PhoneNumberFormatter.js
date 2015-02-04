@@ -22,7 +22,6 @@
  * (123) 456 - 7890
  */
 function formatPhoneNumber(number) {
-
     var numbers = number.replace(/\D/g, '');
     var c = { 0:'(', 3:') ', 6: ' - '};
     var result = '';
