@@ -9,4 +9,5 @@ Item {
     property string modemPath
 
     function hangupAll() { }
+    function dial(number) { }
 }
