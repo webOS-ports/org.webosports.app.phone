@@ -42,6 +42,10 @@ ApplicationWindow {
     property alias main: window
     property alias appTheme: phoneUiAppPhome
 
+    onWindowIdChanged: {
+        console.log("windowId: " + window.windowId);
+    }
+
     Component.onCompleted: {
         console.log("Parsing Launch Params: " + application.launchParameters);
         var params = JSON.parse(application.launchParameters);
@@ -145,9 +149,17 @@ ApplicationWindow {
         }
     }
 
+    SIMLockedWindow {
+        id: simLockedWindow
+        visible: false
+        parentWindowId: window.windowId
+        mainWindow: window
+    }
+
     function dial(number) {
-        if (number === "999")
-            showSIMPinDialog()
+        if (number === "999") {
+            openSIMLockedPage();
+        }
         else if (number === "111") {
             main.activationReason = "incoming";
             main.incomingCall();
@@ -156,10 +168,8 @@ ApplicationWindow {
             manager.dial(number);
     }
 
-    function showSIMPinDialog() {
-        if (!window.visible)
-            window.show();
-        stackView.openPage("SIMLocked");
+    function openSIMLockedPage() {
+        simLockedWindow.show();
     }
 
     function activeCallDialog() {

@@ -16,56 +16,63 @@
  */
 
 import QtQuick 2.0
+import QtQuick.Controls 1.1
+import QtQuick.Controls.Styles 1.1
 import LunaNext.Common 0.1
 import "PhoneNumberFormatter.js" as PhoneNumberFormatter
 
 Item {
-    id:root
+    id: numberEntry
 
-    property alias text:textedit.text
-    property alias color:textedit.color
-    property alias alignment:textedit.horizontalAlignment
-    property alias inputMethodHints:textedit.inputMethodHints
+    property alias text: textEdit.text
+    property string textColor: "white"
+    property alias alignment: textEdit.horizontalAlignment
+    property alias inputMethodHints: textEdit.inputMethodHints
+    property alias echoMode: textEdit.echoMode
+
+    property bool isPhoneNumber: true
 
     property string __previousCharacter
 
     function insert(character) {
-        var text = textedit.text
-        var cpos = textedit.cursorPosition;
+        var text = textEdit.text
+        var cpos = textEdit.cursorPosition;
 
         if(text.length == 0) {
-            textedit.text = character
-            textedit.cursorPosition = textedit.text.length
+            textEdit.text = character
+            textEdit.cursorPosition = textEdit.text.length
         } else {
-            textedit.text = PhoneNumberFormatter.formatPhoneNumber(text.slice(0, cpos) + character + text.slice(cpos,text. length));
-            textedit.cursorPosition = cpos + (textedit.text.length - text.length);
+            var newText = text.slice(0, cpos) + character + text.slice(cpos,text. length);
+            textEdit.text = isPhoneNumber ? PhoneNumberFormatter.formatPhoneNumber(newText) : newText;
+            textEdit.cursorPosition = cpos + (textEdit.text.length - text.length);
         }
 
-        root.__previousCharacter = character;
+        numberEntry.__previousCharacter = character;
         interactionTimeout.restart();
     }
 
     function backspace() {
-        var cpos = textedit.cursorPosition == 0 ? 1 : textedit.cursorPosition;
-        var text = textedit.text
+        var cpos = textEdit.cursorPosition == 0 ? 1 : textEdit.cursorPosition;
+        var text = textEdit.text
 
-        if(text.length == 0) return;
+        if(text.length == 0)
+            return;
 
-        textedit.text = PhoneNumberFormatter.formatPhoneNumber(text.slice(0, cpos - 1) + text.slice(cpos, text.length));
-        textedit.cursorPosition = cpos - (text.length - textedit.text.length);
+        var newText = text.slice(0, cpos - 1) + text.slice(cpos, text.length);
+        textEdit.text = isPhoneNumber ? PhoneNumberFormatter.formatPhoneNumber(newText) : newText;
+        textEdit.cursorPosition = cpos - (text.length - textEdit.text.length);
 
-        root.__previousCharacter = '';
+        numberEntry.__previousCharacter = '';
         interactionTimeout.restart();
     }
 
     function resetCursor() {
-        textedit.cursorPosition = textedit.text.length;
-        textedit.cursorVisible = false;
+        textEdit.cursorPosition = textEdit.text.length;
     }
 
     function clear() {
         resetCursor();
-        textedit.text = '';
+        textEdit.text = '';
     }
 
     function getPhoneNumber(){
@@ -81,7 +88,7 @@ Item {
         interval:10000
         running:false
         repeat:false
-        onTriggered:root.resetCursor();
+        onTriggered:numberEntry.resetCursor();
     }
 
     Image {
@@ -101,50 +108,48 @@ Item {
         MouseArea {
             anchors.fill:parent
 
-            onClicked: root.backspace();
-            onPressAndHold: root.clear();
+            onClicked: numberEntry.backspace();
+            onPressAndHold: numberEntry.clear();
         }
     }
 
-    TextEdit {
-        id:textedit
+    TextField {
+        id: textEdit
 
         anchors {
-            left:parent.left;right:backspace.left
-            leftMargin:30;rightMargin:20
-            verticalCenter:parent.verticalCenter
+            left: parent.left
+            right: backspace.left
+            leftMargin: 30
+            rightMargin: 20
+            verticalCenter: parent.verticalCenter
         }
+
+        height: Units.gu(10)
 
         activeFocusOnPress: false
-        cursorVisible:false
-        inputMethodHints:Qt.ImhDialableCharactersOnly
-        font.pixelSize:64 //TODO:Theme
-        horizontalAlignment:TextEdit.AlignRight
+        inputMethodHints: Qt.ImhDialableCharactersOnly
+        font.pixelSize: FontUtils.sizeToPixels("large")
+        textColor: "white"
+        horizontalAlignment: TextInput.AlignHCenter
 
-        onTextChanged:__resizeText();
-
-        function __resizeText() {
-
-            if(paintedWidth < 0 || paintedHeight < 0) return;
-
-            while(paintedWidth > width) {
-                if(font.pixelSize <= 0) break;
-                font.pixelSize--;
-            }
-
-            while(paintedWidth < width) {
-                if(font.pixelSize >= 72) break;
-                font.pixelSize++;
-            }
+        Component.onCompleted: {
+            // On desktop we don't have this field
+            if (textEdit.passwordCharacter)
+                textEdit.passwordCharacter = "\u2022";
         }
 
+        style: TextFieldStyle {
+            textColor: "white"
+            background: Rectangle {
+                color: phoneUiAppPhome.backgroundColor
+            }
+        }
     }
 
     MouseArea {
-        anchors.fill:textedit
+        anchors.fill:textEdit
 
         onPressed: {
-            textedit.cursorVisible = true;
             interactionTimeout.restart();
             mouse.accepted = false;
         }

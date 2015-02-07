@@ -26,78 +26,16 @@ Item {
      **/
 
     property bool present: true
-
     property string subscriberIdentity: ""
     property string mobileCountryCode: ""
     property string mobileNetworkCode: ""
-    property bool pinRequired: false
-
-    property int pinRetry: 3
-
-    function changePin(type, oldPin, newPin){
-
-    }
-
-    function enterPin(type, pin) {
-        if (!_validatePin(pin))
-            return false;
-
-        simManager.enterPin(_convertPinType(type), pin);
-        return true;
-    }
-
-    function resetPin(type, puk, newpin){
-
-    }
-
-    function lockPin(type, pin){
-
-    }
-
-    function unlockPin(type, pin) {
-        if (!_validatePin(pin))
-            return false;
-        simManager.unlockPin(_convertPinType(type), pin);
-        return true;
-    }
-
-    function getPinRetries(type) {
-        return simManager.pinRetries[_convertPinType(type)];
-    }
 
     /**
      * private API
      **/
 
-    function _convertPinType(type) {
-        switch (type) {
-        case 'pin':
-            return OfonoSimManager.SimPin;
-        default:
-            break;
-        }
-
-        return OfonoSimManager.NoPin;
-    }
-
-    function _validatePin(pin) {
-        console.log("minimumPinLength: " + simManager.minimumPinLength(OfonoSimManager.SimPin));
-        console.log("maxmimumPinLength: " + simManager.maximumPinLength(OfonoSimManager.SimPin));
-        return (pin >= simManager.minimumPinLength(OfonoSimManager.SimPin) && pin <= simManager.maximumPinLength(OfonoSimManager.SimPin));
-    }
-
     function getModemPath() {
         return modemManager.modems[0]
-    }
-
-    onPinRequiredChanged: {
-        if (telephonyManager.pinRequired) {
-            console.log("SIM PIN is required");
-            main.showSIMPinDialog()
-        }
-        else {
-            console.log("SIM PIN is not required");
-        }
     }
 
     OfonoManager {
@@ -152,8 +90,6 @@ Item {
     OfonoSimManager {
         id: simManager
         modemPath: modemManager.modems[0]
-
-
         Component.onCompleted: {
             console.log("simManager->present:" , JSON.stringify(simManager.present));
             console.log("simManager->CardIdentifier:" , JSON.stringify(simManager.cardIdentifier));
@@ -167,15 +103,6 @@ Item {
 
             telephonyManager.subscriberIdentity = simManager.subscriberIdentity
             telephonyManager.present = simManager.present
-
-        }
-
-        onPinRequiredChanged: {
-            if (simManager.pinRequired === OfonoSimManager.SimPin)
-                telephonyManager.pinRequired = true;
-            else
-                telephonyManager.pinRequired = false;
-            /* FIXME support other pin types too */
         }
     }
 
@@ -189,7 +116,6 @@ Item {
             console.log("network->mode:" , JSON.stringify(network.mode));
             console.log("network->status:" , JSON.stringify(network.status));
             console.log("network->name:" , JSON.stringify(network.name));
-
         }
 
         onNetworkOperatorsChanged : {
@@ -212,8 +138,6 @@ Item {
 
     OfonoNetworkOperator {
         id: networkOperator
-
     }
-
 }
 

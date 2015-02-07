@@ -43,7 +43,7 @@ Rectangle {
             right:parent.right
         }
 
-        color:'#ffffff'
+        textColor: '#ffffff'
     }
 
     NumPad {
