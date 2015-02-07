@@ -26,201 +26,51 @@ import QtQuick.Window 2.1
 import LunaNext.Common 0.1
 import LuneOS.Application 1.0
 
-ApplicationWindow {
-    id: window
-
-    keepAlive: true
-    loadingAnimationDisabled: true
-
-    width: Settings.displayWidth
-    height: Settings.displayHeight
-    color: appTheme.backgroundColor
-
-    property string activationReason: 'invoked'
-    property Contact activeVoiceCallPerson
-
-    property alias main: window
-    property alias appTheme: phoneUiAppPhome
-
-    onWindowIdChanged: {
-        console.log("windowId: " + window.windowId);
-    }
+Item {
+    id: root
 
     Component.onCompleted: {
-        console.log("Parsing Launch Params: " + application.launchParameters);
-        var params = JSON.parse(application.launchParameters);
+        var launchParams = "{}";
+        if (typeof application !== "undefined")
+            launchParams = application.launchParameters;
+
+        console.log("Parsing Launch Params: " + launchParams);
+        var params = JSON.parse(launchParams);
 
         if (!params.launchedAtBoot)
-            window.show();
+            phoneWindow.show();
     }
 
-    PhoneUiTheme { id: phoneUiAppPhome }
+    Item {
+        id: dummyApp
+        signal relaunched
+    }
 
     Connections {
-        target: application
+        target: typeof application !== "undefined" ? application : dummyApp
         onRelaunched: {
             console.log("DEBUG: Relaunched with parameters: " + parameters);
 
             // If we're launched at boot time we're not yet visible so bring our window
             // to the foreground
-            if (!window.visible)
-                window.show();
-
-            // default to the main screen.
-            stackView.pop(tabView);
+            if (!phoneWindow.visible)
+                phoneWindow.show();
         }
     }
 
-    /**
-     * When PhoneApp is closed, hang up any active calls.
-     */
-    onVisibleChanged: {
-        if(!visible) {
-            console.log("Window not active - Cleaning up");
-            main.hangup();
-            if (tabView.pDialer)
-                tabView.pDialer.reset();
-        }
-    }
-
-    StackView {
-        id: stackView
-        anchors.fill: parent
-        initialItem: tabView
-
-        function openPage(name) {
-            var pageName = "views/" + name + "Page.qml";
-            // FIXME: check if we already have the page on the stack and
-            // if put it into the foreground
-            stackView.push(Qt.resolvedUrl(pageName));
-        }
-
-        delegate: StackViewDelegate {
-            function transitionFinished(properties) {
-                properties.exitItem.opacity = 1
-            }
-
-            pushTransition: StackViewTransition {
-                PropertyAnimation { target: enterItem; property: "opacity"; from: 0; to: 1 }
-                PropertyAnimation { target: exitItem; property: "opacity"; from: 1; to: 0 }
-            }
-        }
-    }
-
-    VoiceCallManager {
-        id: manager
-        modemPath: telephonyManager.getModemPath()
-
-        onActiveVoiceCallChanged: {
-            if (activeVoiceCall) {
-                console.log("Active Call Status: ",activeVoiceCall.state)
-
-                main.activeVoiceCallPerson = people.personByPhoneNumber(activeVoiceCall.lineId)
-                manager.activeVoiceCall.statusText = "active"
-
-                if (main.activationReason === "incoming")
-                    incomingCall()
-                else
-                    activeCallDialog()
-
-                if (!window.visible) {
-                    main.activationReason = 'activeVoiceCallChanged';
-                    window.show();
-                }
-            }
-            else {
-                console.log("No activeVoiceCall")
-
-                tabView.pDialer.clear();
-                stackView.pop()
-
-                // If we were going back to Voicemail tab, go to first tab instead
-                if (tabView.currentIndex == 3)
-                    tabView.currentIndex = 0;
-
-                main.activeVoiceCallPerson = null;
-
-                if (main.activationReason !== "invoked") {
-                    // reset for next time
-                    main.activationReason = 'invoked';
-                    window.close();
-                }
-            }
-        }
+    PhoneWindow {
+        id: phoneWindow
+        simLockedWindow: simLockedWindow
     }
 
     SIMLockedWindow {
         id: simLockedWindow
         visible: false
-        parentWindowId: window.windowId
-        mainWindow: window
-    }
-
-    function dial(number) {
-        if (number === "999") {
-            openSIMLockedPage();
-        }
-        else if (number === "111") {
-            main.activationReason = "incoming";
-            main.incomingCall();
-        }
-        else
-            manager.dial(number);
+        parentWindowId: phoneWindow.windowId
+        mainWindow: phoneWindow
     }
 
     function openSIMLockedPage() {
         simLockedWindow.show();
-    }
-
-    function activeCallDialog() {
-        console.log("Showing Active Call Dialog")
-        stackView.openPage("ActiveCall");
-    }
-
-    function incomingCall() {
-        console.log("Showing Incoming Call Dialog");
-        stackView.openPage("IncomingCall");
-    }
-
-    function accept() {
-        console.log("accepting Call")
-        stackView.pop()
-        manager.accept()
-        activeCallDialog()
-    }
-
-    function hangup() {
-        console.log("hanging up Call")
-        manager.hangup()
-    }
-
-    function reject() {
-        console.log("rejecting Call")
-        main.hangup()
-        stackView.pop()
-        main.activationReason = 'invoked'; // reset for next time
-        window.close()
-    }
-
-    function secondsToTimeString(seconds) {
-        var h = Math.floor(seconds / 3600);
-        var m = Math.floor((seconds - (h * 3600)) / 60);
-        var s = seconds - h * 3600 - m * 60;
-        if(h < 10) h = '0' + h;
-        if(m < 10) m = '0' + m;
-        if(s < 10) s = '0' + s;
-        return '' + h + ':' + m + ':' + s;
-    }
-
-    PhoneTabView {
-        id: tabView
-    }
-
-    ContactManager {
-        id: people
-    }
-
-    TelephonyManager {
-        id: telephonyManager
     }
 }

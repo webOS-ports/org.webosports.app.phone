@@ -34,7 +34,7 @@ Item {
     Text {
         id: label
         anchors.centerIn: parent
-        color: main.appTheme.foregroundColor
+        color: phoneUiAppTheme.foregroundColor
         font.pixelSize: Units.dp(size)
         font.bold: true
     }
@@ -43,14 +43,14 @@ Item {
         id: sublabel
         anchors.horizontalCenter: parent.horizontalCenter
         anchors.top:label.bottom
-        color:main.appTheme.subForegroundColor
+        color:phoneUiAppTheme.subForegroundColor
         font.pixelSize: Units.dp(10)
     }
 
     Rectangle {
         id: box
         anchors.fill: parent
-        border { color:main.appTheme.foregroundColor; width:0.5}
+        border { color:phoneUiAppTheme.foregroundColor; width:0.5}
         radius: 10
         color: mouseArea.pressed ? '#6495ed' : '#000000'
         z: -10

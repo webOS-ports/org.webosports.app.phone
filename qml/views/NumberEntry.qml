@@ -141,7 +141,7 @@ Item {
         style: TextFieldStyle {
             textColor: "white"
             background: Rectangle {
-                color: phoneUiAppPhome.backgroundColor
+                color: phoneUiAppTheme.backgroundColor
             }
         }
     }

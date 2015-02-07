@@ -30,7 +30,10 @@ LuneOS.ApplicationWindow {
 
     width: Settings.displayWidth
     height: Settings.displayHeight
-    color: main.appTheme.backgroundColor
+
+    PhoneUiTheme { id: phoneUiAppTheme }
+
+    color: phoneUiAppTheme.backgroundColor
 
     // Possible states are: none, pin, pin-retry, puk, puk-retry
     property string state:  "none"
@@ -125,7 +128,7 @@ LuneOS.ApplicationWindow {
         width: Settings.displayWidth
         anchors.left: parent.left
         anchors.right: parent.right
-        color: main.appTheme.headerColor
+        color: phoneUiAppTheme.headerColor
         radius: 2
         height: Units.gu(10)
         ColumnLayout{
@@ -151,7 +154,7 @@ LuneOS.ApplicationWindow {
                 Text {
                     id: title
                     font.pixelSize: Units.dp(18)
-                    color: main.appTheme.headerTitle
+                    color: phoneUiAppTheme.headerTitle
                     anchors.horizontalCenter:parent.horizontalCenter
                 }
 
@@ -183,7 +186,7 @@ LuneOS.ApplicationWindow {
         height: 90
         anchors.top: header.bottom
         anchors.topMargin: 50
-        textColor: main.appTheme.foregroundColor
+        textColor: phoneUiAppTheme.foregroundColor
         echoMode: TextInput.Password
         isPhoneNumber: false
     }
