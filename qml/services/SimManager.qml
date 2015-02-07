@@ -30,6 +30,15 @@ Item {
         return pinRequired !== "none";
     }
 
+    Timer {
+        id: resubscriberSimStatusTimer
+        running: false
+        interval: 2000
+        onTriggered: {
+            simStatusQuery.subscribe(JSON.stringify({"subscribe":true}));
+        }
+    }
+
     LunaService {
         id: simStatusQuery
         usePrivateBus: true
@@ -37,13 +46,16 @@ Item {
         method: "simStatusQuery"
 
         onInitialized: {
-            simStatusQuery.subscribe({"subscribe":true});
+            simStatusQuery.subscribe(JSON.stringify({"subscribe":true}));
         }
 
         onResponse: function (message) {
             var response = JSON.parse(message.payload);
-            console.log("Response: " + message.payload);
-            console.log("state: " + response.extended.state);
+
+            if (!response.returnValue) {
+                resubscriberSimStatusTimer.start();
+                return;
+            }
 
             switch (response.extended.state) {
             case "pinrequired":
