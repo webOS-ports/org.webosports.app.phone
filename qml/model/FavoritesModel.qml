@@ -16,7 +16,7 @@
  */
 
 import QtQuick 2.0
-import LuneOS.Application 1.0
+import LuneOS.Service 1.0
 
 Db8Model {
     id: model

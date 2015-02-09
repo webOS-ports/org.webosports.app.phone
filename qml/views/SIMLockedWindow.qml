@@ -20,6 +20,7 @@ import QtQuick.Controls 1.1
 import QtQuick.Layouts 1.0
 import QtQuick.Controls.Styles 1.1
 import LunaNext.Common 0.1
+import LuneOS.Service 1.0
 import LuneOS.Application 1.0 as LuneOS
 import "../services"
 
