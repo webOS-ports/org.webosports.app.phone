@@ -22,7 +22,7 @@ import LuneOS.Service 1.0
 Item {
     id: simManager
 
-    // Possible values: none, pin1, puk
+    // Possible values: none, pin, puk
     property string pinRequired: "none"
 
     onPinRequiredChanged: console.log("pinRequired: " + pinRequired)
@@ -43,7 +43,7 @@ Item {
     LunaService {
         id: simStatusQuery
         usePrivateBus: true
-        service: "palm://com.palm.telephony"
+        service: "luna://com.palm.telephony"
         method: "simStatusQuery"
 
         onInitialized: {
@@ -53,6 +53,8 @@ Item {
         onResponse: function (message) {
             var response = JSON.parse(message.payload);
 
+            console.log("response: " + message.payload);
+
             if (!response.returnValue) {
                 resubscriberSimStatusTimer.start();
                 return;
@@ -60,7 +62,10 @@ Item {
 
             switch (response.extended.state) {
             case "pinrequired":
-                pinRequired = "pin1";
+                pinRequired = "pin";
+                break;
+            case "pukrequired":
+                pinRequired = "puk";
                 break;
             case "simready":
                 pinRequired = "none";

@@ -40,7 +40,11 @@ LuneOS.ApplicationWindow {
 
     // Possible states are: none, pin, pin-retry, puk, puk-retry
     property string state:  "none"
+    // Possible states are: puk, pin, pin-verify
+    property string pukState: "puk"
     property bool showNeeded: false
+    property string storedPuk: ""
+    property string storedPin: ""
 
     Connections {
         target: mainWindow
@@ -49,6 +53,7 @@ LuneOS.ApplicationWindow {
                 if (mainWindow.windowId === 0)
                     showNeeded = true;
                 else {
+                    updateStateFromSIM();
                     simLockedWindow.show();
                 }
             }
@@ -60,20 +65,34 @@ LuneOS.ApplicationWindow {
             if (!showNeeded)
                 return;
 
+            updateStateFromSIM();
             simLockedWindow.show();
+        }
+    }
+
+    function updateStateFromSIM() {
+        console.log("SIM state " + simManager.pinRequired);
+
+        switch (simManager.pinRequired) {
+        case "pin":
+            advanceState("pin");
+            simLockedWindow.show();
+            break;
+        case "puk":
+            advanceState("puk");
+            simLockedWindow.show();
+            break;
+        case "blocked":
+            // FIXME present banner so users knows he can't try again
+            break;
+        default:
+            break;
         }
     }
 
     SimManager {
         id: simManager
-        onPinRequiredChanged: {
-            if (simManager.pinRequired === "pin1") {
-                state = "pin";
-                simLockedWindow.show();
-            }
-
-            // FIXME support other PIN types
-        }
+        onPinRequiredChanged: updateStateFromSIM()
     }
 
     LunaService {
@@ -95,13 +114,32 @@ LuneOS.ApplicationWindow {
         }
     }
 
-    Component.onCompleted: {
-        state = "pin";
-        console.log("state is now : " + state);
+    LunaService {
+        id: pin1Unblock
+        usePrivateBus: true
+        service: "palm://com.palm.telephony"
+        method: "pin1Unblock"
+
+        onResponse: function (message) {
+            var response = JSON.parse(message.payload);
+
+            if (!response.returnValue) {
+                console.log("Failed to enter puk: ". response.errorText);
+                state = "puk-retry";
+                return;
+            }
+
+            simLockedWindow.close();
+        }
     }
 
-    onStateChanged: {
+    function advanceState(newState) {
+        state = newState;
+
         console.log("State is now " + state);
+
+        pinEntry.text = "";
+
         switch (state) {
         case "pin":
             title.text = "Enter SIM PIN";
@@ -114,6 +152,26 @@ LuneOS.ApplicationWindow {
             break;
         case "puk-retry":
             title.text = "Entered PUK is invalid. Please try again. You have <n> tries left.";
+            break;
+        default:
+            break;
+        }
+    }
+
+    function advancePukState(newState) {
+        pukState = newState;
+
+        switch (pukState) {
+        case "puk":
+            title.text = "Enter SIM PUK";
+            break;
+        case "pin":
+            title.text = "Please enter a new SIM PIN";
+            break;
+        case "pin-verify":
+            title.text = "Please enter your new PIN for verification again";
+            break;
+        default:
             break;
         }
     }
@@ -167,13 +225,36 @@ LuneOS.ApplicationWindow {
                     anchors.rightMargin: Units.gu(3)
                     onClicked: {
                         if (inPinState()) {
-                            console.log("Trying to unlock pin1 with " + pinEntry.text);
+                            console.log("Trying to unlock pin with " + pinEntry.text);
                             pin1Verify.call({"pin": pinEntry.text});
                         }
                         else if (inPukState()) {
-                            // FIXME What we have to do now:
-                            // 1. We need a new PIN which the user has to enter two times
-                            // 2. then we call the pin1Unblock method of the telephony service
+                            switch (pukState) {
+                            case "puk":
+                                storedPuk = pinEntry.text;
+                                pinEntry.text = "";
+                                advancePukState("pin");
+                                break;
+                            case "pin":
+                                storedPin = pinEntry.text;
+                                pinEntry.text = "";
+                                advancePukState("pin-verify");
+                                break;
+                            case "pin-verify":
+                                if (storedPin !== pinEntry.text) {
+                                    advanceState("puk-retry");
+                                    return;
+                                }
+
+                                pin1Unblock.call(JSON.stringify({"puk": storedPuk, "newPin": storedPin}));
+
+                                storedPuk = "";
+                                storedPin = "";
+
+                                break;
+                            default:
+                                break;
+                            }
                         }
                     }
 

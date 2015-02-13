@@ -20,23 +20,18 @@ import QtQuick 2.0
 import "LunaServiceRegistering.js" as LSRegisteredMethods
 
 QtObject {
+    id: service
+
     property string name
     property string method
     property bool usePrivateBus: false
     property string service
 
-    property var lockStatusSubscriber
-    property string currentLockStatus: "locked"
+    property string currentSimState: "pinrequired"
 
-    property var deviceLockModeSubscriber
-    property string deviceLockMode: "none"
-    property string polcyState: "none"
-    property int retriesLeft: 3
-    property string configuredPasscode: "4242"
-
-    signal response
+    signal response(variant message)
     signal initialized
-    signal error
+    signal error(string message)
 
     Component.onCompleted: {
         initialized();
@@ -47,24 +42,6 @@ QtObject {
         var args = JSON.parse(jsonArgs);
         if( serviceURI === "luna://com.palm.applicationManager/listLaunchPoints" ) {
             listLaunchPoints_call(args, returnFct, handleError);
-        }
-        else if( serviceURI === "luna://com.palm.applicationManager/launch" ) {
-            launchApp_call(args, returnFct, handleError);
-        }
-        else if( serviceURI === "palm://com.palm.applicationManager/getAppInfo" ) {
-            giveFakeAppInfo_call(args, returnFct, handleError);
-        }
-        else if (serviceURI === "luna://com.palm.display/control/setLockStatus") {
-            setLockStatus_call(args, returnFct, handleError);
-        }
-        else if (serviceURI === "luna://com.palm.systemmanager/getDeviceLockMode") {
-            getDeviceLockMode_call(args, returnFct, handleError);
-        }
-        else if (serviceURI === "luna://com.palm.systemmanager/matchDevicePasscode") {
-            matchDevicePasscode_call(args, returnFct, handleError);
-        }
-        else if (serviceURI === "luna://com.palm.power/com/palm/power/batteryStatusQuery") {
-            getBatteryStatusQuery_call(args, returnFct, handleError);
         }
         else {
             // Embed the jsonArgs into a payload message
@@ -79,7 +56,9 @@ QtObject {
     function subscribe(serviceURI, jsonArgs, returnFct, handleError) {
         if( arguments.length === 1 ) {
             // handle the short form of subscribe
-            return subscribe(service+"/"+method, arguments[0], onResponse, onError);
+            return subscribe(service+"/"+method, arguments[0],
+                             function(data) { console.log("Test2"); service.response(data); },
+                             function(message) { console.log("test3"); service.error(message) });
         }
         else if(arguments.length === 3 ) {
             // handle the intermediate form of subscribe
@@ -92,32 +71,16 @@ QtObject {
         {
             returnFct({"payload": JSON.stringify({"connected": true})});
         }
-        else if( serviceURI === "luna://com.palm.applicationManager/launchPointChanges" && args.subscribe)
-        {
-            returnFct({"payload": JSON.stringify({"subscribed": true})}); // simulate subscription answer
-            returnFct({"payload": JSON.stringify({})});
-        }
-        else if( serviceURI === "luna://org.webosports.bootmgr/getStatus" && args.subscribe )
-        {
-            console.log("bootmgr status: normal");
-            returnFct({"payload": JSON.stringify({"subscribed":true, "state": "normal"})}); // simulate subscription answer
-        }
-        else if( serviceURI === "palm://com.palm.systemservice/getPreferences" && args.subscribe)
-        {
-            returnFct({"payload": JSON.stringify({"subscribed": true})}); // simulate subscription answer
-            returnFct({"payload": JSON.stringify({"wallpaper": { "wallpaperFile": Qt.resolvedUrl("../../../../images/background.jpg")}})});
-        }
-        else if (serviceURI === "luna://org.webosports.audio/getStatus")
-        {
-            returnFct({"payload": JSON.stringify({"volume":54,"mute":false})});
-        }
-        else if (serviceURI === "luna://com.palm.display/control/lockStatus") {
-            lockStatusSubscriber =  {func: returnFct};
-            returnFct({payload: "{\"lockState\":\"" + currentLockStatus + "\"}"});
-        }
-        else if (serviceURI === "luna://com.palm.systemmanager/getDeviceLockMode") {
-            deviceLockModeSubscriber = {func: returnFct};
-            getDeviceLockMode_call(jsonArgs, returnFct, handleError);
+        else if (serviceURI === "luna://com.palm.telephony/simStatusQuery") {
+            var simState = {
+                "subscribed": true,
+                "returnValue":true,
+                "extended": { "state": "pinrequired" }
+            };
+
+            var respData = {"payload": JSON.stringify(simState)};
+
+            returnFct(respData);
         }
         else if (serviceURI === "palm://com.palm.bus/signal/addmatch" )
         {
@@ -138,122 +101,5 @@ QtObject {
     function replyToSubscribers(path, callerAppId, jsonArgs) {
         console.log("replyToSubscribers " + "luna://" + name + path);
         LSRegisteredMethods.executeMethod("luna://" + name + path, {"applicationId": callerAppId, "payload": jsonArgs});
-    }
-
-    function listLaunchPoints_call(jsonArgs, returnFct, handleError) {
-        returnFct({"payload": JSON.stringify({"returnValue": true,
-                    "launchPoints": [
-             { "title": "Calendar", "id": "org.webosports.tests.dummyWindow", "icon": "../images/default-app-icon.png" },
-             { "title": "Email", "id": "org.webosports.tests.dummyWindow", "icon": "../images/default-app-icon.png" },
-             { "title": "Calculator", "id": "org.webosports.tests.dummyWindow", "icon": "../images/default-app-icon.png", "showInSearch": false },
-             { "title": "Snowshoe", "id": "org.webosports.tests.dummyWindow", "icon": "../images/default-app-icon.png" },
-             { "title": "This is a long title", "id": "org.webosports.tests.dummyWindow", "icon": "../images/default-app-icon.png" },
-             { "title": "This_is_also_a_long_title", "id": "org.webosports.tests.dummyWindow", "icon": "../images/default-app-icon.png" },
-             { "title": "Preware 5", "id": "org.webosports.tests.dummyWindow", "icon": "../images/default-app-icon.png" },
-             { "title": "iOS", "id": "org.webosports.tests.dummyWindow", "icon": "../images/default-app-icon.png" },
-             { "title": "Oh My", "id": "org.webosports.tests.dummyWindow", "icon": "../images/default-app-icon.png" },
-             { "title": "Test1", "id": "org.webosports.tests.dummyWindow", "icon": "../images/default-app-icon.png" },
-             { "title": "Test2", "id": "org.webosports.tests.dummyWindow", "icon": "../images/default-app-icon.png" },
-             { "title": "Test3", "id": "org.webosports.tests.dummyWindow", "icon": "../images/default-app-icon.png" },
-             { "title": "Test5", "id": "org.webosports.tests.dummyWindow", "icon": "../images/default-app-icon.png" },
-             { "title": "Test5bis", "id": "org.webosports.tests.dummyWindow", "icon": "../images/default-app-icon.png" },
-             { "title": "Test6", "id": "org.webosports.tests.dummyWindow", "icon": "../images/default-app-icon.png" },
-             { "title": "End Of All Tests", "id": "org.webosports.tests.dummyWindow", "icon": "../images/default-app-icon.png" }
-           ]})});
-    }
-
-    function giveFakeAppInfo_call(args, returnFct, handleError) {
-        returnFct({"payload": JSON.stringify({"returnValue": true, "appInfo": { "appmenu": "Fake App" } })});
-    }
-
-    function launchApp_call(jsonArgs, returnFct, handleError) {
-        // The JSON params can contain "id" (string) and "params" (object)
-        if( jsonArgs.id === "org.webosports.tests.dummyWindow" || jsonArgs.id === "org.webosports.tests.dummyWindow2" ) {
-            // start a DummyWindow
-            // Simulate the attachement of a new window to the stub Wayland compositor
-            compositor.createFakeWindow("DummyWindow", jsonArgs);
-        }
-        else if( jsonArgs.id === "org.webosports.tests.fakeOverlayWindow" ) {
-            // start a FakeOverlayWindow
-            // Simulate the attachement of a new window to the stub Wayland compositor
-            compositor.createFakeWindow("FakeOverlayWindow", jsonArgs);
-        }
-        else if( jsonArgs.id === "org.webosports.tests.fakeDashboardWindow" ) {
-            // start a FakeDashboardWindow
-            // Simulate the attachement of a new window to the stub Wayland compositor
-            compositor.createFakeWindow("FakeDashboardWindow", jsonArgs);
-        }
-        else if( jsonArgs.id === "org.webosports.tests.fakePopupAlertWindow" ) {
-            // start a FakeDashboardWindow
-            // Simulate the attachement of a new window to the stub Wayland compositor
-            compositor.createFakeWindow("FakePopupAlertWindow", jsonArgs);
-        }
-        else {
-            handleError("Error: parameter 'id' not specified");
-        }
-    }
-
-    function createNotification_call(jsonArgs, returnFct, handleError) {
-
-        if( jsonArgs ) {
-            var callerAppId = "org.webosports.tests.dummyWindow"; // hard-coded
-
-            replyToSubscribers("/createNotification", callerAppId, jsonArgs);
-        }
-        else {
-            handleError("Error: parameter 'id' not specified");
-        }
-    }
-
-
-    function setLockStatus_call(args, returnFct, handleError) {
-        console.log("setLockStatus_call: arg.status = " + args.status + " currentLockStatus = " + currentLockStatus);
-        if (args.status === "unlock" && currentLockStatus === "locked") {
-            currentLockStatus = "unlocked";
-            lockStatusSubscriber.func({payload: "{\"lockState\":\"" + currentLockStatus + "\"}"});
-        }
-    }
-
-    function getDeviceLockMode_call(args, returnFct, handleError) {
-        var message = {
-            "returnValue": true,
-            "lockMode": deviceLockMode,
-            "policyState": polcyState,
-            "retriesLeft": retriesLeft
-        };
-
-        returnFct({payload: JSON.stringify(message)});
-    }
-
-    function getBatteryStatusQuery_call(args, returnFct, handleError) {
-        var message = {
-            "returnValue": true,
-            "percent_ui": 10
-        };
-
-        returnFct({payload: JSON.stringify(message)});
-    }
-
-    function matchDevicePasscode_call(args, returnFct, handleError) {
-        var success = (args.passCode === configuredPasscode);
-
-        if (retriesLeft == 0)
-            success = false;
-
-        if (!success) {
-            if (retriesLeft == 0) {
-                /* FIXME */
-            }
-            else
-                retriesLeft = retriesLeft - 1;
-        }
-
-        var message = {
-            returnValue: success,
-            retriesLeft: retriesLeft,
-            lockedOut: false
-        };
-
-        returnFct({payload: JSON.stringify(message)});
     }
 }
