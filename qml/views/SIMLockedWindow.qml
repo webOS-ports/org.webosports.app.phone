@@ -29,6 +29,8 @@ LuneOS.ApplicationWindow {
 
     property QtObject mainWindow
 
+    type: LuneOS.ApplicationWindow.Pin
+
     width: Settings.displayWidth
     height: Settings.displayHeight
 
