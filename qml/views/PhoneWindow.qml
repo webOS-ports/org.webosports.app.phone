@@ -39,7 +39,7 @@ ApplicationWindow {
     property string activationReason: 'invoked'
     property Contact activeVoiceCallPerson
 
-    property QtObject simLockedWindow
+    property QtObject simPinWindow
 
     property alias main: window
     property alias appTheme: phoneUiAppTheme
@@ -141,7 +141,7 @@ ApplicationWindow {
     }
 
     function openSIMLockedPage() {
-        simLockedWindow.show();
+        simPinWindow.show();
     }
 
     function activeCallDialog() {

@@ -119,12 +119,11 @@ Item {
         anchors {
             left: parent.left
             right: backspace.left
+            top: parent.top
+            bottom: parent.bottom
             leftMargin: 30
             rightMargin: 20
-            verticalCenter: parent.verticalCenter
         }
-
-        height: Units.gu(10)
 
         activeFocusOnPress: false
         inputMethodHints: Qt.ImhDialableCharactersOnly

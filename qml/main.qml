@@ -60,17 +60,15 @@ Item {
 
     PhoneWindow {
         id: phoneWindow
-        simLockedWindow: simLockedWindow
+        simPinWindow: simPinWindow
     }
 
-    SIMLockedWindow {
-        id: simLockedWindow
+    SimPinWindow {
+        id: simPinWindow
         visible: false
-        parentWindowId: phoneWindow.windowId
-        mainWindow: phoneWindow
     }
 
     function openSIMLockedPage() {
-        simLockedWindow.show();
+        simPinWindow.show();
     }
 }
