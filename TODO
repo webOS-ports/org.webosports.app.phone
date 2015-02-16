@@ -1,0 +1,10 @@
+Unsorted and unpriorized list of things we are missing:
+
+* phone number formatting depending on current localization settings
+* Call management
+    * popupalert window for incoming calls
+    * overall call handling
+* extracting person:1 data for favorites
+* SIM PUK handling
+* call history (needs proper support in webos-telephonyd)
+* ...
