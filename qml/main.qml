@@ -58,9 +58,19 @@ Item {
         }
     }
 
+    TelephonyManager {
+        id: telephonyManager
+    }
+
+    VoiceCallManager {
+        id: voiceCallManager
+        modemPath: telephonyManager.getModemPath()
+    }
+
     PhoneWindow {
         id: phoneWindow
         simPinWindow: simPinWindow
+        voiceCallManager: voiceCallManager
     }
 
     SimPinWindow {
