@@ -64,7 +64,21 @@ Item {
 
     VoiceCallManager {
         id: voiceCallManager
-        modemPath: telephonyManager.getModemPath()
+        onIncomingCallChanged: {
+            if (!voiceCallManager.incomingCall) {
+                incomingCallAlert.hide();
+                return;
+            }
+
+            console.log("New incoming call");
+            incomingCallAlert.show();
+        }
+    }
+
+    IncomingCallAlert {
+        id: incomingCallAlert
+        visible: false
+        voiceCallManager: voiceCallManager
     }
 
     PhoneWindow {

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Roshan Gunasekara <roshan@mobileteck.com>
+ * Copyright (C) 2015 Simon Busch <morphis@gravedo.de>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,43 +16,42 @@
  */
 
 import QtQuick 2.0
-import QtQuick.Controls 1.1
-import QtQuick.Layouts 1.0
-import QtQuick.Window 2.1
 import LunaNext.Common 0.1
+import LuneOS.Application 1.0 as LuneOS
 
-Rectangle {
-    id: incommingCallDialog
+LuneOS.ApplicationWindow {
+    id: incomingCallAlert
+
+    property Item voiceCallManager
 
     width: Settings.displayWidth
-    height: Settings.displayHeight
-    color: main.appTheme.backgroundColor
-    radius: 10
+    height: Units.gu(30)
+
+    type: LuneOS.ApplicationWindow.PopupAlert
+    color: "transparent"
 
     Image {
-        id:iAvatar
+        id: avatar
         anchors {
             top: parent.top
-            horizontalCenter:parent.horizontalCenter
+            horizontalCenter: parent.horizontalCenter
             topMargin: Units.gu(3)
         }
 
-        width: Units.gu(35)
-        height:Units.gu(35)
-        asynchronous:true
-        fillMode:Image.PreserveAspectFit
-        smooth:true
+        width: Units.gu(10)
+        height: Units.gu(10)
+        asynchronous: true
+        fillMode: Image.PreserveAspectFit
+        smooth: true
 
         Rectangle {
-            anchors.fill:parent
-            border {color:main.appTheme.foregroundColor;width:2}
-            radius:10
-            color:'#00000000'
+            anchors.fill: parent
+            border { color:main.appTheme.foregroundColor; width: 2 }
+            radius: 10
+            color: '#00000000'
         }
 
-        source: main.activeVoiceCallPerson
-                ? main.activeVoiceCallPerson.avatarPath
-                : 'images/generic-details-view-avatar.png';
+        source: 'images/generic-details-view-avatar.png';
     }
 
     Text {
@@ -65,9 +64,7 @@ Rectangle {
         id: title
         font.pixelSize: Units.dp(20)
         color: main.appTheme.headerTitle
-        text:main.activeVoiceCallPerson
-             ? main.activeVoiceCallPerson.displayLabel
-             : (manager.activeVoiceCall ? manager.activeVoiceCall.lineId : 'Unknown Number');
+        text: "unknown"
     }
 
     Row {
@@ -84,7 +81,7 @@ Rectangle {
             height: 215
             width: 215
             onClicked: {
-                main.accept();
+                voiceCallManager.incomingCall.answer();
             }
         }
 
@@ -92,7 +89,7 @@ Rectangle {
             height: 210
             width: 210
             onClicked: {
-                main.reject();
+                voiceCallManager.incomingCall.hangup();
             }
         }
     }

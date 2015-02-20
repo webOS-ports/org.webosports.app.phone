@@ -88,6 +88,7 @@ ApplicationWindow {
         }
     }
 
+    /*
     Connections {
         target: voiceCallManager
 
@@ -128,6 +129,7 @@ ApplicationWindow {
             }
         }
     }
+    */
 
     function dial(number) {
         if (number === "999") {
