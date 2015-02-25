@@ -19,7 +19,6 @@ import QtQuick 2.0
 import QtQuick.Controls 1.1
 import QtQuick.Controls.Styles 1.1
 import LunaNext.Common 0.1
-import "PhoneNumberFormatter.js" as PhoneNumberFormatter
 
 Item {
     id: numberEntry
@@ -43,7 +42,7 @@ Item {
             textEdit.cursorPosition = textEdit.text.length
         } else {
             var newText = text.slice(0, cpos) + character + text.slice(cpos,text. length);
-            textEdit.text = isPhoneNumber ? PhoneNumberFormatter.formatPhoneNumber(newText) : newText;
+            textEdit.text = newText;
             textEdit.cursorPosition = cpos + (textEdit.text.length - text.length);
         }
 
@@ -59,7 +58,7 @@ Item {
             return;
 
         var newText = text.slice(0, cpos - 1) + text.slice(cpos, text.length);
-        textEdit.text = isPhoneNumber ? PhoneNumberFormatter.formatPhoneNumber(newText) : newText;
+        textEdit.text = newText;
         textEdit.cursorPosition = cpos - (text.length - textEdit.text.length);
 
         numberEntry.__previousCharacter = '';
@@ -130,6 +129,7 @@ Item {
         font.pixelSize: FontUtils.sizeToPixels("large")
         textColor: "white"
         horizontalAlignment: TextInput.AlignHCenter
+        placeholderText: "Enter phone number"
 
         Component.onCompleted: {
             // On desktop we don't have this field
@@ -139,6 +139,7 @@ Item {
 
         style: TextFieldStyle {
             textColor: "white"
+            placeholderTextColor: "white"
             background: Rectangle {
                 color: phoneUiAppTheme.backgroundColor
             }
