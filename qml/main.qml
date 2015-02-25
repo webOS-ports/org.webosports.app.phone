@@ -70,7 +70,6 @@ Item {
                 return;
             }
 
-            console.log("New incoming call");
             incomingCallAlert.show();
         }
     }

@@ -32,6 +32,7 @@ LuneOS.ApplicationWindow {
 
     Image {
         id: avatar
+
         anchors {
             top: parent.top
             horizontalCenter: parent.horizontalCenter
@@ -56,19 +57,21 @@ LuneOS.ApplicationWindow {
 
     Text {
         anchors {
-            bottom: answerRejectBtns.top
+            top: avatar.bottom
+            topMargin: Units.gu(5)
+            bottom: buttons.top
             bottomMargin: Units.gu(5)
             horizontalCenter:parent.horizontalCenter
         }
 
         id: title
-        font.pixelSize: Units.dp(20)
-        color: main.appTheme.headerTitle
-        text: "unknown"
+        font.pixelSize: FontUtils.sizeToPixels("large")
+        color: "white"
+        text: voiceCallManager.incomingCall.lineId
     }
 
     Row {
-        id: answerRejectBtns
+        id: buttons
         height: Units.gu(12)
         anchors {
             bottom: parent.bottom
