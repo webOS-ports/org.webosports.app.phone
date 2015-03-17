@@ -29,6 +29,8 @@ import LuneOS.Application 1.0
 ApplicationWindow {
     id: window
 
+    property QtObject voiceCallManager
+
     keepAlive: true
     loadingAnimationDisabled: true
 
@@ -86,9 +88,9 @@ ApplicationWindow {
         }
     }
 
-    VoiceCallManager {
-        id: manager
-        modemPath: telephonyManager.getModemPath()
+    /*
+    Connections {
+        target: voiceCallManager
 
         onActiveVoiceCallChanged: {
             if (activeVoiceCall) {
@@ -127,6 +129,7 @@ ApplicationWindow {
             }
         }
     }
+    */
 
     function dial(number) {
         if (number === "999") {
@@ -190,9 +193,5 @@ ApplicationWindow {
 
     ContactManager {
         id: people
-    }
-
-    TelephonyManager {
-        id: telephonyManager
     }
 }

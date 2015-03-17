@@ -30,12 +30,18 @@ Item {
     id: root
 
     Component.onCompleted: {
-        var launchParams = "{}";
+        var launchParams = "{\"mode\":\"first-use\"}";
         if (typeof application !== "undefined")
             launchParams = application.launchParameters;
 
         console.log("Parsing Launch Params: " + launchParams);
         var params = JSON.parse(launchParams);
+
+        if (params.mode && params.mode === "first-use") {
+            simPinWindow.type = typeof application === "undefined" ? 0 : ApplicationWindow.Pin;
+            // PIN window will now open automatically when the PIN is required
+            return;
+        }
 
         if (!params.launchedAtBoot)
             phoneWindow.show();
@@ -58,9 +64,32 @@ Item {
         }
     }
 
+    TelephonyManager {
+        id: telephonyManager
+    }
+
+    VoiceCallManager {
+        id: voiceCallManager
+        onIncomingCallChanged: {
+            if (!voiceCallManager.incomingCall) {
+                incomingCallAlert.hide();
+                return;
+            }
+
+            incomingCallAlert.show();
+        }
+    }
+
+    IncomingCallAlert {
+        id: incomingCallAlert
+        visible: false
+        voiceCallManager: voiceCallManager
+    }
+
     PhoneWindow {
         id: phoneWindow
         simPinWindow: simPinWindow
+        voiceCallManager: voiceCallManager
     }
 
     SimPinWindow {
