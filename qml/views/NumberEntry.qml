@@ -83,11 +83,11 @@ Item {
     }
 
     Timer {
-        id:interactionTimeout
-        interval:10000
-        running:false
-        repeat:false
-        onTriggered:numberEntry.resetCursor();
+        id: interactionTimeout
+        interval: 10000
+        running: false
+        repeat: false
+        onTriggered: numberEntry.resetCursor();
     }
 
     Image {
@@ -98,14 +98,14 @@ Item {
         fillMode: Image.PreserveAspectFit
 
         anchors {
-            verticalCenter:parent.verticalCenter
-            right:parent.right
-            margins:Units.gu(3)
+            verticalCenter: parent.verticalCenter
+            right: parent.right
+            margins: Units.gu(3)
         }
         source: 'images/icon-m-common-backspace.svg'
 
         MouseArea {
-            anchors.fill:parent
+            anchors.fill: parent
 
             onClicked: numberEntry.backspace();
             onPressAndHold: numberEntry.clear();
@@ -116,8 +116,8 @@ Item {
         id: textEdit
 
         anchors {
-			verticalCenter: backspace.verticalCenter
-			horizontalCenter: parent.horizontalCenter
+            verticalCenter: backspace.verticalCenter
+            horizontalCenter: parent.horizontalCenter
             leftMargin: Units.gu(1.5)
             rightMargin: Units.gu(1)
         }
