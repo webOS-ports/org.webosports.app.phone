@@ -100,7 +100,7 @@ Item {
         width:parent.width
         height: Units.gu(6)
         anchors.top: header.bottom
-		anchors.horizontalCenter: parent.horizontalCenter
+        anchors.horizontalCenter: parent.horizontalCenter
         textColor: phoneUiAppTheme.foregroundColor
         echoMode: TextInput.Password
         isPhoneNumber: false
