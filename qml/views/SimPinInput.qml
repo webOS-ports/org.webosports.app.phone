@@ -48,7 +48,7 @@ Item {
             id: title
             font.pixelSize: FontUtils.sizeToPixels("large")
             color: phoneUiAppTheme.headerTitle
-            anchors.horizontalCenter:parent.horizontalCenter
+            anchors.horizontalCenter: parent.horizontalCenter
             text: {
                 switch (requestedPinType) {
                 case OfonoSimManager.SimPin:
@@ -67,7 +67,7 @@ Item {
             id: warning
             color: phoneUiAppTheme.headerTitle
             font.pixelSize: FontUtils.sizeToPixels("medium")
-            anchors.horizontalCenter:parent.horizontalCenter
+            anchors.horizontalCenter: parent.horizontalCenter
             wrapMode: Text.Wrap
             horizontalAlignment: Text.AlignHCenter
             text: {
@@ -78,12 +78,12 @@ Item {
                 case OfonoSimManager.SimPin:
                     if (isNaN(_pinRetries) || _pinRetries === 0)
                         return "";
-                    return _pinRetries === 1 ? "Only 1 attempt left. If this goes wrong your SIM will be permanently blocked with PUK code." :
+                    return _pinRetries === 1 ? "Only 1 attempt left. If this goes wrong your SIM will locked and you will need a PUK code to unlock." :
                                            "" + _pinRetries + "attempts left";
                 case OfonoSimManager.SimPuk:
                     if (_pinRetries === 0)
                         return "";
-                    return _pinRetries === 1 ? "Only 1 attempt left. If this goes wrong your SIM card will be permantly blocked." :
+                    return _pinRetries === 1 ? "Only 1 attempt left. If this goes wrong your SIM card will be permanently blocked." :
                                     "" + _pinRetries + "attempts left. Ask your network service provider for the PUK code";
                 default:
                     break;
@@ -100,6 +100,7 @@ Item {
         width:parent.width
         height: Units.gu(6)
         anchors.top: header.bottom
+        anchors.horizontalCenter: parent.horizontalCenter
         textColor: phoneUiAppTheme.foregroundColor
         echoMode: TextInput.Password
         isPhoneNumber: false
@@ -177,7 +178,7 @@ Item {
                     }
                     else {
                         title.text = "Enter new PIN";
-                        warning.title = "Entered PINs doesn't match";
+                        warning.title = "PIN doesn't match";
                         _newPin = "";
                         clear();
                     }
