@@ -24,6 +24,7 @@ import LuneOS.Service 1.0
 import LuneOS.Application 1.0 as LuneOS
 import MeeGo.QOfono 0.2
 import "../services"
+import "../services/PinTypes.js" as PinTypes
 
 LuneOS.ApplicationWindow {
     id: simPinWindow
@@ -87,7 +88,7 @@ LuneOS.ApplicationWindow {
 
         onPinRetriesChanged: {
             for (var type in pinRetries) {
-                if (type === OfonoSimManager.SimPuk.toString() && pinRetries[type] === 0)
+                if (type === PinTypes.SimPuk.toString() && pinRetries[type] === 0)
                     _handleSimPermBlocked();
             }
         }
