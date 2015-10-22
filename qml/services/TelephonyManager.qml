@@ -35,7 +35,7 @@ Item {
      **/
 
     function getModemPath() {
-        return modemManager.modems[0]
+        return modemManager.modems.length > 1 ? modemManager.modems[0] : ""
     }
 
     OfonoManager {
@@ -66,17 +66,17 @@ Item {
         Component.onCompleted: {
             console.log("modems: " + modemManager.modems)
         }
-        modemPath: modemManager.modems[0]
+        modemPath: modemManager.modems.length > 1  ? modemManager.modems[0] : ""
     }
 
     OfonoModem {
         id: modem
-        modemPath: modemManager.modems[0]
+        modemPath: modemManager.modems.length > 1 ? modemManager.modems[0] : ""
     }
 
     OfonoContextConnection {
         id: context1
-        contextPath : ofono1.contexts[0]
+        contextPath: ofono1.contexts.length > 1 ? ofono1.contexts[0] : ""
 
         Component.onCompleted: {
             console.log(context1.active ? "Connection online" : "Connection offline");
@@ -89,7 +89,7 @@ Item {
 
     OfonoSimManager {
         id: simManager
-        modemPath: modemManager.modems[0]
+        modemPath: modemManager.modems.length > 1 ? modemManager.modems[0] : ""
         Component.onCompleted: {
             console.log("simManager->present:" , JSON.stringify(simManager.present));
             console.log("simManager->CardIdentifier:" , JSON.stringify(simManager.cardIdentifier));
@@ -108,7 +108,7 @@ Item {
 
     OfonoNetworkRegistration {
         id: network
-        modemPath: modemManager.modems[0]
+        modemPath: modemManager.modems.length > 1 ? modemManager.modems[0] : ""
 
         Component.onCompleted: {
             console.log("network->currentOperatorPath" , JSON.stringify(network.currentOperatorPath));

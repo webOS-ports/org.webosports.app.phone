@@ -28,7 +28,7 @@ Rectangle {
 
     property Item dtmfKeypadDialog
 
-    state: manager.activeVoiceCall ? manager.activeVoiceCall.statusText : 'disconnected'
+    state: voiceCallManager.activeVoiceCall ? voiceCallManager.activeVoiceCall.statusText : 'disconnected'
 
 
     states {
@@ -43,7 +43,7 @@ Rectangle {
 
     function open(){
         root.visible = true
-        tLineId.text = main.activeVoiceCallPerson ? main.activeVoiceCallPerson.displayLabel : (manager.activeVoiceCall ? manager.activeVoiceCall.lineId : '');
+        tLineId.text = main.activeVoiceCallPerson ? main.activeVoiceCallPerson.displayLabel : (voiceCallManager.activeVoiceCall ? voiceCallManager.activeVoiceCall.lineId : '');
         console.log("Settings.displayWidth: " + Settings.displayWidth)
         console.log("Settings.displayHeight: " + Settings.displayHeight)
         console.log("Screen desktopAvailableHeight: " + Screen.desktopAvailableHeight)
@@ -79,7 +79,7 @@ Rectangle {
 
             text:main.activeVoiceCallPerson
                  ? main.activeVoiceCallPerson.displayLabel
-                 : (manager.activeVoiceCall ? manager.activeVoiceCall.lineId : '');
+                 : (voiceCallManager.activeVoiceCall ? voiceCallManager.activeVoiceCall.lineId : '');
 
             onTextChanged: resizeText();
 
@@ -121,7 +121,7 @@ Rectangle {
 
         color:main.appTheme.foregroundColor
         font.pixelSize: Units.dp(15)
-        text:manager.activeVoiceCall ? main.secondsToTimeString(manager.activeVoiceCall.duration) : '00:00:00'
+        text:voiceCallManager.activeVoiceCall ? main.secondsToTimeString(voiceCallManager.activeVoiceCall.duration) : '00:00:00'
     }
 
 
@@ -214,7 +214,7 @@ Rectangle {
             margins:Units.gu(2)
         }
         onClicked: {
-           manager.hangup()
+           voiceCallManager.hangup()
            root.close();
         }
     }
@@ -232,7 +232,7 @@ Rectangle {
         SpeakerButton {
             visible:root.state == 'active'
             onClicked: {
-                manager.setAudioMode(manager.audioMode === 'ihf' ? 'earpiece' : 'ihf');
+                voiceCallManager.setAudioMode(voiceCallManager.audioMode === 'ihf' ? 'earpiece' : 'ihf');
                 btnActive = !btnActive
             }
         }
@@ -242,9 +242,9 @@ Rectangle {
             onClicked: {
                 btnActive = !btnActive
                 if(root.state == 'incoming') { // TODO: Take in to account unmuting audio when call is answered.
-                    manager.setMuteSpeaker(true);
+                    voiceCallManager.setMuteSpeaker(true);
                 } else {
-                    manager.setMuteMicrophone(manager.isMicrophoneMuted ? false : true);
+                    voiceCallManager.setMuteMicrophone(voiceCallManager.isMicrophoneMuted ? false : true);
                 }
             }
         }
