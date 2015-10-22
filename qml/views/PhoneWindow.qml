@@ -97,7 +97,7 @@ ApplicationWindow {
                 console.log("Active Call Status: ",activeVoiceCall.state)
 
                 main.activeVoiceCallPerson = people.personByPhoneNumber(activeVoiceCall.lineId)
-                manager.activeVoiceCall.statusText = "active"
+                voiceCallManager.activeVoiceCall.statusText = "active"
 
                 if (main.activationReason === "incoming")
                     incomingCall()
@@ -140,7 +140,7 @@ ApplicationWindow {
             main.incomingCall();
         }
         else
-            manager.dial(number);
+            voiceCallManager.dial(number);
     }
 
     function openSIMLockedPage() {
@@ -160,13 +160,13 @@ ApplicationWindow {
     function accept() {
         console.log("accepting Call")
         stackView.pop()
-        manager.accept()
+        voiceCallManager.accept()
         activeCallDialog()
     }
 
     function hangup() {
         console.log("hanging up Call")
-        manager.hangup()
+        voiceCallManager.hangup()
     }
 
     function reject() {
