@@ -3,13 +3,14 @@ import QtQuick.Controls 1.1
 import QtQuick.Controls.Styles 1.1
 import QtQuick.Layouts 1.1
 import MeeGo.QOfono 0.2
+import "../services/PinTypes.js" as PinTypes
 import LunaNext.Common 0.1
 
 Item {
     id: simPinInput
 
     property OfonoSimManager simManager
-    property int requestedPinType
+    property int requestedPinType: 0
     property bool retrying: false
     property alias pin: pinEntry.text
 
@@ -31,7 +32,7 @@ Item {
                                         simManager.pukToPin(requestedPinType) : requestedPinType
     property int _minimumPinLength: simManager.minimumPinLength(_currentPinType)
     property int _maximumPinLength: simManager.maximumPinLength(_currentPinType)
-    property int _pinRetries: simPinInput.requestedPinType !== OfonoSimManager.NoPin ?
+    property int _pinRetries: (simPinInput.requestedPinType !== PinTypes.NoPin) ?
                                   simManager.pinRetries[simPinInput.requestedPinType] : 0
 
     property string _newPin
@@ -51,9 +52,9 @@ Item {
             anchors.horizontalCenter: parent.horizontalCenter
             text: {
                 switch (requestedPinType) {
-                case OfonoSimManager.SimPin:
+                case PinTypes.SimPin:
                     return retrying ? "Incorrect PIN code" : "Enter PIN code";
-                case OfonoSimManager.SimPuk:
+                case PinTypes.SimPuk:
                     return retrying ? "Incorrect PUK code" : "Enter PUK code";
                 default:
                     break;
@@ -75,12 +76,12 @@ Item {
                     return "";
 
                 switch (requestedPinType) {
-                case OfonoSimManager.SimPin:
+                case PinTypes.SimPin:
                     if (isNaN(_pinRetries) || _pinRetries === 0)
                         return "";
                     return _pinRetries === 1 ? "Only 1 attempt left. If this goes wrong your SIM will locked and you will need a PUK code to unlock." :
                                            "" + _pinRetries + "attempts left";
-                case OfonoSimManager.SimPuk:
+                case PinTypes.SimPuk:
                     if (_pinRetries === 0)
                         return "";
                     return _pinRetries === 1 ? "Only 1 attempt left. If this goes wrong your SIM card will be permanently blocked." :

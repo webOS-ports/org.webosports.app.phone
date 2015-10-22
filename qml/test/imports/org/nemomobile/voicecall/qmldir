@@ -1,0 +1,5 @@
+module org.nemomobile.voicecall 
+
+VoiceCallManager 1.0 VoiceCallManager.qml
+
+typeinfo org.nemomobile.voicecall.qmltypes

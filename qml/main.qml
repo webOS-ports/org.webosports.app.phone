@@ -24,6 +24,7 @@ import QtQuick.Controls.Styles 1.1
 import QtQuick.Layouts 1.0
 import QtQuick.Window 2.1
 import LunaNext.Common 0.1
+import LuneOS.Service 1.0
 import LuneOS.Application 1.0
 
 Item {
@@ -68,7 +69,7 @@ Item {
         id: telephonyManager
     }
 
-    VoiceCallManager {
+    VoiceCallMgr {
         id: voiceCallManager
         onIncomingCallChanged: {
             if (!voiceCallManager.incomingCall) {

@@ -17,6 +17,7 @@
 
 import QtQuick 2.0
 import LunaNext.Common 0.1
+import LunaNext.Compositor 0.1
 import LuneOS.Application 1.0 as LuneOS
 
 LuneOS.ApplicationWindow {
@@ -27,7 +28,7 @@ LuneOS.ApplicationWindow {
     width: Settings.displayWidth
     height: Units.gu(30)
 
-    type: LuneOS.ApplicationWindow.PopupAlert
+    type: WindowType.PopupAlert
     color: "transparent"
 
     Image {
@@ -47,7 +48,7 @@ LuneOS.ApplicationWindow {
 
         Rectangle {
             anchors.fill: parent
-            border { color:main.appTheme.foregroundColor; width: 2 }
+            border { color: "white" /*main.appTheme.foregroundColor*/; width: 2 }
             radius: 10
             color: '#00000000'
         }
@@ -67,7 +68,7 @@ LuneOS.ApplicationWindow {
         id: title
         font.pixelSize: FontUtils.sizeToPixels("large")
         color: "white"
-        text: voiceCallManager.incomingCall.lineId
+        text: voiceCallManager.incomingCall ? voiceCallManager.incomingCall.lineId : ""
     }
 
     Row {

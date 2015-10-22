@@ -54,7 +54,7 @@ Item {
     }
 
     function _dial(number) {
-        manaager.dial(manager.defaultProviderId, number);
+        manager.dial(manager.defaultProviderId, number);
     }
 
     function _updateState() {
