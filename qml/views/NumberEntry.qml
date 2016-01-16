@@ -23,6 +23,8 @@ import LunaNext.Common 0.1
 Item {
     id: numberEntry
 
+    height: bgImage.height
+
     property alias text: textEdit.text
     property string textColor: "white"
     property alias alignment: textEdit.horizontalAlignment
@@ -91,6 +93,17 @@ Item {
     }
 
     Image {
+        id: bgImage
+        anchors {
+            top: parent.top
+            left: parent.left
+            right: parent.right
+        }
+        height: Units.gu(7);
+        source: "images/dialer-entry-bg.png"
+    }
+
+    Image {
         id:backspace
 
         width: Units.gu(5)
@@ -117,9 +130,10 @@ Item {
 
         anchors {
             verticalCenter: backspace.verticalCenter
-            horizontalCenter: parent.horizontalCenter
-            leftMargin: Units.gu(1.5)
-            rightMargin: Units.gu(1)
+            right: backspace.left
+            left: parent.left
+            leftMargin: Units.gu(4)
+            rightMargin: Units.gu(3)
         }
 
         activeFocusOnPress: false

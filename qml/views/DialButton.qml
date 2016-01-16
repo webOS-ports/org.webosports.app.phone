@@ -18,23 +18,23 @@
 import QtQuick 2.0
 import QtQuick.Controls 1.1
 import QtQuick.Controls.Styles 1.1
+import LuneOS.Components 1.0
 
 Button {
-    width:612
-    height:99
+    id: dialButtonRoot
 
     style: ButtonStyle {
-        background: Item {
-            clip: true
-            anchors.horizontalCenter: parent.horizontalCenter
-            anchors.verticalCenter: parent.verticalCenter
-            width: 612
-            height: 99
-            Image{
-                x: 0
-                y: control.pressed ? -198: 0
-                source: "images/dial-button.png"
-            }
+        background: ClippedImage {
+            id: bgClippedImage
+
+            source: "images/dial-button.png"
+
+            wantedWidth: control.width
+            imageSize: Qt.size(612, 297)
+            patchGridSize: Qt.size(1, 3)
+            patch: control.pressed ? Qt.point(0,2): Qt.point(0,0)
+
+            onHeightChanged: control.height = bgClippedImage.height
         }
     }
 }
