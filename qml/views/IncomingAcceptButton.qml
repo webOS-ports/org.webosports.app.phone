@@ -19,23 +19,22 @@ import QtQuick 2.0
 import QtQuick.Controls 1.1
 import QtQuick.Controls.Styles 1.1
 
+import LuneOS.Components 1.0
+
 Button {
     width:210
     height:210
 
     style: ButtonStyle {
-        background: Item {
-            clip: true
-            anchors.horizontalCenter: parent.horizontalCenter
-            anchors.verticalCenter: parent.verticalCenter
-            width: 210
-            height: 210
-            Image{
-                x: -210
-                y: control.pressed ? -210: 0
-                source: "images/button-ignore-answer.png"
+        background: ClippedImage {
+            source: "images/button-ignore-answer.png"
 
-            }
+            wantedHeight: control.height
+            wantedWidth: control.width
+
+            imageSize: Qt.size(420, 420)
+            patchGridSize: Qt.size(2, 2)
+            patch: control.pressed ? Qt.point(1,1): Qt.point(1,0)
         }
     }
 }

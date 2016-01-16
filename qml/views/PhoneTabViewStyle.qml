@@ -19,6 +19,7 @@ import QtQuick 2.0
 import QtQuick.Controls.Styles 1.1
 import QtQuick.Layouts 1.0
 import LunaNext.Common 0.1
+import LuneOS.Components 1.0
 
 TabViewStyle {
     frameOverlap: 1
@@ -29,22 +30,20 @@ TabViewStyle {
         implicitHeight: Units.gu(5)
         radius: 2
 
-        Item {
+        ClippedImage {
             id: tabIcon
-            clip: true
+
+            source: tabView.getIcon(styleData.title)
+
             anchors.horizontalCenter: parent.horizontalCenter
             anchors.verticalCenter: parent.verticalCenter
-            width: styleData.title === "Voicemail" ? 72: 48
-            height: 48
-            Image{
-                id: icon
-                x: 0
-                y: styleData.selected ? -48: 0
-                source: tabView.getIcon(styleData.title)
-            }
+            wantedWidth: styleData.title === "Voicemail" ? 72: 48
+            wantedHeight: 48
 
+            imageSize: styleData.title === "Voicemail" ? Qt.size(72, 96) : Qt.size(48, 96)
+            patchGridSize: Qt.size(1, 2)
+            patch: styleData.selected ? Qt.point(0,1): Qt.point(0,0)
         }
-
 
         //Text {
         //      id: text
