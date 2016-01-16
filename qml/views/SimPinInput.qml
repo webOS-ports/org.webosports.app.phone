@@ -98,10 +98,12 @@ Item {
     NumberEntry {
         id: pinEntry
 
-        width:parent.width
-        height: Units.gu(6)
-        anchors.top: header.bottom
-        anchors.horizontalCenter: parent.horizontalCenter
+        anchors {
+            top: header.bottom
+            left:parent.left
+            right:parent.right
+        }
+
         textColor: phoneUiAppTheme.foregroundColor
         echoMode: TextInput.Password
         isPhoneNumber: false
@@ -111,11 +113,10 @@ Item {
         id: keyboard
 
         anchors {
+            top: pinEntry.bottom
             left: parent.left
             right: parent.right
-            top: pinEntry.bottom
             bottom: cancelButton.bottom
-            topMargin: Units.gu(2)
         }
 
         mode:'sim'

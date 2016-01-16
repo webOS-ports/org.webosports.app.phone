@@ -30,16 +30,15 @@ Rectangle {
 
     state: voiceCallManager.activeVoiceCall ? voiceCallManager.activeVoiceCall.statusText : 'disconnected'
 
-
-    states {
-        State {name:'active'}
-        State {name:'held'}
-        State {name:'dialing'}
-        State {name:'alerting'}
-        State {name:'incoming'}
-        State {name:'waiting'}
+    states: [
+        State {name:'active'},
+        State {name:'held'},
+        State {name:'dialing'},
+        State {name:'alerting'},
+        State {name:'incoming'},
+        State {name:'waiting'},
         State {name:'disconnected'}
-    }
+    ]
 
     function open(){
         root.visible = true
@@ -58,54 +57,29 @@ Rectangle {
 
     Rectangle {
         id: topStatusBar
-        width: Settings.displayWidth
-        anchors.left: parent.left
-        anchors.right: parent.right
+        anchors {
+            left: parent.left
+            leftMargin: Units.gu(1)
+            right: parent.right
+            rightMargin: Units.gu(1)
+        }
+        height: Units.gu(5)
         color: main.appTheme.headerColor
         radius: 10
-        height: Units.gu(5)
 
         Text {
             id:tLineId
-            Layout.fillWidth: true
-            height: Units.gu(5)
+            anchors.fill: parent
+            anchors.margins: Units.gu(0.5)
             color:main.appTheme.foregroundColor
-            font.pixelSize: Units.dp(30)
-            anchors{
-                horizontalCenter: parent.horizontalCenter
-                top: parent.top
-            }
-            horizontalAlignment:Text.Center
+            font.pixelSize: height * 0.8
+
+            horizontalAlignment: Text.AlignRight
+            elide: Text.ElideLeft
 
             text:main.activeVoiceCallPerson
                  ? main.activeVoiceCallPerson.displayLabel
                  : (voiceCallManager.activeVoiceCall ? voiceCallManager.activeVoiceCall.lineId : '');
-
-            onTextChanged: resizeText();
-
-            Component.onCompleted: resizeText();
-
-            function resizeText() {
-                if(paintedWidth < 0 || paintedHeight < 0) return;
-                while(paintedWidth > width) {
-                    //console.log("paintedWidth=" + paintedWidth + " width=" + width)
-                    //console.log(font.pixelSize)
-                    if(--font.pixelSize <= 0) break;
-                }
-
-                while(paintedWidth < width)
-                    if(++font.pixelSize >= 38) break;
-            }
-
-            function insertChar(character) {
-
-                if(text.length === 0 || (main.activeVoiceCallPerson && text === main.activeVoiceCallPerson.displayLabel)) {
-                    text = character
-                } else{
-                    text = text + character;
-                }
-
-            }
         }
 
     }
@@ -115,7 +89,7 @@ Rectangle {
         id:tVoiceCallDuration
         anchors{
             top: topStatusBar.bottom
-            topMargin: 5
+            topMargin: Units.gu(1)
             horizontalCenter:parent.horizontalCenter
         }
 
@@ -127,12 +101,16 @@ Rectangle {
 
     Flipable {
         id: flipable
-        height:Units.gu(35)
+        height:Units.gu(38)
 
         anchors{
             top: tVoiceCallDuration.bottom
-            topMargin: 5
-            horizontalCenter:parent.horizontalCenter
+            topMargin: Units.gu(1)
+            bottom: disconnectBtn.top
+            left: parent.left
+            leftMargin: Units.gu(2)
+            right: parent.right
+            rightMargin: Units.gu(2)
         }
 
         property bool flipped: false
@@ -161,8 +139,8 @@ Rectangle {
                 horizontalCenter:parent.horizontalCenter
             }
 
-            width: Units.gu(35)
-            height:Units.gu(35)
+            width: parent.width
+            height:parent.height
             asynchronous:true
             fillMode:Image.PreserveAspectFit
             smooth:true
@@ -171,7 +149,8 @@ Rectangle {
                 anchors.fill:parent
                 border {color:main.appTheme.foregroundColor;width:2}
                 radius:10
-                color:'#00000000'
+                z: -1
+                color:"black"
             }
 
             source: main.activeVoiceCallPerson
@@ -181,21 +160,18 @@ Rectangle {
 
         back:  Item {
             id: numPadDialog
-            anchors {
-                horizontalCenter: parent.horizontalCenter
-                fill: parent
-            }
+            width: parent.width
+            height:parent.height
 
             NumPad {
                 id:dtmfpad
                 anchors {
-                    bottom: parent.disconnectBtn
-                    horizontalCenter:parent.horizontalCenter
-                    topMargin: Units.gu(3)
-
+                    fill: parent
                 }
                 mode:'dtmf'
-                entryTarget: tLineId
+
+                onKeyPressed: tLineId.text += label
+                // entryTarget: tLineId
                 //width: Units.gu(50)
                 //height:childrenRect.height
             }
@@ -207,11 +183,12 @@ Rectangle {
 
     DisconnectButton {
         id: disconnectBtn
-        height: 99
+
         anchors {
-            top: flipable.bottom
-            horizontalCenter:parent.horizontalCenter
-            margins:Units.gu(2)
+            bottom: rVoiceCallTools.top
+            bottomMargin: Units.gu(2)
+            left: flipable.left
+            right: flipable.right
         }
         onClicked: {
            voiceCallManager.hangup()

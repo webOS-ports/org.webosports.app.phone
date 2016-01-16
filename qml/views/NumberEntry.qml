@@ -141,7 +141,7 @@ Item {
         font.pixelSize: FontUtils.sizeToPixels("large")
         textColor: "white"
         horizontalAlignment: TextInput.AlignHCenter
-        placeholderText: "Enter phone number"
+        placeholderText: isPhoneNumber ? "Enter phone number" : ""
 
         Component.onCompleted: {
             // On desktop we don't have this field
