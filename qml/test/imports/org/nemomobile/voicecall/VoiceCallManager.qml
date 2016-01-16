@@ -6,7 +6,11 @@ Item {
 
     property string defaultProviderId: "provider"
 
-    property Item activeVoiceCall: Item {}
+    property Item activeVoiceCall: Item {
+        property string lineId: "+(1)234567890"
+        property string statusText: "active"
+        property int duration: 159
+    }
 
     property string audioMode: "normal"
     property bool isAudioRouted: true

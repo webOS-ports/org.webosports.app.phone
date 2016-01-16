@@ -23,6 +23,7 @@ Item {
     id: root
 
     property alias calls: manager.voiceCalls
+    property alias activeVoiceCall: manager.activeVoiceCall
     property var activeCall: null
     property var outgoingCall: null
     property var incomingCall: null
@@ -30,6 +31,8 @@ Item {
     property var heldCall: null
 
     property string _dialNumberAfterHold: ""
+
+    signal accept();
 
     onHeldCallChanged: {
         if (!root.heldCall || root._dialNumberAfterHold.length === 0)

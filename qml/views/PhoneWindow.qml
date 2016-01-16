@@ -22,14 +22,14 @@ import "../model"
 import QtQuick.Controls 1.1
 import QtQuick.Controls.Styles 1.1
 import QtQuick.Layouts 1.0
-import QtQuick.Window 2.1
+
 import LunaNext.Common 0.1
 import LuneOS.Application 1.0
 
 ApplicationWindow {
     id: window
 
-    property QtObject voiceCallManager
+    property Item voiceCallManager
 
     keepAlive: true
     loadingAnimationDisabled: true
@@ -70,7 +70,7 @@ ApplicationWindow {
         initialItem: tabView
 
         function openPage(name) {
-            var pageName = "views/" + name + "Page.qml";
+            var pageName = name + "Page.qml";
             // FIXME: check if we already have the page on the stack and
             // if put it into the foreground
             stackView.push(Qt.resolvedUrl(pageName));
@@ -144,6 +144,7 @@ ApplicationWindow {
     }
 
     function openSIMLockedPage() {
+        main.hide();
         simPinWindow.show();
     }
 
