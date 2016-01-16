@@ -30,6 +30,9 @@ import LuneOS.Application 1.0
 Item {
     id: root
 
+    width: Settings.displayWidth
+    height: Settings.displayHeight
+
     Component.onCompleted: {
         var launchParams = "{\"mode\":\"first-use\"}";
         if (typeof application !== "undefined")
