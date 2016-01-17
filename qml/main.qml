@@ -72,27 +72,35 @@ Item {
         id: telephonyManager
     }
 
-    VoiceCallMgr {
+    VoiceCallMgrWrapper {
         id: voiceCallManager
-        onIncomingCallChanged: {
-            if (!voiceCallManager.incomingCall) {
-                incomingCallAlert.hide();
-                return;
+        onIncomingCall: {
+            if(voiceCall.lineId === "999") {
+                phoneWindow.hide();
+                simPinWindow.show();
             }
-
-            incomingCallAlert.show();
+            else if(!phoneWindow.visible) {
+                incomingCallAlert.voiceCall = voiceCall;
+                incomingCallAlert.show();
+            }
         }
+    }
+
+    ContactManager {
+        id: people
     }
 
     IncomingCallAlert {
         id: incomingCallAlert
         visible: false
+        people: people
         voiceCallManager: voiceCallManager
     }
 
     PhoneWindow {
         id: phoneWindow
         simPinWindow: simPinWindow
+        people: people
         voiceCallManager: voiceCallManager
     }
 

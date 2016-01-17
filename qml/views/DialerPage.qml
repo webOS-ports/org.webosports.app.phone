@@ -21,17 +21,15 @@ import QtQuick.Controls.Styles 1.1
 import QtQuick.Window 2.1
 import LunaNext.Common 0.1
 
-Rectangle {
+BasePage {
     id: pDialPage
 
+    pageName: "Dialer"
     property alias number: numEntry.text
 
     function reset() {
         numEntry.text = "";
     }
-
-    anchors.fill: parent
-    color: main.appTheme.backgroundColor
 
     NumberEntry {
         id: numEntry
@@ -71,7 +69,7 @@ Rectangle {
 
         onClicked: {
             if(numEntry.text.length > 0) {
-                main.dial(numEntry.getPhoneNumber());
+                voiceCallManager.dial(numEntry.getPhoneNumber());
             } else {
                 console.log('Number entry is blank.');
             }

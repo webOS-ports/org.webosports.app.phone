@@ -22,6 +22,8 @@ import LuneOS.Components 1.0
 Item {
    id:root
 
+   property PhoneUiTheme appTheme: PhoneUiTheme{}
+
    property alias label: label.text
    property alias sublabel: sublabel.text
    property int keycode
@@ -36,7 +38,7 @@ Item {
     Text {
         id: label
         anchors.centerIn: parent
-        color: phoneUiAppTheme.foregroundColor
+        color: appTheme.foregroundColor
         font.pixelSize: fontSize
         font.bold: true
     }
@@ -45,7 +47,7 @@ Item {
         id: sublabel
         anchors.horizontalCenter: parent.horizontalCenter
         anchors.top:label.bottom
-        color:phoneUiAppTheme.subForegroundColor
+        color:appTheme.subForegroundColor
         font.pixelSize: fontSize/2.5
     }
 

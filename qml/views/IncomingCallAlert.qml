@@ -16,14 +16,24 @@
  */
 
 import QtQuick 2.0
+
 import LunaNext.Common 0.1
 import LunaNext.Compositor 0.1
 import LuneOS.Application 1.0 as LuneOS
 
+import org.nemomobile.voicecall 1.0
+
+import "../services"
+import "../model"
+
 LuneOS.ApplicationWindow {
     id: incomingCallAlert
 
-    property Item voiceCallManager
+    property ContactManager people;
+    property VoiceCallMgrWrapper voiceCallManager
+    property QtObject voiceCall;
+
+    property Contact voiceCallPerson: (voiceCall && people) ? people.personByPhoneNumber(voiceCall.lineId) : null
 
     width: Settings.displayWidth
     height: Units.gu(30)
@@ -53,7 +63,7 @@ LuneOS.ApplicationWindow {
             color: '#00000000'
         }
 
-        source: 'images/generic-details-view-avatar.png';
+        source: voiceCallPerson ? voiceCallPerson.avatarPath : 'images/generic-details-view-avatar.png';
     }
 
     Text {
@@ -68,7 +78,7 @@ LuneOS.ApplicationWindow {
         id: title
         font.pixelSize: FontUtils.sizeToPixels("large")
         color: "white"
-        text: voiceCallManager.incomingCall ? voiceCallManager.incomingCall.lineId : ""
+        text: voiceCallPerson ? voiceCallPerson.displayLabel : (voiceCall ? voiceCall.lineId : "")
     }
 
     Row {
@@ -85,7 +95,7 @@ LuneOS.ApplicationWindow {
             height: 215
             width: 215
             onClicked: {
-                voiceCallManager.incomingCall.answer();
+                voiceCall.answer();
             }
         }
 
@@ -93,7 +103,7 @@ LuneOS.ApplicationWindow {
             height: 210
             width: 210
             onClicked: {
-                voiceCallManager.incomingCall.hangup();
+                voiceCall.hangup();
             }
         }
     }

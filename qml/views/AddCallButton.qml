@@ -24,10 +24,12 @@ Button {
     width: Units.gu(5)
     height:Units.gu(5)
 
+    property PhoneUiTheme appTheme: PhoneUiTheme{}
+
     style: ButtonStyle {
 
         background: Rectangle{
-            color: control.pressed ? main.appTheme.callActionBtnFgColorActive : main.appTheme.callActionBtnFgColor
+            color: control.pressed ? appTheme.callActionBtnFgColorActive : appTheme.callActionBtnFgColor
             border.color:  'white'
             implicitWidth: Units.gu(5)
             implicitHeight: Units.gu(5)

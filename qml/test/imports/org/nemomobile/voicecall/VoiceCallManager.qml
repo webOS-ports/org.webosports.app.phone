@@ -1,16 +1,50 @@
+/*
+ * Copyright (C) 2015 Simon Busch <morphis@gravedo.de>
+ * Copyright (C) 2016 Christophe Chapuis <chris.chapuis@gmail.com>
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>
+ */
+
 import QtQuick 2.0
+import QtQml.Models 2.2
+
+import "VoiceCallStatusStub.js" as VoiceCall;
 
 Item {
-    property ListModel voiceCalls: ListModel {}
+    id: testVoiceCallMgr
+    property ObjectModel voiceCalls: ObjectModel {
+        VoiceCall {
+            id: testVoiceCall1
+            isIncoming: true
+            onStatusChanged: {
+                if(status===VoiceCall.STATUS_ACTIVE) activeVoiceCall = testVoiceCall1;
+                else if(activeVoiceCall===testVoiceCall1) activeVoiceCall = null;
+            }
+        }
+        VoiceCall {
+            id: testVoiceCall2
+            onStatusChanged: {
+                if(status===VoiceCall.STATUS_ACTIVE) activeVoiceCall = testVoiceCall2;
+                else if(activeVoiceCall===testVoiceCall2) activeVoiceCall = null;
+            }
+        }
+    }
     property ListModel providers: ListModel {}
 
     property string defaultProviderId: "provider"
 
-    property Item activeVoiceCall: Item {
-        property string lineId: "+(1)234567890"
-        property string statusText: "active"
-        property int duration: 159
-    }
+    property VoiceCall activeVoiceCall
 
     property string audioMode: "normal"
     property bool isAudioRouted: true
@@ -27,7 +61,22 @@ Item {
 
     function dial(providerId, msisdn)
     {
-        console.log("--> dial: providerId=" + providerId + " msisdn=" + msisdn);
+        // hard-code some dial numbers to cover other UI functionalities
+        if(msisdn==="111" || msisdn==="999") {
+            testVoiceCall2.lineId = msisdn;
+            if( testVoiceCall2.status === VoiceCall.STATUS_NULL )
+                testVoiceCall2.status = VoiceCall.STATUS_INCOMING;
+        }
+        else
+        {
+            console.log("--> dial: providerId=" + providerId + " msisdn=" + msisdn);
+            if( testVoiceCall1.status === VoiceCall.STATUS_NULL )
+            {
+                testVoiceCall1.providerId = providerId;
+                testVoiceCall1.lineId = msisdn;
+                testVoiceCall1.status = VoiceCall.STATUS_DIALING;
+            }
+        }
     }
 
     function silenceRingtone()

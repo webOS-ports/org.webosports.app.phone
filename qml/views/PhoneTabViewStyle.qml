@@ -22,9 +22,11 @@ import LunaNext.Common 0.1
 import LuneOS.Components 1.0
 
 TabViewStyle {
+    property PhoneUiTheme appTheme: PhoneUiTheme{}
+
     frameOverlap: 1
     tab: Rectangle {
-        color: styleData.selected ? main.appTheme.backgroundColor : main.appTheme.unselectedTabColor
+        color: styleData.selected ? appTheme.backgroundColor : appTheme.unselectedTabColor
         border.color:  'white' //main.appTheme.backgroundColor
         implicitWidth: tabView.width/4
         implicitHeight: Units.gu(5)
@@ -54,4 +56,4 @@ TabViewStyle {
         //}
 
     }
-    frame: Rectangle { color: main.appTheme.backgroundColor }}
+    frame: Rectangle { color: appTheme.backgroundColor }}

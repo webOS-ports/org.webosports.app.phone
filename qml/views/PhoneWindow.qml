@@ -29,22 +29,19 @@ import LuneOS.Application 1.0
 ApplicationWindow {
     id: window
 
-    property Item voiceCallManager
+    property ContactManager people;
+    property VoiceCallMgrWrapper voiceCallManager;
 
     keepAlive: true
     loadingAnimationDisabled: true
 
     width: Settings.displayWidth
     height: Settings.displayHeight
-    color: appTheme.backgroundColor
+    color: phoneUiAppTheme.backgroundColor
 
     property string activationReason: 'invoked'
-    property Contact activeVoiceCallPerson
 
     property QtObject simPinWindow
-
-    property alias main: window
-    property alias appTheme: phoneUiAppTheme
 
     PhoneUiTheme { id: phoneUiAppTheme }
 
@@ -58,9 +55,9 @@ ApplicationWindow {
     onVisibleChanged: {
         if(!visible) {
             console.log("Window not active - Cleaning up");
-            main.hangup();
-            if (tabView.pDialer)
-                tabView.pDialer.reset();
+            voiceCallManager.hangupAll();
+            if (tabView.dialerPage)
+                tabView.dialerPage.reset();
         }
     }
 
@@ -69,11 +66,25 @@ ApplicationWindow {
         anchors.fill: parent
         initialItem: tabView
 
-        function openPage(name) {
+        function openPage(name, voiceCall) {
             var pageName = name + "Page.qml";
-            // FIXME: check if we already have the page on the stack and
-            // if put it into the foreground
-            stackView.push(Qt.resolvedUrl(pageName));
+
+            var existingPage = stackView.find(function(stackedPage) {
+                if( stackedPage.pageName === name ) return true;
+            });
+
+            if (existingPage) {
+                existingPage.voiceCall = voiceCall;
+                existingPage.voiceCallPerson = people.personByPhoneNumber(voiceCall.lineId);
+                stackView.pop(existingPage);
+            }
+            else {
+                stackView.push({item: Qt.resolvedUrl(pageName),
+                                properties: {voiceCallManager: voiceCallManager,
+                                             appTheme: phoneUiAppTheme,
+                                             voiceCall: voiceCall,
+                                             voiceCallPerson: people.personByPhoneNumber(voiceCall.lineId) }});
+            }
         }
 
         delegate: StackViewDelegate {
@@ -88,111 +99,64 @@ ApplicationWindow {
         }
     }
 
-    /*
     Connections {
         target: voiceCallManager
 
-        onActiveVoiceCallChanged: {
-            if (activeVoiceCall) {
-                console.log("Active Call Status: ",activeVoiceCall.state)
-
-                main.activeVoiceCallPerson = people.personByPhoneNumber(activeVoiceCall.lineId)
-                voiceCallManager.activeVoiceCall.statusText = "active"
-
-                if (main.activationReason === "incoming")
-                    incomingCall()
-                else
-                    activeCallDialog()
-
-                if (!window.visible) {
-                    main.activationReason = 'activeVoiceCallChanged';
-                    window.show();
-                }
-            }
-            else {
-                console.log("No activeVoiceCall")
-
-                tabView.pDialer.clear();
-                stackView.pop()
-
-                // If we were going back to Voicemail tab, go to first tab instead
-                if (tabView.currentIndex == 3)
-                    tabView.currentIndex = 0;
-
-                main.activeVoiceCallPerson = null;
-
-                if (main.activationReason !== "invoked") {
-                    // reset for next time
-                    main.activationReason = 'invoked';
-                    window.close();
-                }
+        onIncomingCall: {
+            if(voiceCall) {
+                incomingCall(voiceCall);
             }
         }
-    }
-    */
+        onOutgoingCall: {
+            console.log("Outgoing Call Status: ",voiceCall.status)
 
-    function dial(number) {
-        if (number === "999") {
-            openSIMLockedPage();
+            activeCallDialog(voiceCall);
+
+            if (!window.visible) {
+                activationReason = 'activeVoiceCallChanged';
+                window.show();
+            }
         }
-        else if (number === "111") {
-            main.activationReason = "incoming";
-            main.incomingCall();
+        onActiveCall: {
+            console.log("Active Call Status: ",voiceCall.status)
+
+            activeCallDialog(voiceCall);
+
+            if (!window.visible) {
+                activationReason = 'activeVoiceCallChanged';
+                window.show();
+            }
         }
-        else
-            voiceCallManager.dial(number);
+        onEndingCall: {
+            console.log("VoiceCall " + voiceCall.lineId + " ended")
+
+            tabView.dialerPage.reset();
+            stackView.pop()
+
+            // If we were going back to Voicemail tab, go to first tab instead
+            if (tabView.currentIndex == 3)
+                tabView.currentIndex = 0;
+
+            // reset for next time
+            activationReason = 'invoked';
+            window.close();
+        }
     }
 
-    function openSIMLockedPage() {
-        main.hide();
-        simPinWindow.show();
-    }
-
-    function activeCallDialog() {
+    function activeCallDialog(voiceCall) {
         console.log("Showing Active Call Dialog")
-        stackView.openPage("ActiveCall");
+        stackView.openPage("ActiveCall", voiceCall);
     }
 
-    function incomingCall() {
+    function incomingCall(voiceCall) {
         console.log("Showing Incoming Call Dialog");
-        stackView.openPage("IncomingCall");
-    }
-
-    function accept() {
-        console.log("accepting Call")
-        stackView.pop()
-        voiceCallManager.accept()
-        activeCallDialog()
-    }
-
-    function hangup() {
-        console.log("hanging up Call")
-        voiceCallManager.hangup()
-    }
-
-    function reject() {
-        console.log("rejecting Call")
-        main.hangup()
-        stackView.pop()
-        main.activationReason = 'invoked'; // reset for next time
-        window.close()
-    }
-
-    function secondsToTimeString(seconds) {
-        var h = Math.floor(seconds / 3600);
-        var m = Math.floor((seconds - (h * 3600)) / 60);
-        var s = seconds - h * 3600 - m * 60;
-        if(h < 10) h = '0' + h;
-        if(m < 10) m = '0' + m;
-        if(s < 10) s = '0' + s;
-        return '' + h + ':' + m + ':' + s;
+        stackView.openPage("IncomingCall", voiceCall);
     }
 
     PhoneTabView {
         id: tabView
-    }
 
-    ContactManager {
-        id: people
+        appTheme: phoneUiAppTheme
+        voiceCallManager: window.voiceCallManager
     }
 }

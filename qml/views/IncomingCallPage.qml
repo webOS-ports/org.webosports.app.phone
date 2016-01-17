@@ -21,15 +21,9 @@ import QtQuick.Layouts 1.0
 
 import LunaNext.Common 0.1
 
-Rectangle {
+BasePage {
     id: incommingCallDialog
-
-    property Item manager: main.voiceCallManager;
-
-    width: Settings.displayWidth
-    height: Settings.displayHeight
-    color: main.appTheme.backgroundColor
-    radius: 10
+    pageName: "IncomingCall"
 
     Image {
         id:iAvatar
@@ -47,14 +41,12 @@ Rectangle {
 
         Rectangle {
             anchors.fill:parent
-            border {color:main.appTheme.foregroundColor;width:2}
+            border {color:appTheme.foregroundColor;width:2}
             radius:10
             color:'#00000000'
         }
 
-        source: main.activeVoiceCallPerson
-                ? main.activeVoiceCallPerson.avatarPath
-                : 'images/generic-details-view-avatar.png';
+        source: voiceCallPerson ? voiceCallPerson.avatarPath : 'images/generic-details-view-avatar.png';
     }
 
     Text {
@@ -66,10 +58,8 @@ Rectangle {
 
         id: title
         font.pixelSize: Units.dp(20)
-        color: main.appTheme.headerTitle
-        text:main.activeVoiceCallPerson
-             ? main.activeVoiceCallPerson.displayLabel
-             : (manager.activeVoiceCall ? manager.activeVoiceCall.lineId : 'Unknown Number');
+        color: appTheme.headerTitle
+        text:voiceCallPerson ? voiceCallPerson.displayLabel : voiceCall.lineId;
     }
 
     Row {
@@ -86,7 +76,7 @@ Rectangle {
             height: 215
             width: 215
             onClicked: {
-                main.accept();
+                voiceCall.answer();
             }
         }
 
@@ -94,7 +84,7 @@ Rectangle {
             height: 210
             width: 210
             onClicked: {
-                main.reject();
+                voiceCall.hangup();
             }
         }
     }

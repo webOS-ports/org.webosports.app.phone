@@ -21,9 +21,8 @@ import LunaNext.Common 0.1
 import LuneOS.Components 1.0
 import "../model"
 
-Rectangle {
-    anchors.fill: parent
-    color: main.appTheme.backgroundColor
+BasePage {
+    pageName: "History"
 
     ListView {
         id:historyList

@@ -17,36 +17,23 @@
 
 import QtQuick 2.0
 import QtQuick.Layouts 1.0
-import QtQuick.Window 2.1
+
+import org.nemomobile.voicecall 1.0
+
 import LunaNext.Common 0.1
 
-Rectangle {
+BasePage {
     id: root
-    width: Settings.displayWidth
-    height: Settings.displayHeight
-    color: main.appTheme.backgroundColor
+
+    pageName: "ActiveCall"
 
     property Item dtmfKeypadDialog
 
-    state: voiceCallManager.activeVoiceCall ? voiceCallManager.activeVoiceCall.statusText : 'disconnected'
-
-    states: [
-        State {name:'active'},
-        State {name:'held'},
-        State {name:'dialing'},
-        State {name:'alerting'},
-        State {name:'incoming'},
-        State {name:'waiting'},
-        State {name:'disconnected'}
-    ]
+    property bool voiceCallIsActive: voiceCall && voiceCall.status === VoiceCall.STATUS_ACTIVE
 
     function open(){
         root.visible = true
-        tLineId.text = main.activeVoiceCallPerson ? main.activeVoiceCallPerson.displayLabel : (voiceCallManager.activeVoiceCall ? voiceCallManager.activeVoiceCall.lineId : '');
-        console.log("Settings.displayWidth: " + Settings.displayWidth)
-        console.log("Settings.displayHeight: " + Settings.displayHeight)
-        console.log("Screen desktopAvailableHeight: " + Screen.desktopAvailableHeight)
-        console.log("Screen desktopAvailableWidth: " + Screen.desktopAvailableWidth)
+        tLineId.text = voiceCallPerson ? voiceCallPerson.displayLabel : (voiceCall ? voiceCall.lineId : '');
     }
 
     function close(){
@@ -64,22 +51,20 @@ Rectangle {
             rightMargin: Units.gu(1)
         }
         height: Units.gu(5)
-        color: main.appTheme.headerColor
+        color: appTheme.headerColor
         radius: 10
 
         Text {
             id:tLineId
             anchors.fill: parent
             anchors.margins: Units.gu(0.5)
-            color:main.appTheme.foregroundColor
+            color:appTheme.foregroundColor
             font.pixelSize: height * 0.8
 
             horizontalAlignment: Text.AlignRight
             elide: Text.ElideLeft
 
-            text:main.activeVoiceCallPerson
-                 ? main.activeVoiceCallPerson.displayLabel
-                 : (voiceCallManager.activeVoiceCall ? voiceCallManager.activeVoiceCall.lineId : '');
+            text:voiceCallPerson ? voiceCallPerson.displayLabel : (voiceCall ? voiceCall.lineId : '');
         }
 
     }
@@ -93,9 +78,19 @@ Rectangle {
             horizontalCenter:parent.horizontalCenter
         }
 
-        color:main.appTheme.foregroundColor
+        color:appTheme.foregroundColor
         font.pixelSize: Units.dp(15)
-        text:voiceCallManager.activeVoiceCall ? main.secondsToTimeString(voiceCallManager.activeVoiceCall.duration) : '00:00:00'
+        text:voiceCall ? secondsToTimeString(voiceCall.duration) : '00:00:00'
+
+        function secondsToTimeString(seconds) {
+            var h = Math.floor(seconds / 3600);
+            var m = Math.floor((seconds - (h * 3600)) / 60);
+            var s = seconds - h * 3600 - m * 60;
+            if(h < 10) h = '0' + h;
+            if(m < 10) m = '0' + m;
+            if(s < 10) s = '0' + s;
+            return '' + h + ':' + m + ':' + s;
+        }
     }
 
 
@@ -147,15 +142,13 @@ Rectangle {
 
             Rectangle {
                 anchors.fill:parent
-                border {color:main.appTheme.foregroundColor;width:2}
+                border {color:appTheme.foregroundColor;width:2}
                 radius:10
                 z: -1
                 color:"black"
             }
 
-            source: main.activeVoiceCallPerson
-                    ? main.activeVoiceCallPerson.avatarPath
-                    : 'images/generic-details-view-avatar.png';
+            source: voiceCallPerson ? voiceCallPerson.avatarPath : 'images/generic-details-view-avatar.png';
         }
 
         back:  Item {
@@ -191,7 +184,7 @@ Rectangle {
             right: flipable.right
         }
         onClicked: {
-           voiceCallManager.hangup()
+           voiceCall.hangup()
            root.close();
         }
     }
@@ -207,7 +200,7 @@ Rectangle {
         spacing: Units.gu(4)
 
         SpeakerButton {
-            visible:root.state == 'active'
+            visible:root.voiceCallIsActive
             onClicked: {
                 voiceCallManager.setAudioMode(voiceCallManager.audioMode === 'ihf' ? 'earpiece' : 'ihf');
                 btnActive = !btnActive
@@ -215,7 +208,7 @@ Rectangle {
         }
 
         MuteButton {
-            visible:root.state == 'active'
+            visible:root.voiceCallIsActive
             onClicked: {
                 btnActive = !btnActive
                 if(root.state == 'incoming') { // TODO: Take in to account unmuting audio when call is answered.
@@ -227,7 +220,7 @@ Rectangle {
         }
 
         KeypadButton {
-            visible:root.state == 'active'
+            visible:root.voiceCallIsActive
             onClicked: {
                 btnActive = !btnActive
                 console.log("Numpad Button tapped");
@@ -236,7 +229,7 @@ Rectangle {
         }
 
         AddCallButton {
-            visible:root.state == 'active'
+            visible:root.voiceCallIsActive
             onClicked: {
                 console.log("Add Call not implemented yet !");
 
