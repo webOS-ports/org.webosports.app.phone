@@ -18,6 +18,6 @@
 import QtQuick 2.0
 
 Item {
-    property string avatarPath: 'images/generic-details-view-avatar.png'
-    property string displayLabel
+    property string avatarPath: Qt.resolvedUrl('../images/generic-details-view-avatar.png');
+    property string displayLabel: ""
 }

@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>
  */
 
-import QtQuick 2.0
+import QtQuick 2.5
 import LunaNext.Common 0.1
 
 Item {
@@ -26,16 +26,20 @@ Item {
     signal keyPressed(int keycode, string label)
     signal keyPressAndHold(int keycode, string label)
 
-    property int keysWidth: Units.gu(11)
-    property int keysHeight: Units.gu(8)
+    property int keysWidth: (numPad.width / keys.columns) - Units.gu(2)
+    property int keysHeight: (numPad.height / keys.rows) - Units.gu(2)
+
+    Image {
+        source: "images/dialpad-bg.png"
+        anchors.fill: parent
+        fillMode: Image.TileVertically
+    }
 
     Grid {
         id: keys
 
         rows: 4
         columns: 3
-        columnSpacing: Units.gu(2.0)
-        rowSpacing: Units.gu(0.5)
         anchors.centerIn: parent
 
         NumPadButton {
@@ -44,6 +48,7 @@ Item {
             label:'1'
             sublabel: (mode === "sim") ? '': 'voicemail'
             keycode: Qt.Key_1
+            posInPadGrid: Qt.point(0,0)
             onKeyPressed: numPad.keyPressed(keycode, label)
             onKeyPressAndHold: numPad.keyPressAndHold(keycode, label)
         }
@@ -54,6 +59,7 @@ Item {
             label:'2'
             sublabel: (mode === "sim") ? '' : 'ABC'
             keycode: Qt.Key_2
+            posInPadGrid: Qt.point(1,0)
             onKeyPressed: numPad.keyPressed(keycode, label)
             onKeyPressAndHold: numPad.keyPressAndHold(keycode, label)
         }
@@ -64,6 +70,7 @@ Item {
             label:'3'
             sublabel: (mode === "sim") ? '' : 'DEF'
             keycode: Qt.Key_3
+            posInPadGrid: Qt.point(2,0)
             onKeyPressed: numPad.keyPressed(keycode, label)
             onKeyPressAndHold: numPad.keyPressAndHold(keycode, label)
         }
@@ -74,6 +81,7 @@ Item {
             label:'4'
             sublabel: (mode === "sim") ? '' : 'GHI'
             keycode: Qt.Key_4
+            posInPadGrid: Qt.point(0,1)
             onKeyPressed: numPad.keyPressed(keycode, label)
             onKeyPressAndHold: numPad.keyPressAndHold(keycode, label)
         }
@@ -84,6 +92,7 @@ Item {
             label:'5'
             sublabel: (mode === "sim") ? '' : 'JKL'
             keycode: Qt.Key_5
+            posInPadGrid: Qt.point(1,1)
             onKeyPressed: numPad.keyPressed(keycode, label)
             onKeyPressAndHold: numPad.keyPressAndHold(keycode, label)
         }
@@ -94,6 +103,7 @@ Item {
             label:'6'
             sublabel: (mode === "sim") ? '' : 'MNO'
             keycode: Qt.Key_6
+            posInPadGrid: Qt.point(2,1)
             onKeyPressed: numPad.keyPressed(keycode, label)
             onKeyPressAndHold: numPad.keyPressAndHold(keycode, label)
         }
@@ -104,6 +114,7 @@ Item {
             label:'7'
             sublabel: (mode === "sim") ? '' : 'PQRS'
             keycode: Qt.Key_7
+            posInPadGrid: Qt.point(0,1)
             onKeyPressed: numPad.keyPressed(keycode, label)
             onKeyPressAndHold: numPad.keyPressAndHold(keycode, label)
         }
@@ -114,6 +125,7 @@ Item {
             label:'8'
             sublabel: (mode === "sim") ? '' : 'TUV'
             keycode: Qt.Key_8
+            posInPadGrid: Qt.point(1,1)
             onKeyPressed: numPad.keyPressed(keycode, label)
             onKeyPressAndHold: numPad.keyPressAndHold(keycode, label)
         }
@@ -124,6 +136,7 @@ Item {
             label:'9'
             sublabel: (mode === "sim") ? '' : 'WXYZ'
             keycode: Qt.Key_9
+            posInPadGrid: Qt.point(2,1)
             onKeyPressed: numPad.keyPressed(keycode, label)
             onKeyPressAndHold: numPad.keyPressAndHold(keycode, label)
         }
@@ -133,6 +146,7 @@ Item {
             height: keysHeight
             label: (mode === "sim") ? '' : '*'
             keycode: Qt.Key_Asterisk
+            posInPadGrid: Qt.point(0,2)
             onKeyPressed: numPad.keyPressed(keycode, label)
             onKeyPressAndHold: numPad.keyPressAndHold(keycode, label)
         }
@@ -143,6 +157,7 @@ Item {
             label: '0'
             sublabel: (mode === "sim") ? '' : '+'
             keycode: Qt.Key_0
+            posInPadGrid: Qt.point(1,2)
             onKeyPressed: numPad.keyPressed(keycode, label)
             onKeyPressAndHold: numPad.keyPressAndHold(keycode, label)
         }
@@ -152,6 +167,7 @@ Item {
             height: keysHeight
             label: (mode === "sim") ? '' : '#'
             keycode: Qt.Key_ssharp
+            posInPadGrid: Qt.point(2,2)
             onKeyPressed: numPad.keyPressed(keycode, label)
             onKeyPressAndHold: numPad.keyPressAndHold(keycode, label)
         }

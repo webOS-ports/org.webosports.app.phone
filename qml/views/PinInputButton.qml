@@ -4,6 +4,8 @@ import LunaNext.Common 0.1
 MouseArea {
     id: button
 
+    property PhoneUiTheme appTheme: PhoneUiTheme{}
+
     property string text: ""
     property bool emergency: false
 

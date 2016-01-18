@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Roshan Gunasekara <roshan@mobileteck.com>
+ * Copyright (C) 2016 Christophe Chapuis <chris.chapuis@gmail.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,25 +15,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>
  */
 
-import QtQuick 2.0
-import QtQuick.Controls 1.1
-import QtQuick.Controls.Styles 1.1
+.pragma library
 
-import LuneOS.Components 1.0
-
-Button {
-    style: ButtonStyle {
-        background: ClippedImage {
-            id: bgClippedImage
-
-            source: "images/disconnect-button.png"
-
-            wantedWidth: control.width
-            imageSize: Qt.size(612, 297)
-            patchGridSize: Qt.size(1, 3)
-            patch: control.pressed ? Qt.point(0,2): Qt.point(0,0)
-
-            onHeightChanged: control.height = bgClippedImage.height
-        }
-    }
-}
+var STATUS_NULL         = 0;
+var STATUS_ACTIVE       = 1;
+var STATUS_HELD         = 2;
+var STATUS_DIALING      = 3;
+var STATUS_ALERTING     = 4;
+var STATUS_INCOMING     = 5;
+var STATUS_WAITING      = 6;
+var STATUS_DISCONNECTED = 7;

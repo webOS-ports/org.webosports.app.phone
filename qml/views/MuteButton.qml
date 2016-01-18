@@ -24,11 +24,13 @@ Button {
     width: Units.gu(5)
     height:Units.gu(5)
 
+    property PhoneUiTheme appTheme: PhoneUiTheme{}
+
     property bool btnActive: false
 
     style: ButtonStyle {
         background: Rectangle{
-            color: btnActive ? main.appTheme.callActionBtnFgColorActive : main.appTheme.callActionBtnFgColor
+            color: btnActive ? appTheme.callActionBtnFgColorActive : appTheme.callActionBtnFgColor
             border.color:  'white'
             implicitWidth: Units.gu(5)
             implicitHeight: Units.gu(5)

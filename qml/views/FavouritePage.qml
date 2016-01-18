@@ -20,9 +20,8 @@ import QtQuick.Controls 1.1
 import LunaNext.Common 0.1
 import "../model"
 
-Rectangle {
-    anchors.fill: parent
-    color: main.appTheme.backgroundColor
+BasePage {
+    pageName: "Favourite"
 
     FavoritesModel {
         id: favoritesModel
@@ -56,7 +55,7 @@ Rectangle {
             Rectangle {
                 anchors.fill:parent
                 border {
-                    color:main.appTheme.foregroundColor
+                    color:appTheme.foregroundColor
                     width: 1.5
                 }
                 radius:20

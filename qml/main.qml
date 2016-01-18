@@ -22,13 +22,16 @@ import "model"
 import QtQuick.Controls 1.1
 import QtQuick.Controls.Styles 1.1
 import QtQuick.Layouts 1.0
-import QtQuick.Window 2.1
+
 import LunaNext.Common 0.1
 import LuneOS.Service 1.0
 import LuneOS.Application 1.0
 
 Item {
     id: root
+
+    width: Settings.displayWidth
+    height: Settings.displayHeight
 
     Component.onCompleted: {
         var launchParams = "{\"mode\":\"first-use\"}";
@@ -69,27 +72,35 @@ Item {
         id: telephonyManager
     }
 
-    VoiceCallMgr {
+    VoiceCallMgrWrapper {
         id: voiceCallManager
-        onIncomingCallChanged: {
-            if (!voiceCallManager.incomingCall) {
-                incomingCallAlert.hide();
-                return;
+        onIncomingCall: {
+            if(voiceCall.lineId === "999") {
+                phoneWindow.hide();
+                simPinWindow.show();
             }
-
-            incomingCallAlert.show();
+            else if(!phoneWindow.visible) {
+                incomingCallAlert.voiceCall = voiceCall;
+                incomingCallAlert.show();
+            }
         }
+    }
+
+    ContactManager {
+        id: people
     }
 
     IncomingCallAlert {
         id: incomingCallAlert
         visible: false
+        people: people
         voiceCallManager: voiceCallManager
     }
 
     PhoneWindow {
         id: phoneWindow
         simPinWindow: simPinWindow
+        people: people
         voiceCallManager: voiceCallManager
     }
 

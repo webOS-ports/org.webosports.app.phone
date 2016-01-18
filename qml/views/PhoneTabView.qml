@@ -18,6 +18,8 @@
 import QtQuick 2.0
 import QtQuick.Controls 1.1
 
+import "../services"
+
 TabView {
     id: tabView
     tabPosition: Qt.BottomEdge
@@ -25,14 +27,21 @@ TabView {
     //frameVisible: true
     //tabsVisible: true
 
-    property alias pDialer: tabDialer.item
-    property alias pHistory: tabHistory.item
-    property alias pFavorites: tabFavorites.item
+    property VoiceCallMgrWrapper voiceCallManager;
+    property PhoneUiTheme appTheme;
+
+    property alias dialerPage: tabDialer.item
+    property alias historyPage: tabHistory.item
+    property alias favoritesPage: tabFavorites.item
 
     Tab {
         id: tabDialer
         title: "Dial"
-        sourceComponent: DialerPage { anchors.horizontalCenter: parent.horizontalCenter}
+        sourceComponent: DialerPage {
+            appTheme: tabView.appTheme
+            voiceCallManager: tabView.voiceCallManager
+            anchors.horizontalCenter: parent.horizontalCenter
+        }
     }
 
     Tab {
@@ -56,11 +65,11 @@ TabView {
 
     onCurrentIndexChanged: {
         if(currentIndex == 3) {
-            main.dial("453");
+            voiceCallManager.dial("453");
         }
     }
 
-    style: PhoneTabViewStyle{}
+    style: PhoneTabViewStyle{ appTheme: appTheme }
     function getIcon(title) {
         if(title === "Dial") {
             return "images/menu-icon-dtmfpad.png"

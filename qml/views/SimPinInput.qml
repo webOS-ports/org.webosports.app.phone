@@ -9,6 +9,8 @@ import LunaNext.Common 0.1
 Item {
     id: simPinInput
 
+    property PhoneUiTheme appTheme: PhoneUiTheme{}
+
     property OfonoSimManager simManager
     property int requestedPinType: 0
     property bool retrying: false
@@ -48,7 +50,7 @@ Item {
         Label {
             id: title
             font.pixelSize: FontUtils.sizeToPixels("large")
-            color: phoneUiAppTheme.headerTitle
+            color: appTheme.headerTitle
             anchors.horizontalCenter: parent.horizontalCenter
             text: {
                 switch (requestedPinType) {
@@ -66,7 +68,7 @@ Item {
 
         Label {
             id: warning
-            color: phoneUiAppTheme.headerTitle
+            color: appTheme.headerTitle
             font.pixelSize: FontUtils.sizeToPixels("medium")
             anchors.horizontalCenter: parent.horizontalCenter
             wrapMode: Text.Wrap
@@ -98,11 +100,13 @@ Item {
     NumberEntry {
         id: pinEntry
 
-        width:parent.width
-        height: Units.gu(6)
-        anchors.top: header.bottom
-        anchors.horizontalCenter: parent.horizontalCenter
-        textColor: phoneUiAppTheme.foregroundColor
+        anchors {
+            top: header.bottom
+            left:parent.left
+            right:parent.right
+        }
+
+        textColor: appTheme.foregroundColor
         echoMode: TextInput.Password
         isPhoneNumber: false
     }
@@ -111,11 +115,10 @@ Item {
         id: keyboard
 
         anchors {
+            top: pinEntry.bottom
             left: parent.left
             right: parent.right
-            top: pinEntry.bottom
             bottom: cancelButton.bottom
-            topMargin: Units.gu(2)
         }
 
         mode:'sim'

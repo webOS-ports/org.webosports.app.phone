@@ -17,16 +17,20 @@
 
 import QtQuick 2.0
 import LunaNext.Common 0.1
+import LuneOS.Components 1.0
 
 Item {
    id:root
+
+   property PhoneUiTheme appTheme: PhoneUiTheme{}
 
    property alias label: label.text
    property alias sublabel: sublabel.text
    property int keycode
    property string alt: ""
+   property point posInPadGrid
 
-   property int size: 25
+   property int fontSize: height/2.5
 
    signal keyPressed
    signal keyPressAndHold
@@ -34,8 +38,8 @@ Item {
     Text {
         id: label
         anchors.centerIn: parent
-        color: phoneUiAppTheme.foregroundColor
-        font.pixelSize: Units.dp(size)
+        color: appTheme.foregroundColor
+        font.pixelSize: fontSize
         font.bold: true
     }
 
@@ -43,16 +47,21 @@ Item {
         id: sublabel
         anchors.horizontalCenter: parent.horizontalCenter
         anchors.top:label.bottom
-        color:phoneUiAppTheme.subForegroundColor
-        font.pixelSize: Units.dp(10)
+        color:appTheme.subForegroundColor
+        font.pixelSize: fontSize/2.5
     }
 
-    Rectangle {
+    ClippedImage {
         id: box
-        anchors.fill: parent
-        border { color:phoneUiAppTheme.foregroundColor; width:0.5}
-        radius: 10
-        color: mouseArea.pressed ? '#6495ed' : '#000000'
+
+        source: mouseArea.pressed ? "images/buttons-numpad-pressed.png" : "images/buttons-numpad.png"
+
+        wantedWidth: parent.width
+        wantedHeight: parent.height
+
+        imageSize: Qt.size(297, 297)
+        patchGridSize: Qt.size(3, 3)
+        patch: posInPadGrid
         z: -10
     }
 

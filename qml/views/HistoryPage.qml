@@ -18,11 +18,11 @@
 import QtQuick 2.0
 import QtQuick.Controls 1.1
 import LunaNext.Common 0.1
+import LuneOS.Components 1.0
 import "../model"
 
-Rectangle {
-    anchors.fill: parent
-    color: main.appTheme.backgroundColor
+BasePage {
+    pageName: "History"
 
     ListView {
         id:historyList
@@ -51,17 +51,17 @@ Rectangle {
                 anchors {left:parent.left; leftMargin:10; verticalCenter:parent.verticalCenter}
                 spacing:10
 
-                Item {
-                    clip: true
-                    anchors.verticalCenter: parent.verticalCenter
-                    width: 44
-                    height: 44
-                    Image{
-                        x: 0
-                        y: model.isMissedCall ? 0 : ((model.direction === "inbound") ? -44 : -88)
-                        source: 'images/call-log-list-sprite.png'
-                    }
+                ClippedImage {
+                    source: 'images/call-log-list-sprite.png'
 
+                    anchors.verticalCenter: parent.verticalCenter
+
+                    wantedWidth: 44
+                    wantedHeight: 44
+
+                    imageSize: Qt.size(44, 182)
+                    patchGridSize: Qt.size(1, 4)
+                    patch: model.isMissedCall ? Qt.point(0,0) : ((model.direction === "inbound") ? Qt.point(0,1) : Qt.point(0,2))
                 }
 
                 Column {
