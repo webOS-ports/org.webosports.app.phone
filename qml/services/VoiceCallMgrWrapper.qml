@@ -60,8 +60,8 @@ Item {
     }
 
     function hangupAll() {
-        for(var iCall = statusObserver.count; iCall>0; iCall--) {
-            var voiceCall = statusObserver.objectAt(iCall);
+        for(var iCall = calls.count; iCall>0; iCall--) {
+            var voiceCall = calls.instance(iCall);
             if(voiceCall) voiceCall.hangup();
         }
     }
@@ -105,10 +105,13 @@ Item {
         onRowsInserted: {
             for(var i=first;i<=last;++i) {
                 var object = calls.instance(i);
-                console.log("Adding status observer for " + object);
-                object.statusChanged.connect( function() { _updateState(object) } );
+                addStatusObserver(object);
                 _updateState(object); // initialize the state
             }
+        }
+        function addStatusObserver(object) {
+            console.log("Adding status observer for " + object);
+            object.statusChanged.connect( function() { _updateState(object) } );
         }
     }
 }
