@@ -23,7 +23,10 @@ import "VoiceCallStatusStub.js" as VoiceCall;
 
 Item {
     id: testVoiceCallMgr
+    // oh boy, waiting for the ObjectModel improvements in Qt 5.6 !
     property ObjectModel voiceCalls: ObjectModel {
+        id: _voiceCalls
+        signal rowsInserted(int first, int last);
         VoiceCall {
             id: testVoiceCall1
             isIncoming: true
@@ -39,6 +42,13 @@ Item {
                 else if(activeVoiceCall===testVoiceCall2) activeVoiceCall = null;
             }
         }
+
+        function instance(idx) {
+            if(idx===1) return testVoiceCall1;
+            if(idx===2) return testVoiceCall2;
+            return null;
+        }
+        Component.onCompleted: rowsInserted(1,2);
     }
     property ListModel providers: ListModel {}
 
