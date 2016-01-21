@@ -38,7 +38,7 @@ Item {
 
     Timer {
         interval: 1000; repeat: true; running: status === VoiceCall.STATUS_ACTIVE
-        onTriggered: duration++
+        onTriggered: duration+=1000
     }
 
     function answer()
