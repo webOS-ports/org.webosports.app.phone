@@ -100,12 +100,15 @@ Item {
         }
     }
 
-    Instantiator {
-        id: statusObserver
-        model: manager.voiceCalls
-        onObjectAdded: {
-            console.log("Adding status observer for " + object);
-            object.statusChanged.connect( function() { _updateState(object) } );
+    Connections {
+        target: calls
+        onRowsInserted: {
+            for(var i=first;i<=last;++i) {
+                var object = calls.instance(i);
+                console.log("Adding status observer for " + object);
+                object.statusChanged.connect( function() { _updateState(object) } );
+                _updateState(object); // initialize the state
+            }
         }
     }
 }
