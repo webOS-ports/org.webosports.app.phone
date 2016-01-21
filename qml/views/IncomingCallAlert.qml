@@ -38,7 +38,7 @@ LuneOS.ApplicationWindow {
     width: Settings.displayWidth
     height: Units.gu(30)
 
-    type: WindowType.PopupAlert
+    type: LuneOS.ApplicationWindow.PopupAlert
     color: "transparent"
 
     Image {
@@ -96,6 +96,7 @@ LuneOS.ApplicationWindow {
             width: 215
             onClicked: {
                 voiceCall.answer();
+                incomingCallAlert.hide();
             }
         }
 
@@ -104,6 +105,7 @@ LuneOS.ApplicationWindow {
             width: 210
             onClicked: {
                 voiceCall.hangup();
+                incomingCallAlert.hide();
             }
         }
     }
