@@ -28,5 +28,27 @@
 			"update": "allow",
 			"delete": "allow"
         }
+    },
+    {
+        "type": "db.kind",
+        "object": "com.palm.phonecall:1",
+        "caller": "org.webosports.app.phone",
+        "operations": {
+			"create": "allow",
+			"read": "allow",
+			"update": "allow",
+			"delete": "allow"
+        }
+    },
+    {
+        "type": "db.kind",
+        "object": "com.palm.phonecallgroup:1",
+        "caller": "org.webosports.app.phone",
+        "operations": {
+			"create": "allow",
+			"read": "allow",
+			"update": "allow",
+			"delete": "allow"
+        }
     }
 ]
