@@ -20,7 +20,7 @@ import LuneOS.Service 1.0
 import LuneOS.Application 1.0
 
 Db8Model {
-    id: model
+    id: db8model
 
     kind: "com.palm.person:1"
     watch: true
@@ -29,5 +29,11 @@ Db8Model {
             { "prop": "favorite", "op": "=", "val": true }
         ],
         "orderBy": "sortKey"
+    }
+
+    Component.onCompleted: {
+        if(db8model.setTestDataFile) {
+            db8model.setTestDataFile(Qt.resolvedUrl("../test/persons.json"));
+        }
     }
 }

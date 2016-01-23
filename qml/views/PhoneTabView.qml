@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2014 Roshan Gunasekara <roshan@mobileteck.com>
+ * Copyright (C) 2016 Christophe Chapuis <chris.chapuis@gmail.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,6 +20,7 @@ import QtQuick 2.0
 import QtQuick.Controls 1.1
 
 import "../services"
+import "../model"
 
 TabView {
     id: tabView
@@ -29,6 +31,9 @@ TabView {
 
     property VoiceCallMgrWrapper voiceCallManager;
     property PhoneUiTheme appTheme;
+
+    property CallHistory historyModel;
+    property FavoritesModel favoritesModel;
 
     property alias dialerPage: tabDialer.item
     property alias historyPage: tabHistory.item
@@ -47,13 +52,21 @@ TabView {
     Tab {
         id: tabFavorites
         title: "Favorites"
-        sourceComponent: FavouritePage{}
+        sourceComponent: FavouritePage{
+            appTheme: tabView.appTheme;
+            voiceCallManager: tabView.voiceCallManager
+            favoritesModel: tabView.favoritesModel
+        }
     }
 
     Tab {
         id: tabHistory
         title: "Call Log"
-        sourceComponent: HistoryPage{}
+        sourceComponent: HistoryPage{
+            appTheme: tabView.appTheme;
+            voiceCallManager: tabView.voiceCallManager
+            historyModel: tabView.historyModel
+        }
     }
 
     Tab {
@@ -69,7 +82,7 @@ TabView {
         }
     }
 
-    style: PhoneTabViewStyle{ appTheme: appTheme }
+    style: PhoneTabViewStyle{ appTheme: tabView.appTheme }
     function getIcon(title) {
         if(title === "Dial") {
             return "images/menu-icon-dtmfpad.png"

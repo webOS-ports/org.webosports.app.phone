@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2014 Roshan Gunasekara <roshan@mobileteck.com>
+ * Copyright (C) 2016 Christophe Chapuis <chris.chapuis@gmail.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -29,6 +30,8 @@ import LuneOS.Application 1.0
 ApplicationWindow {
     id: window
 
+    property alias historyModel: tabView.historyModel
+    property alias favoritesModel: tabView.favoritesModel
     property ContactManager people;
     property VoiceCallMgrWrapper voiceCallManager;
 

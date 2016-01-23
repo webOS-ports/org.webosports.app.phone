@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2014 Roshan Gunasekara <roshan@mobileteck.com>
+ * Copyright (C) 2016 Christophe Chapuis <chris.chapuis@gmail.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,13 +24,14 @@ import "../model"
 BasePage {
     pageName: "Favourite"
 
-    FavoritesModel {
-        id: favoritesModel
-    }
+    property alias favoritesModel: favouriteList.model
 
     function getPrimaryPhoneNumber(person) {
-        if (person.phoneNumbers && person.phoneNumbers.length > 0) {
-            return person.phoneNumbers[0].value;
+        if (person.phoneNumbers && person.phoneNumbers.count > 0) {
+            for( var i=0; i<person.phoneNumbers.count; ++i ) {
+                if(person.phoneNumbers.get(i).primary) return person.phoneNumbers.get(i).value;
+            }
+            return person.phoneNumbers.get(0).value;
         }
         return "";
     }
@@ -40,16 +42,17 @@ BasePage {
         anchors.fill: parent
         spacing:10
         clip:true
-        model: favoritesModel
 
         delegate: Item {
             width:parent.width
             height:Units.gu(10)
             anchors { margins: 20}
             
+            property string primaryPhoneNumber: getPrimaryPhoneNumber(model);
+
             MouseArea {
                 anchors.fill: parent
-                // onClicked: main.dial(model.remoteUid);
+                onClicked: voiceCallManager.dial(primaryPhoneNumber);
             }
 
             Rectangle {
@@ -71,13 +74,12 @@ BasePage {
                         // color:model.isMissedCall ? 'red' : 'white'
                         color: "white"
                         font.pixelSize:Units.dp(20)
-                        text: name.familyName
+                        text: model.name.familyName
                     }
                     Text {
                         color:'grey'
                         font.pixelSize:Units.dp(15)
-                        // text: model.remoteUid
-                        text: getPrimaryPhoneNumber(model);
+                        text: primaryPhoneNumber
                     }
                 }
             }
