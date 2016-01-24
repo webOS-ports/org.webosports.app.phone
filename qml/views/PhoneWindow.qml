@@ -133,7 +133,7 @@ ApplicationWindow {
             console.log("VoiceCall " + voiceCall.lineId + " ended")
 
             tabView.dialerPage.reset();
-            stackView.pop()
+            stackView.pop(null)
 
             // If we were going back to Voicemail tab, go to first tab instead
             if (tabView.currentIndex == 3)
