@@ -37,7 +37,7 @@ BasePage {
         delegate: Column {
             width:parent.width
 
-            property var _callGroupId: model._id
+            property var _callGroupId: model.groupId ? model.groupId : model._id // keep backward read-only compatibility with Legacy db structure
             property var contact: model.recentcall_address
 
             Item {
@@ -81,7 +81,7 @@ BasePage {
                 }
                 MouseArea {
                     anchors.fill: callGroupDetails
-                    onClicked:main.dial(model.recentcall_address.addr);
+                    onClicked: voiceCallManager.dial(model.recentcall_address.addr);
                 }
 
                 Row {
@@ -115,8 +115,8 @@ BasePage {
 
                             property date _timestamp: new Date(timestamp)
                             property string _type: type
-                            property var _from: from
-                            property var _to: to
+                            property var _fromAddr: from.addr
+                            property var _toAddr: to.get ? to.get(0).addr : to[0].addr
 
                               width:parent.width
                               height: Units.dp(12)
@@ -124,7 +124,7 @@ BasePage {
                                   anchors.left: parent.left
                                   font.pixelSize:Units.dp(10)
                                   color:'grey'
-                                  text: (_type !== "outgoing" ? _from.addr : _to.get(0).addr )
+                                  text: (_type !== "outgoing" ? _fromAddr : _toAddr )
                               }
                               Text {
                                   anchors.right: parent.right

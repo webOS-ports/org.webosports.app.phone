@@ -32,7 +32,7 @@ ApplicationWindow {
 
     property alias historyModel: tabView.historyModel
     property alias favoritesModel: tabView.favoritesModel
-    property ContactManager people;
+    property ContactsModel contacts;
     property VoiceCallMgrWrapper voiceCallManager;
 
     keepAlive: true
@@ -78,7 +78,6 @@ ApplicationWindow {
 
             if (existingPage) {
                 existingPage.voiceCall = voiceCall;
-                existingPage.voiceCallPerson = people.personByPhoneNumber(voiceCall.lineId);
                 stackView.pop(existingPage);
             }
             else {
@@ -86,7 +85,7 @@ ApplicationWindow {
                                 properties: {voiceCallManager: voiceCallManager,
                                              appTheme: phoneUiAppTheme,
                                              voiceCall: voiceCall,
-                                             voiceCallPerson: people.personByPhoneNumber(voiceCall.lineId) }});
+                                             contacts: window.contacts }});
             }
         }
 

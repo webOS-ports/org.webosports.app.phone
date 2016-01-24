@@ -73,18 +73,18 @@ Item {
     {
         // hard-code some dial numbers to cover other UI functionalities
         if(msisdn==="111" || msisdn==="999") {
-            testVoiceCall2.lineId = msisdn;
-            if( testVoiceCall2.status === VoiceCall.STATUS_NULL )
-                testVoiceCall2.status = VoiceCall.STATUS_INCOMING;
+            testVoiceCall1.lineId = msisdn;
+            if( testVoiceCall1.status === VoiceCall.STATUS_NULL )
+                testVoiceCall1.status = VoiceCall.STATUS_INCOMING;
         }
         else
         {
             console.log("--> dial: providerId=" + providerId + " msisdn=" + msisdn);
-            if( testVoiceCall1.status === VoiceCall.STATUS_NULL )
+            if( testVoiceCall2.status === VoiceCall.STATUS_NULL )
             {
-                testVoiceCall1.providerId = providerId;
-                testVoiceCall1.lineId = msisdn;
-                testVoiceCall1.status = VoiceCall.STATUS_DIALING;
+                testVoiceCall2.providerId = providerId;
+                testVoiceCall2.lineId = msisdn;
+                testVoiceCall2.status = VoiceCall.STATUS_DIALING;
             }
         }
     }

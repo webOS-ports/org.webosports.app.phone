@@ -51,7 +51,8 @@ Item {
     function hangup()
     {
         console.log("VoiceCall -> hangup()");
-        status = VoiceCall.STATUS_DISCONNECTED;
+        if( status !== VoiceCall.STATUS_NULL && status !== VoiceCall.STATUS_DISCONNECTED )
+            status = VoiceCall.STATUS_DISCONNECTED;
     }
     function hold(isOn)
     {

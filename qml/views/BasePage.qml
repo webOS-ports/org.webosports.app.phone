@@ -12,8 +12,36 @@ Rectangle {
     property string pageName: "Base"
 
     property PhoneUiTheme appTheme;
+    property ContactsModel contacts;
 
     property VoiceCallMgrWrapper voiceCallManager;
     property QtObject voiceCall;
-    property Contact voiceCallPerson;
+    property Contact voiceCallPerson: Contact {}
+
+    onVoiceCallChanged: updateVoiceCallPerson();
+
+    function updateVoiceCallPerson() {
+        if( voiceCall ) {
+            var person = contacts.personByPhoneNumber(voiceCall.lineId);
+            var normalizedLineId = contacts.normalizePhoneNumber(voiceCall.lineId);
+
+            voiceCallPerson.addr = voiceCall.lineId;
+            voiceCallPerson.normalizedAddr = normalizedLineId;
+            if( person ) {
+                voiceCallPerson.nickname = person.nickname;
+                voiceCallPerson.familyName = person.name.familyName;
+                voiceCallPerson.givenName = person.name.givenName;
+                voiceCallPerson.personId = person._id;
+            }
+        }
+        else {
+            // reset contact
+            voiceCallPerson.addr = "";
+            voiceCallPerson.normalizedAddr = "";
+            voiceCallPerson.nickname = "";
+            voiceCallPerson.familyName = "";
+            voiceCallPerson.givenName = "";
+            voiceCallPerson.personId = "";
+        }
+    }
 }

@@ -53,6 +53,7 @@ Db8Model {
     id: db8model
 
     property bool showOnlyMissed: false;
+    property ContactsModel personListModel;
 
     kind: "com.palm.phonecallgroup:1"
     watch: true
@@ -69,13 +70,130 @@ Db8Model {
         }
     }
 
+    function _buildCallGroupID(endedVoiceCall, person)
+    {
+        // We are looking for a group that is within the same day as endedVoiceCall, and corresponding to the same call.
+        // But it's actually possible to build the id of that callgroup by hand:
+
+        var callGroupID = "";
+
+        // "com.palm.app.phone 1003.callgroup__ID_++IgDPYVSrGrr9+W_10/30/2013_all",
+        // "com.palm.app.phone 1003.callgroup__PHONE_-00868448---_8/27/2013_all"
+        //  <app identifier><.callgroup><_><_PHONE_ or _ID_><normalizedAddr or personId><_><dd/mm/yyyy><_><all or missed>
+
+        var appId = Qt.application.name + " pid.callgroup";
+        callGroupID += appId + "_";
+
+        // we now need to know if the voicecall can be related to an existing personId in the db
+        if( !person ) {
+            callGroupID += "_PHONE_" + personListModel.normalizePhoneNumber(endedVoiceCall.lineId) + "_";
+        }
+        else {
+            callGroupID += "_ID_" + person._id + "_";
+        }
+
+        callGroupID += Qt.formatDate(endedVoiceCall.startedAt, "d/M/yyyy") + "_";
+
+        if( endedVoiceCall.isIncoming && endedVoiceCall.duration === 0 ) {
+            callGroupID += "missed";
+        }
+        else {
+            callGroupID += "all";
+        }
+
+        return callGroupID;
+    }
+
     // Surveiller VoiceCallMgrWrapper
     //  onEndingCall --> ajouter l'appel
     //  Considérer voiceCall.startedAt, et faire une recherche dans les callGroups sur
     //    - soit les timestamps de la même journée et de la même personne
     //  --> si le résultat contient qqch on prend le plus récent (il ne devrait y en avoir qu'un !), sinon on en créé un nouveau
-    function addEndedCall(endedVoiceCall) {
+    function addEndedCall(endedVoiceCall, person)
+    {
+        // get the group ID of that call
+        var callGroupID = _buildCallGroupID(endedVoiceCall, person);
+
+        var newCallItem = {
+            _kind: "com.palm.phonecall:1",
+            duration: endedVoiceCall.duration,
+            groups: [ callGroupID ],
+            timestamp: endedVoiceCall.startedAt.getTime(),
+            timestampInSecs: Math.floor(endedVoiceCall.startedAt.getTime()/1000),
+            to: []
+        };
+
+        var normalizedLineId = personListModel.normalizePhoneNumber(endedVoiceCall.lineId);
+
+        var personDetails = {
+            addr: endedVoiceCall.lineId,
+            normalizedAddr: normalizedLineId,
+            service: "com.palm.telephony"
+        };
+        if( person ) {
+            personDetails.name = (person.nickname === "") ? (person.name.givenName + " " + person.name.familyName) : person.nickname;
+            personDetails.personFamilyName = person.name.familyName;
+            personDetails.personGivenName = person.name.givenName;
+            personDetails.personId = person._id;
+        }
+
+        if( endedVoiceCall.isIncoming ) {
+            newCallItem.from = personDetails;
+            newCallItem.to.push ({ addr: "", service: "com.palm.telephony" });
+            newCallItem.type = endedVoiceCall.duration > 0 ? "incoming" : "missed";
+        }
+        else {
+            newCallItem.from = { addr: "", service: "com.palm.telephony" };
+            newCallItem.to.push (personDetails);
+            newCallItem.type = "outgoing";
+        }
+
         // In all cases, a call item must be added
+        __queryDB('put', { objects: [ newCallItem ] }, function(result) {});
+
+        // Also, the callgroup must be either created or updated
+        var __addOrUpdate = function (message) {
+            var result = JSON.parse(message.payload);
+
+            var existingCallGroup = {
+                callcount: 0
+            }
+            var action = "put";
+            if( result && result.results && result.results.length===1 ) {
+                existingCallGroup = result.results[0];
+                action = "merge";
+            }
+
+            existingCallGroup.groupId = callGroupID;
+            existingCallGroup._kind = 'com.palm.phonecallgroup:1';
+            existingCallGroup.callcount++;
+            existingCallGroup.recentcall_address = personDetails;
+            existingCallGroup.recentcall_type = endedVoiceCall.isIncoming ? (endedVoiceCall.duration > 0 ? "incoming" : "missed") : "outgoing";
+            existingCallGroup.timestamp = newCallItem.timestamp;
+            existingCallGroup.type = newCallItem.type === "missed" ? "missed" : "all";
+
+            __queryDB(action, { objects: [ existingCallGroup ] }, function(result) {});
+        }
+
+        // add it to the database
+        __queryDB('find', {query:
+                      {from:"com.palm.phonecallgroup:1",
+                       where: [ { prop: "groupId", op: "=", val: callGroupID } ],
+                       limit:1}}, __addOrUpdate);
     }
+
+
+    property QtObject __ls2service: LunaService {
+        id: __lunaNextLS2Service
+        name: "org.webosports.app.phone"
+    }
+    function __handleDBError(message) {
+        console.log("Could not fulfill DB operation : " + message)
+    }
+    function __queryDB(action, params, handleResultFct) {
+        __lunaNextLS2Service.call("luna://com.palm.db/" + action, JSON.stringify(params),
+                  handleResultFct, __handleDBError)
+    }
+
 }
 

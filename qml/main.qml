@@ -86,16 +86,18 @@ Item {
             }
         }
         onEndingCall: {
-            callHistoryModelId.addEndedCall(voiceCall);
+            callHistoryModelId.addEndedCall(voiceCall, personListModelId.personByPhoneNumber(voiceCall.lineId));
         }
     }
 
     /* models */
-    ContactManager {
+    ContactsModel {
         id: personListModelId
     }
     CallHistory {
         id: callHistoryModelId
+
+        personListModel: personListModelId
     }
     FavoritesModel {
         id: favoritesModelId
@@ -104,14 +106,14 @@ Item {
     IncomingCallAlert {
         id: incomingCallAlert
         visible: false
-        people: people
+        contacts: personListModelId
         voiceCallManager: voiceCallManagerId
     }
 
     PhoneWindow {
         id: phoneWindow
         simPinWindow: simPinWindowId
-        people: personListModelId
+        contacts: personListModelId
         voiceCallManager: voiceCallManagerId
         historyModel: callHistoryModelId
         favoritesModel: favoritesModelId
