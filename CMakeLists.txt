@@ -12,7 +12,8 @@ webos_component(0 1 0)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fvisibility=hidden -fvisibility-inlines-hidden -Wall -std=c++0x")
 
 set(APP_DIR ${WEBOS_INSTALL_WEBOS_APPLICATIONSDIR}/org.webosports.app.phone)
+set(APP_DATA appinfo.json icon.png)
 
-add_subdirectory(data)
+install(FILES ${APP_DATA} DESTINATION ${APP_DIR})
 
 install(DIRECTORY qml DESTINATION ${APP_DIR})
