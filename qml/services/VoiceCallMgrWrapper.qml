@@ -19,12 +19,19 @@
 import QtQuick 2.0
 import QtQml 2.2
 
+import LuneOS.Service 1.0
 import org.nemomobile.voicecall 1.0
 
 import "../model"
 
 Item {
     id: root
+
+    LunaService {
+        id: __lunaNextLS2Service
+        name: "org.webosports.app.phone"
+        usePrivateBus: true
+    }
 
     VoiceCallManager {
         id: manager
@@ -41,6 +48,16 @@ Item {
     signal incomingCall(var voiceCall);
     signal endingCall(var voiceCall);
     signal resetCall(var voiceCall);
+
+    function __setCallModeError(message) {
+        console.log("Problem when calling luna://org.webosports.audio/setCallMode : " + message);
+    }
+
+    onActiveVoiceCallChanged: {
+        console.log("Active VoiceCall changed -> setting audio to " + !!activeVoiceCall);
+        __lunaNextLS2Service.call("luna://org.webosports.audio/setCallMode", JSON.stringify({ inCall: (!!activeVoiceCall) }),
+                                  undefined, root.__setCallModeError);
+    }
 
     onHeldCallChanged: {
         if (!root.heldCall || root._dialNumberAfterHold.length === 0)
