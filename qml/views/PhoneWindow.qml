@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2014 Roshan Gunasekara <roshan@mobileteck.com>
+ * Copyright (C) 2016 Christophe Chapuis <chris.chapuis@gmail.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -29,7 +30,9 @@ import LuneOS.Application 1.0
 ApplicationWindow {
     id: window
 
-    property ContactManager people;
+    property alias historyModel: tabView.historyModel
+    property alias favoritesModel: tabView.favoritesModel
+    property ContactsModel contacts;
     property VoiceCallMgrWrapper voiceCallManager;
 
     keepAlive: true
@@ -75,7 +78,6 @@ ApplicationWindow {
 
             if (existingPage) {
                 existingPage.voiceCall = voiceCall;
-                existingPage.voiceCallPerson = people.personByPhoneNumber(voiceCall.lineId);
                 stackView.pop(existingPage);
             }
             else {
@@ -83,7 +85,7 @@ ApplicationWindow {
                                 properties: {voiceCallManager: voiceCallManager,
                                              appTheme: phoneUiAppTheme,
                                              voiceCall: voiceCall,
-                                             voiceCallPerson: people.personByPhoneNumber(voiceCall.lineId) }});
+                                             contacts: window.contacts }});
             }
         }
 
@@ -131,7 +133,7 @@ ApplicationWindow {
             console.log("VoiceCall " + voiceCall.lineId + " ended")
 
             tabView.dialerPage.reset();
-            stackView.pop()
+            stackView.pop(null)
 
             // If we were going back to Voicemail tab, go to first tab instead
             if (tabView.currentIndex == 3)

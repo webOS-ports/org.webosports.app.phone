@@ -1,0 +1,2779 @@
+{ "data": [
+     {
+        "_id": "++I_ES9tFzKyIn+U",
+        "_kind": "com.palm.phonecall:1",
+        "_rev": 37350,
+        "_sync": true,
+        "duration": 15683,
+        "from": {
+            "addr": "0622101234",
+            "normalizedAddr": "-43210122---",
+            "service": "com.palm.telephony"
+        },
+        "groups": [ { "_id": "com.palm.app.phone 1003.callgroup__PHONE_-80490122---_7/31/2013_all" } ],
+        "timestamp": 1377953582246,
+        "timestampInSecs": 1377953582,
+        "to": [{
+                "_id": "91e4",
+                "addr": "",
+                "service": "com.palm.telephony"
+            }],
+        "type": "incoming"
+    }, {
+        "_id": "++I_ESm9V2gQTj69",
+        "_kind": "com.palm.phonecall:1",
+        "_rev": 37369,
+        "_sync": true,
+        "duration": 14515,
+        "from": {
+            "addr": "0622101234",
+            "normalizedAddr": "-43210122---",
+            "service": "com.palm.telephony"
+        },
+        "groups": [ { "_id": "com.palm.app.phone 1003.callgroup__PHONE_-80490122---_7/31/2013_all" } ],
+        "timestamp": 1377953748140,
+        "timestampInSecs": 1377953748,
+        "to": [{
+                "_id": "91f7",
+                "addr": "",
+                "service": "com.palm.telephony"
+            }],
+        "type": "incoming"
+    }, {
+        "_id": "++I_F15o6FNuQbL7",
+        "_kind": "com.palm.phonecall:1",
+        "_rev": 43044,
+        "_sync": true,
+        "duration": 21288,
+        "from": {
+            "addr": "",
+            "service": "com.palm.telephony"
+        },
+        "groups": [ { "_id": "com.palm.app.phone 1003.callgroup__ID_++HcfNECvl_R+ZiA_7/31/2013_all" } ],
+        "timestamp": 1377963491658,
+        "timestampInSecs": 1377963492,
+        "to": [{
+                "_id": "a825",
+                "addr": "+52699051234",
+                "name": "Mary Spetzler",
+                "normalizedAddr": "-43215099--25-+",
+                "personAddressType": "type_mobile",
+                "personFamilyName": "Spetzler",
+                "personGivenName": "Mary",
+                "personId": "++HcfNECvl_R+ZiA",
+                "service": "com.palm.telephony"
+            }],
+        "type": "outgoing"
+    }, {
+        "_id": "++I_KR_8KD8dWqmA",
+        "_kind": "com.palm.phonecall:1",
+        "_rev": 46705,
+        "_sync": true,
+        "duration": 11868,
+        "from": {
+            "addr": "",
+            "service": "com.palm.telephony"
+        },
+        "groups": [ { "_id": "com.palm.app.phone 1003.callgroup__PHONE_-96337534-1--_8/1/2013_all" } ],
+        "timestamp": 1378056506951,
+        "timestampInSecs": 1378056507,
+        "to": [{
+                "_id": "b672",
+                "addr": "0143571234",
+                "normalizedAddr": "-43217534-1--",
+                "service": "com.palm.telephony"
+            }],
+        "type": "outgoing"
+    }, {
+        "_id": "++I_KReeHXxkER4c",
+        "_kind": "com.palm.phonecall:1",
+        "_rev": 46710,
+        "_sync": true,
+        "duration": 1638,
+        "from": {
+            "addr": "",
+            "service": "com.palm.telephony"
+        },
+        "groups": [ { "_id": "com.palm.app.phone 1003.callgroup__PHONE_-96337534-1--_8/1/2013_all" } ],
+        "timestamp": 1378056540330,
+        "timestampInSecs": 1378056540,
+        "to": [{
+                "_id": "b677",
+                "addr": "0143571234",
+                "normalizedAddr": "-43217534-1--",
+                "service": "com.palm.telephony"
+            }],
+        "type": "outgoing"
+    }, {
+        "_id": "++I_KT3kQ23OeIa0",
+        "_kind": "com.palm.phonecall:1",
+        "_rev": 46720,
+        "_sync": true,
+        "duration": 45171,
+        "from": {
+            "addr": "",
+            "service": "com.palm.telephony"
+        },
+        "groups": [ { "_id": "com.palm.app.phone 1003.callgroup__PHONE_-96337534-1--_8/1/2013_all" } ],
+        "timestamp": 1378056874686,
+        "timestampInSecs": 1378056875,
+        "to": [{
+                "_id": "b681",
+                "addr": "0143571234",
+                "normalizedAddr": "-43217534-1--",
+                "service": "com.palm.telephony"
+            }],
+        "type": "outgoing"
+    }, {
+        "_id": "++I_ZO_SYHWAUJEE",
+        "_kind": "com.palm.phonecall:1",
+        "_rev": 58433,
+        "_sync": true,
+        "duration": 3369,
+        "from": {
+            "addr": "",
+            "service": "com.palm.telephony"
+        },
+        "groups": [ { "_id": "com.palm.app.phone 1003.callgroup__ID_++HcfNECvl_R+ZiA_8/4/2013_all" } ],
+        "timestamp": 1378313409522,
+        "timestampInSecs": 1378313410,
+        "to": [{
+                "_id": "e442",
+                "addr": "+52699051234",
+                "name": "Mary Spetzler",
+                "normalizedAddr": "-43215099--25-+",
+                "personAddressType": "type_mobile",
+                "personFamilyName": "Spetzler",
+                "personGivenName": "Mary",
+                "personId": "++HcfNECvl_R+ZiA",
+                "service": "com.palm.telephony"
+            }],
+        "type": "outgoing"
+    }, {
+        "_id": "++I_ZOhcBqNVS0ou",
+        "_kind": "com.palm.phonecall:1",
+        "_rev": 58440,
+        "_sync": true,
+        "duration": 2560,
+        "from": {
+            "addr": "",
+            "service": "com.palm.telephony"
+        },
+        "groups": [ { "_id": "com.palm.app.phone 1003.callgroup__ID_++HcfNECvl_R+ZiA_8/4/2013_all" } ],
+        "timestamp": 1378313444580,
+        "timestampInSecs": 1378313445,
+        "to": [{
+                "_id": "e449",
+                "addr": "+52699051234",
+                "name": "Mary Spetzler",
+                "normalizedAddr": "-43215099--25-+",
+                "personAddressType": "type_mobile",
+                "personFamilyName": "Spetzler",
+                "personGivenName": "Mary",
+                "personId": "++HcfNECvl_R+ZiA",
+                "service": "com.palm.telephony"
+            }],
+        "type": "outgoing"
+    }, {
+        "_id": "++I_dVXAa3RrKkTQ",
+        "_kind": "com.palm.phonecall:1",
+        "_rev": 83107,
+        "_sync": true,
+        "duration": 25374,
+        "from": {
+            "addr": "0675011234",
+            "name": "John Smith",
+            "normalizedAddr": "-43211057---",
+            "personAddressType": "type_mobile",
+            "personFamilyName": "Smith",
+            "personGivenName": "John",
+            "personId": "++HcfNEQzPgKH0Kb",
+            "service": "com.palm.telephony"
+        },
+        "groups": [ { "_id": "com.palm.app.phone 1003.callgroup__ID_++HcfNEQzPgKH0Kb_8/5/2013_all" } ],
+        "timestamp": 1378401152081,
+        "timestampInSecs": 1378401152,
+        "to": [{
+                "_id": "144a1",
+                "addr": "",
+                "service": "com.palm.telephony"
+            }],
+        "type": "incoming"
+    }, {
+        "_id": "++I_nLeF3ZZVReS5",
+        "_kind": "com.palm.phonecall:1",
+        "_rev": 102610,
+        "_sync": true,
+        "duration": 268612,
+        "from": {
+            "addr": "0675011234",
+            "name": "John Smith",
+            "normalizedAddr": "-43211057---",
+            "personAddressType": "type_mobile",
+            "personFamilyName": "Smith",
+            "personGivenName": "John",
+            "personId": "++HcfNEQzPgKH0Kb",
+            "service": "com.palm.telephony"
+        },
+        "groups": [ { "_id": "com.palm.app.phone 1003.callgroup__ID_++HcfNEQzPgKH0Kb_8/7/2013_all" } ],
+        "timestamp": 1378570057104,
+        "timestampInSecs": 1378570057,
+        "to": [{
+                "_id": "190d0",
+                "addr": "",
+                "service": "com.palm.telephony"
+            }],
+        "type": "incoming"
+    }, {
+        "_id": "++I_nWjpkutjooBQ",
+        "_kind": "com.palm.phonecall:1",
+        "_rev": 102666,
+        "_sync": true,
+        "duration": 112959,
+        "from": {
+            "addr": "0675011234",
+            "name": "John Smith",
+            "normalizedAddr": "-43211057---",
+            "personAddressType": "type_mobile",
+            "personFamilyName": "Smith",
+            "personGivenName": "John",
+            "personId": "++HcfNEQzPgKH0Kb",
+            "service": "com.palm.telephony"
+        },
+        "groups": [ { "_id": "com.palm.app.phone 1003.callgroup__ID_++HcfNEQzPgKH0Kb_8/7/2013_all" } ],
+        "timestamp": 1378573188961,
+        "timestampInSecs": 1378573189,
+        "to": [{
+                "_id": "19108",
+                "addr": "",
+                "service": "com.palm.telephony"
+            }],
+        "type": "incoming"
+    }, {
+        "_id": "++I_nY8BSY7VqLrq",
+        "_kind": "com.palm.phonecall:1",
+        "_rev": 102672,
+        "_sync": true,
+        "duration": 229162,
+        "from": {
+            "addr": "0675011234",
+            "name": "John Smith",
+            "normalizedAddr": "-43211057---",
+            "personAddressType": "type_mobile",
+            "personFamilyName": "Smith",
+            "personGivenName": "John",
+            "personId": "++HcfNEQzPgKH0Kb",
+            "service": "com.palm.telephony"
+        },
+        "groups": [ { "_id": "com.palm.app.phone 1003.callgroup__ID_++HcfNEQzPgKH0Kb_8/7/2013_all" } ],
+        "timestamp": 1378573447565,
+        "timestampInSecs": 1378573448,
+        "to": [{
+                "_id": "1910e",
+                "addr": "",
+                "service": "com.palm.telephony"
+            }],
+        "type": "incoming"
+    }, {
+        "_id": "++Ia+GcjnYZQd+mp",
+        "_kind": "com.palm.phonecall:1",
+        "_rev": 120866,
+        "_sync": true,
+        "duration": 345320,
+        "from": {
+            "addr": "+32496261234",
+            "normalizedAddr": "-432162--23-+",
+            "service": "com.palm.telephony"
+        },
+        "groups": [ { "_id": "com.palm.app.phone 1003.callgroup__PHONE_-772862--23-+_8/10/2013_all" } ],
+        "timestamp": 1378791970192,
+        "timestampInSecs": 1378791970,
+        "to": [{
+                "_id": "1d820",
+                "addr": "",
+                "service": "com.palm.telephony"
+            }],
+        "type": "incoming"
+    }, {
+        "_id": "++IaBtKSnb8sx86D",
+        "_kind": "com.palm.phonecall:1",
+        "_rev": 134300,
+        "_sync": true,
+        "duration": 33168,
+        "from": {
+            "addr": "0650801234",
+            "normalizedAddr": "-43210805---",
+            "service": "com.palm.telephony"
+        },
+        "groups": [ { "_id": "com.palm.app.phone 1003.callgroup__PHONE_-97170805---_8/12/2013_all" } ],
+        "timestamp": 1379009097316,
+        "timestampInSecs": 1379009097,
+        "to": [{
+                "_id": "20c9a",
+                "addr": "",
+                "service": "com.palm.telephony"
+            }],
+        "type": "incoming"
+    }, {
+        "_id": "++IaF8UYXE4120j0",
+        "_kind": "com.palm.phonecall:1",
+        "_rev": 301674,
+        "_sync": true,
+        "duration": 31222,
+        "from": {
+            "addr": "",
+            "service": "com.palm.telephony"
+        },
+        "groups": [ { "_id": "com.palm.app.phone 1003.callgroup__ID_++Ic92viH3lCYDKN_8/13/2013_all" } ],
+        "timestamp": 1379064976173,
+        "timestampInSecs": 1379064976,
+        "to": [{
+                "_id": "49a6b",
+                "addr": "0146361234",
+                "name": "Martin Turén",
+                "normalizedAddr": "-43216364-1--",
+                "personAddressType": "type_work",
+                "personFamilyName": "Turén",
+                "personGivenName": "Martin",
+                "personId": "++Ic92viH3lCYDKN",
+                "service": "com.palm.telephony"
+            }],
+        "type": "outgoing"
+    }, {
+        "_id": "++IaF8ZnX1dEUQAx",
+        "_kind": "com.palm.phonecall:1",
+        "_rev": 301677,
+        "_sync": true,
+        "duration": 0,
+        "from": {
+            "addr": "",
+            "service": "com.palm.telephony"
+        },
+        "groups": [ { "_id": "com.palm.app.phone 1003.callgroup__ID_++Ic92viH3lCYDKN_8/13/2013_all" } ],
+        "timestamp": 1379065029412,
+        "timestampInSecs": 1379065029,
+        "to": [{
+                "_id": "49a6e",
+                "addr": "0146361234",
+                "name": "Martin Turén",
+                "normalizedAddr": "-43216364-1--",
+                "personAddressType": "type_work",
+                "personFamilyName": "Turén",
+                "personGivenName": "Martin",
+                "personId": "++Ic92viH3lCYDKN",
+                "service": "com.palm.telephony"
+            }],
+        "type": "outgoing"
+    }, {
+        "_id": "++IaKEP24jciKUIW",
+        "_kind": "com.palm.phonecall:1",
+        "_rev": 140580,
+        "_sync": true,
+        "duration": 198636,
+        "from": {
+            "addr": "",
+            "service": "com.palm.telephony"
+        },
+        "groups": [ { "_id": "com.palm.app.phone 1003.callgroup__ID_++HcfNEQzPgKH0Kb_8/14/2013_all" } ],
+        "timestamp": 1379152295594,
+        "timestampInSecs": 1379152296,
+        "to": [{
+                "_id": "22525",
+                "addr": "0675011234",
+                "name": "John Smith",
+                "normalizedAddr": "-43211057---",
+                "personFamilyName": "Smith",
+                "personGivenName": "John",
+                "personId": "++HcfNEQzPgKH0Kb",
+                "service": "com.palm.telephony"
+            }],
+        "type": "outgoing"
+    }, {
+        "_id": "++IaKIa+4nJ1ni26",
+        "_kind": "com.palm.phonecall:1",
+        "_rev": 140592,
+        "_sync": true,
+        "duration": 0,
+        "from": {
+            "addr": "0675011234",
+            "name": "John Smith",
+            "normalizedAddr": "-43211057---",
+            "personAddressType": "type_mobile",
+            "personFamilyName": "Smith",
+            "personGivenName": "John",
+            "personId": "++HcfNEQzPgKH0Kb",
+            "service": "com.palm.telephony"
+        },
+        "groups": [ { "_id": "com.palm.app.phone 1003.callgroup__ID_++HcfNEQzPgKH0Kb_8/14/2013_all" }, { "_id": "com.palm.app.phone 1003.callgroup__ID_++HcfNEQzPgKH0Kb_8/14/2013_missed" } ],
+        "timestamp": 1379153618129,
+        "timestampInSecs": 1379153618,
+        "to": [{
+                "_id": "2252d",
+                "addr": "",
+                "service": "com.palm.telephony"
+            }],
+        "type": "missed"
+    }, {
+        "_id": "++IaKJUPgzdiIg8Y",
+        "_kind": "com.palm.phonecall:1",
+        "_rev": 140604,
+        "_sync": true,
+        "duration": 17427,
+        "from": {
+            "addr": "",
+            "service": "com.palm.telephony"
+        },
+        "groups": [ { "_id": "com.palm.app.phone 1003.callgroup__ID_++HcfNEQzPgKH0Kb_8/14/2013_all" } ],
+        "timestamp": 1379153841525,
+        "timestampInSecs": 1379153842,
+        "to": [{
+                "_id": "2253d",
+                "addr": "0675011234",
+                "name": "John Smith",
+                "normalizedAddr": "-43211057---",
+                "personAddressType": "type_mobile",
+                "personFamilyName": "Smith",
+                "personGivenName": "John",
+                "personId": "++HcfNEQzPgKH0Kb",
+                "service": "com.palm.telephony"
+            }],
+        "type": "outgoing"
+    }, {
+        "_id": "++IaKQESj5NG1Td1",
+        "_kind": "com.palm.phonecall:1",
+        "_rev": 140656,
+        "_sync": true,
+        "duration": 40306,
+        "from": {
+            "addr": "0675011234",
+            "name": "John Smith",
+            "normalizedAddr": "-43211057---",
+            "personAddressType": "type_mobile",
+            "personFamilyName": "Smith",
+            "personGivenName": "John",
+            "personId": "++HcfNEQzPgKH0Kb",
+            "service": "com.palm.telephony"
+        },
+        "groups": [ { "_id": "com.palm.app.phone 1003.callgroup__ID_++HcfNEQzPgKH0Kb_8/14/2013_all" } ],
+        "timestamp": 1379155630779,
+        "timestampInSecs": 1379155631,
+        "to": [{
+                "_id": "2256e",
+                "addr": "",
+                "service": "com.palm.telephony"
+            }],
+        "type": "incoming"
+    }, {
+        "_id": "++IaKSeY4Nh+U4l4",
+        "_kind": "com.palm.phonecall:1",
+        "_rev": 140673,
+        "_sync": true,
+        "duration": 26273,
+        "from": {
+            "addr": "123",
+            "name": "Voice Mail",
+            "normalizedAddr": "-321---",
+            "service": "com.palm.telephony"
+        },
+        "groups": [ { "_id": "com.palm.app.phone 1003.callgroup__PHONE_-321---_8/14/2013_all" } ],
+        "timestamp": 1379156295283,
+        "timestampInSecs": 1379156295,
+        "to": [{
+                "_id": "2257f",
+                "addr": "",
+                "service": "com.palm.telephony"
+            }],
+        "type": "incoming"
+    }, {
+        "_id": "++IaKT5YDcVV1rU0",
+        "_kind": "com.palm.phonecall:1",
+        "_rev": 140692,
+        "_sync": true,
+        "duration": 67485,
+        "from": {
+            "addr": "",
+            "service": "com.palm.telephony"
+        },
+        "groups": [ { "_id": "com.palm.app.phone 1003.callgroup__ID_++HcfNEQzPgKH0Kb_8/14/2013_all" } ],
+        "timestamp": 1379156371524,
+        "timestampInSecs": 1379156372,
+        "to": [{
+                "_id": "22595",
+                "addr": "0675011234",
+                "name": "John Smith",
+                "normalizedAddr": "-43211057---",
+                "personFamilyName": "Smith",
+                "personGivenName": "John",
+                "personId": "++HcfNEQzPgKH0Kb",
+                "service": "com.palm.telephony"
+            }],
+        "type": "outgoing"
+    }, {
+        "_id": "++IaKUgq6msoIcxJ",
+        "_kind": "com.palm.phonecall:1",
+        "_rev": 140699,
+        "_sync": true,
+        "duration": 12654,
+        "from": {
+            "addr": "",
+            "service": "com.palm.telephony"
+        },
+        "groups": [ { "_id": "com.palm.app.phone 1003.callgroup__ID_++HcfNEQzPgKH0Kb_8/14/2013_all" } ],
+        "timestamp": 1379156855416,
+        "timestampInSecs": 1379156855,
+        "to": [{
+                "_id": "2259c",
+                "addr": "0675011234",
+                "name": "John Smith",
+                "normalizedAddr": "-43211057---",
+                "personFamilyName": "Smith",
+                "personGivenName": "John",
+                "personId": "++HcfNEQzPgKH0Kb",
+                "service": "com.palm.telephony"
+            }],
+        "type": "outgoing"
+    }, {
+        "_id": "++IaZngIoPWApcz6",
+        "_kind": "com.palm.phonecall:1",
+        "_rev": 299994,
+        "_sync": true,
+        "duration": 32840,
+        "from": {
+            "addr": "0674231234",
+            "name": null,
+            "normalizedAddr": "-43213247---",
+            "personAddressType": null,
+            "personFamilyName": null,
+            "personGivenName": null,
+            "personId": null,
+            "service": "com.palm.telephony"
+        },
+        "groups": [ { "_id": "com.palm.app.phone 1003.callgroup__PHONE_-35233247---_8/17/2013_all" } ],
+        "timestamp": 1379419899711,
+        "timestampInSecs": 1379419900,
+        "to": [{
+                "_id": "25932",
+                "addr": "",
+                "service": "com.palm.telephony"
+            }],
+        "type": "incoming"
+    }, {
+        "_id": "++IaZo6C9UBGNS4V",
+        "_kind": "com.palm.phonecall:1",
+        "_rev": 301622,
+        "_sync": true,
+        "duration": 17526,
+        "from": {
+            "addr": "",
+            "service": "com.palm.telephony"
+        },
+        "groups": [ { "_id": "com.palm.app.phone 1003.callgroup__ID_++Ic92t8xxt2fLVj_8/17/2013_all" } ],
+        "timestamp": 1379420027846,
+        "timestampInSecs": 1379420028,
+        "to": [{
+                "_id": "49a37",
+                "addr": "+52674231234",
+                "name": "Xavier Lingberg",
+                "normalizedAddr": "-43213247--25-+",
+                "personAddressType": "type_mobile",
+                "personFamilyName": "Lingberg",
+                "personGivenName": "Xavier",
+                "personId": "++Ic92t8xxt2fLVj",
+                "service": "com.palm.telephony"
+            }],
+        "type": "outgoing"
+    }, {
+        "_id": "++IaelkPpfFWbrtD",
+        "_kind": "com.palm.phonecall:1",
+        "_rev": 163481,
+        "_sync": true,
+        "duration": 0,
+        "from": {
+            "addr": "",
+            "service": "com.palm.telephony"
+        },
+        "groups": [ { "_id": "com.palm.app.phone 1003.callgroup__ID_++HcfNHQmcgjuHSX_8/18/2013_all" } ],
+        "timestamp": 1379522492144,
+        "timestampInSecs": 1379522492,
+        "to": [{
+                "_id": "27e9a",
+                "addr": "+52677221234",
+                "name": "Claire Meyer",
+                "normalizedAddr": "-43212277--25-+",
+                "personAddressType": "type_mobile",
+                "personFamilyName": "Meyer",
+                "personGivenName": "Claire",
+                "personId": "++HcfNHQmcgjuHSX",
+                "service": "com.palm.telephony"
+            }],
+        "type": "outgoing"
+    }, {
+        "_id": "++Iaelq+LP7tbvo4",
+        "_kind": "com.palm.phonecall:1",
+        "_rev": 163493,
+        "_sync": true,
+        "duration": 0,
+        "from": {
+            "addr": "",
+            "service": "com.palm.telephony"
+        },
+        "groups": [ { "_id": "com.palm.app.phone 1003.callgroup__ID_++HcfNHQmcgjuHSX_8/18/2013_all" } ],
+        "timestamp": 1379522515532,
+        "timestampInSecs": 1379522516,
+        "to": [{
+                "_id": "27ea6",
+                "addr": "+52677221234",
+                "name": "Claire Meyer",
+                "normalizedAddr": "-43212277--25-+",
+                "personAddressType": "type_mobile",
+                "personFamilyName": "Meyer",
+                "personGivenName": "Claire",
+                "personId": "++HcfNHQmcgjuHSX",
+                "service": "com.palm.telephony"
+            }],
+        "type": "outgoing"
+    }, {
+        "_id": "++Iaem0jpU4zCMWc",
+        "_kind": "com.palm.phonecall:1",
+        "_rev": 163501,
+        "_sync": true,
+        "duration": 0,
+        "from": {
+            "addr": "",
+            "service": "com.palm.telephony"
+        },
+        "groups": [ { "_id": "com.palm.app.phone 1003.callgroup__ID_++HcfNHQmcgjuHSX_8/18/2013_all" } ],
+        "timestamp": 1379522564828,
+        "timestampInSecs": 1379522565,
+        "to": [{
+                "_id": "27eae",
+                "addr": "+52677221234",
+                "name": "Claire Meyer",
+                "normalizedAddr": "-43212277--25-+",
+                "personAddressType": "type_mobile",
+                "personFamilyName": "Meyer",
+                "personGivenName": "Claire",
+                "personId": "++HcfNHQmcgjuHSX",
+                "service": "com.palm.telephony"
+            }],
+        "type": "outgoing"
+    }, {
+        "_id": "++IaemD1Mccb0e_b",
+        "_kind": "com.palm.phonecall:1",
+        "_rev": 163788,
+        "_sync": true,
+        "duration": 0,
+        "from": {
+            "addr": "",
+            "service": "com.palm.telephony"
+        },
+        "groups": [ { "_id": "com.palm.app.phone 1003.callgroup__ID_++HcfNHQmcgjuHSX_8/18/2013_all" } ],
+        "timestamp": 1379522616372,
+        "timestampInSecs": 1379522616,
+        "to": [{
+                "_id": "27fcd",
+                "addr": "+52677221234",
+                "name": "Claire Meyer",
+                "normalizedAddr": "-43212277--25-+",
+                "personAddressType": "type_mobile",
+                "personFamilyName": "Meyer",
+                "personGivenName": "Claire",
+                "personId": "++HcfNHQmcgjuHSX",
+                "service": "com.palm.telephony"
+            }],
+        "type": "outgoing"
+    }, {
+        "_id": "++IaemIOHZ_ofy9t",
+        "_kind": "com.palm.phonecall:1",
+        "_rev": 163863,
+        "_sync": true,
+        "duration": 0,
+        "from": {
+            "addr": "",
+            "service": "com.palm.telephony"
+        },
+        "groups": [ { "_id": "com.palm.app.phone 1003.callgroup__ID_++HcfNHQmcgjuHSX_8/18/2013_all" } ],
+        "timestamp": 1379522638852,
+        "timestampInSecs": 1379522639,
+        "to": [{
+                "_id": "28018",
+                "addr": "+52677221234",
+                "name": "Claire Meyer",
+                "normalizedAddr": "-43212277--25-+",
+                "personAddressType": "type_mobile",
+                "personFamilyName": "Meyer",
+                "personGivenName": "Claire",
+                "personId": "++HcfNHQmcgjuHSX",
+                "service": "com.palm.telephony"
+            }],
+        "type": "outgoing"
+    }, {
+        "_id": "++Iasnn7eP3_uiKx",
+        "_kind": "com.palm.phonecall:1",
+        "_rev": 301548,
+        "_sync": true,
+        "duration": 41576,
+        "from": {
+            "addr": "",
+            "service": "com.palm.telephony"
+        },
+        "groups": [ { "_id": "com.palm.app.phone 1003.callgroup__ID_++Ic92kYF5Wquwdv_8/21/2013_all" } ],
+        "timestamp": 1379763516986,
+        "timestampInSecs": 1379763517,
+        "to": [{
+                "_id": "499ed",
+                "addr": "+52684481234",
+                "name": "John Farser",
+                "normalizedAddr": "-43218448--25-+",
+                "personAddressType": "type_mobile",
+                "personFamilyName": "Farser",
+                "personGivenName": "John",
+                "personId": "++Ic92kYF5Wquwdv",
+                "service": "com.palm.telephony"
+            }],
+        "type": "outgoing"
+    }, {
+        "_id": "++Ib2Cj_Ub_j19dR",
+        "_kind": "com.palm.phonecall:1",
+        "_rev": 206880,
+        "_sync": true,
+        "duration": 0,
+        "from": {
+            "addr": "0899031234",
+            "normalizedAddr": "-43213099-8--",
+            "service": "com.palm.telephony"
+        },
+        "groups": [ { "_id": "com.palm.app.phone 1003.callgroup__PHONE_-19013099-8--_8/23/2013_all" }, { "_id": "com.palm.app.phone 1003.callgroup__PHONE_-19013099-8--_8/23/2013_missed" } ],
+        "timestamp": 1379942321709,
+        "timestampInSecs": 1379942322,
+        "to": [{
+                "_id": "3281d",
+                "addr": "",
+                "service": "com.palm.telephony"
+            }],
+        "type": "missed"
+    }, {
+        "_id": "++IbGZg2jn3l5yHE",
+        "_kind": "com.palm.phonecall:1",
+        "_rev": 211821,
+        "_sync": true,
+        "duration": 0,
+        "from": {
+            "addr": "0675011234",
+            "name": "John Smith",
+            "normalizedAddr": "-43211057---",
+            "personAddressType": "type_mobile",
+            "personFamilyName": "Smith",
+            "personGivenName": "John",
+            "personId": "++HcfNEQzPgKH0Kb",
+            "service": "com.palm.telephony"
+        },
+        "groups": [ { "_id": "com.palm.app.phone 1003.callgroup__ID_++HcfNEQzPgKH0Kb_8/26/2013_all" }, { "_id": "com.palm.app.phone 1003.callgroup__ID_++HcfNEQzPgKH0Kb_8/26/2013_missed" } ],
+        "timestamp": 1380188999099,
+        "timestampInSecs": 1380188999,
+        "to": [{
+                "_id": "33b6a",
+                "addr": "",
+                "service": "com.palm.telephony"
+            }],
+        "type": "missed"
+    }, {
+        "_id": "++IbHs63yiZ0OHHQ",
+        "_kind": "com.palm.phonecall:1",
+        "_rev": 211999,
+        "_sync": true,
+        "duration": 0,
+        "from": {
+            "addr": "0675011234",
+            "name": "John Smith",
+            "normalizedAddr": "-43211057---",
+            "personAddressType": "type_mobile",
+            "personFamilyName": "Smith",
+            "personGivenName": "John",
+            "personId": "++HcfNEQzPgKH0Kb",
+            "service": "com.palm.telephony"
+        },
+        "groups": [ { "_id": "com.palm.app.phone 1003.callgroup__ID_++HcfNEQzPgKH0Kb_8/26/2013_all" }, { "_id": "com.palm.app.phone 1003.callgroup__ID_++HcfNEQzPgKH0Kb_8/26/2013_missed" } ],
+        "timestamp": 1380211392531,
+        "timestampInSecs": 1380211393,
+        "to": [{
+                "_id": "33c1c",
+                "addr": "",
+                "service": "com.palm.telephony"
+            }],
+        "type": "missed"
+    }, {
+        "_id": "++IbNsV7TNVPVkEI",
+        "_kind": "com.palm.phonecall:1",
+        "_rev": 301550,
+        "_sync": true,
+        "duration": 23904,
+        "from": {
+            "addr": "",
+            "service": "com.palm.telephony"
+        },
+        "groups": [ { "_id": "com.palm.app.phone 1003.callgroup__ID_++Ic92kYF5Wquwdv_8/27/2013_all" } ],
+        "timestamp": 1380314552959,
+        "timestampInSecs": 1380314553,
+        "to": [{
+                "_id": "499ef",
+                "addr": "+52684481234",
+                "name": "John Farser",
+                "normalizedAddr": "-43218448--25-+",
+                "personAddressType": "type_mobile",
+                "personFamilyName": "Farser",
+                "personGivenName": "John",
+                "personId": "++Ic92kYF5Wquwdv",
+                "service": "com.palm.telephony"
+            }],
+        "type": "outgoing"
+    }, {
+        "_id": "++IbNsnGZe4uTx+D",
+        "_kind": "com.palm.phonecall:1",
+        "_rev": 299938,
+        "_sync": true,
+        "duration": 30844,
+        "from": {
+            "addr": "0684481234",
+            "name": null,
+            "normalizedAddr": "-43218448---",
+            "personAddressType": null,
+            "personFamilyName": null,
+            "personGivenName": null,
+            "personId": null,
+            "service": "com.palm.telephony"
+        },
+        "groups": [ { "_id": "com.palm.app.phone 1003.callgroup__PHONE_-00868448---_8/27/2013_all" } ],
+        "timestamp": 1380314626298,
+        "timestampInSecs": 1380314626,
+        "to": [{
+                "_id": "33f78",
+                "addr": "",
+                "service": "com.palm.telephony"
+            }],
+        "type": "incoming"
+    }, {
+        "_id": "++IbSIFs1g7brU8u",
+        "_kind": "com.palm.phonecall:1",
+        "_rev": 213427,
+        "_sync": true,
+        "duration": 146664,
+        "from": {
+            "addr": "",
+            "service": "com.palm.telephony"
+        },
+        "groups": [ { "_id": "com.palm.app.phone 1003.callgroup__PHONE_-50962024-1--_8/28/2013_all" } ],
+        "timestamp": 1380390333448,
+        "timestampInSecs": 1380390333,
+        "to": [{
+                "_id": "341b4",
+                "addr": "0142021234",
+                "normalizedAddr": "-43212024-1--",
+                "service": "com.palm.telephony"
+            }],
+        "type": "outgoing"
+    }, {
+        "_id": "++IbuV4Iz1FIlnfW",
+        "_kind": "com.palm.phonecall:1",
+        "_rev": 301851,
+        "_sync": true,
+        "duration": 33707,
+        "from": {
+            "addr": "",
+            "service": "com.palm.telephony"
+        },
+        "groups": [ { "_id": "com.palm.app.phone 1003.callgroup__ID_++Ic933PQqW7HPFk_9/4/2013_all" } ],
+        "timestamp": 1380892103767,
+        "timestampInSecs": 1380892104,
+        "to": [{
+                "_id": "49b1c",
+                "addr": "+52153101234",
+                "name": "The Fun Place",
+                "normalizedAddr": "-43210135-1-25-+",
+                "personAddressType": "type_work",
+                "personFamilyName": "",
+                "personGivenName": "",
+                "personId": "++Ic933PQqW7HPFk",
+                "service": "com.palm.telephony"
+            }],
+        "type": "outgoing"
+    }, {
+        "_id": "++IbvG982xpsYP0I",
+        "_kind": "com.palm.phonecall:1",
+        "_rev": 221261,
+        "_sync": true,
+        "duration": 3016,
+        "from": {
+            "addr": "",
+            "service": "com.palm.telephony"
+        },
+        "groups": [ { "_id": "com.palm.app.phone 1003.callgroup__ID_++HcfNECvl_R+ZiA_9/4/2013_all" } ],
+        "timestamp": 1380905308050,
+        "timestampInSecs": 1380905308,
+        "to": [{
+                "_id": "3604e",
+                "addr": "+52699051234",
+                "name": "Mary Spetzler",
+                "normalizedAddr": "-43215099--25-+",
+                "personAddressType": "type_mobile",
+                "personFamilyName": "Spetzler",
+                "personGivenName": "Mary",
+                "personId": "++HcfNECvl_R+ZiA",
+                "service": "com.palm.telephony"
+            }],
+        "type": "outgoing"
+    }, {
+        "_id": "++Icg1Z8tMd3ugoY",
+        "_kind": "com.palm.phonecall:1",
+        "_rev": 309822,
+        "_sync": true,
+        "duration": 55394,
+        "from": {
+            "addr": "",
+            "service": "com.palm.telephony"
+        },
+        "groups": [ { "_id": "com.palm.app.phone 1003.callgroup__ID_++HcfNECvl_R+ZiA_9/14/2013_all" } ],
+        "timestamp": 1381743151836,
+        "timestampInSecs": 1381743152,
+        "to": [{
+                "_id": "4ba3f",
+                "addr": "+52699051234",
+                "name": "Mary Spetzler",
+                "normalizedAddr": "-43215099--25-+",
+                "personAddressType": "type_mobile",
+                "personFamilyName": "Spetzler",
+                "personGivenName": "Mary",
+                "personId": "++HcfNECvl_R+ZiA",
+                "service": "com.palm.telephony"
+            }],
+        "type": "outgoing"
+    }, {
+        "_id": "++IcwMkbxfsgixsX",
+        "_kind": "com.palm.phonecall:1",
+        "_rev": 312838,
+        "_sync": true,
+        "duration": 34110,
+        "from": {
+            "addr": "0699051234",
+            "name": "Mary Spetzler",
+            "normalizedAddr": "-43215099---",
+            "personAddressType": "type_mobile",
+            "personFamilyName": "Spetzler",
+            "personGivenName": "Mary",
+            "personId": "++HcfNECvl_R+ZiA",
+            "service": "com.palm.telephony"
+        },
+        "groups": [ { "_id": "com.palm.app.phone 1003.callgroup__ID_++HcfNECvl_R+ZiA_9/17/2013_all" } ],
+        "timestamp": 1382023740463,
+        "timestampInSecs": 1382023740,
+        "to": [{
+                "_id": "4c604",
+                "addr": "",
+                "service": "com.palm.telephony"
+            }],
+        "type": "incoming"
+    }, {
+        "_id": "++Id5XDPJfoXTqBA",
+        "_kind": "com.palm.phonecall:1",
+        "_rev": 314775,
+        "_sync": true,
+        "duration": 49046,
+        "from": {
+            "addr": "",
+            "service": "com.palm.telephony"
+        },
+        "groups": [ { "_id": "com.palm.app.phone 1003.callgroup__ID_++Ic92o1sExbLF06_9/19/2013_all" } ],
+        "timestamp": 1382198333513,
+        "timestampInSecs": 1382198334,
+        "to": [{
+                "_id": "4cd98",
+                "addr": "+52680441234",
+                "name": "Ulf Willer",
+                "normalizedAddr": "-43214408--25-+",
+                "personAddressType": "type_mobile",
+                "personFamilyName": "Willer",
+                "personGivenName": "Ulf",
+                "personId": "++Ic92o1sExbLF06",
+                "service": "com.palm.telephony"
+            }],
+        "type": "outgoing"
+    }, {
+        "_id": "++Id5syxjHlslnxl",
+        "_kind": "com.palm.phonecall:1",
+        "_rev": 314849,
+        "_sync": true,
+        "duration": 19574,
+        "from": {
+            "addr": "0144841234",
+            "normalizedAddr": "-43214844-1--",
+            "service": "com.palm.telephony"
+        },
+        "groups": [ { "_id": "com.palm.app.phone 1003.callgroup__PHONE_-28594844-1--_9/19/2013_all" } ],
+        "timestamp": 1382204472225,
+        "timestampInSecs": 1382204472,
+        "to": [{
+                "_id": "4cddf",
+                "addr": "",
+                "service": "com.palm.telephony"
+            }],
+        "type": "incoming"
+    }, {
+        "_id": "++Id9KYWAeF2ydeB",
+        "_kind": "com.palm.phonecall:1",
+        "_rev": 315642,
+        "_sync": true,
+        "duration": 237085,
+        "from": {
+            "addr": "",
+            "service": "com.palm.telephony"
+        },
+        "groups": [ { "_id": "com.palm.app.phone 1003.callgroup__ID_++Ic92o1sExbLF06_9/20/2013_all" } ],
+        "timestamp": 1382263463828,
+        "timestampInSecs": 1382263464,
+        "to": [{
+                "_id": "4d0fb",
+                "addr": "+52680441234",
+                "name": "Ulf Willer",
+                "normalizedAddr": "-43214408--25-+",
+                "personAddressType": "type_mobile",
+                "personFamilyName": "Willer",
+                "personGivenName": "Ulf",
+                "personId": "++Ic92o1sExbLF06",
+                "service": "com.palm.telephony"
+            }],
+        "type": "outgoing"
+    }, {
+        "_id": "++IdyD+phS8UiUdQ",
+        "_kind": "com.palm.phonecall:1",
+        "_rev": 327750,
+        "_sync": true,
+        "duration": 67806,
+        "from": {
+            "addr": "0699051234",
+            "name": "Mary Spetzler",
+            "normalizedAddr": "-43215099---",
+            "personAddressType": "type_mobile",
+            "personFamilyName": "Spetzler",
+            "personGivenName": "Mary",
+            "personId": "++HcfNECvl_R+ZiA",
+            "service": "com.palm.telephony"
+        },
+        "groups": [ { "_id": "com.palm.app.phone 1003.callgroup__ID_++HcfNECvl_R+ZiA_9/30/2013_all" } ],
+        "timestamp": 1383154961796,
+        "timestampInSecs": 1383154962,
+        "to": [{
+                "_id": "50044",
+                "addr": "",
+                "service": "com.palm.telephony"
+            }],
+        "type": "incoming"
+    }, {
+        "_id": "++IdyEIJPN4h3y3r",
+        "_kind": "com.palm.phonecall:1",
+        "_rev": 327757,
+        "_sync": true,
+        "duration": 164778,
+        "from": {
+            "addr": "",
+            "service": "com.palm.telephony"
+        },
+        "groups": [ { "_id": "com.palm.app.phone 1003.callgroup__ID_++HcfNECvl_R+ZiA_9/30/2013_all" } ],
+        "timestamp": 1383155210769,
+        "timestampInSecs": 1383155211,
+        "to": [{
+                "_id": "5004e",
+                "addr": "0699051234",
+                "name": "Mary Spetzler",
+                "normalizedAddr": "-43215099---",
+                "personFamilyName": "Spetzler",
+                "personGivenName": "Mary",
+                "personId": "++HcfNECvl_R+ZiA",
+                "service": "com.palm.telephony"
+            }],
+        "type": "outgoing"
+    }, {
+        "_id": "++IdyGge3IcBGKNw",
+        "_kind": "com.palm.phonecall:1",
+        "_rev": 327780,
+        "_sync": true,
+        "duration": 72927,
+        "from": {
+            "addr": "",
+            "service": "com.palm.telephony"
+        },
+        "groups": [ { "_id": "com.palm.app.phone 1003.callgroup__ID_++HcfNECvl_R+ZiA_9/30/2013_all" } ],
+        "timestamp": 1383155945770,
+        "timestampInSecs": 1383155946,
+        "to": [{
+                "_id": "50065",
+                "addr": "0699051234",
+                "name": "Mary Spetzler",
+                "normalizedAddr": "-43215099---",
+                "personFamilyName": "Spetzler",
+                "personGivenName": "Mary",
+                "personId": "++HcfNECvl_R+ZiA",
+                "service": "com.palm.telephony"
+            }],
+        "type": "outgoing"
+    }, {
+        "_id": "++IeRSSFO0BoZLEd",
+        "_kind": "com.palm.phonecall:1",
+        "_rev": 331001,
+        "_sync": true,
+        "duration": 5029,
+        "from": {
+            "addr": "",
+            "service": "com.palm.telephony"
+        },
+        "groups": [ { "_id": "com.palm.app.phone 1003.callgroup__ID_++HcfNECvl_R+ZiA_10/5/2013_all" } ],
+        "timestamp": 1383674566366,
+        "timestampInSecs": 1383674566,
+        "to": [{
+                "_id": "50cfa",
+                "addr": "0699051234",
+                "name": "Mary Spetzler",
+                "normalizedAddr": "-43215099---",
+                "personFamilyName": "Spetzler",
+                "personGivenName": "Mary",
+                "personId": "++HcfNECvl_R+ZiA",
+                "service": "com.palm.telephony"
+            }],
+        "type": "outgoing"
+    }, {
+        "_id": "++IeRSXngWCUwyTR",
+        "_kind": "com.palm.phonecall:1",
+        "_rev": 331008,
+        "_sync": true,
+        "duration": 3888,
+        "from": {
+            "addr": "",
+            "service": "com.palm.telephony"
+        },
+        "groups": [ { "_id": "com.palm.app.phone 1003.callgroup__ID_++HcfNECvl_R+ZiA_10/5/2013_all" } ],
+        "timestamp": 1383674590796,
+        "timestampInSecs": 1383674591,
+        "to": [{
+                "_id": "50d01",
+                "addr": "0699051234",
+                "name": "Mary Spetzler",
+                "normalizedAddr": "-43215099---",
+                "personFamilyName": "Spetzler",
+                "personGivenName": "Mary",
+                "personId": "++HcfNECvl_R+ZiA",
+                "service": "com.palm.telephony"
+            }],
+        "type": "outgoing"
+    }, {
+        "_id": "++IeRStiNCJf8T57",
+        "_kind": "com.palm.phonecall:1",
+        "_rev": 331016,
+        "_sync": true,
+        "duration": 4008,
+        "from": {
+            "addr": "",
+            "service": "com.palm.telephony"
+        },
+        "groups": [ { "_id": "com.palm.app.phone 1003.callgroup__ID_++HcfNJyoqB0JW3B_10/5/2013_all" } ],
+        "timestamp": 1383674686800,
+        "timestampInSecs": 1383674687,
+        "to": [{
+                "_id": "50d09",
+                "addr": "+52950751234",
+                "name": "Bob Willer",
+                "normalizedAddr": "-43215705-9-25-+",
+                "personAddressType": "type_other",
+                "personFamilyName": "Willer",
+                "personGivenName": "Bob",
+                "personId": "++HcfNJyoqB0JW3B",
+                "service": "com.palm.telephony"
+            }],
+        "type": "outgoing"
+    }, {
+        "_id": "++IeS0t+MfofdtGS",
+        "_kind": "com.palm.phonecall:1",
+        "_rev": 331058,
+        "_sync": true,
+        "duration": 0,
+        "from": {
+            "addr": "",
+            "service": "com.palm.telephony"
+        },
+        "groups": [ { "_id": "com.palm.app.phone 1003.callgroup__ID_++HcfNJyoqB0JW3B_10/5/2013_all" } ],
+        "timestamp": 1383684351473,
+        "timestampInSecs": 1383684351,
+        "to": [{
+                "_id": "50d33",
+                "addr": "+52950751234",
+                "name": "Bob Willer",
+                "normalizedAddr": "-43215705-9-25-+",
+                "personAddressType": "type_other",
+                "personFamilyName": "Willer",
+                "personGivenName": "Bob",
+                "personId": "++HcfNJyoqB0JW3B",
+                "service": "com.palm.telephony"
+            }],
+        "type": "outgoing"
+    }, {
+        "_id": "++IfSVXg0VlCbCw3",
+        "_kind": "com.palm.phonecall:1",
+        "_rev": 339282,
+        "_sync": true,
+        "duration": 44192,
+        "from": {
+            "addr": "",
+            "service": "com.palm.telephony"
+        },
+        "groups": [ { "_id": "com.palm.app.phone 1003.callgroup__ID_++HcfNECvl_R+ZiA_10/18/2013_all" } ],
+        "timestamp": 1384792046797,
+        "timestampInSecs": 1384792047,
+        "to": [{
+                "_id": "52d53",
+                "addr": "0699051234",
+                "name": "Mary Spetzler",
+                "normalizedAddr": "-43215099---",
+                "personFamilyName": "Spetzler",
+                "personGivenName": "Mary",
+                "personId": "++HcfNECvl_R+ZiA",
+                "service": "com.palm.telephony"
+            }],
+        "type": "outgoing"
+    }, {
+        "_id": "++IfcX7UjrSYm8Uh",
+        "_kind": "com.palm.phonecall:1",
+        "_rev": 342078,
+        "_sync": true,
+        "duration": 0,
+        "from": {
+            "addr": "",
+            "service": "com.palm.telephony"
+        },
+        "groups": [ { "_id": "com.palm.app.phone 1003.callgroup__ID_++Ifb7P1_1p6u8K3_10/20/2013_all" } ],
+        "timestamp": 1384981496571,
+        "timestampInSecs": 1384981497,
+        "to": [{
+                "_id": "5383f",
+                "addr": "0758111234",
+                "name": "Glenn Trellan",
+                "normalizedAddr": "-43211185---",
+                "personAddressType": "type_mobile",
+                "personFamilyName": "Trellan",
+                "personGivenName": "Glenn",
+                "personId": "++Ifb7P1_1p6u8K3",
+                "service": "com.palm.telephony"
+            }],
+        "type": "outgoing"
+    }, {
+        "_id": "++IfcXHjlHRm7dtk",
+        "_kind": "com.palm.phonecall:1",
+        "_rev": 342085,
+        "_sync": true,
+        "duration": 0,
+        "from": {
+            "addr": "",
+            "service": "com.palm.telephony"
+        },
+        "groups": [ { "_id": "com.palm.app.phone 1003.callgroup__ID_++Ifb7P1_1p6u8K3_10/20/2013_all" } ],
+        "timestamp": 1384981539554,
+        "timestampInSecs": 1384981540,
+        "to": [{
+                "_id": "53846",
+                "addr": "0758111234",
+                "name": "Glenn Trellan",
+                "normalizedAddr": "-43211185---",
+                "personAddressType": "type_mobile",
+                "personFamilyName": "Trellan",
+                "personGivenName": "Glenn",
+                "personId": "++Ifb7P1_1p6u8K3",
+                "service": "com.palm.telephony"
+            }],
+        "type": "outgoing"
+    }, {
+        "_id": "++IfcXjfa+8PEb8i",
+        "_kind": "com.palm.phonecall:1",
+        "_rev": 342104,
+        "_sync": true,
+        "duration": 0,
+        "from": {
+            "addr": "+135443001234",
+            "name": "Glenn Trellan",
+            "normalizedAddr": "-432100344--531-+",
+            "personAddressType": "",
+            "personFamilyName": "Trellan",
+            "personGivenName": "Glenn",
+            "personId": "++Ifb7P1_1p6u8K3",
+            "service": "com.palm.telephony"
+        },
+        "groups": [ { "_id": "com.palm.app.phone 1003.callgroup__ID_++Ifb7P1_1p6u8K3_10/20/2013_all" }, { "_id": "com.palm.app.phone 1003.callgroup__ID_++Ifb7P1_1p6u8K3_10/20/2013_missed" } ],
+        "timestamp": 1384981660926,
+        "timestampInSecs": 1384981661,
+        "to": [{
+                "_id": "53849",
+                "addr": "",
+                "service": "com.palm.telephony"
+            }],
+        "type": "missed"
+    }, {
+        "_id": "++Ifp5yfRSWdtbf6",
+        "_kind": "com.palm.phonecall:1",
+        "_rev": 343978,
+        "_sync": true,
+        "duration": 0,
+        "from": {
+            "addr": "+38261711234",
+            "normalizedAddr": "-43211716--283-+",
+            "service": "com.palm.telephony"
+        },
+        "groups": [ { "_id": "com.palm.app.phone 1003.callgroup__PHONE_-48711716--283-+_10/23/2013_all" }, { "_id": "com.palm.app.phone 1003.callgroup__PHONE_-48711716--283-+_10/23/2013_missed" } ],
+        "timestamp": 1385197545936,
+        "timestampInSecs": 1385197546,
+        "to": [{
+                "_id": "53fa7",
+                "addr": "",
+                "service": "com.palm.telephony"
+            }],
+        "type": "missed"
+    }, {
+        "_id": "++Ifpnv7QfWdAXVS",
+        "_kind": "com.palm.phonecall:1",
+        "_rev": 344053,
+        "_sync": true,
+        "duration": 303879,
+        "from": {
+            "addr": "",
+            "service": "com.palm.telephony"
+        },
+        "groups": [ { "_id": "com.palm.app.phone 1003.callgroup__PHONE_-16955558-3--_10/23/2013_all" } ],
+        "timestamp": 1385209306768,
+        "timestampInSecs": 1385209307,
+        "to": [{
+                "_id": "53ff6",
+                "addr": "0385551234",
+                "normalizedAddr": "-43215558-3--",
+                "service": "com.palm.telephony"
+            }],
+        "type": "outgoing"
+    }, {
+        "_id": "++IfpsHiZ1g+GC0V",
+        "_kind": "com.palm.phonecall:1",
+        "_rev": 344065,
+        "_sync": true,
+        "duration": 2597,
+        "from": {
+            "addr": "",
+            "service": "com.palm.telephony"
+        },
+        "groups": [ { "_id": "com.palm.app.phone 1003.callgroup__ID_++HcfNECvl_R+ZiA_10/23/2013_all" } ],
+        "timestamp": 1385210780760,
+        "timestampInSecs": 1385210781,
+        "to": [{
+                "_id": "54002",
+                "addr": "0699051234",
+                "name": "Mary Spetzler",
+                "normalizedAddr": "-43215099---",
+                "personFamilyName": "Spetzler",
+                "personGivenName": "Mary",
+                "personId": "++HcfNECvl_R+ZiA",
+                "service": "com.palm.telephony"
+            }],
+        "type": "outgoing"
+    }, {
+        "_id": "++IfpsSBfSVUZUiz",
+        "_kind": "com.palm.phonecall:1",
+        "_rev": 344072,
+        "_sync": true,
+        "duration": 3507,
+        "from": {
+            "addr": "",
+            "service": "com.palm.telephony"
+        },
+        "groups": [ { "_id": "com.palm.app.phone 1003.callgroup__ID_++HcfNECvl_R+ZiA_10/23/2013_all" } ],
+        "timestamp": 1385210823767,
+        "timestampInSecs": 1385210824,
+        "to": [{
+                "_id": "54009",
+                "addr": "0699051234",
+                "name": "Mary Spetzler",
+                "normalizedAddr": "-43215099---",
+                "personFamilyName": "Spetzler",
+                "personGivenName": "Mary",
+                "personId": "++HcfNECvl_R+ZiA",
+                "service": "com.palm.telephony"
+            }],
+        "type": "outgoing"
+    }, {
+        "_id": "++IfpsofinJPMabe",
+        "_kind": "com.palm.phonecall:1",
+        "_rev": 344079,
+        "_sync": true,
+        "duration": 65002,
+        "from": {
+            "addr": "",
+            "service": "com.palm.telephony"
+        },
+        "groups": [ { "_id": "com.palm.app.phone 1003.callgroup__ID_++Ifb7P1_1p6u8K3_10/23/2013_all" } ],
+        "timestamp": 1385210860768,
+        "timestampInSecs": 1385210861,
+        "to": [{
+                "_id": "54010",
+                "addr": "+135443001234",
+                "name": "Glenn Trellan",
+                "normalizedAddr": "-432100344--531-+",
+                "personAddressType": "type_other",
+                "personFamilyName": "Trellan",
+                "personGivenName": "Glenn",
+                "personId": "++Ifb7P1_1p6u8K3",
+                "service": "com.palm.telephony"
+            }],
+        "type": "outgoing"
+    }, {
+        "_id": "++Ifpy+3Ma4D6PDr",
+        "_kind": "com.palm.phonecall:1",
+        "_rev": 344088,
+        "_sync": true,
+        "duration": 1915,
+        "from": {
+            "addr": "",
+            "service": "com.palm.telephony"
+        },
+        "groups": [ { "_id": "com.palm.app.phone 1003.callgroup__ID_++HcfNHQmcgjuHSX_10/23/2013_all" } ],
+        "timestamp": 1385212313789,
+        "timestampInSecs": 1385212314,
+        "to": [{
+                "_id": "54019",
+                "addr": "+52677221234",
+                "name": "Claire Meyer",
+                "normalizedAddr": "-43212277--25-+",
+                "personAddressType": "type_mobile",
+                "personFamilyName": "Meyer",
+                "personGivenName": "Claire",
+                "personId": "++HcfNHQmcgjuHSX",
+                "service": "com.palm.telephony"
+            }],
+        "type": "outgoing"
+    }, {
+        "_id": "++Ifpz0bhV7LYZl1",
+        "_kind": "com.palm.phonecall:1",
+        "_rev": 344100,
+        "_sync": true,
+        "duration": 234646,
+        "from": {
+            "addr": "0677221234",
+            "name": "Claire Meyer",
+            "normalizedAddr": "-43212277---",
+            "personAddressType": "type_mobile",
+            "personFamilyName": "Meyer",
+            "personGivenName": "Claire",
+            "personId": "++HcfNHQmcgjuHSX",
+            "service": "com.palm.telephony"
+        },
+        "groups": [ { "_id": "com.palm.app.phone 1003.callgroup__ID_++HcfNHQmcgjuHSX_10/23/2013_all" } ],
+        "timestamp": 1385212355939,
+        "timestampInSecs": 1385212356,
+        "to": [{
+                "_id": "54022",
+                "addr": "",
+                "service": "com.palm.telephony"
+            }],
+        "type": "incoming"
+    }, {
+        "_id": "++IfvwDjguVZ3HK9",
+        "_kind": "com.palm.phonecall:1",
+        "_rev": 344306,
+        "_sync": true,
+        "duration": 226839,
+        "from": {
+            "addr": "",
+            "service": "com.palm.telephony"
+        },
+        "groups": [ { "_id": "com.palm.app.phone 1003.callgroup__ID_++I_9xc+hihssbNy_10/24/2013_all" } ],
+        "timestamp": 1385314692770,
+        "timestampInSecs": 1385314693,
+        "to": [{
+                "_id": "540f3",
+                "addr": "+52385801234",
+                "name": "Tara Norman",
+                "normalizedAddr": "-43210858-3-25-+",
+                "personAddressType": "type_other",
+                "personFamilyName": "Norman",
+                "personGivenName": "Tara",
+                "personId": "++I_9xc+hihssbNy",
+                "service": "com.palm.telephony"
+            }],
+        "type": "outgoing"
+    }, {
+        "_id": "++Ifw+W8aZ_ndxol",
+        "_kind": "com.palm.phonecall:1",
+        "_rev": 344313,
+        "_sync": true,
+        "duration": 249778,
+        "from": {
+            "addr": "",
+            "service": "com.palm.telephony"
+        },
+        "groups": [ { "_id": "com.palm.app.phone 1003.callgroup__ID_++Ic92o1sExbLF06_10/24/2013_all" } ],
+        "timestamp": 1385315820770,
+        "timestampInSecs": 1385315821,
+        "to": [{
+                "_id": "540fa",
+                "addr": "+52680441234",
+                "name": "Ulf Willer",
+                "normalizedAddr": "-43214408--25-+",
+                "personAddressType": "type_mobile",
+                "personFamilyName": "Willer",
+                "personGivenName": "Ulf",
+                "personId": "++Ic92o1sExbLF06",
+                "service": "com.palm.telephony"
+            }],
+        "type": "outgoing"
+    }, {
+        "_id": "++Ig0+wlh4w0j+4d",
+        "_kind": "com.palm.phonecall:1",
+        "_rev": 344991,
+        "_sync": true,
+        "duration": 452021,
+        "from": {
+            "addr": "",
+            "service": "com.palm.telephony"
+        },
+        "groups": [ { "_id": "com.palm.app.phone 1003.callgroup__ID_++Ic92k1tBcqnS8p_10/25/2013_all" } ],
+        "timestamp": 1385401633745,
+        "timestampInSecs": 1385401634,
+        "to": [{
+                "_id": "543a0",
+                "addr": "+52674681234",
+                "name": "Peter Dörn",
+                "normalizedAddr": "-43218647--25-+",
+                "personAddressType": "type_mobile",
+                "personFamilyName": "Dörn",
+                "personGivenName": "Peter",
+                "personId": "++Ic92k1tBcqnS8p",
+                "service": "com.palm.telephony"
+            }],
+        "type": "outgoing"
+    }, {
+        "_id": "++Ig0EePXINStMIu",
+        "_kind": "com.palm.phonecall:1",
+        "_rev": 345015,
+        "_sync": true,
+        "duration": 0,
+        "from": {
+            "addr": "0385731234",
+            "normalizedAddr": "-43213758-3--",
+            "service": "com.palm.telephony"
+        },
+        "groups": [ { "_id": "com.palm.app.phone 1003.callgroup__PHONE_-58203758-3--_10/25/2013_all" }, { "_id": "com.palm.app.phone 1003.callgroup__PHONE_-58203758-3--_10/25/2013_missed" } ],
+        "timestamp": 1385406035288,
+        "timestampInSecs": 1385406035,
+        "to": [{
+                "_id": "543b4",
+                "addr": "",
+                "service": "com.palm.telephony"
+            }],
+        "type": "missed"
+    }, {
+        "_id": "++Ig0HTu+CBOXrJ7",
+        "_kind": "com.palm.phonecall:1",
+        "_rev": 345020,
+        "_sync": true,
+        "duration": 4529,
+        "from": {
+            "addr": "",
+            "service": "com.palm.telephony"
+        },
+        "groups": [ { "_id": "com.palm.app.phone 1003.callgroup__PHONE_-58203758-3--_10/25/2013_all" } ],
+        "timestamp": 1385406787793,
+        "timestampInSecs": 1385406788,
+        "to": [{
+                "_id": "543bd",
+                "addr": "0385731234",
+                "normalizedAddr": "-43213758-3--",
+                "service": "com.palm.telephony"
+            }],
+        "type": "outgoing"
+    }, {
+        "_id": "++Ig0J7sov44SwP6",
+        "_kind": "com.palm.phonecall:1",
+        "_rev": 345032,
+        "_sync": true,
+        "duration": 312519,
+        "from": {
+            "addr": "0385731234",
+            "normalizedAddr": "-43213758-3--",
+            "service": "com.palm.telephony"
+        },
+        "groups": [ { "_id": "com.palm.app.phone 1003.callgroup__PHONE_-58203758-3--_10/25/2013_all" } ],
+        "timestamp": 1385406924304,
+        "timestampInSecs": 1385406924,
+        "to": [{
+                "_id": "543c6",
+                "addr": "",
+                "service": "com.palm.telephony"
+            }],
+        "type": "incoming"
+    }, {
+        "_id": "++Ig4akjM70knWUZ",
+        "_kind": "com.palm.phonecall:1",
+        "_rev": 345230,
+        "_sync": true,
+        "duration": 123090,
+        "from": {
+            "addr": "0142661234",
+            "name": "Cindy Kate",
+            "normalizedAddr": "-43216624-1--",
+            "personAddressType": "type_mobile",
+            "personFamilyName": "",
+            "personGivenName": "",
+            "personId": "++Ig3QlAcX7HwSoV",
+            "service": "com.palm.telephony"
+        },
+        "groups": [ { "_id": "com.palm.app.phone 1003.callgroup__ID_++Ig3QlAcX7HwSoV_10/26/2013_all" } ],
+        "timestamp": 1385480832210,
+        "timestampInSecs": 1385480832,
+        "to": [{
+                "_id": "5448c",
+                "addr": "",
+                "service": "com.palm.telephony"
+            }],
+        "type": "incoming"
+    }, {
+        "_id": "++Ig4bC9mzpgabkI",
+        "_kind": "com.palm.phonecall:1",
+        "_rev": 345238,
+        "_sync": true,
+        "duration": 88344,
+        "from": {
+            "addr": "0142661234",
+            "name": "Cindy Kate",
+            "normalizedAddr": "-43216624-1--",
+            "personAddressType": "type_mobile",
+            "personFamilyName": "",
+            "personGivenName": "",
+            "personId": "++Ig3QlAcX7HwSoV",
+            "service": "com.palm.telephony"
+        },
+        "groups": [ { "_id": "com.palm.app.phone 1003.callgroup__ID_++Ig3QlAcX7HwSoV_10/26/2013_all" } ],
+        "timestamp": 1385480986148,
+        "timestampInSecs": 1385480986,
+        "to": [{
+                "_id": "54494",
+                "addr": "",
+                "service": "com.palm.telephony"
+            }],
+        "type": "incoming"
+    }, {
+        "_id": "++Ig5GBtx5x79ST0",
+        "_kind": "com.palm.phonecall:1",
+        "_rev": 345279,
+        "_sync": true,
+        "duration": 2961,
+        "from": {
+            "addr": "",
+            "service": "com.palm.telephony"
+        },
+        "groups": [ { "_id": "com.palm.app.phone 1003.callgroup__ID_++HcfNECvl_R+ZiA_10/26/2013_all" } ],
+        "timestamp": 1385492344769,
+        "timestampInSecs": 1385492345,
+        "to": [{
+                "_id": "544c0",
+                "addr": "0699051234",
+                "name": "Mary Spetzler",
+                "normalizedAddr": "-43215099---",
+                "personFamilyName": "Spetzler",
+                "personGivenName": "Mary",
+                "personId": "++HcfNECvl_R+ZiA",
+                "service": "com.palm.telephony"
+            }],
+        "type": "outgoing"
+    }, {
+        "_id": "++Ig5GMWqfBVqJ7J",
+        "_kind": "com.palm.phonecall:1",
+        "_rev": 345286,
+        "_sync": true,
+        "duration": 2518,
+        "from": {
+            "addr": "",
+            "service": "com.palm.telephony"
+        },
+        "groups": [ { "_id": "com.palm.app.phone 1003.callgroup__ID_++HcfNECvl_R+ZiA_10/26/2013_all" } ],
+        "timestamp": 1385492389770,
+        "timestampInSecs": 1385492390,
+        "to": [{
+                "_id": "544c7",
+                "addr": "0699051234",
+                "name": "Mary Spetzler",
+                "normalizedAddr": "-43215099---",
+                "personFamilyName": "Spetzler",
+                "personGivenName": "Mary",
+                "personId": "++HcfNECvl_R+ZiA",
+                "service": "com.palm.telephony"
+            }],
+        "type": "outgoing"
+    }, {
+        "_id": "++Ig5GhmZOckud+2",
+        "_kind": "com.palm.phonecall:1",
+        "_rev": 345293,
+        "_sync": true,
+        "duration": 72546,
+        "from": {
+            "addr": "0699051234",
+            "name": "Mary Spetzler",
+            "normalizedAddr": "-43215099---",
+            "personAddressType": "type_mobile",
+            "personFamilyName": "Spetzler",
+            "personGivenName": "Mary",
+            "personId": "++HcfNECvl_R+ZiA",
+            "service": "com.palm.telephony"
+        },
+        "groups": [ { "_id": "com.palm.app.phone 1003.callgroup__ID_++HcfNECvl_R+ZiA_10/26/2013_all" } ],
+        "timestamp": 1385492413097,
+        "timestampInSecs": 1385492413,
+        "to": [{
+                "_id": "544cb",
+                "addr": "",
+                "service": "com.palm.telephony"
+            }],
+        "type": "incoming"
+    }, {
+        "_id": "++Ig5Wt2qxkiNzlv",
+        "_kind": "com.palm.phonecall:1",
+        "_rev": 345325,
+        "_sync": true,
+        "duration": 9064,
+        "from": {
+            "addr": "",
+            "service": "com.palm.telephony"
+        },
+        "groups": [ { "_id": "com.palm.app.phone 1003.callgroup__PHONE_-321---_10/26/2013_all" } ],
+        "timestamp": 1385496818825,
+        "timestampInSecs": 1385496819,
+        "to": [{
+                "_id": "544ee",
+                "addr": "123",
+                "name": "Voice Mail",
+                "normalizedAddr": "-321---",
+                "service": "com.palm.telephony"
+            }],
+        "type": "outgoing"
+    }, {
+        "_id": "++Ig5WygK8gdAjvL",
+        "_kind": "com.palm.phonecall:1",
+        "_rev": 345332,
+        "_sync": true,
+        "duration": 0,
+        "from": {
+            "addr": "",
+            "service": "com.palm.telephony"
+        },
+        "groups": [ { "_id": "com.palm.app.phone 1003.callgroup__ID_++HcfNECvl_R+ZiA_10/26/2013_all" } ],
+        "timestamp": 1385496851525,
+        "timestampInSecs": 1385496852,
+        "to": [{
+                "_id": "544f5",
+                "addr": "0699051234",
+                "name": "Mary Spetzler",
+                "normalizedAddr": "-43215099---",
+                "personFamilyName": "Spetzler",
+                "personGivenName": "Mary",
+                "personId": "++HcfNECvl_R+ZiA",
+                "service": "com.palm.telephony"
+            }],
+        "type": "outgoing"
+    }, {
+        "_id": "++Ig94ZQSuNZfwHO",
+        "_kind": "com.palm.phonecall:1",
+        "_rev": 346003,
+        "_sync": true,
+        "duration": 105285,
+        "from": {
+            "addr": "0142661234",
+            "name": "Cindy Kate",
+            "normalizedAddr": "-43216624-1--",
+            "personAddressType": "type_mobile",
+            "personFamilyName": "",
+            "personGivenName": "",
+            "personId": "++Ig3QlAcX7HwSoV",
+            "service": "com.palm.telephony"
+        },
+        "groups": [ { "_id": "com.palm.app.phone 1003.callgroup__ID_++Ig3QlAcX7HwSoV_10/27/2013_all" } ],
+        "timestamp": 1385557839325,
+        "timestampInSecs": 1385557839,
+        "to": [{
+                "_id": "54791",
+                "addr": "",
+                "service": "com.palm.telephony"
+            }],
+        "type": "incoming"
+    }, {
+        "_id": "++Ig9ABdxuoeMsFB",
+        "_kind": "com.palm.phonecall:1",
+        "_rev": 346024,
+        "_sync": true,
+        "duration": 124153,
+        "from": {
+            "addr": "0142661234",
+            "name": "Cindy Kate",
+            "normalizedAddr": "-43216624-1--",
+            "personAddressType": "type_mobile",
+            "personFamilyName": "",
+            "personGivenName": "",
+            "personId": "++Ig3QlAcX7HwSoV",
+            "service": "com.palm.telephony"
+        },
+        "groups": [ { "_id": "com.palm.app.phone 1003.callgroup__ID_++Ig3QlAcX7HwSoV_10/27/2013_all" } ],
+        "timestamp": 1385559331379,
+        "timestampInSecs": 1385559331,
+        "to": [{
+                "_id": "547a6",
+                "addr": "",
+                "service": "com.palm.telephony"
+            }],
+        "type": "incoming"
+    }, {
+        "_id": "++IgA6QR87F4l7b1",
+        "_kind": "com.palm.phonecall:1",
+        "_rev": 346136,
+        "_sync": true,
+        "duration": 2913,
+        "from": {
+            "addr": "",
+            "service": "com.palm.telephony"
+        },
+        "groups": [ { "_id": "com.palm.app.phone 1003.callgroup__ID_++HcfNECvl_R+ZiA_10/27/2013_all" } ],
+        "timestamp": 1385575620769,
+        "timestampInSecs": 1385575621,
+        "to": [{
+                "_id": "54819",
+                "addr": "0699051234",
+                "name": "Mary Spetzler",
+                "normalizedAddr": "-43215099---",
+                "personFamilyName": "Spetzler",
+                "personGivenName": "Mary",
+                "personId": "++HcfNECvl_R+ZiA",
+                "service": "com.palm.telephony"
+            }],
+        "type": "outgoing"
+    }, {
+        "_id": "++IgA6Z2Vg0IrVN8",
+        "_kind": "com.palm.phonecall:1",
+        "_rev": 346143,
+        "_sync": true,
+        "duration": 3049,
+        "from": {
+            "addr": "",
+            "service": "com.palm.telephony"
+        },
+        "groups": [ { "_id": "com.palm.app.phone 1003.callgroup__ID_++HcfNECvl_R+ZiA_10/27/2013_all" } ],
+        "timestamp": 1385575656769,
+        "timestampInSecs": 1385575657,
+        "to": [{
+                "_id": "54820",
+                "addr": "0699051234",
+                "name": "Mary Spetzler",
+                "normalizedAddr": "-43215099---",
+                "personFamilyName": "Spetzler",
+                "personGivenName": "Mary",
+                "personId": "++HcfNECvl_R+ZiA",
+                "service": "com.palm.telephony"
+            }],
+        "type": "outgoing"
+    }, {
+        "_id": "++IgAJBtNtCUlNAa",
+        "_kind": "com.palm.phonecall:1",
+        "_rev": 346177,
+        "_sync": true,
+        "duration": 0,
+        "from": {
+            "addr": "0699051234",
+            "name": "Mary Spetzler",
+            "normalizedAddr": "-43215099---",
+            "personAddressType": "type_mobile",
+            "personFamilyName": "Spetzler",
+            "personGivenName": "Mary",
+            "personId": "++HcfNECvl_R+ZiA",
+            "service": "com.palm.telephony"
+        },
+        "groups": [ { "_id": "com.palm.app.phone 1003.callgroup__ID_++HcfNECvl_R+ZiA_10/27/2013_all" }, { "_id": "com.palm.app.phone 1003.callgroup__ID_++HcfNECvl_R+ZiA_10/27/2013_missed" } ],
+        "timestamp": 1385579052340,
+        "timestampInSecs": 1385579052,
+        "to": [{
+                "_id": "5483e",
+                "addr": "",
+                "service": "com.palm.telephony"
+            }],
+        "type": "missed"
+    }, {
+        "_id": "++IgAJQ4uLsD9HAJ",
+        "_kind": "com.palm.phonecall:1",
+        "_rev": 346190,
+        "_sync": true,
+        "duration": 0,
+        "from": {
+            "addr": "123",
+            "name": "Voice Mail",
+            "normalizedAddr": "-321---",
+            "service": "com.palm.telephony"
+        },
+        "groups": [ { "_id": "com.palm.app.phone 1003.callgroup__PHONE_-321---_10/27/2013_all" }, { "_id": "com.palm.app.phone 1003.callgroup__PHONE_-321---_10/27/2013_missed" } ],
+        "timestamp": 1385579111881,
+        "timestampInSecs": 1385579112,
+        "to": [{
+                "_id": "5484b",
+                "addr": "",
+                "service": "com.palm.telephony"
+            }],
+        "type": "missed"
+    }, {
+        "_id": "++IgAKm1vypJ58lx",
+        "_kind": "com.palm.phonecall:1",
+        "_rev": 346194,
+        "_sync": true,
+        "duration": 631833,
+        "from": {
+            "addr": "",
+            "service": "com.palm.telephony"
+        },
+        "groups": [ { "_id": "com.palm.app.phone 1003.callgroup__PHONE_-16955558-3--_10/27/2013_all" } ],
+        "timestamp": 1385578844769,
+        "timestampInSecs": 1385578845,
+        "to": [{
+                "_id": "54853",
+                "addr": "0385551234",
+                "normalizedAddr": "-43215558-3--",
+                "service": "com.palm.telephony"
+            }],
+        "type": "outgoing"
+    }, {
+        "_id": "++IgAKxayq71_sCt",
+        "_kind": "com.palm.phonecall:1",
+        "_rev": 346202,
+        "_sync": true,
+        "duration": 35679,
+        "from": {
+            "addr": "",
+            "service": "com.palm.telephony"
+        },
+        "groups": [ { "_id": "com.palm.app.phone 1003.callgroup__PHONE_-321---_10/27/2013_all" } ],
+        "timestamp": 1385579489402,
+        "timestampInSecs": 1385579489,
+        "to": [{
+                "_id": "5485b",
+                "addr": "123",
+                "name": "Voice Mail",
+                "normalizedAddr": "-321---",
+                "service": "com.palm.telephony"
+            }],
+        "type": "outgoing"
+    }, {
+        "_id": "++IgAKxk__+h9+Xy",
+        "_kind": "com.palm.phonecall:1",
+        "_rev": 346207,
+        "_sync": true,
+        "duration": 34158,
+        "from": {
+            "addr": "",
+            "service": "com.palm.telephony"
+        },
+        "groups": [ { "_id": "com.palm.app.phone 1003.callgroup__PHONE_-321---_10/27/2013_all" } ],
+        "timestamp": 1385579491571,
+        "timestampInSecs": 1385579492,
+        "to": [{
+                "_id": "54860",
+                "addr": "123",
+                "name": "Voice Mail",
+                "normalizedAddr": "-321---",
+                "service": "com.palm.telephony"
+            }],
+        "type": "outgoing"
+    }, {
+        "_id": "++IgDOSDuY+clWpi",
+        "_kind": "com.palm.phonecall:1",
+        "_rev": 346388,
+        "_sync": true,
+        "duration": 436256,
+        "from": {
+            "addr": "0674851234",
+            "name": "Marina Skolowksy",
+            "normalizedAddr": "-43215847---",
+            "personAddressType": "",
+            "personFamilyName": "Skolowksy",
+            "personGivenName": "Marina",
+            "personId": "++IgDPYVSrGrr9+W",
+            "service": "com.palm.telephony"
+        },
+        "groups": [ { "_id": "com.palm.app.phone 1003.callgroup__ID_++IgDPYVSrGrr9+W_10/28/2013_all" } ],
+        "timestamp": 1385631566372,
+        "timestampInSecs": 1385631566,
+        "to": [{
+                "_id": "54900",
+                "addr": "",
+                "service": "com.palm.telephony"
+            }],
+        "type": "incoming"
+    }, {
+        "_id": "++IgEzRkRzNrxWQr",
+        "_kind": "com.palm.phonecall:1",
+        "_rev": 346501,
+        "_sync": true,
+        "duration": 2301,
+        "from": {
+            "addr": "",
+            "service": "com.palm.telephony"
+        },
+        "groups": [ { "_id": "com.palm.app.phone 1003.callgroup__ID_++HcfNHQmcgjuHSX_10/28/2013_all" } ],
+        "timestamp": 1385659378770,
+        "timestampInSecs": 1385659379,
+        "to": [{
+                "_id": "54986",
+                "addr": "0677221234",
+                "name": "Claire Meyer",
+                "normalizedAddr": "-43212277---",
+                "personFamilyName": "Meyer",
+                "personGivenName": "Claire",
+                "personId": "++HcfNHQmcgjuHSX",
+                "service": "com.palm.telephony"
+            }],
+        "type": "outgoing"
+    }, {
+        "_id": "++IgFLOmKgp75cUF",
+        "_kind": "com.palm.phonecall:1",
+        "_rev": 346528,
+        "_sync": true,
+        "duration": 209852,
+        "from": {
+            "addr": "",
+            "service": "com.palm.telephony"
+        },
+        "groups": [ { "_id": "com.palm.app.phone 1003.callgroup__ID_++HcfNHQmcgjuHSX_10/28/2013_all" } ],
+        "timestamp": 1385665332769,
+        "timestampInSecs": 1385665333,
+        "to": [{
+                "_id": "549a1",
+                "addr": "0677221234",
+                "name": "Claire Meyer",
+                "normalizedAddr": "-43212277---",
+                "personFamilyName": "Meyer",
+                "personGivenName": "Claire",
+                "personId": "++HcfNHQmcgjuHSX",
+                "service": "com.palm.telephony"
+            }],
+        "type": "outgoing"
+    }, {
+        "_id": "++IgNNL1AyODvJBs",
+        "_kind": "com.palm.phonecall:1",
+        "_rev": 348663,
+        "_sync": true,
+        "duration": 87706,
+        "from": {
+            "addr": "0674851234",
+            "name": "Marina Skolowksy",
+            "normalizedAddr": "-43215847---",
+            "personAddressType": "type_other",
+            "personFamilyName": "Skolowksy",
+            "personGivenName": "Marina",
+            "personId": "++IgDPYVSrGrr9+W",
+            "service": "com.palm.telephony"
+        },
+        "groups": [ { "_id": "com.palm.app.phone 1003.callgroup__ID_++IgDPYVSrGrr9+W_10/30/2013_all" } ],
+        "timestamp": 1385803414966,
+        "timestampInSecs": 1385803415,
+        "to": [{
+                "_id": "551f5",
+                "addr": "",
+                "service": "com.palm.telephony"
+            }],
+        "type": "incoming"
+    }, {
+        "_id": "++IgOQS8Md04JphC",
+        "_kind": "com.palm.phonecall:1",
+        "_rev": 348746,
+        "_sync": true,
+        "duration": 6023,
+        "from": {
+            "addr": "",
+            "service": "com.palm.telephony"
+        },
+        "groups": [ { "_id": "com.palm.app.phone 1003.callgroup__ID_++Ifb7P1_1p6u8K3_10/30/2013_all" } ],
+        "timestamp": 1385821511698,
+        "timestampInSecs": 1385821512,
+        "to": [{
+                "_id": "5524b",
+                "addr": "0758111234",
+                "name": "Glenn Trellan",
+                "normalizedAddr": "-43211185---",
+                "personAddressType": "type_mobile",
+                "personFamilyName": "Trellan",
+                "personGivenName": "Glenn",
+                "personId": "++Ifb7P1_1p6u8K3",
+                "service": "com.palm.telephony"
+            }],
+        "type": "outgoing"
+    }, {
+        "_id": "++Igie+4wIo_YixL",
+        "_kind": "com.palm.phonecall:1",
+        "_rev": 351759,
+        "_sync": true,
+        "duration": 45872,
+        "from": {
+            "addr": "",
+            "service": "com.palm.telephony"
+        },
+        "groups": [ { "_id": "com.palm.app.phone 1003.callgroup__ID_++HcfNECvl_R+ZiA_11/4/2013_all" } ],
+        "timestamp": 1386186153770,
+        "timestampInSecs": 1386186154,
+        "to": [{
+                "_id": "55e10",
+                "addr": "0699051234",
+                "name": "Mary Spetzler",
+                "normalizedAddr": "-43215099---",
+                "personFamilyName": "Spetzler",
+                "personGivenName": "Mary",
+                "personId": "++HcfNECvl_R+ZiA",
+                "service": "com.palm.telephony"
+            }],
+        "type": "outgoing"
+    }, {
+        "_id": "++IgqEgkogRBg1_h",
+        "_kind": "com.palm.phonecall:1",
+        "_rev": 353831,
+        "_sync": true,
+        "duration": 0,
+        "from": {
+            "addr": "0892231234",
+            "normalizedAddr": "-43213229-8--",
+            "service": "com.palm.telephony"
+        },
+        "groups": [ { "_id": "com.palm.app.phone 1003.callgroup__PHONE_-41013229-8--_11/6/2013_all" }, { "_id": "com.palm.app.phone 1003.callgroup__PHONE_-41013229-8--_11/6/2013_missed" } ],
+        "timestamp": 1386316578207,
+        "timestampInSecs": 1386316578,
+        "to": [{
+                "_id": "56624",
+                "addr": "",
+                "service": "com.palm.telephony"
+            }],
+        "type": "missed"
+    }, {
+        "_id": "++Igu3vK5O0IKefS",
+        "_kind": "com.palm.phonecall:1",
+        "_rev": 355132,
+        "_sync": true,
+        "duration": 57674,
+        "from": {
+            "addr": "",
+            "service": "com.palm.telephony"
+        },
+        "groups": [ { "_id": "com.palm.app.phone 1003.callgroup__PHONE_-51---_11/7/2013_all" } ],
+        "timestamp": 1386382348312,
+        "timestampInSecs": 1386382348,
+        "to": [{
+                "_id": "56b3d",
+                "addr": "15",
+                "normalizedAddr": "-51----",
+                "service": "com.palm.telephony"
+            }],
+        "type": "outgoing"
+    }, {
+        "_id": "++IgvQzU0cdPthix",
+        "_kind": "com.palm.phonecall:1",
+        "_rev": 355344,
+        "_sync": true,
+        "duration": 6495,
+        "from": {
+            "addr": "",
+            "service": "com.palm.telephony"
+        },
+        "groups": [ { "_id": "com.palm.app.phone 1003.callgroup__ID_++Ic92viH3lCYDKN_11/7/2013_all" } ],
+        "timestamp": 1386405770795,
+        "timestampInSecs": 1386405771,
+        "to": [{
+                "_id": "56c11",
+                "addr": "0146361234",
+                "name": "Martin Turén",
+                "normalizedAddr": "-43216364-1--",
+                "personAddressType": "type_work",
+                "personFamilyName": "Turén",
+                "personGivenName": "Martin",
+                "personId": "++Ic92viH3lCYDKN",
+                "service": "com.palm.telephony"
+            }],
+        "type": "outgoing"
+    }, {
+        "_id": "++IgvRsxeudxWTZ9",
+        "_kind": "com.palm.phonecall:1",
+        "_rev": 355367,
+        "_sync": true,
+        "duration": 65862,
+        "from": {
+            "addr": "",
+            "service": "com.palm.telephony"
+        },
+        "groups": [ { "_id": "com.palm.app.phone 1003.callgroup__ID_++Ic92viH3lCYDKN_11/7/2013_all" } ],
+        "timestamp": 1386405952520,
+        "timestampInSecs": 1386405953,
+        "to": [{
+                "_id": "56c28",
+                "addr": "0146361234",
+                "name": "Martin Turén",
+                "normalizedAddr": "-43216364-1--",
+                "personAddressType": "type_work",
+                "personFamilyName": "Turén",
+                "personGivenName": "Martin",
+                "personId": "++Ic92viH3lCYDKN",
+                "service": "com.palm.telephony"
+            }],
+        "type": "outgoing"
+    }, {
+        "_id": "++Igwn0R_wwZ_1nF",
+        "_kind": "com.palm.phonecall:1",
+        "_rev": 355821,
+        "_sync": true,
+        "duration": 78891,
+        "from": {
+            "addr": "",
+            "service": "com.palm.telephony"
+        },
+        "groups": [ { "_id": "com.palm.app.phone 1003.callgroup__ID_++HcfNHQmcgjuHSX_11/7/2013_all" } ],
+        "timestamp": 1386429060521,
+        "timestampInSecs": 1386429061,
+        "to": [{
+                "_id": "56dee",
+                "addr": "+52677221234",
+                "name": "Claire Meyer",
+                "normalizedAddr": "-43212277--25-+",
+                "personAddressType": "type_mobile",
+                "personFamilyName": "Meyer",
+                "personGivenName": "Claire",
+                "personId": "++HcfNHQmcgjuHSX",
+                "service": "com.palm.telephony"
+            }],
+        "type": "outgoing"
+    }, {
+        "_id": "++IgxZelDKht4Fv3",
+        "_kind": "com.palm.phonecall:1",
+        "_rev": 355925,
+        "_sync": true,
+        "duration": 0,
+        "from": {
+            "addr": "0758111234",
+            "name": "Glenn Trellan",
+            "normalizedAddr": "-43211185---",
+            "personAddressType": "type_mobile",
+            "personFamilyName": "Trellan",
+            "personGivenName": "Glenn",
+            "personId": "++Ifb7P1_1p6u8K3",
+            "service": "com.palm.telephony"
+        },
+        "groups": [ { "_id": "com.palm.app.phone 1003.callgroup__ID_++Ifb7P1_1p6u8K3_11/7/2013_all" }, { "_id": "com.palm.app.phone 1003.callgroup__ID_++Ifb7P1_1p6u8K3_11/7/2013_missed" } ],
+        "timestamp": 1386442466074,
+        "timestampInSecs": 1386442466,
+        "to": [{
+                "_id": "56e52",
+                "addr": "",
+                "service": "com.palm.telephony"
+            }],
+        "type": "missed"
+    }, {
+        "_id": "++IgxZov7Go7PFnX",
+        "_kind": "com.palm.phonecall:1",
+        "_rev": 355938,
+        "_sync": true,
+        "duration": 0,
+        "from": {
+            "addr": "123",
+            "name": "Voice Mail",
+            "normalizedAddr": "-321---",
+            "service": "com.palm.telephony"
+        },
+        "groups": [ { "_id": "com.palm.app.phone 1003.callgroup__PHONE_-321---_11/7/2013_all" }, { "_id": "com.palm.app.phone 1003.callgroup__PHONE_-321---_11/7/2013_missed" } ],
+        "timestamp": 1386442508645,
+        "timestampInSecs": 1386442509,
+        "to": [{
+                "_id": "56e5f",
+                "addr": "",
+                "service": "com.palm.telephony"
+            }],
+        "type": "missed"
+    }, {
+        "_id": "++IgxcK34jpOD8k5",
+        "_kind": "com.palm.phonecall:1",
+        "_rev": 355963,
+        "_sync": true,
+        "duration": 12583,
+        "from": {
+            "addr": "123",
+            "name": "Voice Mail",
+            "normalizedAddr": "-321---",
+            "service": "com.palm.telephony"
+        },
+        "groups": [ { "_id": "com.palm.app.phone 1003.callgroup__PHONE_-321---_11/7/2013_all" } ],
+        "timestamp": 1386443436166,
+        "timestampInSecs": 1386443436,
+        "to": [{
+                "_id": "56e79",
+                "addr": "",
+                "service": "com.palm.telephony"
+            }],
+        "type": "incoming"
+    }, {
+        "_id": "++IgxhvmmBRV8nwZ",
+        "_kind": "com.palm.phonecall:1",
+        "_rev": 356002,
+        "_sync": true,
+        "duration": 20815,
+        "from": {
+            "addr": "",
+            "service": "com.palm.telephony"
+        },
+        "groups": [ { "_id": "com.palm.app.phone 1003.callgroup__ID_++Ifb7P1_1p6u8K3_11/7/2013_all" } ],
+        "timestamp": 1386444932524,
+        "timestampInSecs": 1386444933,
+        "to": [{
+                "_id": "56ea3",
+                "addr": "0758111234",
+                "name": "Glenn Trellan",
+                "normalizedAddr": "-43211185---",
+                "personAddressType": "type_mobile",
+                "personFamilyName": "Trellan",
+                "personGivenName": "Glenn",
+                "personId": "++Ifb7P1_1p6u8K3",
+                "service": "com.palm.telephony"
+            }],
+        "type": "outgoing"
+    }, {
+        "_id": "++IgxqmURQF8hYlI",
+        "_kind": "com.palm.phonecall:1",
+        "_rev": 356060,
+        "_sync": true,
+        "duration": 36771,
+        "from": {
+            "addr": "",
+            "service": "com.palm.telephony"
+        },
+        "groups": [ { "_id": "com.palm.app.phone 1003.callgroup__ID_++HcfNECvl_R+ZiA_11/7/2013_all" } ],
+        "timestamp": 1386447293524,
+        "timestampInSecs": 1386447294,
+        "to": [{
+                "_id": "56edd",
+                "addr": "0699051234",
+                "name": "Mary Spetzler",
+                "normalizedAddr": "-43215099---",
+                "personFamilyName": "Spetzler",
+                "personGivenName": "Mary",
+                "personId": "++HcfNECvl_R+ZiA",
+                "service": "com.palm.telephony"
+            }],
+        "type": "outgoing"
+    }, {
+        "_id": "++Ih5DJO9wpjB7mQ",
+        "_kind": "com.palm.phonecall:1",
+        "_rev": 357764,
+        "_sync": true,
+        "duration": 94476,
+        "from": {
+            "addr": "0758111234",
+            "name": "Glenn Trellan",
+            "normalizedAddr": "-43211185---",
+            "personAddressType": "type_mobile",
+            "personFamilyName": "Trellan",
+            "personGivenName": "Glenn",
+            "personId": "++Ifb7P1_1p6u8K3",
+            "service": "com.palm.telephony"
+        },
+        "groups": [ { "_id": "com.palm.app.phone 1003.callgroup__ID_++Ifb7P1_1p6u8K3_11/9/2013_all" } ],
+        "timestamp": 1386590990987,
+        "timestampInSecs": 1386590991,
+        "to": [{
+                "_id": "57582",
+                "addr": "",
+                "service": "com.palm.telephony"
+            }],
+        "type": "incoming"
+    }, {
+        "_id": "++Ih5GY2pvgSILB1",
+        "_kind": "com.palm.phonecall:1",
+        "_rev": 357800,
+        "_sync": true,
+        "duration": 3758,
+        "from": {
+            "addr": "",
+            "service": "com.palm.telephony"
+        },
+        "groups": [ { "_id": "com.palm.app.phone 1003.callgroup__ID_++Ifb7P1_1p6u8K3_11/9/2013_all" } ],
+        "timestamp": 1386591948523,
+        "timestampInSecs": 1386591949,
+        "to": [{
+                "_id": "575a9",
+                "addr": "0758111234",
+                "name": "Glenn Trellan",
+                "normalizedAddr": "-43211185---",
+                "personAddressType": "type_mobile",
+                "personFamilyName": "Trellan",
+                "personGivenName": "Glenn",
+                "personId": "++Ifb7P1_1p6u8K3",
+                "service": "com.palm.telephony"
+            }],
+        "type": "outgoing"
+    }, {
+        "_id": "++Ih5GgEbWkAPe08",
+        "_kind": "com.palm.phonecall:1",
+        "_rev": 357807,
+        "_sync": true,
+        "duration": 4278,
+        "from": {
+            "addr": "",
+            "service": "com.palm.telephony"
+        },
+        "groups": [ { "_id": "com.palm.app.phone 1003.callgroup__ID_++Ifb7P1_1p6u8K3_11/9/2013_all" } ],
+        "timestamp": 1386591986524,
+        "timestampInSecs": 1386591987,
+        "to": [{
+                "_id": "575b0",
+                "addr": "0758111234",
+                "name": "Glenn Trellan",
+                "normalizedAddr": "-43211185---",
+                "personAddressType": "type_mobile",
+                "personFamilyName": "Trellan",
+                "personGivenName": "Glenn",
+                "personId": "++Ifb7P1_1p6u8K3",
+                "service": "com.palm.telephony"
+            }],
+        "type": "outgoing"
+    }, {
+        "_id": "++Ih5KvEShS9kWSw",
+        "_kind": "com.palm.phonecall:1",
+        "_rev": 357814,
+        "_sync": true,
+        "duration": 555681,
+        "from": {
+            "addr": "0758111234",
+            "name": "Glenn Trellan",
+            "normalizedAddr": "-43211185---",
+            "personAddressType": "type_mobile",
+            "personFamilyName": "Trellan",
+            "personGivenName": "Glenn",
+            "personId": "++Ifb7P1_1p6u8K3",
+            "service": "com.palm.telephony"
+        },
+        "groups": [ { "_id": "com.palm.app.phone 1003.callgroup__ID_++Ifb7P1_1p6u8K3_11/9/2013_all" } ],
+        "timestamp": 1386592571695,
+        "timestampInSecs": 1386592572,
+        "to": [{
+                "_id": "575b4",
+                "addr": "",
+                "service": "com.palm.telephony"
+            }],
+        "type": "incoming"
+    }, {
+        "_id": "++Ih6F5LyasFyylp",
+        "_kind": "com.palm.phonecall:1",
+        "_rev": 357906,
+        "_sync": true,
+        "duration": 196810,
+        "from": {
+            "addr": "",
+            "service": "com.palm.telephony"
+        },
+        "groups": [ { "_id": "com.palm.app.phone 1003.callgroup__ID_++HcfNECvl_R+ZiA_11/9/2013_all" } ],
+        "timestamp": 1386608546524,
+        "timestampInSecs": 1386608547,
+        "to": [{
+                "_id": "57613",
+                "addr": "0699051234",
+                "name": "Mary Spetzler",
+                "normalizedAddr": "-43215099---",
+                "personFamilyName": "Spetzler",
+                "personGivenName": "Mary",
+                "personId": "++HcfNECvl_R+ZiA",
+                "service": "com.palm.telephony"
+            }],
+        "type": "outgoing"
+    }, {
+        "_id": "++Ih6JhHLpoUuJ9N",
+        "_kind": "com.palm.phonecall:1",
+        "_rev": 357918,
+        "_sync": true,
+        "duration": 57820,
+        "from": {
+            "addr": "",
+            "service": "com.palm.telephony"
+        },
+        "groups": [ { "_id": "com.palm.app.phone 1003.callgroup__ID_++HcfNECvl_R+ZiA_11/9/2013_all" } ],
+        "timestamp": 1386609922526,
+        "timestampInSecs": 1386609923,
+        "to": [{
+                "_id": "5761f",
+                "addr": "0699051234",
+                "name": "Mary Spetzler",
+                "normalizedAddr": "-43215099---",
+                "personFamilyName": "Spetzler",
+                "personGivenName": "Mary",
+                "personId": "++HcfNECvl_R+ZiA",
+                "service": "com.palm.telephony"
+            }],
+        "type": "outgoing"
+    }, {
+        "_id": "++Ih6UcAozsBTz03",
+        "_kind": "com.palm.phonecall:1",
+        "_rev": 357949,
+        "_sync": true,
+        "duration": 0,
+        "from": {
+            "addr": "0699051234",
+            "name": "Mary Spetzler",
+            "normalizedAddr": "-43215099---",
+            "personAddressType": "type_mobile",
+            "personFamilyName": "Spetzler",
+            "personGivenName": "Mary",
+            "personId": "++HcfNECvl_R+ZiA",
+            "service": "com.palm.telephony"
+        },
+        "groups": [ { "_id": "com.palm.app.phone 1003.callgroup__ID_++HcfNECvl_R+ZiA_11/9/2013_all" }, { "_id": "com.palm.app.phone 1003.callgroup__ID_++HcfNECvl_R+ZiA_11/9/2013_missed" } ],
+        "timestamp": 1386612911749,
+        "timestampInSecs": 1386612912,
+        "to": [{
+                "_id": "5763a",
+                "addr": "",
+                "service": "com.palm.telephony"
+            }],
+        "type": "missed"
+    }, {
+        "_id": "++Ih6Us3blFJFcdX",
+        "_kind": "com.palm.phonecall:1",
+        "_rev": 357954,
+        "_sync": true,
+        "duration": 46300,
+        "from": {
+            "addr": "",
+            "service": "com.palm.telephony"
+        },
+        "groups": [ { "_id": "com.palm.app.phone 1003.callgroup__ID_++HcfNECvl_R+ZiA_11/9/2013_all" } ],
+        "timestamp": 1386612932078,
+        "timestampInSecs": 1386612932,
+        "to": [{
+                "_id": "57643",
+                "addr": "0699051234",
+                "name": "Mary Spetzler",
+                "normalizedAddr": "-43215099---",
+                "personAddressType": "type_mobile",
+                "personFamilyName": "Spetzler",
+                "personGivenName": "Mary",
+                "personId": "++HcfNECvl_R+ZiA",
+                "service": "com.palm.telephony"
+            }],
+        "type": "outgoing"
+    }, {
+        "_id": "++Ih6VZMO7WdXURd",
+        "_kind": "com.palm.phonecall:1",
+        "_rev": 357962,
+        "_sync": true,
+        "duration": 0,
+        "from": {
+            "addr": "0699051234",
+            "name": "Mary Spetzler",
+            "normalizedAddr": "-43215099---",
+            "personAddressType": "type_mobile",
+            "personFamilyName": "Spetzler",
+            "personGivenName": "Mary",
+            "personId": "++HcfNECvl_R+ZiA",
+            "service": "com.palm.telephony"
+        },
+        "groups": [ { "_id": "com.palm.app.phone 1003.callgroup__ID_++HcfNECvl_R+ZiA_11/9/2013_all" }, { "_id": "com.palm.app.phone 1003.callgroup__ID_++HcfNECvl_R+ZiA_11/9/2013_missed" } ],
+        "timestamp": 1386613164149,
+        "timestampInSecs": 1386613164,
+        "to": [{
+                "_id": "57647",
+                "addr": "",
+                "service": "com.palm.telephony"
+            }],
+        "type": "missed"
+    }, {
+        "_id": "++Ih6VuaEBsAkiei",
+        "_kind": "com.palm.phonecall:1",
+        "_rev": 357966,
+        "_sync": true,
+        "duration": 60880,
+        "from": {
+            "addr": "",
+            "service": "com.palm.telephony"
+        },
+        "groups": [ { "_id": "com.palm.app.phone 1003.callgroup__ID_++HcfNECvl_R+ZiA_11/9/2013_all" } ],
+        "timestamp": 1386613196524,
+        "timestampInSecs": 1386613197,
+        "to": [{
+                "_id": "5764f",
+                "addr": "0699051234",
+                "name": "Mary Spetzler",
+                "normalizedAddr": "-43215099---",
+                "personAddressType": "type_mobile",
+                "personFamilyName": "Spetzler",
+                "personGivenName": "Mary",
+                "personId": "++HcfNECvl_R+ZiA",
+                "service": "com.palm.telephony"
+            }],
+        "type": "outgoing"
+    }, {
+        "_id": "++IhP8_ULWxNjIwn",
+        "_kind": "com.palm.phonecall:1",
+        "_rev": 361555,
+        "_sync": true,
+        "duration": 0,
+        "from": {
+            "addr": "0675011234",
+            "name": "John Smith",
+            "normalizedAddr": "-43211057---",
+            "personAddressType": "type_mobile",
+            "personFamilyName": "Smith",
+            "personGivenName": "John",
+            "personId": "++HcfNEQzPgKH0Kb",
+            "service": "com.palm.telephony"
+        },
+        "groups": [ { "_id": "com.palm.app.phone 1003.callgroup__ID_++HcfNEQzPgKH0Kb_11/13/2013_all" }, { "_id": "com.palm.app.phone 1003.callgroup__ID_++HcfNEQzPgKH0Kb_11/13/2013_missed" } ],
+        "timestamp": 1386933412379,
+        "timestampInSecs": 1386933412,
+        "to": [{
+                "_id": "58450",
+                "addr": "",
+                "service": "com.palm.telephony"
+            }],
+        "type": "missed"
+    }, {
+        "_id": "++JGV9wVGfgIE7bV",
+        "_kind": "com.palm.phonecall:1",
+        "_rev": 367856,
+        "_sync": true,
+        "duration": 32218,
+        "from": {
+            "addr": "",
+            "service": "com.palm.telephony"
+        },
+        "groups": [ { "_id": "com.palm.app.phone 1003.callgroup__PHONE_-323---_2/17/2015_all" } ],
+        "timestamp": 1426619242935,
+        "timestampInSecs": 1426619243,
+        "to": [{
+                "_id": "59cf1",
+                "addr": "323",
+                "normalizedAddr": "-321---",
+                "service": "com.palm.telephony"
+            }],
+        "type": "outgoing"
+    }, {
+        "_id": "++JGVA7lV0k7RXBz",
+        "_kind": "com.palm.phonecall:1",
+        "_rev": 367863,
+        "_sync": true,
+        "duration": 17942,
+        "from": {
+            "addr": "",
+            "service": "com.palm.telephony"
+        },
+        "groups": [ { "_id": "com.palm.app.phone 1003.callgroup__PHONE_-323---_2/17/2015_all" } ],
+        "timestamp": 1426619308667,
+        "timestampInSecs": 1426619309,
+        "to": [{
+                "_id": "59cf8",
+                "addr": "323",
+                "normalizedAddr": "-321---",
+                "service": "com.palm.telephony"
+            }],
+        "type": "outgoing"
+    }, {
+        "_id": "++JGVD6TdXNbM4Se",
+        "_kind": "com.palm.phonecall:1",
+        "_rev": 367870,
+        "_sync": true,
+        "duration": 0,
+        "from": {
+            "addr": "",
+            "service": "com.palm.telephony"
+        },
+        "groups": [ { "_id": "com.palm.app.phone 1003.callgroup__ID_++HcfNECvl_R+ZiA_2/17/2015_all" } ],
+        "timestamp": 1426620126498,
+        "timestampInSecs": 1426620126,
+        "to": [{
+                "_id": "59cff",
+                "addr": "0699051234",
+                "name": "Mary Spetzler",
+                "normalizedAddr": "-43215099---",
+                "personAddressType": "type_mobile",
+                "personFamilyName": "Spetzler",
+                "personGivenName": "Mary",
+                "personId": "++HcfNECvl_R+ZiA",
+                "service": "com.palm.telephony"
+            }],
+        "type": "outgoing"
+    }, {
+        "_id": "++JdrHAthe0Plpsl",
+        "_kind": "com.palm.phonecall:1",
+        "_rev": 368340,
+        "_sync": true,
+        "duration": 0,
+        "from": {
+            "addr": "",
+            "service": "com.palm.telephony"
+        },
+        "groups": [ { "_id": "com.palm.app.phone 1003.callgroup__ID_++HcfNJyoqB0JW3B_0/21/2016_all" } ],
+        "timestamp": 1453404634832,
+        "timestampInSecs": 1453404635,
+        "to": [{
+                "_id": "59ed5",
+                "addr": "0661871234",
+                "name": "Bob Willer",
+                "normalizedAddr": "-43217816---",
+                "personAddressType": "type_mobile",
+                "personFamilyName": "Willer",
+                "personGivenName": "Bob",
+                "personId": "++HcfNJyoqB0JW3B",
+                "service": "com.palm.telephony"
+            }],
+        "type": "outgoing"
+    }, {
+        "_id": "++JdrHLPQH77Velh",
+        "_kind": "com.palm.phonecall:1",
+        "_rev": 368356,
+        "_sync": true,
+        "duration": 0,
+        "from": {
+            "addr": "+52661871234",
+            "name": "Bob Willer",
+            "normalizedAddr": "-43217816--25-+",
+            "personAddressType": "type_mobile",
+            "personFamilyName": "Willer",
+            "personGivenName": "Bob",
+            "personId": "++HcfNJyoqB0JW3B",
+            "service": "com.palm.telephony"
+        },
+        "groups": [ { "_id": "com.palm.app.phone 1003.callgroup__ID_++HcfNJyoqB0JW3B_0/21/2016_all" }, { "_id": "com.palm.app.phone 1003.callgroup__ID_++HcfNJyoqB0JW3B_0/21/2016_missed" } ],
+        "timestamp": 1453404678938,
+        "timestampInSecs": 1453404679,
+        "to": [{
+                "_id": "59ee1",
+                "addr": "",
+                "service": "com.palm.telephony"
+            }],
+        "type": "missed"
+    }, {
+        "_id": "++JdrHQi+ZFZ953n",
+        "_kind": "com.palm.phonecall:1",
+        "_rev": 368361,
+        "_sync": true,
+        "duration": 0,
+        "from": {
+            "addr": "",
+            "service": "com.palm.telephony"
+        },
+        "groups": [ { "_id": "com.palm.app.phone 1003.callgroup__ID_++HcfNJyoqB0JW3B_0/21/2016_all" } ],
+        "timestamp": 1453404701038,
+        "timestampInSecs": 1453404701,
+        "to": [{
+                "_id": "59eea",
+                "addr": "0661871234",
+                "name": "Bob Willer",
+                "normalizedAddr": "-43217816---",
+                "personAddressType": "type_mobile",
+                "personFamilyName": "Willer",
+                "personGivenName": "Bob",
+                "personId": "++HcfNJyoqB0JW3B",
+                "service": "com.palm.telephony"
+            }],
+        "type": "outgoing"
+    }
+] }

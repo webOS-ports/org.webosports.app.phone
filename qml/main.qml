@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2014 Roshan Gunasekara <roshan@mobileteck.com>
+ * Copyright (C) 2016 Christophe Chapuis <chris.chapuis@gmail.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -42,7 +43,7 @@ Item {
         var params = JSON.parse(launchParams);
 
         if (params.mode && params.mode === "first-use") {
-            simPinWindow.type = typeof application === "undefined" ? 0 : ApplicationWindow.Pin;
+            simPinWindowId.type = typeof application === "undefined" ? 0 : ApplicationWindow.Pin;
             // PIN window will now open automatically when the PIN is required
             return;
         }
@@ -73,43 +74,57 @@ Item {
     }
 
     VoiceCallMgrWrapper {
-        id: voiceCallManager
+        id: voiceCallManagerId
         onIncomingCall: {
             if(voiceCall.lineId === "999") {
                 phoneWindow.hide();
-                simPinWindow.show();
+                simPinWindowId.show();
             }
             else if(!phoneWindow.visible) {
                 incomingCallAlert.voiceCall = voiceCall;
                 incomingCallAlert.show();
             }
         }
+        onEndingCall: {
+            callHistoryModelId.addEndedCall(voiceCall, personListModelId.personByPhoneNumber(voiceCall.lineId));
+        }
     }
 
-    ContactManager {
-        id: people
+    /* models */
+    ContactsModel {
+        id: personListModelId
+    }
+    CallHistory {
+        id: callHistoryModelId
+
+        personListModel: personListModelId
+    }
+    FavoritesModel {
+        id: favoritesModelId
     }
 
     IncomingCallAlert {
         id: incomingCallAlert
         visible: false
-        people: people
-        voiceCallManager: voiceCallManager
+        contacts: personListModelId
+        voiceCallManager: voiceCallManagerId
     }
 
     PhoneWindow {
         id: phoneWindow
-        simPinWindow: simPinWindow
-        people: people
-        voiceCallManager: voiceCallManager
+        simPinWindow: simPinWindowId
+        contacts: personListModelId
+        voiceCallManager: voiceCallManagerId
+        historyModel: callHistoryModelId
+        favoritesModel: favoritesModelId
     }
 
     SimPinWindow {
-        id: simPinWindow
+        id: simPinWindowId
         visible: false
     }
 
     function openSIMLockedPage() {
-        simPinWindow.show();
+        simPinWindowId.show();
     }
 }

@@ -1,5 +1,6 @@
 {
 	"id": "com.palm.phonecallgroup:1",
+	"owner": "org.webosports.app.phone",
 	"sync": true,
 	"schema": {
 		"type": "object",
@@ -8,6 +9,10 @@
 				"type": "string",
 				"enum": ["all","missed"],
 				"description": "Type of grouping. 'all' contains every phonecall and 'missed' is only where phonecall.type = 'missed'"
+			},
+			"groupId": {
+				"type": "string",
+				"description": "Unique identifier which can be built from a phone call description."
 			},
 			"timestamp": {
 				"type": "integer",
@@ -64,6 +69,15 @@
 				}
 			],
 			"description": "Used by contacts.plugin.phone to delete groups associated with a person (and optional )"
+		},
+		{
+			"name" : "groupId_unique",
+			"props": [
+				{
+					"name":"groupId"
+				}
+			],
+			"description": "Used by phone app to easily find if a group already corresponds to a new phone call"
 		}
 	]
 }

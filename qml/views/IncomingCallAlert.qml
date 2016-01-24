@@ -29,11 +29,11 @@ import "../model"
 LuneOS.ApplicationWindow {
     id: incomingCallAlert
 
-    property ContactManager people;
+    property ContactsModel contacts;
     property VoiceCallMgrWrapper voiceCallManager
     property QtObject voiceCall;
 
-    property Contact voiceCallPerson: (voiceCall && people) ? people.personByPhoneNumber(voiceCall.lineId) : null
+    property Contact voiceCallPerson: (voiceCall && contacts) ? contacts.personByPhoneNumber(voiceCall.lineId) : null
 
     width: Settings.displayWidth
     height: Units.gu(30)

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Roshan Gunasekara <roshan@mobileteck.com>
+ * Copyright (C) 2016 Christophe Chapuis <chris.chapuis@gmail.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,9 +25,6 @@ Db8Model {
     kind: "com.palm.person:1"
     watch: true
     query: {
-        "where": [
-            { "prop": "favorite", "op": "=", "val": true }
-        ],
         "orderBy": "sortKey"
     }
 
@@ -35,5 +32,30 @@ Db8Model {
         if(db8model.setTestDataFile) {
             db8model.setTestDataFile(Qt.resolvedUrl("../test/persons.json"));
         }
+    }
+
+    function normalizePhoneNumber(phoneNumber)
+    {
+
+        return phoneNumber;
+    }
+
+    // this service is synchronous, which can be handy
+    function personByPhoneNumber(phoneNumber)
+    {
+        console.log("Looking up Contact for phone number: " + phoneNumber);
+        for( var i=0; i<db8model.count; ++i ) {
+            var person = db8model.get(i);
+            for( var j=0; j<person.phoneNumbers.count; ++j ) {
+                var personPhoneNumber = person.phoneNumbers.get(j);
+                if( personPhoneNumber.value === phoneNumber ) {
+                    console.log(" ... found " + person.nickname);
+                    return person;
+                }
+            }
+        }
+
+        console.log(" ... no contact found.");
+        return null;
     }
 }

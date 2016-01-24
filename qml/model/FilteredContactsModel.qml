@@ -1,5 +1,4 @@
 /*
- * Copyright (C) 2014 Roshan Gunasekara <roshan@mobileteck.com>
  * Copyright (C) 2016 Christophe Chapuis <chris.chapuis@gmail.com>
  *
  * This program is free software: you can redistribute it and/or modify
@@ -17,18 +16,28 @@
  */
 
 import QtQuick 2.0
+import LuneOS.Service 1.0
+import LuneOS.Application 1.0
 
-QtObject {
-    id: contactObj
+Db8Model {
+    id: db8model
 
-    property string avatarPath: Qt.resolvedUrl('../images/generic-details-view-avatar.png');
-    property string displayLabel: (nickname === "") ? (givenName + " " + familyName) : nickname;
+    // this list will give the persons whose normalized phone number begins with a given value
 
-    property string addr; // endedVoiceCall.lineId,
+    property string filterOnNPhoneNumber: ""
 
-    property string normalizedAddr;
-    property string nickname;
-    property string familyName;
-    property string givenName;
-    property string personId;
+    kind: "com.palm.person:1"
+    watch: false
+    query: {
+        "where": [
+            { "prop": "phoneNumbers.normalizedValue", "op": "%", "val": filterOnNPhoneNumber }
+        ],
+        "orderBy": "sortKey"
+    }
+
+    Component.onCompleted: {
+        if(db8model.setTestDataFile) {
+            db8model.setTestDataFile(Qt.resolvedUrl("../test/persons.json"));
+        }
+    }
 }

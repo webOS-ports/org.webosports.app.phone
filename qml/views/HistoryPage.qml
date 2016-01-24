@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2014 Roshan Gunasekara <roshan@mobileteck.com>
+ * Copyright (C) 2016 Christophe Chapuis <chris.chapuis@gmail.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -24,70 +25,116 @@ import "../model"
 BasePage {
     pageName: "History"
 
+    property alias historyModel: historyList.model
+
     ListView {
         id:historyList
         anchors {/*top:parent.bottom;bottom:parent.bottom;*/margins:5;horizontalCenter:parent.horizontalCenter}
         anchors.fill: parent
         spacing:4
         clip:true
-        model: CallHistory {}
 
-        delegate: Item {
-        
-            MouseArea {
-                anchors.fill: parent
-                onClicked:main.dial(model.remoteUid);
-            }
-
+        delegate: Column {
             width:parent.width
-            height:Units.gu(5)
 
-            property Contact contact: Contact{}
+            property var _callGroupId: model.groupId ? model.groupId : model._id // keep backward read-only compatibility with Legacy db structure
+            property var contact: model.recentcall_address
 
-            Component.onCompleted: contact = people.personByPhoneNumber(model.remoteUid);
+            Item {
+        
+                width:parent.width
+                height:Units.gu(5)
 
+                // layout to rework
 
-            Row {
-                anchors {left:parent.left; leftMargin:10; verticalCenter:parent.verticalCenter}
-                spacing:10
+                Row {
+                    id: callGroupDetails
+                    anchors {left:parent.left; leftMargin:10; verticalCenter:parent.verticalCenter}
+                    spacing:10
 
-                ClippedImage {
-                    source: 'images/call-log-list-sprite.png'
+                    ClippedImage {
+                        source: 'images/call-log-list-sprite.png'
 
-                    anchors.verticalCenter: parent.verticalCenter
+                        anchors.verticalCenter: parent.verticalCenter
 
-                    wantedWidth: 44
-                    wantedHeight: 44
+                        wantedWidth: 44
+                        wantedHeight: 44
 
-                    imageSize: Qt.size(44, 182)
-                    patchGridSize: Qt.size(1, 4)
-                    patch: model.isMissedCall ? Qt.point(0,0) : ((model.direction === "inbound") ? Qt.point(0,1) : Qt.point(0,2))
+                        imageSize: Qt.size(44, 182)
+                        patchGridSize: Qt.size(1, 4)
+                        patch: (model.recentcall_type==="missed") ? Qt.point(0,0) : ((model.recentcall_type === "incoming") ? Qt.point(0,1) : Qt.point(0,2))
+                    }
+
+                    Column {
+                        Text {
+                            color:(model.recentcall_type==="missed") ? 'red' : 'white'
+                            font.pixelSize:Units.dp(20)
+                            text:(contact && contact.name) ? contact.name : model.recentcall_address.addr
+                        }
+                        Text {
+                            property date timeStamp: new Date(model.timestamp);
+                            color:'grey'
+                            font.pixelSize:Units.dp(10)
+                            text: timeStamp.toLocaleString();
+                        }
+                    }
+                }
+                MouseArea {
+                    anchors.fill: callGroupDetails
+                    onClicked: voiceCallManager.dial(model.recentcall_address.addr);
                 }
 
-                Column {
-                    Text {
-                        color:model.isMissedCall ? 'red' : 'white'
-                        font.pixelSize:Units.dp(20)
-                        text:contact ? contact.displayLabel : model.remoteUid
+                Row {
+                    anchors {
+                        right:parent.right
+                        rightMargin:10
+                        verticalCenter:parent.verticalCenter
                     }
-                    Text {
-                        color:'grey'
-                        font.pixelSize:Units.dp(10)
-                        text:Qt.formatDateTime(model.startTime, Qt.DefaultLocaleShortDate)
+                    spacing:10
+                    Button {
+                        width:Units.gu(5);height:Units.gu(5)
+                        iconSource:'images/generic-details-view-avatar-small.png'
+
+                        MouseArea {
+                            anchors.fill: parent
+                            onClicked:callgroupDetail.active = !callgroupDetail.active
+                        }
                     }
                 }
             }
+            Loader {
+                id: callgroupDetail
+                width:parent.width
+                active: false
+                visible: active
+                sourceComponent: Component {
+                    Column {
+                        Repeater {
+                        model: CallGroupItems { callGroupId: _callGroupId }
+                        delegate: Item {
 
-            Row {
-                anchors {
-                    right:parent.right
-                    rightMargin:10
-                    verticalCenter:parent.verticalCenter
-                }
-                spacing:10
-                Button {
-                    width:Units.gu(5);height:Units.gu(5)
-                    iconSource:'images/generic-details-view-avatar-small.png'
+                            property date _timestamp: new Date(timestamp)
+                            property string _type: type
+                            property var _fromAddr: from.addr
+                            property var _toAddr: to.get ? to.get(0).addr : to[0].addr
+
+                              width:parent.width
+                              height: Units.dp(12)
+                              Text {
+                                  anchors.left: parent.left
+                                  font.pixelSize:Units.dp(10)
+                                  color:'grey'
+                                  text: (_type !== "outgoing" ? _fromAddr : _toAddr )
+                              }
+                              Text {
+                                  anchors.right: parent.right
+                                  font.pixelSize:Units.dp(10)
+                                  color:'grey'
+                                  text: _timestamp.toLocaleTimeString()
+                              }
+                            }
+                        }
+                    }
                 }
             }
         }
