@@ -130,7 +130,7 @@ BasePage {
                                   anchors.right: parent.right
                                   font.pixelSize:Units.dp(10)
                                   color:'grey'
-                                  text: _timestamp.toLocaleTimeString()
+                                  text: Qt.formatTime(_timestamp, Qt.locale().timeFormat(Locale.ShortFormat));
                               }
                             }
                         }
