@@ -110,7 +110,23 @@ Item {
             root.heldCall = voiceCall;
             break;
         case VoiceCall.STATUS_DISCONNECTED:
-            root.endingCall(voiceCall);
+            // the voicecall object is soon to be destroyed, so save its state before sending the signal
+            var endedVoiceCall = {
+                handlerId: voiceCall.handlerId,
+                provider: voiceCall.provider,
+                status: voiceCall.status,
+                statusText: voiceCall.statusText,
+                lineId:voiceCall.lineId,
+                startedAt: voiceCall.startedAt,
+                duration: voiceCall.duration,
+                isIncoming: voiceCall.isIncoming,
+                isEmergency: voiceCall.isEmergency,
+                isMultiparty: voiceCall.isMultiparty,
+                isForwarded: voiceCall.isForwarded,
+                isRemoteHeld: voiceCall.isRemoteHeld
+            };
+
+            root.endingCall(endedVoiceCall);
             break;
         case VoiceCall.STATUS_NULL:
             root.resetCall(voiceCall);
