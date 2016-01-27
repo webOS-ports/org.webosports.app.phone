@@ -70,7 +70,7 @@ Db8Model {
         }
     }
 
-    function _buildCallGroupID(endedVoiceCall, person)
+    function _buildCallGroupID(endedVoiceCall, person, startTime)
     {
         // We are looking for a group that is within the same day as endedVoiceCall, and corresponding to the same call.
         // But it's actually possible to build the id of that callgroup by hand:
@@ -92,14 +92,7 @@ Db8Model {
             callGroupID += "_ID_" + person._id + "_";
         }
 
-        callGroupID += Qt.formatDate(endedVoiceCall.startedAt, "d/M/yyyy") + "_";
-
-        if( endedVoiceCall.isIncoming && endedVoiceCall.duration === 0 ) {
-            callGroupID += "missed";
-        }
-        else {
-            callGroupID += "all";
-        }
+        callGroupID += Qt.formatDate(startTime, "d/M/yyyy") + "_";
 
         return callGroupID;
     }
@@ -111,17 +104,23 @@ Db8Model {
     //  --> si le résultat contient qqch on prend le plus récent (il ne devrait y en avoir qu'un !), sinon on en créé un nouveau
     function addEndedCall(endedVoiceCall, person)
     {
+        var startTime = new Date();
+        startTime.setSeconds(startTime.getSeconds() - endedVoiceCall.duration);
+
         // get the group ID of that call
-        var callGroupID = _buildCallGroupID(endedVoiceCall, person);
+        var callGroupID = _buildCallGroupID(endedVoiceCall, person, startTime);
+
+        var isMissed = ( endedVoiceCall.isIncoming && endedVoiceCall.duration === 0 );
 
         var newCallItem = {
             _kind: "com.palm.phonecall:1",
             duration: endedVoiceCall.duration,
-            groups: [ callGroupID ],
-            timestamp: endedVoiceCall.startedAt.getTime(),
-            timestampInSecs: Math.floor(endedVoiceCall.startedAt.getTime()/1000),
+            groups: [ callGroupID+"all" ],
+            timestamp: startTime.getTime(),
+            timestampInSecs: Math.floor(startTime.getTime()/1000),
             to: []
         };
+        if( isMissed ) newCallItem.groups.push(callGroupID+"missed");
 
         var normalizedLineId = personListModel.normalizePhoneNumber(endedVoiceCall.lineId);
 
@@ -139,38 +138,52 @@ Db8Model {
 
         if( endedVoiceCall.isIncoming ) {
             newCallItem.from = personDetails;
-            newCallItem.to.push ({ addr: "", service: "com.palm.telephony" });
+            newCallItem.to.push({ addr: "", service: "com.palm.telephony" });
             newCallItem.type = endedVoiceCall.duration > 0 ? "incoming" : "missed";
         }
         else {
             newCallItem.from = { addr: "", service: "com.palm.telephony" };
-            newCallItem.to.push (personDetails);
+            newCallItem.to.push(personDetails);
             newCallItem.type = "outgoing";
         }
 
         // In all cases, a call item must be added
         __queryDB('put', { objects: [ newCallItem ] }, function(result) {});
 
-        // Also, the callgroup must be either created or updated
-        var __addOrUpdate = function (message) {
-            var result = JSON.parse(message.payload);
-
+        function findResult_all(message) {
             var existingCallGroup = {
                 callcount: 0
             }
             var action = "put";
+            var result = JSON.parse(message.payload);
             if( result && result.results && result.results.length===1 ) {
                 existingCallGroup = result.results[0];
                 action = "merge";
             }
+            __addOrUpdate(action, existingCallGroup, "all");
+        }
+        function findResult_missed(message) {
+            var existingCallGroup = {
+                callcount: 0
+            }
+            var action = "put";
+            var result = JSON.parse(message.payload);
+            if( result && result.results && result.results.length===1 ) {
+                existingCallGroup = result.results[0];
+                action = "merge";
+            }
+            __addOrUpdate(action, existingCallGroup, "merge");
+        }
 
-            existingCallGroup.groupId = callGroupID;
+        // Also, the callgroup must be either created or updated
+        function __addOrUpdate(action, existingCallGroup, callGroupType) {
+            existingCallGroup.groupId = callGroupID + callGroupType;
             existingCallGroup._kind = 'com.palm.phonecallgroup:1';
             existingCallGroup.callcount++;
             existingCallGroup.recentcall_address = personDetails;
-            existingCallGroup.recentcall_type = endedVoiceCall.isIncoming ? (endedVoiceCall.duration > 0 ? "incoming" : "missed") : "outgoing";
+            existingCallGroup.recentcall_type = newCallItem.type;
             existingCallGroup.timestamp = newCallItem.timestamp;
-            existingCallGroup.type = newCallItem.type === "missed" ? "missed" : "all";
+            existingCallGroup.type = callGroupType;
 
             __queryDB(action, { objects: [ existingCallGroup ] }, function(result) {});
         }
@@ -178,8 +191,16 @@ Db8Model {
         // add it to the database
         __queryDB('find', {query:
                       {from:"com.palm.phonecallgroup:1",
-                       where: [ { prop: "groupId", op: "=", val: callGroupID } ],
-                       limit:1}}, __addOrUpdate);
+                       where: [ { prop: "groupId", op: "=", val: callGroupID+"all" } ],
+                       limit:1}}, findResult_all);
+
+        // if the called was missed add also the corresponding group to the database
+        if( newCallItem.type === "missed" ) {
+            __queryDB('find', {query:
+                          {from:"com.palm.phonecallgroup:1",
+                           where: [ { prop: "groupId", op: "=", val: callGroupID+"missed" } ],
+                           limit:1}}, findResult_missed);
+        }
     }
 
 
