@@ -27,7 +27,6 @@ Button {
     property PhoneUiTheme appTheme: PhoneUiTheme{}
 
     style: ButtonStyle {
-
         background: Rectangle{
             color: control.pressed ? appTheme.callActionBtnFgColorActive : appTheme.callActionBtnFgColor
             border.color:  'white'
@@ -49,16 +48,5 @@ Button {
                 }
             }
         }
-
-
-
-        //        label: Text {
-        //                     id: text
-        //                     //anchors.top: parent.bottom
-        //                     anchors.horizontalCenter: parent.horizontalCenter
-        //                     text: "Add Call"
-        //                     color: 'white'
-        //               }
-
     }
 }

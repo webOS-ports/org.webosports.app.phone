@@ -26,7 +26,7 @@ TabViewStyle {
 
     frameOverlap: 1
     tab: Rectangle {
-        color: styleData.selected ? appTheme.backgroundColor : appTheme.unselectedTabColor
+        gradient: styleData.selected ? appTheme.selectedGradient : appTheme.unSelectedGradient
         border.color:  'white' //main.appTheme.backgroundColor
         implicitWidth: tabView.width/4
         implicitHeight: Units.gu(5)
@@ -46,14 +46,5 @@ TabViewStyle {
             patchGridSize: Qt.size(1, 2)
             patch: styleData.selected ? Qt.point(0,1): Qt.point(0,0)
         }
-
-        //Text {
-        //      id: text
-        //      anchors.top: icon.bottom
-        //      anchors.horizontalCenter: parent.horizontalCenter
-        //      text: styleData.title
-        //      color: styleData.selected ? main.appTheme.foregroundColor : main.appTheme.foregroundColor
-        //}
-
     }
-    frame: Rectangle { color: appTheme.backgroundColor }}
+}

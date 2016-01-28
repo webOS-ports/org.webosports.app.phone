@@ -140,7 +140,7 @@ Item {
         inputMethodHints: Qt.ImhDialableCharactersOnly
         font.pixelSize: FontUtils.sizeToPixels("large")
         textColor: "white"
-        horizontalAlignment: TextInput.AlignHCenter
+        horizontalAlignment: TextInput.AlignLeft
         placeholderText: isPhoneNumber ? "Enter phone number" : ""
 
         Component.onCompleted: {
@@ -153,7 +153,7 @@ Item {
             textColor: "white"
             placeholderTextColor: "white"
             background: Rectangle {
-                color: phoneUiAppTheme.backgroundColor
+                color: 'transparent'
             }
         }
     }

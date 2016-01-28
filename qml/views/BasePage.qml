@@ -6,7 +6,7 @@ import "../services"
 import "../model"
 
 Rectangle {
-    color: appTheme ? appTheme.backgroundColor : "black"
+    gradient: appTheme ? appTheme.mainGradient : undefined
     radius: 10
 
     property string pageName: "Base"
