@@ -52,13 +52,8 @@ Item {
             phoneWindow.show();
     }
 
-    Item {
-        id: dummyApp
-        signal relaunched
-    }
-
     Connections {
-        target: typeof application !== "undefined" ? application : dummyApp
+        target: typeof application !== "undefined" ? application : null
         onRelaunched: {
             console.log("DEBUG: Relaunched with parameters: " + parameters);
 
@@ -86,6 +81,7 @@ Item {
             }
         }
         onEndingCall: {
+            if(incomingCallAlert.visible) incomingCallAlert.hide();
             callHistoryModelId.addEndedCall(voiceCall, personListModelId.personByPhoneNumber(voiceCall.lineId));
         }
     }

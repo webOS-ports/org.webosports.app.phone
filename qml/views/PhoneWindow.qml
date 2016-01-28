@@ -42,7 +42,7 @@ ApplicationWindow {
     height: Settings.displayHeight
     color: phoneUiAppTheme.backgroundColor
 
-    property string activationReason: 'invoked'
+    property bool hideWindowWhenCallEnds: false
 
     property QtObject simPinWindow
 
@@ -113,21 +113,11 @@ ApplicationWindow {
             console.log("Outgoing Call Status: ",voiceCall.status)
 
             activeCallDialog(voiceCall);
-
-            if (!window.visible) {
-                activationReason = 'activeVoiceCallChanged';
-                window.show();
-            }
         }
         onActiveCall: {
             console.log("Active Call Status: ",voiceCall.status)
 
             activeCallDialog(voiceCall);
-
-            if (!window.visible) {
-                activationReason = 'activeVoiceCallChanged';
-                window.show();
-            }
         }
         onEndingCall: {
             console.log("VoiceCall " + voiceCall.lineId + " ended")
@@ -139,15 +129,23 @@ ApplicationWindow {
             if (tabView.currentIndex == 3)
                 tabView.currentIndex = 0;
 
+            if(hideWindowWhenCallEnds) window.hide();
+
             // reset for next time
-            activationReason = 'invoked';
-            window.close();
+            hideWindowWhenCallEnds = false;
         }
     }
 
     function activeCallDialog(voiceCall) {
         console.log("Showing Active Call Dialog")
+
+        hideWindowWhenCallEnds = (window.visible === false);
+
         stackView.openPage("ActiveCall", voiceCall);
+
+        if (!window.visible) {
+            window.show();
+        }
     }
 
     function incomingCall(voiceCall) {
