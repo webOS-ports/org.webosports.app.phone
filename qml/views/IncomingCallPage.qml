@@ -21,6 +21,8 @@ import QtQuick.Layouts 1.0
 
 import LunaNext.Common 0.1
 
+import "../services/IncomingCallsService.js" as IncomingCallsService
+
 BasePage {
     id: incommingCallDialog
     pageName: "IncomingCall"
@@ -76,6 +78,7 @@ BasePage {
             height: 215
             width: 215
             onClicked: {
+                IncomingCallsService.setActionForCall(voiceCall.handlerId, IncomingCallsService.Accepted);
                 voiceCall.answer();
             }
         }
@@ -84,6 +87,7 @@ BasePage {
             height: 210
             width: 210
             onClicked: {
+                IncomingCallsService.setActionForCall(voiceCall.handlerId, IncomingCallsService.Ignored);
                 voiceCall.hangup();
             }
         }

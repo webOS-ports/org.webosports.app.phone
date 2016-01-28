@@ -25,6 +25,7 @@ import org.nemomobile.voicecall 1.0
 
 import "../services"
 import "../model"
+import "../services/IncomingCallsService.js" as IncomingCallsService
 
 LuneOS.ApplicationWindow {
     id: incomingCallAlert
@@ -95,6 +96,7 @@ LuneOS.ApplicationWindow {
             height: 215
             width: 215
             onClicked: {
+                IncomingCallsService.setActionForCall(voiceCall.handlerId, IncomingCallsService.Accepted);
                 voiceCall.answer();
                 incomingCallAlert.hide();
             }
@@ -104,6 +106,7 @@ LuneOS.ApplicationWindow {
             height: 210
             width: 210
             onClicked: {
+                IncomingCallsService.setActionForCall(voiceCall.handlerId, IncomingCallsService.Ignored);
                 voiceCall.hangup();
                 incomingCallAlert.hide();
             }
