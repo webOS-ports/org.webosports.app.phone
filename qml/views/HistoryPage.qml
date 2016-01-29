@@ -143,7 +143,9 @@ BasePage {
 
                         imageSize: Qt.size(44, 182)
                         patchGridSize: Qt.size(1, 4)
-                        patch: (model.recentcall_type==="missed") ? Qt.point(0,0) : ((model.recentcall_type === "incoming") ? Qt.point(0,1) : Qt.point(0,2))
+                        patch: (model.recentcall_type==="missed") ? Qt.point(0,0) :
+                               (model.recentcall_type === "incoming") ? Qt.point(0,1) :
+                               (model.recentcall_type === "ignored") ? Qt.point(0,3) : Qt.point(0,2)
                         anchors.horizontalCenter: timeStampText.horizontalCenter
                     }
                     Text {
