@@ -139,7 +139,7 @@ BasePage {
                         wantedWidth: Units.gu(3.2)
                         wantedHeight: Units.gu(3.2)
 
-                        imageSize: Qt.size(Units.gu(3.2), Units.gu(18.2))
+                        imageSize: Qt.size(44, 182)
                         patchGridSize: Qt.size(1, 4)
                         patch: (model.recentcall_type==="missed") ? Qt.point(0,0) : ((model.recentcall_type === "incoming") ? Qt.point(0,1) : Qt.point(0,2))
                         anchors.horizontalCenter: timeStampText.horizontalCenter
@@ -163,7 +163,6 @@ BasePage {
                     width:Units.gu(5);
                     height:Units.gu(5)
                     iconSource:'images/list-avatar-default.png'
-                    anchors.bottom: Units.gu(0.5)
                     checkable: true
                     onClicked: callgroupDetail.active = checked
                 }
