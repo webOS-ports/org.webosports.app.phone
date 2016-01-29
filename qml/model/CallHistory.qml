@@ -121,7 +121,6 @@ Db8Model {
         var callGroupID = _buildCallGroupID(endedVoiceCall, person, startTime);
 
         var actionForCall = IncomingCallsService.getActionForCall(endedVoiceCall.handlerId);
-        var isMissed = ( endedVoiceCall.isIncoming && endedVoiceCall.duration === 0 );
 
         var newCallItem = {
             _kind: "com.palm.phonecall:1",

@@ -88,7 +88,7 @@ Item {
         manager.dial(manager.defaultProviderId, number);
     }
 
-    function _updateState(voiceCall) {
+    function _updateState(voiceCall, isIncoming) {
         console.log("Currently we have " + manager.voiceCalls.count + " calls");
 
         console.log("Looking at call " + voiceCall.lineId + " with state " + voiceCall.statusText + " "
@@ -119,7 +119,7 @@ Item {
                 lineId:voiceCall.lineId,
                 startedAt: voiceCall.startedAt,
                 duration: voiceCall.duration,
-                isIncoming: voiceCall.isIncoming,
+                isIncoming: isIncoming,
                 isEmergency: voiceCall.isEmergency,
                 isMultiparty: voiceCall.isMultiparty,
                 isForwarded: voiceCall.isForwarded,
@@ -140,12 +140,13 @@ Item {
             for(var i=first;i<=last;++i) {
                 var object = calls.instance(i);
                 addStatusObserver(object);
-                _updateState(object); // initialize the state
+                _updateState(object, object.isIncoming); // initialize the state
             }
         }
         function addStatusObserver(object) {
             console.log("Adding status observer for " + object);
-            object.statusChanged.connect( function() { _updateState(object) } );
+            var isIncoming=object.isIncoming; // memorize the incoming status asap
+            object.statusChanged.connect( function() { _updateState(object, isIncoming) } );
         }
     }
 }
