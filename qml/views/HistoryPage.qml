@@ -71,9 +71,10 @@ BasePage {
             width: parent.width
             height: childrenRect.height
             Rectangle {
-                width: parent.width
+                width: Units.gu(1) //parent.width
                 color: '#25394A'
                 height: sectionTextId.height/5
+                anchors.left: parent.left
                 anchors.verticalCenter: sectionTextId.verticalCenter
             }
             Text {
@@ -81,10 +82,18 @@ BasePage {
                 x: Units.gu(2)
                 color: "lightgrey"
                 font.bold: true
-                font.pixelSize: Units.gu(1)
+                font.pixelSize: FontUtils.sizeToPixels("18pt")
                 property date _timestamp: new Date(Number(section)*86400000) //  convert timestamp_day to ms
                 text: _timestamp.toLocaleDateString()
             }
+            Rectangle {
+                width: parent.width - sectionTextId.contentWidth - Units.gu(3) //Units.gu(1) //parent.width
+                color: '#25394A'
+                height: sectionTextId.height/5
+                anchors.right: parent.right
+                anchors.verticalCenter: sectionTextId.verticalCenter
+            }
+
         }
 
         delegate: Column {
@@ -99,7 +108,7 @@ BasePage {
                 anchors.right: parent.right
                 anchors.leftMargin: Units.gu(1)
                 anchors.rightMargin: Units.gu(1)
-                height:Units.gu(5)
+                height:Units.gu(7)
                 spacing: 5
                 // On the left: details of the person
                 ColumnLayout {
@@ -108,39 +117,41 @@ BasePage {
                     Text {
                         Layout.fillWidth: true
                         color: 'white'
-                        font.pixelSize:Units.gu(2)
+                        font.pixelSize: FontUtils.sizeToPixels("18pt")
                         text:(contact && contact.name) ? contact.name : model.recentcall_address.addr
                     }
                     Text {
                         Layout.fillWidth: true
                         color: 'white'
-                        font.pixelSize:Units.gu(2)
+                        font.pixelSize: FontUtils.sizeToPixels("14pt")
                         text:(contact && contact.addr) ? contact.addr : "Unknown"
                     }
                 }
                 // On the middle: type of call and time of call
                 ColumnLayout {
                     Layout.fillHeight: true
-                    Layout.minimumWidth: 44
+                    Layout.minimumWidth: Units.gu(3.2)
                     ClippedImage {
-                        Layout.preferredHeight: 44
+                        Layout.preferredHeight: Units.gu(3.2)
 
                         source: 'images/call-log-list-sprite.png'
 
-                        wantedWidth: 44
-                        wantedHeight: 44
+                        wantedWidth: Units.gu(3.2)
+                        wantedHeight: Units.gu(3.2)
 
-                        imageSize: Qt.size(44, 182)
+                        imageSize: Qt.size(Units.gu(3.2), Units.gu(18.2))
                         patchGridSize: Qt.size(1, 4)
                         patch: (model.recentcall_type==="missed") ? Qt.point(0,0) : ((model.recentcall_type === "incoming") ? Qt.point(0,1) : Qt.point(0,2))
+                        anchors.horizontalCenter: timeStampText.horizontalCenter
                     }
                     Text {
+                        id: timeStampText
                         Layout.fillHeight: true
 
                         property date timeStamp: new Date(model.timestamp);
 
                         color:'white'
-                        font.pixelSize:Units.gu(1.5)
+                        font.pixelSize: FontUtils.sizeToPixels("15pt")
                         text: Qt.formatTime(timeStamp, Qt.locale().timeFormat(Locale.ShortFormat));
                     }
                 }
@@ -149,9 +160,10 @@ BasePage {
                 Button {
                     Layout.fillHeight: true
                     Layout.minimumWidth: height
-                    width:Units.gu(5);height:Units.gu(5)
-                    iconSource:'images/generic-details-view-avatar-small.png'
-
+                    width:Units.gu(5);
+                    height:Units.gu(5)
+                    iconSource:'images/list-avatar-default.png'
+                    anchors.bottom: Units.gu(0.5)
                     checkable: true
                     onClicked: callgroupDetail.active = checked
                 }
@@ -160,8 +172,6 @@ BasePage {
                 anchors {
                     left: parent.left
                     right: parent.right
-                    leftMargin: Units.gu(2)
-                    rightMargin: Units.gu(2)
                 }
                 height: callgroupDetail.visible ? callgroupDetail.height : 1
                 color: '#25394A'
@@ -188,13 +198,13 @@ BasePage {
                                   height: Units.dp(12)
                                   Text {
                                       anchors.left: parent.left
-                                      font.pixelSize:Units.dp(10)
+                                      font.pixelSize: FontUtils.sizeToPixels("10pt")
                                       color:'grey'
                                       text: (_type !== "outgoing" ? _fromAddr : _toAddr )
                                   }
                                   Text {
                                       anchors.right: parent.right
-                                      font.pixelSize:Units.dp(10)
+                                      font.pixelSize: FontUtils.sizeToPixels("10pt")
                                       color:'grey'
                                       text: Qt.formatTime(_timestamp, Qt.locale().timeFormat(Locale.ShortFormat));
                                   }
@@ -210,7 +220,7 @@ BasePage {
             visible: historyList.count === 0
             Text {
                 color: "white"
-                font.pixelSize:Units.dp(20)
+                font.pixelSize: FontUtils.sizeToPixels("20pt")
                 text: "No calls yet"
             }
         }
