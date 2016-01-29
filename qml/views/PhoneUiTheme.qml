@@ -19,11 +19,26 @@ import QtQuick 2.0
 
 QtObject {
     property color foregroundColor:'white'
-    property color backgroundColor:'#444444'
+    property color backgroundColor: '#456B8E' //'#444444'
+    property Gradient mainGradient: Gradient {
+        GradientStop { position: 0.0; color: '#456B8E' }
+        GradientStop { position: 1.0; color: '#243849' }
+    }
+    property Gradient selectedGradient: Gradient {
+        GradientStop { position: 0.0; color: '#243849' }
+        GradientStop { position: 1.0; color: '#5F93C0' }
+    }
+    property Gradient unSelectedGradient: Gradient {
+        GradientStop { position: 0.0; color: '#43637E' }
+        GradientStop { position: 0.5; color: '#20303E' }
+        GradientStop { position: 1.0; color: '#263949' }
+    }
     property color headerColor:'#6f6f6f'
     property color headerTitle: 'white'
     property color headerTip: 'black'
     property color subForegroundColor:'#6f6f6f'
+    property color selectedTabColor: '#6f6f6f'
+    property color selectedTabForground: 'grey'
     property color unselectedTabColor: '#6f6f6f'
     property color unselectedTabForground: 'grey'
     property color callActionBtnFgColor: '#0B2161'
