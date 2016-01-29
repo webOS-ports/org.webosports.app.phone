@@ -104,6 +104,7 @@ BasePage {
 
             // Description of the call group
             RowLayout {
+                id: callGroupRowLayout
                 anchors.left: parent.left
                 anchors.right: parent.right
                 anchors.leftMargin: Units.gu(1)
@@ -129,6 +130,7 @@ BasePage {
                 }
                 // On the middle: type of call and time of call
                 ColumnLayout {
+                    Layout.fillWidth: false
                     Layout.fillHeight: true
                     Layout.minimumWidth: Units.gu(3.2)
                     ClippedImage {
@@ -157,14 +159,18 @@ BasePage {
                 }
                 // On the right: image of person with eventual mask with number of calls,
                 // and arrow to show details
-                Button {
+                Image {
+                    Layout.fillWidth: false
                     Layout.fillHeight: true
-                    Layout.minimumWidth: height
-                    width:Units.gu(5);
-                    height:Units.gu(5)
-                    iconSource:'images/list-avatar-default.png'
-                    checkable: true
-                    onClicked: callgroupDetail.active = checked
+                    Layout.preferredWidth: callGroupRowLayout.height
+
+                    source:'images/list-avatar-default.png'
+                    fillMode: Image.PreserveAspectFit
+
+                    MouseArea {
+                        anchors.fill: parent
+                        onClicked: callgroupDetail.active = !callgroupDetail.active
+                    }
                 }
             }
             Rectangle {
