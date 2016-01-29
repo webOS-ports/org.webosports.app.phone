@@ -1,5 +1,4 @@
-{ "data": [
-         {
+{ "data": [{
             "_id": "com.palm.app.phone 1003.callgroup__ID_++HcfNECvl_R+ZiA_10/18/2013_all",
             "_kind": "com.palm.phonecallgroup:1",
             "_rev": 339281,
@@ -16,7 +15,8 @@
             },
             "recentcall_type": "outgoing",
             "timestamp": 1384792046797,
-            "type": "all"
+            "type": "all",
+            "timestamp_day": 16027
         }, {
             "_id": "com.palm.app.phone 1003.callgroup__ID_++HcfNECvl_R+ZiA_10/23/2013_all",
             "_kind": "com.palm.phonecallgroup:1",
@@ -35,7 +35,8 @@
             },
             "recentcall_type": "outgoing",
             "timestamp": 1385210823767,
-            "type": "all"
+            "type": "all",
+            "timestamp_day": 16032
         }, {
             "_id": "com.palm.app.phone 1003.callgroup__ID_++HcfNECvl_R+ZiA_10/26/2013_all",
             "_kind": "com.palm.phonecallgroup:1",
@@ -55,7 +56,8 @@
             },
             "recentcall_type": "outgoing",
             "timestamp": 1385496851525,
-            "type": "all"
+            "type": "all",
+            "timestamp_day": 16035
         }, {
             "_id": "com.palm.app.phone 1003.callgroup__ID_++HcfNECvl_R+ZiA_10/27/2013_all",
             "_kind": "com.palm.phonecallgroup:1",
@@ -75,7 +77,8 @@
             },
             "recentcall_type": "missed",
             "timestamp": 1385579052340,
-            "type": "all"
+            "type": "all",
+            "timestamp_day": 16036
         }, {
             "_id": "com.palm.app.phone 1003.callgroup__ID_++HcfNECvl_R+ZiA_10/27/2013_missed",
             "_kind": "com.palm.phonecallgroup:1",
@@ -94,7 +97,8 @@
             },
             "recentcall_type": "missed",
             "timestamp": 1385579052340,
-            "type": "missed"
+            "type": "missed",
+            "timestamp_day": 16036
         }, {
             "_id": "com.palm.app.phone 1003.callgroup__ID_++HcfNECvl_R+ZiA_10/5/2013_all",
             "_kind": "com.palm.phonecallgroup:1",
@@ -113,7 +117,8 @@
             },
             "recentcall_type": "outgoing",
             "timestamp": 1383674590796,
-            "type": "all"
+            "type": "all",
+            "timestamp_day": 16014
         }, {
             "_id": "com.palm.app.phone 1003.callgroup__ID_++HcfNECvl_R+ZiA_11/4/2013_all",
             "_kind": "com.palm.phonecallgroup:1",
@@ -131,7 +136,8 @@
             },
             "recentcall_type": "outgoing",
             "timestamp": 1386186153770,
-            "type": "all"
+            "type": "all",
+            "timestamp_day": 16043
         }, {
             "_id": "com.palm.app.phone 1003.callgroup__ID_++HcfNECvl_R+ZiA_11/7/2013_all",
             "_kind": "com.palm.phonecallgroup:1",
@@ -149,7 +155,8 @@
             },
             "recentcall_type": "outgoing",
             "timestamp": 1386447293524,
-            "type": "all"
+            "type": "all",
+            "timestamp_day": 16046
         }, {
             "_id": "com.palm.app.phone 1003.callgroup__ID_++HcfNECvl_R+ZiA_11/9/2013_all",
             "_kind": "com.palm.phonecallgroup:1",
@@ -169,7 +176,8 @@
             },
             "recentcall_type": "outgoing",
             "timestamp": 1386613196524,
-            "type": "all"
+            "type": "all",
+            "timestamp_day": 16048
         }, {
             "_id": "com.palm.app.phone 1003.callgroup__ID_++HcfNECvl_R+ZiA_11/9/2013_missed",
             "_kind": "com.palm.phonecallgroup:1",
@@ -189,7 +197,8 @@
             },
             "recentcall_type": "missed",
             "timestamp": 1386613164149,
-            "type": "missed"
+            "type": "missed",
+            "timestamp_day": 16048
         }, {
             "_id": "com.palm.app.phone 1003.callgroup__ID_++HcfNECvl_R+ZiA_2/17/2015_all",
             "_kind": "com.palm.phonecallgroup:1",
@@ -208,7 +217,8 @@
             },
             "recentcall_type": "outgoing",
             "timestamp": 1426620126498,
-            "type": "all"
+            "type": "all",
+            "timestamp_day": 16511
         }, {
             "_id": "com.palm.app.phone 1003.callgroup__ID_++HcfNECvl_R+ZiA_7/31/2013_all",
             "_kind": "com.palm.phonecallgroup:1",
@@ -227,7 +237,8 @@
             },
             "recentcall_type": "outgoing",
             "timestamp": 1377963491658,
-            "type": "all"
+            "type": "all",
+            "timestamp_day": 15948
         }, {
             "_id": "com.palm.app.phone 1003.callgroup__ID_++HcfNECvl_R+ZiA_8/4/2013_all",
             "_kind": "com.palm.phonecallgroup:1",
@@ -247,7 +258,8 @@
             },
             "recentcall_type": "outgoing",
             "timestamp": 1378313444580,
-            "type": "all"
+            "type": "all",
+            "timestamp_day": 15952
         }, {
             "_id": "com.palm.app.phone 1003.callgroup__ID_++HcfNECvl_R+ZiA_9/14/2013_all",
             "_kind": "com.palm.phonecallgroup:1",
@@ -266,7 +278,8 @@
             },
             "recentcall_type": "outgoing",
             "timestamp": 1381743151836,
-            "type": "all"
+            "type": "all",
+            "timestamp_day": 15992
         }, {
             "_id": "com.palm.app.phone 1003.callgroup__ID_++HcfNECvl_R+ZiA_9/17/2013_all",
             "_kind": "com.palm.phonecallgroup:1",
@@ -285,7 +298,8 @@
             },
             "recentcall_type": "incoming",
             "timestamp": 1382023740463,
-            "type": "all"
+            "type": "all",
+            "timestamp_day": 15995
         }, {
             "_id": "com.palm.app.phone 1003.callgroup__ID_++HcfNECvl_R+ZiA_9/30/2013_all",
             "_kind": "com.palm.phonecallgroup:1",
@@ -305,7 +319,8 @@
             },
             "recentcall_type": "outgoing",
             "timestamp": 1383155945770,
-            "type": "all"
+            "type": "all",
+            "timestamp_day": 16008
         }, {
             "_id": "com.palm.app.phone 1003.callgroup__ID_++HcfNECvl_R+ZiA_9/4/2013_all",
             "_kind": "com.palm.phonecallgroup:1",
@@ -324,7 +339,8 @@
             },
             "recentcall_type": "outgoing",
             "timestamp": 1380905308050,
-            "type": "all"
+            "type": "all",
+            "timestamp_day": 15982
         }, {
             "_id": "com.palm.app.phone 1003.callgroup__ID_++HcfNEQzPgKH0Kb_11/13/2013_all",
             "_kind": "com.palm.phonecallgroup:1",
@@ -343,7 +359,8 @@
             },
             "recentcall_type": "missed",
             "timestamp": 1386933412379,
-            "type": "all"
+            "type": "all",
+            "timestamp_day": 16052
         }, {
             "_id": "com.palm.app.phone 1003.callgroup__ID_++HcfNEQzPgKH0Kb_11/13/2013_missed",
             "_kind": "com.palm.phonecallgroup:1",
@@ -362,7 +379,8 @@
             },
             "recentcall_type": "missed",
             "timestamp": 1386933412379,
-            "type": "missed"
+            "type": "missed",
+            "timestamp_day": 16052
         }, {
             "_id": "com.palm.app.phone 1003.callgroup__ID_++HcfNEQzPgKH0Kb_8/14/2013_all",
             "_kind": "com.palm.phonecallgroup:1",
@@ -382,7 +400,8 @@
             },
             "recentcall_type": "outgoing",
             "timestamp": 1379156855416,
-            "type": "all"
+            "type": "all",
+            "timestamp_day": 15962
         }, {
             "_id": "com.palm.app.phone 1003.callgroup__ID_++HcfNEQzPgKH0Kb_8/14/2013_missed",
             "_kind": "com.palm.phonecallgroup:1",
@@ -401,7 +420,8 @@
             },
             "recentcall_type": "missed",
             "timestamp": 1379153618129,
-            "type": "missed"
+            "type": "missed",
+            "timestamp_day": 15962
         }, {
             "_id": "com.palm.app.phone 1003.callgroup__ID_++HcfNEQzPgKH0Kb_8/26/2013_all",
             "_kind": "com.palm.phonecallgroup:1",
@@ -421,7 +441,8 @@
             },
             "recentcall_type": "missed",
             "timestamp": 1380211392531,
-            "type": "all"
+            "type": "all",
+            "timestamp_day": 15974
         }, {
             "_id": "com.palm.app.phone 1003.callgroup__ID_++HcfNEQzPgKH0Kb_8/26/2013_missed",
             "_kind": "com.palm.phonecallgroup:1",
@@ -441,7 +462,8 @@
             },
             "recentcall_type": "missed",
             "timestamp": 1380211392531,
-            "type": "missed"
+            "type": "missed",
+            "timestamp_day": 15974
         }, {
             "_id": "com.palm.app.phone 1003.callgroup__ID_++HcfNEQzPgKH0Kb_8/5/2013_all",
             "_kind": "com.palm.phonecallgroup:1",
@@ -460,7 +482,8 @@
             },
             "recentcall_type": "incoming",
             "timestamp": 1378401152081,
-            "type": "all"
+            "type": "all",
+            "timestamp_day": 15953
         }, {
             "_id": "com.palm.app.phone 1003.callgroup__ID_++HcfNEQzPgKH0Kb_8/7/2013_all",
             "_kind": "com.palm.phonecallgroup:1",
@@ -480,7 +503,8 @@
             },
             "recentcall_type": "incoming",
             "timestamp": 1378573447565,
-            "type": "all"
+            "type": "all",
+            "timestamp_day": 15955
         }, {
             "_id": "com.palm.app.phone 1003.callgroup__ID_++HcfNHQmcgjuHSX_10/23/2013_all",
             "_kind": "com.palm.phonecallgroup:1",
@@ -500,7 +524,8 @@
             },
             "recentcall_type": "incoming",
             "timestamp": 1385212355939,
-            "type": "all"
+            "type": "all",
+            "timestamp_day": 16032
         }, {
             "_id": "com.palm.app.phone 1003.callgroup__ID_++HcfNHQmcgjuHSX_10/28/2013_all",
             "_kind": "com.palm.phonecallgroup:1",
@@ -519,7 +544,8 @@
             },
             "recentcall_type": "outgoing",
             "timestamp": 1385665332769,
-            "type": "all"
+            "type": "all",
+            "timestamp_day": 16037
         }, {
             "_id": "com.palm.app.phone 1003.callgroup__ID_++HcfNHQmcgjuHSX_11/7/2013_all",
             "_kind": "com.palm.phonecallgroup:1",
@@ -538,7 +564,8 @@
             },
             "recentcall_type": "outgoing",
             "timestamp": 1386429060521,
-            "type": "all"
+            "type": "all",
+            "timestamp_day": 16046
         }, {
             "_id": "com.palm.app.phone 1003.callgroup__ID_++HcfNHQmcgjuHSX_8/18/2013_all",
             "_kind": "com.palm.phonecallgroup:1",
@@ -558,7 +585,8 @@
             },
             "recentcall_type": "outgoing",
             "timestamp": 1379522638852,
-            "type": "all"
+            "type": "all",
+            "timestamp_day": 15966
         }, {
             "_id": "com.palm.app.phone 1003.callgroup__ID_++HcfNJyoqB0JW3B_0/21/2016_all",
             "_kind": "com.palm.phonecallgroup:1",
@@ -578,7 +606,8 @@
             },
             "recentcall_type": "outgoing",
             "timestamp": 1453404701038,
-            "type": "all"
+            "type": "all",
+            "timestamp_day": 16821
         }, {
             "_id": "com.palm.app.phone 1003.callgroup__ID_++HcfNJyoqB0JW3B_0/21/2016_missed",
             "_kind": "com.palm.phonecallgroup:1",
@@ -597,7 +626,8 @@
             },
             "recentcall_type": "missed",
             "timestamp": 1453404678938,
-            "type": "missed"
+            "type": "missed",
+            "timestamp_day": 16821
         }, {
             "_id": "com.palm.app.phone 1003.callgroup__ID_++HcfNJyoqB0JW3B_10/5/2013_all",
             "_kind": "com.palm.phonecallgroup:1",
@@ -617,7 +647,8 @@
             },
             "recentcall_type": "outgoing",
             "timestamp": 1383684351473,
-            "type": "all"
+            "type": "all",
+            "timestamp_day": 16014
         }, {
             "_id": "com.palm.app.phone 1003.callgroup__ID_++I_9xc+hihssbNy_10/24/2013_all",
             "_kind": "com.palm.phonecallgroup:1",
@@ -636,7 +667,8 @@
             },
             "recentcall_type": "outgoing",
             "timestamp": 1385314692770,
-            "type": "all"
+            "type": "all",
+            "timestamp_day": 16033
         }, {
             "_id": "com.palm.app.phone 1003.callgroup__ID_++Ic92k1tBcqnS8p_10/25/2013_all",
             "_kind": "com.palm.phonecallgroup:1",
@@ -655,7 +687,8 @@
             },
             "recentcall_type": "outgoing",
             "timestamp": 1385401633745,
-            "type": "all"
+            "type": "all",
+            "timestamp_day": 16034
         }, {
             "_id": "com.palm.app.phone 1003.callgroup__ID_++Ic92kYF5Wquwdv_8/21/2013_all",
             "_kind": "com.palm.phonecallgroup:1",
@@ -674,7 +707,8 @@
             },
             "recentcall_type": "outgoing",
             "timestamp": 1379763516986,
-            "type": "all"
+            "type": "all",
+            "timestamp_day": 15969
         }, {
             "_id": "com.palm.app.phone 1003.callgroup__ID_++Ic92kYF5Wquwdv_8/27/2013_all",
             "_kind": "com.palm.phonecallgroup:1",
@@ -693,7 +727,8 @@
             },
             "recentcall_type": "outgoing",
             "timestamp": 1380314552959,
-            "type": "all"
+            "type": "all",
+            "timestamp_day": 15975
         }, {
             "_id": "com.palm.app.phone 1003.callgroup__ID_++Ic92o1sExbLF06_10/24/2013_all",
             "_kind": "com.palm.phonecallgroup:1",
@@ -712,7 +747,8 @@
             },
             "recentcall_type": "outgoing",
             "timestamp": 1385315820770,
-            "type": "all"
+            "type": "all",
+            "timestamp_day": 16033
         }, {
             "_id": "com.palm.app.phone 1003.callgroup__ID_++Ic92o1sExbLF06_9/19/2013_all",
             "_kind": "com.palm.phonecallgroup:1",
@@ -731,7 +767,8 @@
             },
             "recentcall_type": "outgoing",
             "timestamp": 1382198333513,
-            "type": "all"
+            "type": "all",
+            "timestamp_day": 15997
         }, {
             "_id": "com.palm.app.phone 1003.callgroup__ID_++Ic92o1sExbLF06_9/20/2013_all",
             "_kind": "com.palm.phonecallgroup:1",
@@ -750,7 +787,8 @@
             },
             "recentcall_type": "outgoing",
             "timestamp": 1382263463828,
-            "type": "all"
+            "type": "all",
+            "timestamp_day": 15998
         }, {
             "_id": "com.palm.app.phone 1003.callgroup__ID_++Ic92t8xxt2fLVj_8/17/2013_all",
             "_kind": "com.palm.phonecallgroup:1",
@@ -769,7 +807,8 @@
             },
             "recentcall_type": "outgoing",
             "timestamp": 1379420027846,
-            "type": "all"
+            "type": "all",
+            "timestamp_day": 15965
         }, {
             "_id": "com.palm.app.phone 1003.callgroup__ID_++Ic92viH3lCYDKN_11/7/2013_all",
             "_kind": "com.palm.phonecallgroup:1",
@@ -789,7 +828,8 @@
             },
             "recentcall_type": "outgoing",
             "timestamp": 1386405952520,
-            "type": "all"
+            "type": "all",
+            "timestamp_day": 16046
         }, {
             "_id": "com.palm.app.phone 1003.callgroup__ID_++Ic92viH3lCYDKN_8/13/2013_all",
             "_kind": "com.palm.phonecallgroup:1",
@@ -809,7 +849,8 @@
             },
             "recentcall_type": "outgoing",
             "timestamp": 1379065029412,
-            "type": "all"
+            "type": "all",
+            "timestamp_day": 15961
         }, {
             "_id": "com.palm.app.phone 1003.callgroup__ID_++Ic933PQqW7HPFk_9/4/2013_all",
             "_kind": "com.palm.phonecallgroup:1",
@@ -828,7 +869,8 @@
             },
             "recentcall_type": "outgoing",
             "timestamp": 1380892103767,
-            "type": "all"
+            "type": "all",
+            "timestamp_day": 15982
         }, {
             "_id": "com.palm.app.phone 1003.callgroup__ID_++Ifb7P1_1p6u8K3_10/20/2013_all",
             "_kind": "com.palm.phonecallgroup:1",
@@ -848,7 +890,8 @@
             },
             "recentcall_type": "missed",
             "timestamp": 1384981660926,
-            "type": "all"
+            "type": "all",
+            "timestamp_day": 16029
         }, {
             "_id": "com.palm.app.phone 1003.callgroup__ID_++Ifb7P1_1p6u8K3_10/20/2013_missed",
             "_kind": "com.palm.phonecallgroup:1",
@@ -867,7 +910,8 @@
             },
             "recentcall_type": "missed",
             "timestamp": 1384981660926,
-            "type": "missed"
+            "type": "missed",
+            "timestamp_day": 16029
         }, {
             "_id": "com.palm.app.phone 1003.callgroup__ID_++Ifb7P1_1p6u8K3_10/23/2013_all",
             "_kind": "com.palm.phonecallgroup:1",
@@ -886,7 +930,8 @@
             },
             "recentcall_type": "outgoing",
             "timestamp": 1385210860768,
-            "type": "all"
+            "type": "all",
+            "timestamp_day": 16032
         }, {
             "_id": "com.palm.app.phone 1003.callgroup__ID_++Ifb7P1_1p6u8K3_10/30/2013_all",
             "_kind": "com.palm.phonecallgroup:1",
@@ -905,7 +950,8 @@
             },
             "recentcall_type": "outgoing",
             "timestamp": 1385821511698,
-            "type": "all"
+            "type": "all",
+            "timestamp_day": 16039
         }, {
             "_id": "com.palm.app.phone 1003.callgroup__ID_++Ifb7P1_1p6u8K3_11/7/2013_all",
             "_kind": "com.palm.phonecallgroup:1",
@@ -925,7 +971,8 @@
             },
             "recentcall_type": "outgoing",
             "timestamp": 1386444932524,
-            "type": "all"
+            "type": "all",
+            "timestamp_day": 16046
         }, {
             "_id": "com.palm.app.phone 1003.callgroup__ID_++Ifb7P1_1p6u8K3_11/7/2013_missed",
             "_kind": "com.palm.phonecallgroup:1",
@@ -944,7 +991,8 @@
             },
             "recentcall_type": "missed",
             "timestamp": 1386442466074,
-            "type": "missed"
+            "type": "missed",
+            "timestamp_day": 16046
         }, {
             "_id": "com.palm.app.phone 1003.callgroup__ID_++Ifb7P1_1p6u8K3_11/9/2013_all",
             "_kind": "com.palm.phonecallgroup:1",
@@ -964,7 +1012,8 @@
             },
             "recentcall_type": "incoming",
             "timestamp": 1386592571695,
-            "type": "all"
+            "type": "all",
+            "timestamp_day": 16048
         }, {
             "_id": "com.palm.app.phone 1003.callgroup__ID_++Ig3QlAcX7HwSoV_10/26/2013_all",
             "_kind": "com.palm.phonecallgroup:1",
@@ -984,7 +1033,8 @@
             },
             "recentcall_type": "incoming",
             "timestamp": 1385480986148,
-            "type": "all"
+            "type": "all",
+            "timestamp_day": 16035
         }, {
             "_id": "com.palm.app.phone 1003.callgroup__ID_++Ig3QlAcX7HwSoV_10/27/2013_all",
             "_kind": "com.palm.phonecallgroup:1",
@@ -1004,7 +1054,8 @@
             },
             "recentcall_type": "incoming",
             "timestamp": 1385559331379,
-            "type": "all"
+            "type": "all",
+            "timestamp_day": 16036
         }, {
             "_id": "com.palm.app.phone 1003.callgroup__ID_++IgDPYVSrGrr9+W_10/28/2013_all",
             "_kind": "com.palm.phonecallgroup:1",
@@ -1023,7 +1074,8 @@
             },
             "recentcall_type": "incoming",
             "timestamp": 1385631566372,
-            "type": "all"
+            "type": "all",
+            "timestamp_day": 16037
         }, {
             "_id": "com.palm.app.phone 1003.callgroup__ID_++IgDPYVSrGrr9+W_10/30/2013_all",
             "_kind": "com.palm.phonecallgroup:1",
@@ -1042,7 +1094,8 @@
             },
             "recentcall_type": "incoming",
             "timestamp": 1385803414966,
-            "type": "all"
+            "type": "all",
+            "timestamp_day": 16039
         }, {
             "_id": "com.palm.app.phone 1003.callgroup__PHONE_-00868448---_8/27/2013_all",
             "_kind": "com.palm.phonecallgroup:1",
@@ -1061,7 +1114,8 @@
             },
             "recentcall_type": "incoming",
             "timestamp": 1380314626298,
-            "type": "all"
+            "type": "all",
+            "timestamp_day": 15975
         }, {
             "_id": "com.palm.app.phone 1003.callgroup__PHONE_-16955558-3--_10/23/2013_all",
             "_kind": "com.palm.phonecallgroup:1",
@@ -1075,7 +1129,8 @@
             },
             "recentcall_type": "outgoing",
             "timestamp": 1385209306768,
-            "type": "all"
+            "type": "all",
+            "timestamp_day": 16032
         }, {
             "_id": "com.palm.app.phone 1003.callgroup__PHONE_-16955558-3--_10/27/2013_all",
             "_kind": "com.palm.phonecallgroup:1",
@@ -1089,7 +1144,8 @@
             },
             "recentcall_type": "outgoing",
             "timestamp": 1385578844769,
-            "type": "all"
+            "type": "all",
+            "timestamp_day": 16036
         }, {
             "_id": "com.palm.app.phone 1003.callgroup__PHONE_-19013099-8--_8/23/2013_all",
             "_kind": "com.palm.phonecallgroup:1",
@@ -1103,7 +1159,8 @@
             },
             "recentcall_type": "missed",
             "timestamp": 1379942321709,
-            "type": "all"
+            "type": "all",
+            "timestamp_day": 15971
         }, {
             "_id": "com.palm.app.phone 1003.callgroup__PHONE_-19013099-8--_8/23/2013_missed",
             "_kind": "com.palm.phonecallgroup:1",
@@ -1117,7 +1174,8 @@
             },
             "recentcall_type": "missed",
             "timestamp": 1379942321709,
-            "type": "missed"
+            "type": "missed",
+            "timestamp_day": 15971
         }, {
             "_id": "com.palm.app.phone 1003.callgroup__PHONE_-28594844-1--_9/19/2013_all",
             "_kind": "com.palm.phonecallgroup:1",
@@ -1131,7 +1189,8 @@
             },
             "recentcall_type": "incoming",
             "timestamp": 1382204472225,
-            "type": "all"
+            "type": "all",
+            "timestamp_day": 15997
         }, {
             "_id": "com.palm.app.phone 1003.callgroup__PHONE_-321---_10/26/2013_all",
             "_kind": "com.palm.phonecallgroup:1",
@@ -1146,7 +1205,8 @@
             },
             "recentcall_type": "outgoing",
             "timestamp": 1385496818825,
-            "type": "all"
+            "type": "all",
+            "timestamp_day": 16035
         }, {
             "_id": "com.palm.app.phone 1003.callgroup__PHONE_-321---_10/27/2013_all",
             "_kind": "com.palm.phonecallgroup:1",
@@ -1162,7 +1222,8 @@
             },
             "recentcall_type": "outgoing",
             "timestamp": 1385579491571,
-            "type": "all"
+            "type": "all",
+            "timestamp_day": 16036
         }, {
             "_id": "com.palm.app.phone 1003.callgroup__PHONE_-321---_10/27/2013_missed",
             "_kind": "com.palm.phonecallgroup:1",
@@ -1177,7 +1238,8 @@
             },
             "recentcall_type": "missed",
             "timestamp": 1385579111881,
-            "type": "missed"
+            "type": "missed",
+            "timestamp_day": 16036
         }, {
             "_id": "com.palm.app.phone 1003.callgroup__PHONE_-321---_11/7/2013_all",
             "_kind": "com.palm.phonecallgroup:1",
@@ -1193,7 +1255,8 @@
             },
             "recentcall_type": "incoming",
             "timestamp": 1386443436166,
-            "type": "all"
+            "type": "all",
+            "timestamp_day": 16046
         }, {
             "_id": "com.palm.app.phone 1003.callgroup__PHONE_-321---_11/7/2013_missed",
             "_kind": "com.palm.phonecallgroup:1",
@@ -1208,7 +1271,8 @@
             },
             "recentcall_type": "missed",
             "timestamp": 1386442508645,
-            "type": "missed"
+            "type": "missed",
+            "timestamp_day": 16046
         }, {
             "_id": "com.palm.app.phone 1003.callgroup__PHONE_-321---_8/14/2013_all",
             "_kind": "com.palm.phonecallgroup:1",
@@ -1223,7 +1287,8 @@
             },
             "recentcall_type": "incoming",
             "timestamp": 1379156295283,
-            "type": "all"
+            "type": "all",
+            "timestamp_day": 15962
         }, {
             "_id": "com.palm.app.phone 1003.callgroup__PHONE_-323---_2/17/2015_all",
             "_kind": "com.palm.phonecallgroup:1",
@@ -1238,7 +1303,8 @@
             },
             "recentcall_type": "outgoing",
             "timestamp": 1426619308667,
-            "type": "all"
+            "type": "all",
+            "timestamp_day": 16511
         }, {
             "_id": "com.palm.app.phone 1003.callgroup__PHONE_-35233247---_8/17/2013_all",
             "_kind": "com.palm.phonecallgroup:1",
@@ -1257,7 +1323,8 @@
             },
             "recentcall_type": "incoming",
             "timestamp": 1379419899711,
-            "type": "all"
+            "type": "all",
+            "timestamp_day": 15965
         }, {
             "_id": "com.palm.app.phone 1003.callgroup__PHONE_-41013229-8--_11/6/2013_all",
             "_kind": "com.palm.phonecallgroup:1",
@@ -1271,7 +1338,8 @@
             },
             "recentcall_type": "missed",
             "timestamp": 1386316578207,
-            "type": "all"
+            "type": "all",
+            "timestamp_day": 16045
         }, {
             "_id": "com.palm.app.phone 1003.callgroup__PHONE_-41013229-8--_11/6/2013_missed",
             "_kind": "com.palm.phonecallgroup:1",
@@ -1285,7 +1353,8 @@
             },
             "recentcall_type": "missed",
             "timestamp": 1386316578207,
-            "type": "missed"
+            "type": "missed",
+            "timestamp_day": 16045
         }, {
             "_id": "com.palm.app.phone 1003.callgroup__PHONE_-48711716--283-+_10/23/2013_all",
             "_kind": "com.palm.phonecallgroup:1",
@@ -1299,7 +1368,8 @@
             },
             "recentcall_type": "missed",
             "timestamp": 1385197545936,
-            "type": "all"
+            "type": "all",
+            "timestamp_day": 16032
         }, {
             "_id": "com.palm.app.phone 1003.callgroup__PHONE_-48711716--283-+_10/23/2013_missed",
             "_kind": "com.palm.phonecallgroup:1",
@@ -1313,7 +1383,8 @@
             },
             "recentcall_type": "missed",
             "timestamp": 1385197545936,
-            "type": "missed"
+            "type": "missed",
+            "timestamp_day": 16032
         }, {
             "_id": "com.palm.app.phone 1003.callgroup__PHONE_-50962024-1--_8/28/2013_all",
             "_kind": "com.palm.phonecallgroup:1",
@@ -1327,7 +1398,8 @@
             },
             "recentcall_type": "outgoing",
             "timestamp": 1380390333448,
-            "type": "all"
+            "type": "all",
+            "timestamp_day": 15976
         }, {
             "_id": "com.palm.app.phone 1003.callgroup__PHONE_-51---_11/7/2013_all",
             "_kind": "com.palm.phonecallgroup:1",
@@ -1341,7 +1413,8 @@
             },
             "recentcall_type": "outgoing",
             "timestamp": 1386382348312,
-            "type": "all"
+            "type": "all",
+            "timestamp_day": 16046
         }, {
             "_id": "com.palm.app.phone 1003.callgroup__PHONE_-58203758-3--_10/25/2013_all",
             "_kind": "com.palm.phonecallgroup:1",
@@ -1356,7 +1429,8 @@
             },
             "recentcall_type": "incoming",
             "timestamp": 1385406924304,
-            "type": "all"
+            "type": "all",
+            "timestamp_day": 16034
         }, {
             "_id": "com.palm.app.phone 1003.callgroup__PHONE_-58203758-3--_10/25/2013_missed",
             "_kind": "com.palm.phonecallgroup:1",
@@ -1370,7 +1444,8 @@
             },
             "recentcall_type": "missed",
             "timestamp": 1385406035288,
-            "type": "missed"
+            "type": "missed",
+            "timestamp_day": 16034
         }, {
             "_id": "com.palm.app.phone 1003.callgroup__PHONE_-772862--23-+_8/10/2013_all",
             "_kind": "com.palm.phonecallgroup:1",
@@ -1384,7 +1459,8 @@
             },
             "recentcall_type": "incoming",
             "timestamp": 1378791970192,
-            "type": "all"
+            "type": "all",
+            "timestamp_day": 15958
         }, {
             "_id": "com.palm.app.phone 1003.callgroup__PHONE_-80490122---_7/31/2013_all",
             "_kind": "com.palm.phonecallgroup:1",
@@ -1399,7 +1475,8 @@
             },
             "recentcall_type": "incoming",
             "timestamp": 1377953748140,
-            "type": "all"
+            "type": "all",
+            "timestamp_day": 15948
         }, {
             "_id": "com.palm.app.phone 1003.callgroup__PHONE_-96337534-1--_8/1/2013_all",
             "_kind": "com.palm.phonecallgroup:1",
@@ -1414,7 +1491,8 @@
             },
             "recentcall_type": "outgoing",
             "timestamp": 1378056874686,
-            "type": "all"
+            "type": "all",
+            "timestamp_day": 15949
         }, {
             "_id": "com.palm.app.phone 1003.callgroup__PHONE_-97170805---_8/12/2013_all",
             "_kind": "com.palm.phonecallgroup:1",
@@ -1428,6 +1506,7 @@
             },
             "recentcall_type": "incoming",
             "timestamp": 1379009097316,
-            "type": "all"
-        }
-] }
+            "type": "all",
+            "timestamp_day": 15960
+        }]
+}

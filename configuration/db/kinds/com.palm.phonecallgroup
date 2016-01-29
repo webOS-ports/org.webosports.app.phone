@@ -18,7 +18,11 @@
 				"type": "integer",
 				"description": "Start time of the most recent phone call in ms timestamp."
 			},
-			"callcount": {
+                        "timestamp_day": {
+                                "type": "integer",
+                                "description": "Start time of the most recent phone call in days timestamp. Its value is Math.floor(timestamp/86400000)."
+                        },
+                        "callcount": {
 				"type": "integer",
 				"description": "Cached value for performance. Number of calls associated with this group.",
 			},

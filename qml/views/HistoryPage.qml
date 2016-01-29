@@ -65,7 +65,7 @@ BasePage {
         spacing:4
         clip:true
 
-        section.property: "date"
+        section.property: "timestamp_day"
         section.criteria: ViewSection.FullString
         section.delegate: Item {
             width: parent.width
@@ -73,16 +73,17 @@ BasePage {
             Rectangle {
                 width: parent.width
                 color: '#25394A'
-                height: sectionText.height/5
-                anchors.verticalCenter: sectionText.verticalCenter
+                height: sectionTextId.height/5
+                anchors.verticalCenter: sectionTextId.verticalCenter
             }
             Text {
-                id: sectionText
+                id: sectionTextId
                 x: Units.gu(2)
                 color: "lightgrey"
                 font.bold: true
                 font.pixelSize: Units.gu(1)
-                text: section
+                property date _timestamp: new Date(Number(section)*86400000) //  convert timestamp_day to ms
+                text: _timestamp.toLocaleDateString()
             }
         }
 

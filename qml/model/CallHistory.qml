@@ -31,9 +31,17 @@ import "../services/IncomingCallsService.js" as IncomingCallsService
                 "enum": ["all","missed"],
                 "description": "Type of grouping. 'all' contains every phonecall and 'missed' is only where phonecall.type = 'missed'"
             },
+            "groupId": {
+                "type": "string",
+                "description": "Unique identifier which can be built from a phone call description."
+            },
             "timestamp": {
                 "type": "integer",
                 "description": "Start time of the most recent phone call in ms timestamp."
+            },
+            "timestamp_day": {
+                    "type": "integer",
+                    "description": "Start time of the most recent phone call in days timestamp. Its value is Math.floor(timestamp/86400000)."
             },
             "callcount": {
                 "type": "integer",
@@ -195,6 +203,7 @@ Db8Model {
             existingCallGroup.recentcall_address = personDetails;
             existingCallGroup.recentcall_type = newCallItem.type;
             existingCallGroup.timestamp = newCallItem.timestamp;
+            existingCallGroup.timestamp_day = Math.floor(newCallItem.timestamp/86400000);
             existingCallGroup.type = callGroupType;
 
             __queryDB(action, { objects: [ existingCallGroup ] }, function(result) {});
