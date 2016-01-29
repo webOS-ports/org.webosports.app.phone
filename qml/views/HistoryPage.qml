@@ -107,13 +107,13 @@ BasePage {
                     Layout.fillHeight: true
                     Text {
                         Layout.fillWidth: true
-                        color:(model.recentcall_type==="missed") ? 'red' : 'white'
+                        color: 'white'
                         font.pixelSize:Units.gu(2)
                         text:(contact && contact.name) ? contact.name : model.recentcall_address.addr
                     }
                     Text {
                         Layout.fillWidth: true
-                        color:(model.recentcall_type==="missed") ? 'red' : 'white'
+                        color: 'white'
                         font.pixelSize:Units.gu(2)
                         text:(contact && contact.addr) ? contact.addr : "Unknown"
                     }
