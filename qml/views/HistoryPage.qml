@@ -180,7 +180,8 @@ BasePage {
                     left: parent.left
                     right: parent.right
                 }
-                height: callgroupDetail.visible ? callgroupDetail.height : 1
+                property bool _isLastGroupOfDay: (index+1)<historyModel.count && historyModel.get(index+1).timestamp_day !== model.timestamp_day
+                height: callgroupDetail.visible ? callgroupDetail.height : _isLastGroupOfDay ? 0 : 1
                 color: '#25394A'
 
                 Loader {
