@@ -161,15 +161,74 @@ BasePage {
                 }
                 // On the right: image of person with eventual mask with number of calls,
                 // and arrow to show details
-                Image {
+
+                Item {
+                    id: avatarDisclosureItem
                     Layout.fillWidth: false
                     Layout.fillHeight: true
                     Layout.preferredWidth: callGroupRowLayout.height
 
-                    source:'images/list-avatar-default.png'
-                    fillMode: Image.PreserveAspectFit
+                    property url personPhotoUrl: (model.recentcall_address && model.recentcall_address.personId) ?
+                                                     contacts.personById(model.recentcall_address.personId).photos.listPhotoPath :
+                                                     Qt.resolvedUrl('images/generic-details-view-avatar.png');
+
+                    Image {
+                        id: avatarPhotoImage
+                        anchors {
+                            top: avatarDisclosureMask.top
+                            topMargin: 5*avatarDisclosureMask.height/90
+                            left: avatarDisclosureMask.left
+                            leftMargin: 6*avatarDisclosureMask.width/108
+                        }
+                        width: 60*avatarDisclosureMask.height/90
+                        height: 75*avatarDisclosureMask.height/90
+                        source: avatarDisclosureItem.personPhotoUrl
+                        fillMode: Image.PreserveAspectCrop
+                        visible: false
+                    }
+                    CornerShader {
+                        id: cornerShader
+                        anchors.fill: avatarPhotoImage
+                        sourceItem: avatarPhotoImage
+                        radius: 5*avatarDisclosureMask.height/90
+                    }
+
+                    ClippedImage {
+                        id: avatarDisclosureMask
+                        source: 'images/avatar-disclosure.png'
+
+                        anchors.fill: parent
+
+                        wantedWidth: avatarDisclosureItem.width
+                        wantedHeight: avatarDisclosureItem.height
+
+                        imageSize: Qt.size(108, 360)
+                        patchGridSize: Qt.size(1, 4)
+                        patch: callgroupDetail.active ? (avatarDisclosureMouseArea.pressed ? Qt.point(0,3) : Qt.point(0,2) ) :
+                                                        (avatarDisclosureMouseArea.pressed ? Qt.point(0,1) : Qt.point(0,0) )
+                    }
+                    Image {
+                        source: 'images/call-log-count-pill.png'
+                        anchors {
+                            top: avatarDisclosureMask.top
+                            topMargin: -Units.gu(0.5)
+                            left: avatarDisclosureMask.left
+                            leftMargin: -Units.gu(0.5)
+                        }
+                        width: Units.gu(3.2)
+                        height: Units.gu(3.2)
+
+                        Text {
+                            anchors.centerIn: parent
+                            text: model.callcount
+                            color: 'white'
+                            font.pixelSize: FontUtils.sizeToPixels("12pt")
+                            anchors.verticalCenterOffset: -Units.gu(0.2)
+                        }
+                    }
 
                     MouseArea {
+                        id: avatarDisclosureMouseArea
                         anchors.fill: parent
                         onClicked: callgroupDetail.active = !callgroupDetail.active
                     }
@@ -186,7 +245,12 @@ BasePage {
 
                 Loader {
                     id: callgroupDetail
-                    width:parent.width
+                    anchors {
+                        left: parent.left
+                        right: parent.right
+                        leftMargin: Units.gu(1)
+                        rightMargin: Units.gu(3)
+                    }
                     active: false
                     visible: active
                     sourceComponent: Component {
@@ -195,30 +259,76 @@ BasePage {
                             id: modelRepeater
                             width:parent.width
                             model: CallGroupItems { callGroupId: _callGroupId }
-                            delegate: Item {
+                            delegate: RowLayout {
+                                id: callphoneDelegate
+                                spacing: Units.gu(0.5)
 
-                                property date _timestamp: new Date(timestamp)
-                                property string _type: type
-                                property var _fromAddr: from.addr
-                                property var _toAddr: to.get ? to.get(0).addr : to[0].addr
+                                // NUMBER_TYPE number (duration) icon time
 
-                                  width:modelRepeater.width
-                                  height: Units.dp(12)
-                                  Text {
-                                      anchors.left: parent.left
-                                      font.pixelSize: FontUtils.sizeToPixels("10pt")
-                                      color:'grey'
-                                      text: (_type !== "outgoing" ? _fromAddr : _toAddr )
-                                  }
-                                  Text {
-                                      anchors.right: parent.right
-                                      font.pixelSize: FontUtils.sizeToPixels("10pt")
-                                      color:'grey'
-                                      text: Qt.formatTime(_timestamp, Qt.locale().timeFormat(Locale.ShortFormat));
-                                  }
+                                property date _timestamp: new Date(model.timestamp)
+                                property var _remotePerson: (model.type !== "outgoing") ? model.from : model.to[0]
+                                property string _duration: secondsToTimeString(duration/1000)
+
+                                function secondsToTimeString(seconds) {
+                                    if(seconds===0) return '';
+
+                                    var h = Math.floor(seconds / 3600);
+                                    var m = Math.floor((seconds - (h * 3600)) / 60);
+                                    var s = Math.round(seconds - h * 3600 - m * 60);
+
+                                    var result = '(';
+                                    if(h>0) result += h + 'h';
+                                    if(m>0) result += m + 'm';
+                                    if(s>0) result += s + 's';
+                                    result += ')';
+
+                                    return result;
+                                }
+
+                                width:modelRepeater.width
+                                height: Units.gu(3.2)
+                                Text {
+                                    font.pixelSize: FontUtils.sizeToPixels("12pt")
+                                    color:'white'
+                                    text: _remotePerson.personAddressType ? _addressTypeMap[_remotePerson.personAddressType]: "";
+
+                                    property var _addressTypeMap: { "type_mobile": "MOBILE",
+                                                                    "type_work": "WORK" };
+                                }
+                                Text {
+                                    font.pixelSize: FontUtils.sizeToPixels("12pt")
+                                    color:'grey'
+                                    text: _remotePerson.addr
+                                }
+                                Text {
+                                    Layout.fillWidth: true
+                                    font.pixelSize: FontUtils.sizeToPixels("12pt")
+                                    color:'grey'
+                                    text: _duration;
+                                }
+                                ClippedImage {
+                                    Layout.preferredHeight: callphoneDelegate.height
+                                    Layout.preferredWidth: callphoneDelegate.height
+
+                                    source: 'images/call-log-list-sprite.png'
+
+                                    wantedWidth: callphoneDelegate.height
+                                    wantedHeight: callphoneDelegate.height
+
+                                    imageSize: Qt.size(44, 182)
+                                    patchGridSize: Qt.size(1, 4)
+                                    patch: (model.type==="missed") ? Qt.point(0,0) :
+                                           (model.type === "incoming") ? Qt.point(0,1) :
+                                           (model.type === "ignored") ? Qt.point(0,3) : Qt.point(0,2)
+                                }
+                                Text {
+                                    font.pixelSize: FontUtils.sizeToPixels("12pt")
+                                    color:'grey'
+                                    text: Qt.formatTime(_timestamp, Qt.locale().timeFormat(Locale.ShortFormat));
                                 }
                             }
                         }
+                      }
                     }
                 }
             }
@@ -233,7 +343,5 @@ BasePage {
             }
         }
     }
-
-
 }
 

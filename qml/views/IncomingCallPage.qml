@@ -48,7 +48,7 @@ BasePage {
             color:'#00000000'
         }
 
-        source: voiceCallPerson ? voiceCallPerson.avatarPath : 'images/generic-details-view-avatar.png';
+        source: (voiceCallPerson && voiceCallPerson.avatarPath) ? voiceCallPerson.avatarPath : 'images/generic-details-view-avatar.png';
     }
 
     Text {

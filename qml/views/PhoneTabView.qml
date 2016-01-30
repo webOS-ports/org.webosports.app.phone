@@ -32,6 +32,7 @@ TabView {
     property VoiceCallMgrWrapper voiceCallManager;
     property PhoneUiTheme appTheme;
 
+    property ContactsModel contactsModel;
     property CallHistory historyModel;
     property FavoritesModel favoritesModel;
 
@@ -66,6 +67,7 @@ TabView {
             appTheme: tabView.appTheme;
             voiceCallManager: tabView.voiceCallManager
             historyModel: tabView.historyModel
+            contacts: contactsModel
         }
     }
 
