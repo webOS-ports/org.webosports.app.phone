@@ -207,6 +207,25 @@ BasePage {
                         patch: callgroupDetail.active ? (avatarDisclosureMouseArea.pressed ? Qt.point(0,3) : Qt.point(0,2) ) :
                                                         (avatarDisclosureMouseArea.pressed ? Qt.point(0,1) : Qt.point(0,0) )
                     }
+                    Image {
+                        source: 'images/call-log-count-pill.png'
+                        anchors {
+                            top: avatarDisclosureMask.top
+                            topMargin: -Units.gu(0.5)
+                            left: avatarDisclosureMask.left
+                            leftMargin: -Units.gu(0.5)
+                        }
+                        width: Units.gu(3.2)
+                        height: Units.gu(3.2)
+
+                        Text {
+                            anchors.centerIn: parent
+                            text: model.callcount
+                            color: 'white'
+                            font.pixelSize: FontUtils.sizeToPixels("12pt")
+                            anchors.verticalCenterOffset: -Units.gu(0.2)
+                        }
+                    }
 
                     MouseArea {
                         id: avatarDisclosureMouseArea
