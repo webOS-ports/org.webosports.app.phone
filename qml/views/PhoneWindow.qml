@@ -158,5 +158,6 @@ ApplicationWindow {
 
         appTheme: phoneUiAppTheme
         voiceCallManager: window.voiceCallManager
+        contactsModel: contacts
     }
 }

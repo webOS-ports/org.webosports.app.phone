@@ -41,9 +41,21 @@ Db8Model {
     }
 
     // this service is synchronous, which can be handy
+    function personById(personId)
+    {
+        console.log("Looking up contacts for personId: " + personId);
+        for( var i=0; i<db8model.count; ++i ) {
+            var person = db8model.get(i);
+            if( person._id === personId ) return person;
+        }
+        console.log(" ... no contact found.");
+        return null;
+    }
+
+    // this service is synchronous, which can be handy
     function personByPhoneNumber(phoneNumber)
     {
-        console.log("Looking up Contact for phone number: " + phoneNumber);
+        console.log("Looking up contacts for phone number: " + phoneNumber);
         for( var i=0; i<db8model.count; ++i ) {
             var person = db8model.get(i);
             for( var j=0; j<person.phoneNumbers.count; ++j ) {

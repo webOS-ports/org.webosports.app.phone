@@ -21,7 +21,7 @@ import QtQuick 2.0
 QtObject {
     id: contactObj
 
-    property string avatarPath: Qt.resolvedUrl('../images/generic-details-view-avatar.png');
+    property string avatarPath: Qt.resolvedUrl('../views/images/generic-details-view-avatar.png');
     property string displayLabel: (nickname === "") ? (givenName + " " + familyName) : nickname;
 
     property string addr; // endedVoiceCall.lineId,

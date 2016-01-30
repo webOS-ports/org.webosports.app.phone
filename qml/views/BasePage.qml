@@ -25,6 +25,7 @@ Rectangle {
             var person = contacts.personByPhoneNumber(voiceCall.lineId);
             var normalizedLineId = contacts.normalizePhoneNumber(voiceCall.lineId);
 
+            voiceCallPerson.avatarPath = Qt.resolvedUrl('images/generic-details-view-avatar.png');
             voiceCallPerson.addr = voiceCall.lineId;
             voiceCallPerson.normalizedAddr = normalizedLineId;
             if( person ) {
@@ -32,10 +33,14 @@ Rectangle {
                 voiceCallPerson.familyName = person.name.familyName;
                 voiceCallPerson.givenName = person.name.givenName;
                 voiceCallPerson.personId = person._id;
+                if(person.photos) {
+                    voiceCallPerson.avatarPath = person.photos.listPhotoPath;
+                }
             }
         }
         else {
             // reset contact
+            voiceCallPerson.avatarPath = "";
             voiceCallPerson.addr = "";
             voiceCallPerson.normalizedAddr = "";
             voiceCallPerson.nickname = "";
