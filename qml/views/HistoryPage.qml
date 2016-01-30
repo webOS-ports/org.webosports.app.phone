@@ -245,7 +245,12 @@ BasePage {
 
                 Loader {
                     id: callgroupDetail
-                    width:parent.width
+                    anchors {
+                        left: parent.left
+                        right: parent.right
+                        leftMargin: Units.gu(1)
+                        rightMargin: Units.gu(3)
+                    }
                     active: false
                     visible: active
                     sourceComponent: Component {
@@ -256,6 +261,7 @@ BasePage {
                             model: CallGroupItems { callGroupId: _callGroupId }
                             delegate: RowLayout {
                                 id: callphoneDelegate
+                                spacing: Units.gu(0.5)
 
                                 // NUMBER_TYPE number (duration) icon time
 
@@ -280,9 +286,9 @@ BasePage {
                                 }
 
                                 width:modelRepeater.width
-                                height: Units.dp(12)
+                                height: Units.gu(3.2)
                                 Text {
-                                    font.pixelSize: FontUtils.sizeToPixels("10pt")
+                                    font.pixelSize: FontUtils.sizeToPixels("12pt")
                                     color:'white'
                                     text: _remotePerson.personAddressType ? _addressTypeMap[_remotePerson.personAddressType]: "";
 
@@ -290,13 +296,13 @@ BasePage {
                                                                     "type_work": "WORK" };
                                 }
                                 Text {
-                                    font.pixelSize: FontUtils.sizeToPixels("10pt")
+                                    font.pixelSize: FontUtils.sizeToPixels("12pt")
                                     color:'grey'
                                     text: _remotePerson.addr
                                 }
                                 Text {
                                     Layout.fillWidth: true
-                                    font.pixelSize: FontUtils.sizeToPixels("10pt")
+                                    font.pixelSize: FontUtils.sizeToPixels("12pt")
                                     color:'grey'
                                     text: _duration;
                                 }
@@ -316,7 +322,7 @@ BasePage {
                                            (model.type === "ignored") ? Qt.point(0,3) : Qt.point(0,2)
                                 }
                                 Text {
-                                    font.pixelSize: FontUtils.sizeToPixels("10pt")
+                                    font.pixelSize: FontUtils.sizeToPixels("12pt")
                                     color:'grey'
                                     text: Qt.formatTime(_timestamp, Qt.locale().timeFormat(Locale.ShortFormat));
                                 }
