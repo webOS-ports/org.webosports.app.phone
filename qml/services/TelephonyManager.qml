@@ -16,6 +16,8 @@
  */
 
 import QtQuick 2.0
+import QtQml 2.2
+
 import MeeGo.QOfono 0.2
 
 Item {
@@ -25,35 +27,24 @@ Item {
      * public API
      **/
 
-    property bool present: true
-    property string subscriberIdentity: ""
-    property string mobileCountryCode: ""
-    property string mobileNetworkCode: ""
+    property bool present: simManager.present
+    property string subscriberIdentity: simManager.subscriberIdentity
+    property string mobileCountryCode: simManager.mobileCountryCode
+    property string mobileNetworkCode: simManager.mobileNetworkCode
 
     /**
      * private API
      **/
 
     function getModemPath() {
-        return modemManager.modems.length > 1 ? modemManager.modems[0] : ""
+        return modemManager.defaultModem
     }
 
     OfonoManager {
         id: modemManager
 
-        Component.onCompleted: {
-            console.log("modem->online:" , JSON.stringify(modem.online));
-            console.log("modem->powered:" , JSON.stringify(modem.powered));
-            console.log("modem->name:" , JSON.stringify(modem.name));
-            console.log("modem->manufacturer:" , JSON.stringify(modem.manufacturer));
-            console.log("modem->features:" , JSON.stringify(modem.features));
-            console.log("modem->revision:" , JSON.stringify(modem.revision));
-            console.log("modem->serial:" , JSON.stringify(modem.serial));
-        }
-
         onAvailableChanged: {
-            console.log("Ofono is " + available)
-            console.log(modemManager.available ? network.currentOperator["Name"].toString() :"Ofono not available")
+            console.log("Ofono is " + available + (modemManager.available ? network.currentOperatorPath :"Ofono not available"))
         }
         onModemAdded: {
             console.log("modem added "+modem)
@@ -63,73 +54,62 @@ Item {
 
     OfonoConnMan {
         id: ofono1
-        Component.onCompleted: {
-            console.log("modems: " + modemManager.modems)
-        }
-        modemPath: modemManager.modems.length > 1  ? modemManager.modems[0] : ""
+        modemPath: modemManager.defaultModem
     }
 
     OfonoModem {
         id: modem
-        modemPath: modemManager.modems.length > 1 ? modemManager.modems[0] : ""
+        modemPath: modemManager.defaultModem
+
+        onOnlineChanged: console.log("modem->online:" , JSON.stringify(modem.online));
+        onPoweredChanged: console.log("modem->powered:" , JSON.stringify(modem.powered));
+        onNameChanged: console.log("modem->name:" , JSON.stringify(modem.name));
+        onManufacturerChanged: console.log("modem->manufacturer:" , JSON.stringify(modem.manufacturer));
+        onFeaturesChanged: console.log("modem->features:" , JSON.stringify(modem.features));
+        onRevisionChanged: console.log("modem->revision:" , JSON.stringify(modem.revision));
+        onSerialChanged: console.log("modem->serial:" , JSON.stringify(modem.serial));
     }
 
-    OfonoContextConnection {
-        id: context1
-        contextPath: ofono1.contexts.length > 1 ? ofono1.contexts[0] : ""
+    Instantiator {
+        model: ofono1.contexts
+        delegate: OfonoContextConnection {
+            id: contextConnection
+            contextPath: modelData
 
-        Component.onCompleted: {
-            console.log(context1.active ? "Connection online" : "Connection offline");
-        }
-
-        onActiveChanged: {
-            console.log(context1.active ? "Connection online" : "Connection offline");
+            onTypeChanged: console.log("contextConnection("+contextPath+")->type:" , JSON.stringify(contextConnection.type));
+            onActiveChanged: console.log("contextConnection("+contextPath+")->active:" , JSON.stringify(contextConnection.active));
         }
     }
 
     OfonoSimManager {
         id: simManager
-        modemPath: modemManager.modems.length > 1 ? modemManager.modems[0] : ""
-        Component.onCompleted: {
-            console.log("simManager->present:" , JSON.stringify(simManager.present));
-            console.log("simManager->CardIdentifier:" , JSON.stringify(simManager.cardIdentifier));
-            console.log("simManager->SubscriberIdentity:" , JSON.stringify(simManager.subscriberIdentity));
-            console.log("simManager->SubscriberNumbers:" , JSON.stringify(simManager.subscriberNumbers));
-            console.log("simManager->LockedPins:" , JSON.stringify(simManager.lockedPins));
-            console.log("simManager->ServiceNumbers:" , JSON.stringify(simManager.serviceNumbers));
-            console.log("simManager->PinRequired:" , JSON.stringify(simManager.pinRequired));
-            console.log("simManager->Retries:" , JSON.stringify(simManager.retries));
-            console.log("pinRetries:" , JSON.stringify(simManager.pinRetries));
+        modemPath: modemManager.defaultModem
 
-            telephonyManager.subscriberIdentity = simManager.subscriberIdentity
-            telephonyManager.present = simManager.present
-        }
+        onPresentChanged: console.log("simManager->present:" , JSON.stringify(simManager.present));
+        onSubscriberNumbersChanged: console.log("simManager->subscriberNumbers:" , JSON.stringify(simManager.subscriberNumbers));
+        onMobileCountryCodeChanged: console.log("simManager->mobileCountryCode:" , JSON.stringify(simManager.mobileCountryCode));
+        onMobileNetworkCodeChanged: console.log("simManager->mobileNetworkCode:" , JSON.stringify(simManager.mobileNetworkCode));
+        onLockedPinsChanged: console.log("simManager->lockedPins:" , JSON.stringify(simManager.lockedPins));
+        onServiceNumbersChanged: console.log("simManager->serviceNumbers:" , JSON.stringify(simManager.serviceNumbers));
+        onPinRequiredChanged: console.log("simManager->pinRequired:" , JSON.stringify(simManager.pinRequired));
+        onPinRetriesChanged: console.log("simManager->pinRetries:" , JSON.stringify(simManager.pinRetries));
+
+        // these two may be sensitive, do not risk having them on a paste on internet
+        //onCardIdentifierChanged: console.log("simManager->CardIdentifier:" , JSON.stringify(simManager.cardIdentifier));
+        //onSubscriberIdentityChanged: console.log("simManager->SubscriberIdentity:" , JSON.stringify(simManager.subscriberIdentity));
     }
 
     OfonoNetworkRegistration {
         id: network
-        modemPath: modemManager.modems.length > 1 ? modemManager.modems[0] : ""
+        modemPath: modemManager.defaultModem
 
-        Component.onCompleted: {
-            console.log("network->currentOperatorPath" , JSON.stringify(network.currentOperatorPath));
-            console.log("network->technology:" , JSON.stringify(network.technology));
-            console.log("network->mode:" , JSON.stringify(network.mode));
-            console.log("network->status:" , JSON.stringify(network.status));
-            console.log("network->name:" , JSON.stringify(network.name));
-        }
+        onCurrentOperatorPathChanged: console.log("network->currentOperatorPath" , JSON.stringify(network.currentOperatorPath));
+        onTechnologyChanged: console.log("network->technology:" , JSON.stringify(network.technology));
+        onModeChanged: console.log("network->mode:" , JSON.stringify(network.mode));
+        onStatusChanged: console.log("network->status:" , JSON.stringify(network.status));
+        onNameChanged: console.log("network->name:" , JSON.stringify(network.name));
 
-        onNetworkOperatorsChanged : {
-            console.log("onNetworkOperatorsChanged")
-            console.log("network->currentOperatorPath" , JSON.stringify(network.currentOperatorPath));
-            if(network.currentOperatorPath) {
-                console.log("network->technology:" , JSON.stringify(network.technology));
-                console.log("network->mode:" , JSON.stringify(network.mode));
-                console.log("network->status:" , JSON.stringify(network.status));
-                console.log("network->name:" , JSON.stringify(network.name));
-            }else{
-                console.log("Not Registered with a network")
-            }
-        }
+        onNetworkOperatorsChanged : console.log("network->networkOperators" , JSON.stringify(network.networkOperators));
 
         onScanError: {
             console.log("Network Scan Failed");

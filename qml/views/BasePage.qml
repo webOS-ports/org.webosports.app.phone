@@ -2,6 +2,8 @@ import QtQuick 2.0
 
 import org.nemomobile.voicecall 1.0
 
+import LuneOS.Telephony 1.0
+
 import "../services"
 import "../model"
 
@@ -22,8 +24,8 @@ Rectangle {
 
     function updateVoiceCallPerson() {
         if( voiceCall ) {
-            var person = contacts.personByPhoneNumber(voiceCall.lineId);
-            var normalizedLineId = contacts.normalizePhoneNumber(voiceCall.lineId);
+            var normalizedLineId = LibPhoneNumber.normalizePhoneNumber(voiceCall.lineId, contacts.countryCode);
+            var person = contacts.personByNormalizedPhoneNumber(normalizedLineId);
 
             voiceCallPerson.avatarPath = Qt.resolvedUrl('images/generic-details-view-avatar.png');
             voiceCallPerson.addr = voiceCall.lineId;

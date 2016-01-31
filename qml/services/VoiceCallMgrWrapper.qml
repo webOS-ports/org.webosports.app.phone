@@ -40,6 +40,8 @@ Item {
     property alias calls: manager.voiceCalls
     property alias activeVoiceCall: manager.activeVoiceCall
 
+    property string countryCode: 'US'
+
     property var heldCall: null
     property string _dialNumberAfterHold: ""
 
@@ -148,5 +150,21 @@ Item {
             var isIncoming=object.isIncoming; // memorize the incoming status asap
             object.statusChanged.connect( function() { _updateState(object, isIncoming) } );
         }
+    }
+
+    Component.onCompleted: {
+        __lunaNextLS2Service.call("luna://com.palm.systemservice/getPreferences", JSON.stringify({ keys: ["region"], subscribe: false }), _getPreferencesSuccess, _getPreferencesFailure)
+    }
+    function _getPreferencesSuccess(message) {
+        var response = JSON.parse(message.payload)
+        if (response.region && response.region.countryCode) {
+            countryCode = response.region.countryCode;
+            console.log("phone: set current country code to: " + response.region.countryCode);
+        }
+    }
+    function _getPreferencesFailure(message) {
+        console.log("No region found, default to US: " + message);
+        countryCode = 'US'
+        console.log("phone: set current country code to: " + response.region.countryCode);
     }
 }

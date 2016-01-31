@@ -19,6 +19,7 @@
 import QtQuick 2.0
 import LuneOS.Application 1.0
 import LuneOS.Service 1.0
+import LuneOS.Telephony 1.0
 
 import "../services/IncomingCallsService.js" as IncomingCallsService
 
@@ -96,7 +97,7 @@ Db8Model {
 
         // we now need to know if the voicecall can be related to an existing personId in the db
         if( !person ) {
-            callGroupID += "_PHONE_" + personListModel.normalizePhoneNumber(endedVoiceCall.lineId) + "_";
+            callGroupID += "_PHONE_" + LibPhoneNumber.normalizePhoneNumber(endedVoiceCall.lineId, personListModel.countryCode) + "_";
         }
         else {
             callGroupID += "_ID_" + person._id + "_";
@@ -132,7 +133,7 @@ Db8Model {
         };
         if( actionForCall===IncomingCallsService.Missed ) newCallItem.groups.push(callGroupID+"missed");
 
-        var normalizedLineId = personListModel.normalizePhoneNumber(endedVoiceCall.lineId);
+        var normalizedLineId = LibPhoneNumber.normalizePhoneNumber(endedVoiceCall.lineId, personListModel.countryCode);
 
         var personDetails = {
             addr: endedVoiceCall.lineId,

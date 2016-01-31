@@ -81,7 +81,7 @@ LuneOS.ApplicationWindow {
     OfonoSimManager {
         id: simManager
 
-        modemPath: modemManager.modems[0]
+        modemPath: modemManager.defaultModem
 
         onEnterPinComplete: _handlePinComplete(error, errorString)
         onResetPinComplete: _handlePinComplete(error, errorString)
