@@ -97,7 +97,7 @@ Db8Model {
 
         // we now need to know if the voicecall can be related to an existing personId in the db
         if( !person ) {
-            callGroupID += "_PHONE_" + LibPhoneNumber.normalizePhoneNumber(endedVoiceCall.lineId) + "_";
+            callGroupID += "_PHONE_" + LibPhoneNumber.normalizePhoneNumber(endedVoiceCall.lineId, personListModel.countryCode) + "_";
         }
         else {
             callGroupID += "_ID_" + person._id + "_";

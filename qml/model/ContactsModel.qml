@@ -63,8 +63,9 @@ Db8Model {
         console.log("Looking up contacts for normalized phone number: " + normalizedPhoneNumber);
         for( var i=0; i<db8model.count; ++i ) {
             var person = db8model.get(i);
-            for( var j=0; j<person.phoneNumbers.count; ++j ) {
-                var personPhoneNumber = person.phoneNumbers.get(j);
+            var nbPhoneNunmbers = (typeof person.phoneNumbers.length !== 'undefined') ? person.phoneNumbers.length : person.phoneNumbers.count
+            for( var j=0; j<nbPhoneNunmbers; ++j ) {
+                var personPhoneNumber = Array.isArray(person.phoneNumbers) ? person.phoneNumbers[j] : person.phoneNumbers.get(j);
                 if( personPhoneNumber.normalizedValue.substr(0, strippedNormalizedPhoneNumber.length) === strippedNormalizedPhoneNumber ) {
                     console.log(" ... found " + person.nickname);
                     return person;
