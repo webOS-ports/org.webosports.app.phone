@@ -16,8 +16,12 @@
  */
 
 import QtQuick 2.0
+
+import LunaNext.Common 0.1
+
 import LuneOS.Service 1.0
 import LuneOS.Application 1.0
+import LuneOS.Telephony 1.0
 
 Db8Model {
     id: db8model
@@ -28,19 +32,15 @@ Db8Model {
         "orderBy": "sortKey"
     }
 
+    property string countryCode
+
     Component.onCompleted: {
         if(db8model.setTestDataFile) {
             db8model.setTestDataFile(Qt.resolvedUrl("../test/persons.json"));
         }
     }
 
-    function normalizePhoneNumber(phoneNumber)
-    {
 
-        return phoneNumber;
-    }
-
-    // this service is synchronous, which can be handy
     function personById(personId)
     {
         console.log("Looking up contacts for personId: " + personId);
@@ -52,15 +52,20 @@ Db8Model {
         return null;
     }
 
-    // this service is synchronous, which can be handy
-    function personByPhoneNumber(phoneNumber)
+    function personByNormalizedPhoneNumber(normalizedPhoneNumber)
     {
-        console.log("Looking up contacts for phone number: " + phoneNumber);
+        // in legacy phone app, this search was done by normalizing the phone
+        // number _without_ the area, country or prefix codes.
+        // only the extension and the national number are taken into account.
+
+        var strippedNormalizedPhoneNumber = normalizedPhoneNumber.split("-", 2).join("-");
+
+        console.log("Looking up contacts for normalized phone number: " + normalizedPhoneNumber);
         for( var i=0; i<db8model.count; ++i ) {
             var person = db8model.get(i);
             for( var j=0; j<person.phoneNumbers.count; ++j ) {
                 var personPhoneNumber = person.phoneNumbers.get(j);
-                if( personPhoneNumber.value === phoneNumber ) {
+                if( personPhoneNumber.normalizedValue.substr(0, strippedNormalizedPhoneNumber.length) === strippedNormalizedPhoneNumber ) {
                     console.log(" ... found " + person.nickname);
                     return person;
                 }
@@ -69,5 +74,10 @@ Db8Model {
 
         console.log(" ... no contact found.");
         return null;
+    }
+
+    function personByPhoneNumber(phoneNumber)
+    {
+        return personByNormalizedPhoneNumber(LibPhoneNumber.normalizePhoneNumber(phoneNumber, db8model.countryCode));
     }
 }

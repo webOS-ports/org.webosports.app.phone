@@ -22,7 +22,13 @@ Item {
                                "13": 3,
                                "14": 3
                              }
+    property var lockedPins: [ 3, 4 ]
     property string subscriberIdentity: ""
+    property string mobileCountryCode: "208"
+    property string mobileNetworkCode: ""
+    property var serviceNumbers: {}
+    property var subscriberNumbers: [ "123" ]
+    property string cardIdentifier: "2563212345678906583"
     property bool present: true
 
     signal enterPinComplete(int error, string errorString)

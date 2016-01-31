@@ -89,6 +89,7 @@ Item {
     /* models */
     ContactsModel {
         id: personListModelId
+        countryCode: voiceCallManagerId.countryCode
     }
     CallHistory {
         id: callHistoryModelId

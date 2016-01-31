@@ -266,7 +266,7 @@ BasePage {
                                 // NUMBER_TYPE number (duration) icon time
 
                                 property date _timestamp: new Date(model.timestamp)
-                                property var _remotePerson: (model.type !== "outgoing") ? model.from : model.to[0]
+                                property var _remotePerson: (model.type !== "outgoing") ? model.from : (Array.isArray(model.to) ? model.to[0] : model.to.get(0))
                                 property string _duration: secondsToTimeString(duration/1000)
 
                                 function secondsToTimeString(seconds) {
