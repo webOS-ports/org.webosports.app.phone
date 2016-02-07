@@ -191,7 +191,7 @@ BasePage {
 
     Row {
         id:rVoiceCallTools
-        height: Units.gu(7)
+        height: Units.gu(5)
         anchors {
             bottom: parent.bottom
             horizontalCenter:parent.horizontalCenter
@@ -200,10 +200,12 @@ BasePage {
         spacing: Units.gu(4)
 
         SpeakerButton {
+            width: Units.gu(5)
+            height: parent.height
+            checkable: true
             visible:root.voiceCallIsActive
             onClicked: {
                 voiceCallManager.setAudioMode(voiceCallManager.audioMode === 'ihf' ? 'earpiece' : 'ihf');
-                btnActive = !btnActive
             }
         }
 
