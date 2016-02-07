@@ -40,6 +40,10 @@ Db8Model {
         }
     }
 
+    function getPhoneNumberTypeStr(phoneNumberType)
+    {
+        return LibPhoneNumber.getPhoneNumberTypeStr(phoneNumberType);
+    }
 
     function personById(personId)
     {

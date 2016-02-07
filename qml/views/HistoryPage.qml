@@ -97,10 +97,13 @@ BasePage {
         }
 
         delegate: Column {
+            id: callGroupDelegate
             width:parent.width
 
             property var _callGroupId: model.groupId ? model.groupId : model._id // keep backward read-only compatibility with Legacy db structure
             property var contact: model.recentcall_address
+            property var remotePerson: (model.recentcall_address && model.recentcall_address.personId) ? contacts.personById(model.recentcall_address.personId) : null
+
 
             // Description of the call group
             RowLayout {
@@ -168,8 +171,8 @@ BasePage {
                     Layout.fillHeight: true
                     Layout.preferredWidth: callGroupRowLayout.height
 
-                    property url personPhotoUrl: (model.recentcall_address && model.recentcall_address.personId) ?
-                                                     contacts.personById(model.recentcall_address.personId).photos.listPhotoPath :
+                    property url personPhotoUrl: callGroupDelegate.remotePerson ?
+                                                     callGroupDelegate.remotePerson.photos.listPhotoPath :
                                                      Qt.resolvedUrl('images/generic-details-view-avatar.png');
 
                     Image {
@@ -255,7 +258,7 @@ BasePage {
                     visible: active
                     sourceComponent: Component {
                       Column {
-                          Repeater {
+                         Repeater {
                             id: modelRepeater
                             width:parent.width
                             model: CallGroupItems { callGroupId: _callGroupId }
@@ -290,10 +293,7 @@ BasePage {
                                 Text {
                                     font.pixelSize: FontUtils.sizeToPixels("12pt")
                                     color:'white'
-                                    text: _remotePerson.personAddressType ? _addressTypeMap[_remotePerson.personAddressType]: "";
-
-                                    property var _addressTypeMap: { "type_mobile": "MOBILE",
-                                                                    "type_work": "WORK" };
+                                    text: _remotePerson.personAddressType ? contacts.getPhoneNumberTypeStr(_remotePerson.personAddressType): "";
                                 }
                                 Text {
                                     font.pixelSize: FontUtils.sizeToPixels("12pt")
@@ -327,9 +327,57 @@ BasePage {
                                     text: Qt.formatTime(_timestamp, Qt.locale().timeFormat(Locale.ShortFormat));
                                 }
                             }
-                        }
+                         }
+
+                         // Now put the phone numbers of the remote person, if it is available
+                         Loader {
+                             active: callGroupDelegate.remotePerson !== null
+                             width: parent.width
+                             sourceComponent: Component {
+                                 Column {
+                                     width: parent.width
+                                     Repeater {
+                                         width: parent.width
+                                         model: callGroupDelegate.remotePerson.phoneNumbers
+                                         delegate: RowLayout {
+                                             width: parent.width
+                                             height: Units.gu(5)
+                                             Text {
+                                                 Layout.fillWidth: true
+                                                 font.pixelSize: FontUtils.sizeToPixels("12pt")
+                                                 color:'white'
+                                                 text: model.value ? model.value : modelData.value;
+                                             }
+                                             Text {
+                                                 font.pixelSize: FontUtils.sizeToPixels("12pt")
+                                                 color:'grey'
+                                                 text: contacts.getPhoneNumberTypeStr(model.type ? model.type : modelData.type);
+                                             }
+                                             ClippedImage {
+                                                 source: 'images/button-sprite.png'
+
+                                                 wantedWidth: parent.height // square button
+                                                 wantedHeight: parent.height // square button
+
+                                                 imageSize: Qt.size(183, 244)
+                                                 patchGridSize: Qt.size(3, 4)
+                                                 patch: smsButtonMouseArea.pressed ? Qt.point(2,1) : Qt.point(2,0)
+
+                                                 MouseArea {
+                                                     id: smsButtonMouseArea
+                                                     anchors.fill: parent
+                                                     onClicked: {
+                                                         // that the Message app with this contact as target
+                                                     }
+                                                 }
+                                             }
+                                         }
+                                     }
+                                 }
+                             }
+                         }
                       }
-                    }
+                   }
                 }
             }
         }
