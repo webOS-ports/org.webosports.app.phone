@@ -20,35 +20,21 @@ import QtQuick.Controls 1.1
 import QtQuick.Controls.Styles 1.1
 import LunaNext.Common 0.1
 
-Button {
-    width: Units.gu(5)
-    height:Units.gu(5)
+import LuneOS.Components 1.0
 
+Button {
     property PhoneUiTheme appTheme: PhoneUiTheme{}
 
-    property bool btnActive: false
-
     style: ButtonStyle {
-        background: Rectangle{
-            color: btnActive ? appTheme.callActionBtnFgColorActive : appTheme.callActionBtnFgColor
-            border.color:  'white'
-            implicitWidth: Units.gu(5)
-            implicitHeight: Units.gu(5)
-            radius: 10
+        background: ClippedImage {
+            source: 'images/button-sprite.png'
 
-            Item {
-                clip: true
-                anchors.horizontalCenter: parent.horizontalCenter
-                anchors.verticalCenter: parent.verticalCenter
-                width: 61
-                height: 61
-                Image{
-                    x: 0
-                    y: control.pressed ? -123: 0
-                    source: "images/button-sprite.png"
-                }
-            }
+            wantedWidth: control.width
+
+            imageSize: Qt.size(183, 244)
+            patchGridSize: Qt.size(3, 4)
+            patch: control.checked ? (control.pressed ? Qt.point(0,3) : Qt.point(0,2) ) :
+                                     (control.pressed ? Qt.point(0,1) : Qt.point(0,0) )
         }
-
     }
 }
