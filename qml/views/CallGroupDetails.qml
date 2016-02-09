@@ -20,6 +20,7 @@ import QtQuick.Layouts 1.2
 
 import LunaNext.Common 0.1
 import LuneOS.Components 1.0
+import LuneOS.Telephony 1.0
 
 import "../model"
 
@@ -42,6 +43,7 @@ Column {
           property date _timestamp: new Date(model.timestamp)
           property var _remotePerson: (model.type !== "outgoing") ? model.from : (Array.isArray(model.to) ? model.to[0] : model.to.get(0))
           property string _duration: secondsToTimeString(duration/1000)
+          property string _callPhoneNumberForDisplay: LibPhoneNumber.formatPhoneNumberForDisplay(_remotePerson.addr, contacts.countryCode);
 
           function secondsToTimeString(seconds) {
               if(seconds===0) return '';
@@ -69,7 +71,7 @@ Column {
           Text {
               font.pixelSize: FontUtils.sizeToPixels("12pt")
               color:'grey'
-              text: _remotePerson.addr
+              text: _callPhoneNumberForDisplay
           }
           Text {
               Layout.fillWidth: true
@@ -113,11 +115,14 @@ Column {
                    delegate: RowLayout {
                        width: parent.width
                        height: Units.gu(5)
+
+                       property string _callGroupDetailPhoneNumberForDisplay: LibPhoneNumber.formatPhoneNumberForDisplay(model.value ? model.value : modelData.value, contacts.countryCode);
+
                        Text {
                            Layout.fillWidth: true
                            font.pixelSize: FontUtils.sizeToPixels("12pt")
                            color:'white'
-                           text: model.value ? model.value : modelData.value;
+                           text: _callGroupDetailPhoneNumberForDisplay;
                        }
                        Text {
                            font.pixelSize: FontUtils.sizeToPixels("12pt")

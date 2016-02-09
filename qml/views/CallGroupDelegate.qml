@@ -21,6 +21,7 @@ import QtQuick.Layouts 1.2
 
 import LunaNext.Common 0.1
 import LuneOS.Components 1.0
+import LuneOS.Telephony 1.0
 
 import "../model"
 
@@ -35,6 +36,7 @@ Column {
     property var contactAddress: model.recentcall_address
     property var remotePerson: (contactAddress && contactAddress.personId) ? contacts.personById(model.recentcall_address.personId) : null
 
+    property string _callGroupPhoneNumberForDisplay: LibPhoneNumber.formatPhoneNumberForDisplay(contactAddress.addr, contacts.countryCode);
 
     // Description of the call group
     RowLayout {
@@ -53,13 +55,13 @@ Column {
                 Layout.fillWidth: true
                 color: 'white'
                 font.pixelSize: FontUtils.sizeToPixels("18pt")
-                text:(contactAddress && contactAddress.name) ? contactAddress.name : model.recentcall_address.addr
+                text:(remotePerson) ? contactAddress.name : _callGroupPhoneNumberForDisplay
             }
             Text {
                 Layout.fillWidth: true
                 color: 'white'
                 font.pixelSize: FontUtils.sizeToPixels("14pt")
-                text:(contactAddress && contactAddress.addr) ? contactAddress.addr : "Unknown"
+                text:(remotePerson) ? _callGroupPhoneNumberForDisplay : "Unknown" // (needs geolocalization of number)
             }
         }
         // On the middle: type of call and time of call
