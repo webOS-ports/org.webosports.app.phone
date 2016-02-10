@@ -1,0 +1,36 @@
+[
+    {
+        "category": "phone",
+        "owner": "org.webosports.app.phone",
+        "prefs": [
+			{
+                "group": "Dialpad Preferences",
+                "restart": "none",
+                "label": "Dialpad Feedback",
+                "help": "Vibrate, sound, both, or none",
+                "key": "dialPadFeedback",
+                "type": "ListSelector",
+                "value": "noFeedback",
+				"choices": 
+				[ 
+					{
+						"label": "Vibrate & Sound",
+						"value": "vibrateSound"
+					}, 
+					{
+						"label": "Vibrate Only",
+						"value": "vibrateOnly"
+					}, 
+					{
+						"label": "Sound Only",
+						"value": "soundOnly"
+					}, 
+					{
+						"label": "None",
+						"value": "noFeedback"
+					} 	
+				]
+            }						
+        ]
+    }
+]

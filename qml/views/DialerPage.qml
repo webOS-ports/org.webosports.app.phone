@@ -19,6 +19,8 @@ import QtQuick 2.0
 import QtQuick.Controls 1.1
 import QtQuick.Controls.Styles 1.1
 import QtQuick.Window 2.1
+import LuneOS.Service 1.0
+import LuneOS.Components 1.0
 import LunaNext.Common 0.1
 
 BasePage {
@@ -29,6 +31,12 @@ BasePage {
 
     function reset() {
         numEntry.text = "";
+    }
+
+    LunaService {
+        id: service
+        name: "org.webosports.app.phone"
+        usePrivateBus: true
     }
 
     NumberEntry {
@@ -52,7 +60,25 @@ BasePage {
             right:dialButton.right
         }
 
+        Tweak {
+            id: dialpadFeedbackTweak
+            owner: "org.webosports.app.phone"
+            serviceName: "org.webosports.app.phone"
+            key: "dialPadFeedback"
+            defaultValue: "noFeedback"
+        }
+
         onKeyPressed: {
+            if(dialpadFeedbackTweak.value === "vibrateSound" || dialpadFeedbackTweak.value === "vibrateOnly") {
+                service.call("luna://com.palm.vibrate/vibrate", JSON.stringify({
+                                                              period: 0, duration: 180
+                                                          }), undefined,
+                                           vibrateFailure)
+            }
+            function vibrateFailure(message) {
+                console.log("Unable to vibrate");
+            }
+
             numEntry.insert(label);
         }
     }
