@@ -18,8 +18,8 @@
            "ims" : [],
            "phoneNumbers" : [
               {
-                 "normalizedValue" : "-432125505--531-+",
-                 "value" : "+135505521234",
+                 "normalizedValue" : "-432125505--024-+",
+                 "value" : "+420505521234",
                  "_id" : "497ec",
                  "primary" : true,
                  "type" : "type_mobile",
@@ -27,8 +27,8 @@
                  "favoriteData" : {}
               },
               {
-                 "normalizedValue" : "-43215099--25-+",
-                 "value" : "+52699051234",
+                 "normalizedValue" : "-43215099--64-+",
+                 "value" : "+46699051234",
                  "_id" : "497ed",
                  "primary" : false,
                  "type" : "type_mobile",
@@ -109,8 +109,8 @@
            "ims" : [],
            "phoneNumbers" : [
               {
-                 "normalizedValue" : "-43219455-1-25-+",
-                 "value" : "+52155491234",
+                 "normalizedValue" : "-43219455-1-64-+",
+                 "value" : "+46155491234",
                  "_id" : "497f7",
                  "primary" : false,
                  "type" : "type_other",
@@ -118,8 +118,8 @@
                  "favoriteData" : {}
               },
               {
-                 "normalizedValue" : "-43211057--25-+",
-                 "value" : "+52675011234",
+                 "normalizedValue" : "-43211057--64-+",
+                 "value" : "+46675011234",
                  "_id" : "497f8",
                  "primary" : false,
                  "type" : "type_mobile",
@@ -200,8 +200,8 @@
            "ims" : [],
            "phoneNumbers" : [
               {
-                 "normalizedValue" : "-43216245-9-25-+",
-                 "value" : "+52954261234",
+                 "normalizedValue" : "-43216245-9-64-+",
+                 "value" : "+46954261234",
                  "_id" : "49838",
                  "primary" : false,
                  "type" : "type_other",
@@ -209,8 +209,8 @@
                  "favoriteData" : {}
               },
               {
-                 "normalizedValue" : "-43216327-4-25-+",
-                 "value" : "+52472361234",
+                 "normalizedValue" : "-43216327-4-64-+",
+                 "value" : "+46472361234",
                  "_id" : "49839",
                  "primary" : false,
                  "type" : "type_other",
@@ -218,8 +218,8 @@
                  "favoriteData" : {}
               },
               {
-                 "normalizedValue" : "-43212277--25-+",
-                 "value" : "+52677221234",
+                 "normalizedValue" : "-43212277--64-+",
+                 "value" : "+46677221234",
                  "_id" : "4983a",
                  "primary" : false,
                  "type" : "type_mobile",
@@ -300,8 +300,8 @@
            "ims" : [],
            "phoneNumbers" : [
               {
-                 "normalizedValue" : "-43217816--25-+",
-                 "value" : "+52661871234",
+                 "normalizedValue" : "-43217816--64-+",
+                 "value" : "+46661871234",
                  "_id" : "49881",
                  "primary" : false,
                  "type" : "type_mobile",
@@ -309,8 +309,8 @@
                  "favoriteData" : {}
               },
               {
-                 "normalizedValue" : "-43217634-1-25-+",
-                 "value" : "+52143671234",
+                 "normalizedValue" : "-43217634-1-64-+",
+                 "value" : "+46143671234",
                  "_id" : "49882",
                  "primary" : false,
                  "type" : "type_other",
@@ -318,8 +318,8 @@
                  "favoriteData" : {}
               },
               {
-                 "normalizedValue" : "-74274321-9-25-+",
-                 "value" : "+52950751234",
+                 "normalizedValue" : "-74274321-9-64-+",
+                 "value" : "+46950751234",
                  "_id" : "49883",
                  "primary" : false,
                  "type" : "type_other",
@@ -403,8 +403,8 @@
            "ims" : [],
            "phoneNumbers" : [
               {
-                 "normalizedValue" : "-43210858-3-25-+",
-                 "value" : "+52385801234",
+                 "normalizedValue" : "-43210858-3-64-+",
+                 "value" : "+46385801234",
                  "_id" : "49905",
                  "primary" : false,
                  "type" : "type_other",
@@ -412,8 +412,8 @@
                  "favoriteData" : {}
               },
               {
-                 "normalizedValue" : "-43213676--25-+",
-                 "value" : "+5266761234",
+                 "normalizedValue" : "-43213676--64-+",
+                 "value" : "+4666761234",
                  "_id" : "49906",
                  "primary" : false,
                  "type" : "type_mobile",
@@ -495,8 +495,8 @@
            "ims" : [],
            "phoneNumbers" : [
               {
-                 "normalizedValue" : "-43211625-9-25-+",
-                 "value" : "+52952611234",
+                 "normalizedValue" : "-43211625-9-64-+",
+                 "value" : "+46952611234",
                  "_id" : "4981f",
                  "primary" : false,
                  "type" : "type_other",
@@ -504,8 +504,8 @@
                  "favoriteData" : {}
               },
               {
-                 "normalizedValue" : "-43218647--25-+",
-                 "value" : "+52674681234",
+                 "normalizedValue" : "-43218647--64-+",
+                 "value" : "+46674681234",
                  "_id" : "49820",
                  "primary" : false,
                  "type" : "type_mobile",
@@ -585,8 +585,8 @@
            "ims" : [],
            "phoneNumbers" : [
               {
-                 "normalizedValue" : "-43218448--25-+",
-                 "value" : "+52684481234",
+                 "normalizedValue" : "-43218448--64-+",
+                 "value" : "+46684481234",
                  "_id" : "497ad",
                  "primary" : false,
                  "type" : "type_mobile",
@@ -666,8 +666,8 @@
            "ims" : [],
            "phoneNumbers" : [
               {
-                 "normalizedValue" : "-43218758-3-25-+",
-                 "value" : "+52385781234",
+                 "normalizedValue" : "-43218758-3-64-+",
+                 "value" : "+46385781234",
                  "_id" : "49778",
                  "primary" : false,
                  "type" : "type_other",
@@ -675,8 +675,8 @@
                  "favoriteData" : {}
               },
               {
-                 "normalizedValue" : "-43214625-9-25-+",
-                 "value" : "+52952641234",
+                 "normalizedValue" : "-43214625-9-64-+",
+                 "value" : "+46952641234",
                  "_id" : "49779",
                  "primary" : false,
                  "type" : "type_other",
@@ -684,8 +684,8 @@
                  "favoriteData" : {}
               },
               {
-                 "normalizedValue" : "-43214408--25-+",
-                 "value" : "+52680441234",
+                 "normalizedValue" : "-43214408--64-+",
+                 "value" : "+46680441234",
                  "_id" : "4977a",
                  "primary" : false,
                  "type" : "type_mobile",
@@ -764,8 +764,8 @@
            "ims" : [],
            "phoneNumbers" : [
               {
-                 "normalizedValue" : "-43213247--25-+",
-                 "value" : "+52674231234",
+                 "normalizedValue" : "-43213247--64-+",
+                 "value" : "+46674231234",
                  "_id" : "49833",
                  "primary" : false,
                  "type" : "type_mobile",
@@ -773,8 +773,8 @@
                  "favoriteData" : {}
               },
               {
-                 "normalizedValue" : "-43212616-1-25-+",
-                 "value" : "+52161621234",
+                 "normalizedValue" : "-43212616-1-64-+",
+                 "value" : "+46161621234",
                  "_id" : "49834",
                  "primary" : false,
                  "type" : "type_work",
@@ -934,8 +934,8 @@
            "ims" : [],
            "phoneNumbers" : [
               {
-                 "normalizedValue" : "-43210135-1-25-+",
-                 "value" : "+52 1 5310 1234",
+                 "normalizedValue" : "-43210135-1-64-+",
+                 "value" : "+46 1 5310 1234",
                  "_id" : "49986",
                  "primary" : false,
                  "type" : "type_work",
@@ -1018,8 +1018,8 @@
                  "favoriteData" : {}
               },
               {
-                 "normalizedValue" : "-432100344--531-+",
-                 "value" : "+135443001234",
+                 "normalizedValue" : "-432100344--024-+",
+                 "value" : "+420443001234",
                  "_id" : "56b7f",
                  "primary" : false,
                  "type" : "type_other",
