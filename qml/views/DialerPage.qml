@@ -71,7 +71,7 @@ BasePage {
         onKeyPressed: {
             if(dialpadFeedbackTweak.value === "vibrateSound" || dialpadFeedbackTweak.value === "vibrateOnly") {
                 service.call("luna://com.palm.vibrate/vibrate", JSON.stringify({
-                                                              period: 0, duration: 180
+                                                              period: 100, duration: 10
                                                           }), undefined,
                                            vibrateFailure)
             }
