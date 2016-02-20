@@ -58,10 +58,17 @@ Column {
                 text:(remotePerson) ? contactAddress.name : _callGroupPhoneNumberForDisplay
             }
             Text {
+                id: detailTextId
                 Layout.fillWidth: true
                 color: 'white'
                 font.pixelSize: FontUtils.sizeToPixels("14pt")
                 text:(remotePerson) ? _callGroupPhoneNumberForDisplay : "Unknown" // (needs geolocalization of number)
+
+                Component.onCompleted: {
+                    if(!remotePerson) {
+                        LibPhoneNumber.getNumberGeolocation(contactAddress.addr, contacts.countryCode, function(loc) { detailTextId.text = loc; });
+                    }
+                }
             }
         }
         // On the middle: type of call and time of call

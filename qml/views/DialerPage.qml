@@ -23,6 +23,8 @@ import LuneOS.Service 1.0
 import LuneOS.Components 1.0
 import LunaNext.Common 0.1
 
+import "../AppTweaks"
+
 BasePage {
     id: pDialPage
 
@@ -60,16 +62,8 @@ BasePage {
             right:dialButton.right
         }
 
-        Tweak {
-            id: dialpadFeedbackTweak
-            owner: "org.webosports.app.phone"
-            serviceName: "org.webosports.app.phone"
-            key: "dialPadFeedback"
-            defaultValue: "noFeedback"
-        }
-
         onKeyPressed: {
-            if(dialpadFeedbackTweak.value === "vibrateSound" || dialpadFeedbackTweak.value === "vibrateOnly") {
+            if(AppTweaks.dialpadFeedbackTweakValue === "vibrateSound" || AppTweaks.dialpadFeedbackTweakValue === "vibrateOnly") {
                 service.call("luna://com.palm.vibrate/vibrate", JSON.stringify({
                                                               period: 100, duration: 10
                                                           }), undefined,
