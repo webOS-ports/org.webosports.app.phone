@@ -66,8 +66,15 @@ Column {
 
                 Component.onCompleted: {
                     if(!remotePerson) {
-                        LibPhoneNumber.getNumberGeolocation(contactAddress.addr, contacts.countryCode, function(loc) { detailTextId.text = loc; });
+                        LibPhoneNumber.getNumberGeolocation(contactAddress.addr, contacts.countryCode, setTextFromGeoLocation);
                     }
+                }
+
+                function setTextFromGeoLocation(geoLocation) {
+                    var location = geoLocation.location || "Unknown";
+                    var country = geoLocation.country || {};
+                    var countryShortName = country.sn || "Unknown Country";
+                    detailTextId.text = location + ", " + countryShortName;
                 }
             }
         }
