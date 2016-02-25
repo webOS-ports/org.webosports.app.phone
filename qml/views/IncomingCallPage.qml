@@ -21,18 +21,36 @@ import QtQuick.Layouts 1.0
 
 import LunaNext.Common 0.1
 
+import LuneOS.Telephony 1.0
+
 import "../services/IncomingCallsService.js" as IncomingCallsService
 
 BasePage {
     id: incommingCallDialog
     pageName: "IncomingCall"
 
-    Image {
-        id:iAvatar
+    BorderImage {
+        id: avatarBackground
+
+        source: "images/frame-background.png"
+        border.left: 70; border.top: 70
+        border.right: 70; border.bottom: 70
+
         anchors {
             top: parent.top
-            horizontalCenter:parent.horizontalCenter
-            topMargin: Units.gu(3)
+            left: parent.left
+            right: parent.right
+            bottom: answerRejectBtns.top
+            margins: Units.gu(1)
+        }
+    }
+
+    Image {
+        id:imageAvatar
+        anchors {
+            top: avatarBackground.top
+            horizontalCenter:avatarBackground.horizontalCenter
+            topMargin: Units.gu(2)
         }
 
         width: Units.gu(35)
@@ -40,43 +58,66 @@ BasePage {
         asynchronous:true
         fillMode:Image.PreserveAspectFit
         smooth:true
-
-        Rectangle {
-            anchors.fill:parent
-            border {color:appTheme.foregroundColor;width:2}
-            radius:10
-            color:'#00000000'
-        }
-
         source: (voiceCallPerson && voiceCallPerson.avatarPath) ? voiceCallPerson.avatarPath : 'images/generic-details-view-avatar.png';
     }
 
     Text {
+        id: lineIdText
         anchors {
-            bottom: answerRejectBtns.top
-            bottomMargin: Units.gu(5)
-            horizontalCenter:parent.horizontalCenter
+            top: imageAvatar.bottom
+            bottom: avatarBackground.bottom
+            topMargin: Units.gu(1)
+            bottomMargin: Units.gu(1)
+            left: avatarBackground.left
+            right: avatarBackground.right
         }
 
-        id: title
-        font.pixelSize: Units.dp(20)
+        font.pixelSize: Units.dp(30)
+        fontSizeMode: Text.Fit
+        horizontalAlignment: Text.AlignHCenter
         color: appTheme.headerTitle
-        text:voiceCallPerson ? voiceCallPerson.displayLabel : voiceCall.lineId;
+        text: voiceCall.lineId
+
+        function updateText() {
+            if(voiceCallPerson && voiceCallPerson.personId) {
+                lineIdText.text = voiceCallPerson.displayLabel +"\n" +
+                                  voiceCallPerson.addr;
+            }
+            else {
+                LibPhoneNumber.getNumberGeolocation(voiceCall.lineId, contacts.countryCode, lineIdText.setTextFromGeoLocation);
+            }
+        }
+
+        function setTextFromGeoLocation(geoLocation) {
+                if(geoLocation.parsed) {
+                    var location = geoLocation.location || "Unknown";
+                    var country = geoLocation.country || {};
+                    var countryShortName = country.sn || "Unknown Country";
+                    lineIdText.text = voiceCall.lineId + "\n"+
+                                      location + ", " + countryShortName;
+                }
+        }
     }
 
-    Row {
+    Component.onCompleted: lineIdText.updateText();
+
+    Item {
         id: answerRejectBtns
         height: Units.gu(12)
         anchors {
             bottom: parent.bottom
-            horizontalCenter:parent.horizontalCenter
+            bottomMargin: Units.gu(2)
+            left: parent.left
+            leftMargin: Units.gu(3)
+            right: parent.right
+            rightMargin: Units.gu(3)
         }
 
-        spacing: Units.gu(16)
-
         IncomingAcceptButton {
-            height: 215
-            width: 215
+            height: 210
+            width: 210
+            anchors.left: parent.left
+            anchors.verticalCenter: parent.verticalCenter
             onClicked: {
                 IncomingCallsService.setActionForCall(voiceCall.handlerId, IncomingCallsService.Accepted);
                 voiceCall.answer();
@@ -86,6 +127,8 @@ BasePage {
         IncomingRejectButton {
             height: 210
             width: 210
+            anchors.right: parent.right
+            anchors.verticalCenter: parent.verticalCenter
             onClicked: {
                 IncomingCallsService.setActionForCall(voiceCall.handlerId, IncomingCallsService.Ignored);
                 voiceCall.hangup();

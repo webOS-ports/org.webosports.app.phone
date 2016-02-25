@@ -17,6 +17,7 @@
 
 import QtQuick 2.0
 import QtQuick.Layouts 1.0
+import QtGraphicalEffects 1.0
 
 import org.nemomobile.voicecall 1.0
 
@@ -33,63 +34,29 @@ BasePage {
 
     function open(){
         root.visible = true
-        tLineId.text = voiceCallPerson ? voiceCallPerson.displayLabel : (voiceCall ? voiceCall.lineId : '');
+        lineIdText.updateText();
     }
 
     function close(){
         root.visible = false
-        tLineId.text = ''
     }
 
+    BorderImage {
+        id: rootBackground
 
-    Rectangle {
-        id: topStatusBar
+        source: "images/frame-background.png"
+        border.left: 70; border.top: 70
+        border.right: 70; border.bottom: 70
+
         anchors {
+            bottom: tVoiceCallDuration.top
+            bottomMargin: Units.gu(1)
+            top: parent.top
+            topMargin: Units.gu(1)
             left: parent.left
             leftMargin: Units.gu(1)
             right: parent.right
             rightMargin: Units.gu(1)
-        }
-        height: Units.gu(5)
-        color: appTheme.headerColor
-        radius: 10
-
-        Text {
-            id:tLineId
-            anchors.fill: parent
-            anchors.margins: Units.gu(0.5)
-            color:appTheme.foregroundColor
-            font.pixelSize: height * 0.8
-
-            horizontalAlignment: Text.AlignRight
-            elide: Text.ElideLeft
-
-            text:voiceCallPerson ? voiceCallPerson.displayLabel : (voiceCall ? voiceCall.lineId : '');
-        }
-
-    }
-
-
-    Text {
-        id:tVoiceCallDuration
-        anchors{
-            top: topStatusBar.bottom
-            topMargin: Units.gu(1)
-            horizontalCenter:parent.horizontalCenter
-        }
-
-        color:appTheme.foregroundColor
-        font.pixelSize: Units.dp(15)
-        text:voiceCall ? secondsToTimeString(voiceCall.duration/1000) : '00:00:00'
-
-        function secondsToTimeString(seconds) {
-            var h = Math.floor(seconds / 3600);
-            var m = Math.floor((seconds - (h * 3600)) / 60);
-            var s = Math.floor(seconds - h * 3600 - m * 60);
-            if(h < 10) h = '0' + h;
-            if(m < 10) m = '0' + m;
-            if(s < 10) s = '0' + s;
-            return '' + h + ':' + m + ':' + s;
         }
     }
 
@@ -99,13 +66,13 @@ BasePage {
         height:Units.gu(38)
 
         anchors{
-            top: tVoiceCallDuration.bottom
-            topMargin: Units.gu(1)
+            top: rootBackground.top
+            topMargin: Units.gu(2)
             bottom: disconnectBtn.top
-            left: parent.left
-            leftMargin: Units.gu(2)
-            right: parent.right
-            rightMargin: Units.gu(2)
+            left: rootBackground.left
+            leftMargin: 23
+            right: rootBackground.right
+            rightMargin: 23
         }
 
         property bool flipped: false
@@ -125,30 +92,64 @@ BasePage {
         }
 
         transitions: Transition {
-            NumberAnimation { target: rotation; property: "angle"; duration: 10 }
+            NumberAnimation { target: rotation; property: "angle"; duration: 200 }
         }
 
-        front:  Image {
-            id:iAvatar
-            anchors {
-                horizontalCenter:parent.horizontalCenter
-            }
-
+        front: Item {
             width: parent.width
             height:parent.height
-            asynchronous:true
-            fillMode:Image.PreserveAspectFit
-            smooth:true
 
-            Rectangle {
-                anchors.fill:parent
-                border {color:appTheme.foregroundColor;width:2}
-                radius:10
-                z: -1
-                color:"black"
+            Image {
+                id:imageAvatar
+                anchors.horizontalCenter: parent.horizontalCenter
+                anchors.top: parent.top
+                anchors.topMargin: Units.gu(2);
+                width: parent.width/2
+                height:parent.height/2
+
+                asynchronous:true
+                fillMode:Image.PreserveAspectFit
+                smooth:true
+                source: voiceCallPerson ? voiceCallPerson.avatarPath : 'images/generic-details-view-avatar.png';
             }
 
-            source: voiceCallPerson ? voiceCallPerson.avatarPath : 'images/generic-details-view-avatar.png';
+            Text {
+                id: lineIdText
+                anchors {
+                    top: imageAvatar.bottom
+                    bottom: parent.bottom
+                    topMargin: Units.gu(1)
+                    bottomMargin: Units.gu(1)
+                    left: parent.left
+                    right: parent.right
+                }
+
+                font.pixelSize: Units.dp(30)
+                fontSizeMode: Text.Fit
+                horizontalAlignment: Text.AlignHCenter
+                color: appTheme.headerTitle
+                text: voiceCall.lineId
+
+                function updateText() {
+                    if(voiceCallPerson && voiceCallPerson.personId) {
+                        lineIdText.text = voiceCallPerson.displayLabel +"\n" +
+                                          voiceCallPerson.addr;
+                    }
+                    else {
+                        LibPhoneNumber.getNumberGeolocation(voiceCall.lineId, contacts.countryCode, lineIdText.setTextFromGeoLocation);
+                    }
+                }
+
+                function setTextFromGeoLocation(geoLocation) {
+                        if(geoLocation.parsed) {
+                            var location = geoLocation.location || "Unknown";
+                            var country = geoLocation.country || {};
+                            var countryShortName = country.sn || "Unknown Country";
+                            lineIdText.text = voiceCall.lineId + "\n"+
+                                              location + ", " + countryShortName;
+                        }
+                }
+            }
         }
 
         back:  Item {
@@ -156,10 +157,26 @@ BasePage {
             width: parent.width
             height:parent.height
 
+            Text {
+                id:tLineId
+                anchors{
+                    top: parent.top
+                    horizontalCenter:parent.horizontalCenter
+                }
+
+                color:appTheme.foregroundColor
+                font.pixelSize: Units.dp(20)
+                text:voiceCall ? voiceCall.lineId : ""
+            }
+
+
             NumPad {
                 id:dtmfpad
                 anchors {
-                    fill: parent
+                    top: tLineId.bottom
+                    bottom: parent.bottom
+                    right: parent.right
+                    left: parent.left
                 }
                 mode:'dtmf'
 
@@ -178,14 +195,39 @@ BasePage {
         id: disconnectBtn
 
         anchors {
-            bottom: rVoiceCallTools.top
-            bottomMargin: Units.gu(2)
-            left: flipable.left
-            right: flipable.right
+            bottom: rootBackground.bottom
+            bottomMargin: 30
+            left: rootBackground.left
+            leftMargin: 23
+            right: rootBackground.right
+            rightMargin: 23
         }
         onClicked: {
            voiceCall.hangup()
            root.close();
+        }
+    }
+
+    Text {
+        id:tVoiceCallDuration
+        anchors{
+            bottom: rVoiceCallTools.top
+            bottomMargin: Units.gu(1)
+            horizontalCenter:parent.horizontalCenter
+        }
+
+        color:appTheme.foregroundColor
+        font.pixelSize: Units.dp(20)
+        text:voiceCall ? secondsToTimeString(voiceCall.duration/1000) : '00:00:00'
+
+        function secondsToTimeString(seconds) {
+            var h = Math.floor(seconds / 3600);
+            var m = Math.floor((seconds - (h * 3600)) / 60);
+            var s = Math.floor(seconds - h * 3600 - m * 60);
+            if(h < 10) h = '0' + h;
+            if(m < 10) m = '0' + m;
+            if(s < 10) s = '0' + s;
+            return '' + h + ':' + m + ':' + s;
         }
     }
 

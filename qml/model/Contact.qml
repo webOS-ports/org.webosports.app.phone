@@ -18,17 +18,54 @@
 
 import QtQuick 2.0
 
+import LuneOS.Telephony 1.0
+
 QtObject {
     id: contactObj
 
-    property string avatarPath: Qt.resolvedUrl('../views/images/generic-details-view-avatar.png');
+    property ContactsModel contactsModel;
+
+    property string avatarPath: _genericAvatarPath
     property string displayLabel: (nickname === "") ? (givenName + " " + familyName) : nickname;
 
-    property string addr; // endedVoiceCall.lineId,
+    property string addr: "";
 
-    property string normalizedAddr;
-    property string nickname;
-    property string familyName;
-    property string givenName;
-    property string personId;
+    property string normalizedAddr: "";
+    property string nickname: "";
+    property string familyName: "";
+    property string givenName: "";
+    property string personId: "";
+
+    readonly property string _genericAvatarPath: Qt.resolvedUrl('../views/images/contacts-unknown-icon-large.png')
+
+    function buildFromVoiceCall(voiceCall)
+    {
+        contactObj.reset();
+
+        var normalizedLineId = LibPhoneNumber.normalizePhoneNumber(voiceCall.lineId, contactsModel.countryCode);
+        var person = contactsModel.personByNormalizedPhoneNumber(normalizedLineId);
+
+        contactObj.addr = voiceCall.lineId;
+        contactObj.normalizedAddr = normalizedLineId;
+        if( person ) {
+            contactObj.nickname = person.nickname;
+            contactObj.familyName = person.name.familyName;
+            contactObj.givenName = person.name.givenName;
+            contactObj.personId = person._id;
+            if(person.photos) {
+                contactObj.avatarPath = person.photos.listPhotoPath;
+            }
+        }
+    }
+
+    function reset()
+    {
+        contactObj.avatarPath = contactObj._genericAvatarPath;
+        contactObj.addr = "";
+        contactObj.normalizedAddr = "";
+        contactObj.nickname = "";
+        contactObj.familyName = "";
+        contactObj.givenName = "";
+        contactObj.personId = "";
+    }
 }
