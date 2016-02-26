@@ -53,8 +53,8 @@ BasePage {
             topMargin: Units.gu(2)
         }
 
-        width: Units.gu(35)
-        height:Units.gu(35)
+        width: avatarBackground.width/2
+        height: width
         asynchronous:true
         fillMode:Image.PreserveAspectFit
         smooth:true
