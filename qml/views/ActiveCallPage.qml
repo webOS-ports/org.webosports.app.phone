@@ -21,6 +21,8 @@ import QtGraphicalEffects 1.0
 
 import org.nemomobile.voicecall 1.0
 
+import LuneOS.Telephony 1.0
+
 import LunaNext.Common 0.1
 
 BasePage {
@@ -31,6 +33,8 @@ BasePage {
     property Item dtmfKeypadDialog
 
     property bool voiceCallIsActive: voiceCall && voiceCall.status === VoiceCall.STATUS_ACTIVE
+
+    Component.onCompleted: lineIdText.updateText();
 
     function open(){
         root.visible = true
