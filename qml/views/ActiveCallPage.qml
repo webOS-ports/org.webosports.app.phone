@@ -204,7 +204,7 @@ BasePage {
                 }
                 mode:'dtmf'
 
-                onKeyPressed: tLineId.text += label
+                onSendKey: tLineId.text += String.fromCharCode(keycode)
                 // entryTarget: tLineId
                 //width: Units.gu(50)
                 //height:childrenRect.height

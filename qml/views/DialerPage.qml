@@ -62,7 +62,7 @@ BasePage {
             right:dialButton.right
         }
 
-        onKeyPressed: {
+        onSendKey: {
             if(AppTweaks.dialpadFeedbackTweakValue === "vibrateSound" || AppTweaks.dialpadFeedbackTweakValue === "vibrateOnly") {
                 service.call("luna://com.palm.vibrate/vibrate", JSON.stringify({
                                                               period: 100, duration: 10
@@ -73,7 +73,7 @@ BasePage {
                 console.log("Unable to vibrate");
             }
 
-            numEntry.insert(label);
+            numEntry.insert(String.fromCharCode(keycode));
         }
     }
 
