@@ -23,8 +23,7 @@ Item {
 
     property string mode: 'dial' // dial, sim
 
-    signal keyPressed(int keycode, string label)
-    signal keyPressAndHold(int keycode, string label)
+    signal sendKey(int keycode)
 
     property int keysWidth: (numPad.width / keys.columns) - Units.gu(2)
     property int keysHeight: (numPad.height / keys.rows) - Units.gu(2)
@@ -46,130 +45,131 @@ Item {
             width: keysWidth
             height: keysHeight
             label:'1'
-            sublabel: (mode === "sim") ? '': 'voicemail'
+            sublabel: 'voicemail'
             keycode: Qt.Key_1
+            disableSubLabel: (mode === "sim")
             posInPadGrid: Qt.point(0,0)
-            onKeyPressed: numPad.keyPressed(keycode, label)
-            onKeyPressAndHold: numPad.keyPressAndHold(keycode, label)
+            onSendKey: numPad.sendKey(keycode)
         }
 
         NumPadButton {
             width: keysWidth
             height: keysHeight
             label:'2'
-            sublabel: (mode === "sim") ? '' : 'ABC'
+            sublabel: 'ABC'
+            disableSubLabel: (mode === "sim")
             keycode: Qt.Key_2
             posInPadGrid: Qt.point(1,0)
-            onKeyPressed: numPad.keyPressed(keycode, label)
-            onKeyPressAndHold: numPad.keyPressAndHold(keycode, label)
+            onSendKey: numPad.sendKey(keycode)
         }
 
         NumPadButton {
             width: keysWidth
             height: keysHeight
             label:'3'
-            sublabel: (mode === "sim") ? '' : 'DEF'
+            sublabel: 'DEF'
+            disableSubLabel: (mode === "sim")
             keycode: Qt.Key_3
             posInPadGrid: Qt.point(2,0)
-            onKeyPressed: numPad.keyPressed(keycode, label)
-            onKeyPressAndHold: numPad.keyPressAndHold(keycode, label)
+            onSendKey: numPad.sendKey(keycode)
         }
 
         NumPadButton {
             width: keysWidth
             height: keysHeight
             label:'4'
-            sublabel: (mode === "sim") ? '' : 'GHI'
+            sublabel: 'GHI'
+            disableSubLabel: (mode === "sim")
             keycode: Qt.Key_4
             posInPadGrid: Qt.point(0,1)
-            onKeyPressed: numPad.keyPressed(keycode, label)
-            onKeyPressAndHold: numPad.keyPressAndHold(keycode, label)
+            onSendKey: numPad.sendKey(keycode)
         }
 
         NumPadButton {
             width: keysWidth
             height: keysHeight
             label:'5'
-            sublabel: (mode === "sim") ? '' : 'JKL'
+            sublabel: 'JKL'
+            disableSubLabel: (mode === "sim")
             keycode: Qt.Key_5
             posInPadGrid: Qt.point(1,1)
-            onKeyPressed: numPad.keyPressed(keycode, label)
-            onKeyPressAndHold: numPad.keyPressAndHold(keycode, label)
+            onSendKey: numPad.sendKey(keycode)
         }
 
         NumPadButton {
             width: keysWidth
             height: keysHeight
             label:'6'
-            sublabel: (mode === "sim") ? '' : 'MNO'
+            sublabel: 'MNO'
+            disableSubLabel: (mode === "sim")
             keycode: Qt.Key_6
             posInPadGrid: Qt.point(2,1)
-            onKeyPressed: numPad.keyPressed(keycode, label)
-            onKeyPressAndHold: numPad.keyPressAndHold(keycode, label)
+            onSendKey: numPad.sendKey(keycode)
         }
 
         NumPadButton {
             width: keysWidth
             height: keysHeight
             label:'7'
-            sublabel: (mode === "sim") ? '' : 'PQRS'
+            sublabel: 'PQRS'
+            disableSubLabel: (mode === "sim")
             keycode: Qt.Key_7
             posInPadGrid: Qt.point(0,1)
-            onKeyPressed: numPad.keyPressed(keycode, label)
-            onKeyPressAndHold: numPad.keyPressAndHold(keycode, label)
+            onSendKey: numPad.sendKey(keycode)
         }
 
         NumPadButton {
             width: keysWidth
             height: keysHeight
             label:'8'
-            sublabel: (mode === "sim") ? '' : 'TUV'
+            sublabel: 'TUV'
+            disableSubLabel: (mode === "sim")
             keycode: Qt.Key_8
             posInPadGrid: Qt.point(1,1)
-            onKeyPressed: numPad.keyPressed(keycode, label)
-            onKeyPressAndHold: numPad.keyPressAndHold(keycode, label)
+            onSendKey: numPad.sendKey(keycode)
         }
 
         NumPadButton {
             width: keysWidth
             height: keysHeight
             label:'9'
-            sublabel: (mode === "sim") ? '' : 'WXYZ'
+            sublabel: 'WXYZ'
+            disableSubLabel: (mode === "sim")
             keycode: Qt.Key_9
             posInPadGrid: Qt.point(2,1)
-            onKeyPressed: numPad.keyPressed(keycode, label)
-            onKeyPressAndHold: numPad.keyPressAndHold(keycode, label)
+            onSendKey: numPad.sendKey(keycode)
         }
 
         NumPadButton {
             width: keysWidth
             height: keysHeight
             label: (mode === "sim") ? '' : '*'
+            disableSubLabel: true
             keycode: Qt.Key_Asterisk
             posInPadGrid: Qt.point(0,2)
-            onKeyPressed: numPad.keyPressed(keycode, label)
-            onKeyPressAndHold: numPad.keyPressAndHold(keycode, label)
+            onSendKey: numPad.sendKey(keycode)
         }
 
         NumPadButton {
             width: keysWidth
             height: keysHeight
             label: '0'
-            sublabel: (mode === "sim") ? '' : '+'
+            sublabel: '+'
+            disableSubLabel: (mode === "sim")
             keycode: Qt.Key_0
+            longpresskeycode: Qt.Key_Plus
             posInPadGrid: Qt.point(1,2)
-            onKeyPressed: numPad.keyPressed(keycode, label)
-            onKeyPressAndHold: numPad.keyPressAndHold(keycode, label)
+            onSendKey: numPad.sendKey(keycode)
         }
 
         NumPadButton {
             width: keysWidth
             height: keysHeight
             label: (mode === "sim") ? '' : '#'
+            disableSubLabel: true
             keycode: Qt.Key_ssharp
             posInPadGrid: Qt.point(2,2)
-            onKeyPressed: numPad.keyPressed(keycode, label)
-            onKeyPressAndHold: numPad.keyPressAndHold(keycode, label)
+            onSendKey: numPad.sendKey(keycode)
         }
     }
 }

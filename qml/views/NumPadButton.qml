@@ -27,13 +27,14 @@ Item {
    property alias label: label.text
    property alias sublabel: sublabel.text
    property int keycode
+   property int longpresskeycode: keycode
+   property bool disableSubLabel: false
    property string alt: ""
    property point posInPadGrid
 
    property int fontSize: height/2.5
 
-   signal keyPressed
-   signal keyPressAndHold
+   signal sendKey(int keycode)
 
     Text {
         id: label
@@ -45,6 +46,7 @@ Item {
 
     Text {
         id: sublabel
+        visible: !disableSubLabel
         anchors.horizontalCenter: parent.horizontalCenter
         anchors.top:label.bottom
         color:appTheme.subForegroundColor
@@ -68,8 +70,19 @@ Item {
     MouseArea {
         id: mouseArea
         anchors.fill:parent
-        onPressed: keyPressed()
-        onPressAndHold: keyPressAndHold()
+
+        // try to send the correct keycode asap
+        property bool _keySent: false
+        onPressed: _keySent = false;
+        onPressAndHold: {
+            _keySent = true;
+            sendKey(root.longpresskeycode);
+        }
+        onReleased: {
+            if(!_keySent) {
+                sendKey(root.keycode);
+            }
+        }
     }
 }
 

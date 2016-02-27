@@ -123,10 +123,10 @@ Item {
 
         mode:'sim'
 
-        onKeyPressed: {
+        onSendKey: {
             if (pinEntry.text.length === _maximumPinLength)
                 return;
-            pinEntry.insert(label);
+            pinEntry.insert(String.fromCharCode(keycode));
         }
     }
 
