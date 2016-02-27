@@ -81,7 +81,7 @@ BasePage {
             id: rotation
             origin.x: flipable.width/2
             origin.y: flipable.height/2
-            axis.x: 1; axis.y: 0; axis.z: 0     // set axis.y to 1 to rotate around y-axis
+            axis.x: 0; axis.y: 1; axis.z: 0
             angle: 0    // the default angle
         }
 
@@ -101,16 +101,35 @@ BasePage {
 
             Image {
                 id:imageAvatar
-                anchors.horizontalCenter: parent.horizontalCenter
-                anchors.top: parent.top
-                anchors.topMargin: Units.gu(2);
-                width: parent.width/2
-                height:parent.height/2
+                anchors {
+                    top: parent.top
+                    topMargin: Units.gu(3);
+                    horizontalCenter: parent.horizontalCenter
+                }
+
+                width: parent.width * 0.6
+                height:width
 
                 asynchronous:true
-                fillMode:Image.PreserveAspectFit
+                fillMode:Image.PreserveAspectCrop
                 smooth:true
                 source: voiceCallPerson ? voiceCallPerson.avatarPath : 'images/generic-details-view-avatar.png';
+            }
+            CornerShader {
+                radius: 35
+                sourceItem: imageAvatar
+                anchors.fill: imageAvatar
+            }
+            Image {
+                id: avatarFrame
+                anchors.centerIn: imageAvatar
+
+                width: imageAvatar.width + Units.gu(2)
+                height: width
+                source: "images/contacts-icon-frame.png"
+                fillMode:Image.Stretch
+                asynchronous:true
+                smooth:true
             }
 
             Text {
@@ -127,6 +146,7 @@ BasePage {
                 font.pixelSize: Units.dp(30)
                 fontSizeMode: Text.Fit
                 horizontalAlignment: Text.AlignHCenter
+                verticalAlignment: Text.AlignVCenter
                 color: appTheme.headerTitle
                 text: voiceCall.lineId
 
