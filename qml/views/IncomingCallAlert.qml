@@ -23,6 +23,8 @@ import LuneOS.Application 1.0 as LuneOS
 
 import org.nemomobile.voicecall 1.0
 
+import LuneOS.Telephony 1.0
+
 import "../services"
 import "../model"
 import "../services/IncomingCallsService.js" as IncomingCallsService
@@ -33,53 +35,52 @@ LuneOS.ApplicationWindow {
     property ContactsModel contacts;
     property VoiceCallMgrWrapper voiceCallManager
     property QtObject voiceCall;
+    onVoiceCallChanged: lineIdText.updateText();
 
     property Contact voiceCallPerson: (voiceCall && contacts) ? contacts.personByPhoneNumber(voiceCall.lineId) : null
 
     width: Settings.displayWidth
-    height: Units.gu(30)
+    height: Units.gu(24)
 
     type: LuneOS.ApplicationWindow.PopupAlert
     color: "transparent"
 
-    Image {
-        id: avatar
-
+    Text {
+        id: lineIdText
         anchors {
             top: parent.top
-            horizontalCenter: parent.horizontalCenter
-            topMargin: Units.gu(3)
-        }
-
-        width: Units.gu(10)
-        height: Units.gu(10)
-        asynchronous: true
-        fillMode: Image.PreserveAspectFit
-        smooth: true
-
-        Rectangle {
-            anchors.fill: parent
-            border { color: "white" /*main.appTheme.foregroundColor*/; width: 2 }
-            radius: 10
-            color: '#00000000'
-        }
-
-        source: voiceCallPerson ? voiceCallPerson.avatarPath : 'images/generic-details-view-avatar.png';
-    }
-
-    Text {
-        anchors {
-            top: avatar.bottom
-            topMargin: Units.gu(5)
             bottom: buttons.top
-            bottomMargin: Units.gu(5)
-            horizontalCenter:parent.horizontalCenter
+            margins: Units.gu(1)
+            left: parent.left
+            right: parent.right
         }
 
-        id: title
-        font.pixelSize: FontUtils.sizeToPixels("large")
+        font.pixelSize: Units.dp(30)
+        fontSizeMode: Text.Fit
+        horizontalAlignment: Text.AlignHCenter
+        verticalAlignment: Text.AlignVCenter
         color: "white"
-        text: voiceCallPerson ? voiceCallPerson.displayLabel : (voiceCall ? voiceCall.lineId : "")
+        text: voiceCall ? voiceCall.lineId : ""
+
+        function updateText() {
+            if(voiceCallPerson && voiceCallPerson.personId) {
+                lineIdText.text = voiceCallPerson.displayLabel +"\n" +
+                                  voiceCallPerson.addr;
+            }
+            else if(voiceCall) {
+                LibPhoneNumber.getNumberGeolocation(voiceCall.lineId, contacts.countryCode, lineIdText.setTextFromGeoLocation);
+            }
+        }
+
+        function setTextFromGeoLocation(geoLocation) {
+                if(geoLocation.parsed) {
+                    var location = geoLocation.location || "Unknown";
+                    var country = geoLocation.country || {};
+                    var countryShortName = country.sn || "Unknown Country";
+                    lineIdText.text = voiceCall.lineId + "\n"+
+                                      location + ", " + countryShortName;
+                }
+        }
     }
 
     Row {
@@ -90,11 +91,12 @@ LuneOS.ApplicationWindow {
             horizontalCenter:parent.horizontalCenter
         }
 
-        spacing: Units.gu(16)
+        spacing: Units.gu(1)
 
         IncomingAcceptButton {
-            height: 215
-            width: 215
+            anchors.verticalCenter: buttons.verticalCenter
+            height: 210
+            width: 210
             onClicked: {
                 IncomingCallsService.setActionForCall(voiceCall.handlerId, IncomingCallsService.Accepted);
                 voiceCall.answer();
@@ -102,7 +104,29 @@ LuneOS.ApplicationWindow {
             }
         }
 
+        Item {
+            anchors.verticalCenter: buttons.verticalCenter
+
+            width: incomingCallAlert.width - 2*210 - Units.gu(1)
+            height: buttons.height
+
+            Image {
+                id: imageAvatar
+                anchors.fill: parent
+                asynchronous:true
+                fillMode:Image.PreserveAspectCrop
+                smooth:true
+                source: (voiceCallPerson && voiceCallPerson.avatarPath) ? voiceCallPerson.avatarPath : 'images/contacts-unknown-icon-large.png';
+            }
+            CornerShader {
+                radius: 30
+                sourceItem: imageAvatar
+                anchors.fill: imageAvatar
+            }
+        }
+
         IncomingRejectButton {
+            anchors.verticalCenter: buttons.verticalCenter
             height: 210
             width: 210
             onClicked: {
