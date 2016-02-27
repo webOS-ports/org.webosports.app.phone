@@ -49,16 +49,33 @@ BasePage {
         id:imageAvatar
         anchors {
             top: avatarBackground.top
+            topMargin: Units.gu(3)
             horizontalCenter:avatarBackground.horizontalCenter
-            topMargin: Units.gu(2)
         }
 
-        width: avatarBackground.width/2
+        width: avatarBackground.width*0.6
         height: width
+
         asynchronous:true
-        fillMode:Image.PreserveAspectFit
+        fillMode:Image.PreserveAspectCrop
         smooth:true
         source: (voiceCallPerson && voiceCallPerson.avatarPath) ? voiceCallPerson.avatarPath : 'images/generic-details-view-avatar.png';
+    }
+    CornerShader {
+        radius: 35
+        sourceItem: imageAvatar
+        anchors.fill: imageAvatar
+    }
+    Image {
+        id: avatarFrame
+        anchors.centerIn: imageAvatar
+
+        width: imageAvatar.width + Units.gu(2)
+        height: width
+        source: "images/contacts-icon-frame.png"
+        fillMode:Image.Stretch
+        asynchronous:true
+        smooth:true
     }
 
     Text {
@@ -68,6 +85,8 @@ BasePage {
             bottom: avatarBackground.bottom
             topMargin: Units.gu(1)
             bottomMargin: Units.gu(1)
+            leftMargin: 50
+            rightMargin: 50
             left: avatarBackground.left
             right: avatarBackground.right
         }
@@ -75,6 +94,7 @@ BasePage {
         font.pixelSize: Units.dp(30)
         fontSizeMode: Text.Fit
         horizontalAlignment: Text.AlignHCenter
+        verticalAlignment: Text.AlignVCenter
         color: appTheme.headerTitle
         text: voiceCall.lineId
 
