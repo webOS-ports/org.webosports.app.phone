@@ -72,7 +72,7 @@ Db8Model {
                 var personPhoneNumber = Array.isArray(person.phoneNumbers) ? person.phoneNumbers[j] : person.phoneNumbers.get(j);
                 if( personPhoneNumber.normalizedValue.substr(0, strippedNormalizedPhoneNumber.length) === strippedNormalizedPhoneNumber ) {
                     console.log(" ... found " + person.nickname);
-                    return person;
+                    return { foundPerson: person, foundPhoneNumber: personPhoneNumber };
                 }
             }
         }

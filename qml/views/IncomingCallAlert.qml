@@ -35,9 +35,8 @@ LuneOS.ApplicationWindow {
     property ContactsModel contacts;
     property VoiceCallMgrWrapper voiceCallManager
     property QtObject voiceCall;
-    onVoiceCallChanged: lineIdText.updateText();
 
-    property Contact voiceCallPerson: (voiceCall && contacts) ? contacts.personByPhoneNumber(voiceCall.lineId) : null
+    property Contact currentContact: Contact { contactsModel: contacts; lineId: voiceCall ? voiceCall.lineId : "" }
 
     width: Settings.displayWidth
     height: Units.gu(24)
@@ -60,27 +59,8 @@ LuneOS.ApplicationWindow {
         horizontalAlignment: Text.AlignHCenter
         verticalAlignment: Text.AlignVCenter
         color: "white"
-        text: voiceCall ? voiceCall.lineId : ""
-
-        function updateText() {
-            if(voiceCallPerson && voiceCallPerson.personId) {
-                lineIdText.text = voiceCallPerson.displayLabel +"\n" +
-                                  voiceCallPerson.addr;
-            }
-            else if(voiceCall) {
-                LibPhoneNumber.getNumberGeolocation(voiceCall.lineId, contacts.countryCode, lineIdText.setTextFromGeoLocation);
-            }
-        }
-
-        function setTextFromGeoLocation(geoLocation) {
-                if(geoLocation.parsed) {
-                    var location = geoLocation.location || "Unknown";
-                    var country = geoLocation.country || {};
-                    var countryShortName = country.sn || "Unknown Country";
-                    lineIdText.text = voiceCall.lineId + "\n"+
-                                      location + ", " + countryShortName;
-                }
-        }
+        text: currentContact.personId ? (currentContact.displayLabel +"\n" + currentContact.addr) :
+                                        (currentContact.lineId + "\n"+ currentContact.geoLocation);
     }
 
     Row {
@@ -101,6 +81,7 @@ LuneOS.ApplicationWindow {
                 IncomingCallsService.setActionForCall(voiceCall.handlerId, IncomingCallsService.Accepted);
                 voiceCall.answer();
                 incomingCallAlert.hide();
+                voiceCall = null;
             }
         }
 
@@ -116,7 +97,7 @@ LuneOS.ApplicationWindow {
                 asynchronous:true
                 fillMode:Image.PreserveAspectCrop
                 smooth:true
-                source: (voiceCallPerson && voiceCallPerson.avatarPath) ? voiceCallPerson.avatarPath : 'images/contacts-unknown-icon-large.png';
+                source: currentContact.avatarPath
             }
             CornerShader {
                 radius: 30
@@ -133,6 +114,7 @@ LuneOS.ApplicationWindow {
                 IncomingCallsService.setActionForCall(voiceCall.handlerId, IncomingCallsService.Ignored);
                 voiceCall.hangup();
                 incomingCallAlert.hide();
+                voiceCall = null;
             }
         }
     }

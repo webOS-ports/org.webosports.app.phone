@@ -24,6 +24,7 @@ QtObject {
     id: contactObj
 
     property ContactsModel contactsModel;
+    property string lineId: "";
 
     property string avatarPath: _genericAvatarPath
     property string displayLabel: (nickname === "") ? (givenName + " " + familyName) : nickname;
@@ -36,25 +37,41 @@ QtObject {
     property string givenName: "";
     property string personId: "";
 
+    property string geoLocation: "Unknown"
+
     readonly property string _genericAvatarPath: Qt.resolvedUrl('../views/images/contacts-unknown-icon-large.png')
 
-    function buildFromVoiceCall(voiceCall)
+    onLineIdChanged: buildFromLineId()
+    function buildFromLineId()
     {
         contactObj.reset();
+        if(contactObj.lineId.length === 0) return;
 
-        var normalizedLineId = LibPhoneNumber.normalizePhoneNumber(voiceCall.lineId, contactsModel.countryCode);
+        var normalizedLineId = LibPhoneNumber.normalizePhoneNumber(contactObj.lineId, contactsModel.countryCode);
         var person = contactsModel.personByNormalizedPhoneNumber(normalizedLineId);
 
-        contactObj.addr = voiceCall.lineId;
+        contactObj.addr = contactObj.lineId;
         contactObj.normalizedAddr = normalizedLineId;
-        if( person ) {
-            contactObj.nickname = person.nickname;
-            contactObj.familyName = person.name.familyName;
-            contactObj.givenName = person.name.givenName;
-            contactObj.personId = person._id;
-            if(person.photos) {
-                contactObj.avatarPath = person.photos.listPhotoPath;
+        if( person && person.foundPerson ) {
+            contactObj.nickname = person.foundPerson.nickname;
+            contactObj.familyName = person.foundPerson.name.familyName;
+            contactObj.givenName = person.foundPerson.name.givenName;
+            contactObj.personId = person.foundPerson._id;
+            if(person.foundPerson.photos) {
+                contactObj.avatarPath = person.foundPerson.photos.listPhotoPath;
             }
+        }
+
+        LibPhoneNumber.getNumberGeolocation(contactObj.lineId, contactsModel.countryCode, contactObj.setTextFromGeoLocation);
+    }
+
+    function setTextFromGeoLocation(geoLocation) {
+        if(geoLocation.parsed) {
+            var location = geoLocation.location || "Unknown";
+            var country = geoLocation.country || {};
+            var countryShortName = country.sn || "Unknown Country";
+
+            contactObj.geoLocation = location + ", " + countryShortName;
         }
     }
 

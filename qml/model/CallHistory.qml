@@ -81,6 +81,54 @@ Db8Model {
         }
     }
 
+    property Connections _personsDbConnections: Connections {
+        target: personListModel
+        onModelReset:_updatePersonsInHistory();
+    }
+
+    function _updatePersonsInHistory() {
+        // This method does two updates:
+        //  - ensure that the recentcall_address.personId still exists for every item
+        //  - associate recentcall_address with a personId when the contact can be found
+        var mergeActions = [];
+        var callGroup = null;
+        var i = 0;
+        // first phase: fill missing personId
+        for(i=0; i<db8model.count; ++i) {
+            callGroup = db8model.get(i);
+            if(callGroup && callGroup.recentcall_address && !callGroup.recentcall_address.personId) {
+                var correspondingPersonId = personListModel.personByNormalizedPhoneNumber(callGroup.recentcall_address.normalizedAddr);
+                if(correspondingPersonId && correspondingPersonId.foundPerson) {
+                    // this number is now associated to a person, so fill in the fields
+                    callGroup.recentcall_address.personId = correspondingPersonId.foundPerson._id;
+                    callGroup.recentcall_address.name = (correspondingPersonId.foundPerson.nickname === "") ? (correspondingPersonId.foundPerson.name.givenName + " " + correspondingPersonId.foundPerson.name.familyName) : correspondingPersonId.foundPerson.nickname;
+                    callGroup.recentcall_address.personFamilyName = correspondingPersonId.foundPerson.name.familyName;
+                    callGroup.recentcall_address.personGivenName = correspondingPersonId.foundPerson.name.givenName;
+                    if(correspondingPersonId.foundPhoneNumber) {
+                        callGroup.recentcall_address.personAddressType = correspondingPersonId.foundPhoneNumber.type;
+                    }
+                    mergeActions.push({ "_id": callGroup._id, "recentcall_address": callGroup.recentcall_address });
+                }
+            }
+        }
+        // second phase: cleanup
+        for(i=0; i<db8model.count; ++i) {
+            callGroup = db8model.get(i);
+            if(callGroup && callGroup.recentcall_address && callGroup.recentcall_address.personId) {
+                if(!personListModel.personById(callGroup.recentcall_address.personId))
+                {
+                    // register a new action to cleanup this one
+                    callGroup.recentcall_address.personId = null;
+                    mergeActions.push({ "_id": callGroup._id, "recentcall_address": callGroup.recentcall_address });
+                }
+            }
+        }
+        // do the merge
+        if(mergeActions.length>0) {
+            __queryDB("merge", { objects: mergeActions }, function(result) {});
+        }
+    }
+
     function _buildCallGroupID(endedVoiceCall, person, startTime)
     {
         // We are looking for a group that is within the same day as endedVoiceCall, and corresponding to the same call.
@@ -113,13 +161,18 @@ Db8Model {
     //  Considérer voiceCall.startedAt, et faire une recherche dans les callGroups sur
     //    - soit les timestamps de la même journée et de la même personne
     //  --> si le résultat contient qqch on prend le plus récent (il ne devrait y en avoir qu'un !), sinon on en créé un nouveau
-    function addEndedCall(endedVoiceCall, person)
+    function addEndedCall(endedVoiceCall)
     {
+        console.log("Call History: adding " + endedVoiceCall.lineId + " to history");
+        var personMatchingNumber = personListModel.personByPhoneNumber(endedVoiceCall.lineId);
+        var foundPerson = personMatchingNumber ? personMatchingNumber.foundPerson: null;
+        var foundPhoneNumber = personMatchingNumber ? personMatchingNumber.foundPhoneNumber: null;
+
         var startTime = new Date();
         startTime.setSeconds(startTime.getSeconds() - endedVoiceCall.duration);
 
         // get the group ID of that call
-        var callGroupID = _buildCallGroupID(endedVoiceCall, person, startTime);
+        var callGroupID = _buildCallGroupID(endedVoiceCall, foundPerson, startTime);
 
         var actionForCall = IncomingCallsService.getActionForCall(endedVoiceCall.handlerId);
 
@@ -140,11 +193,14 @@ Db8Model {
             normalizedAddr: normalizedLineId,
             service: "com.palm.telephony"
         };
-        if( person ) {
-            personDetails.name = (person.nickname === "") ? (person.name.givenName + " " + person.name.familyName) : person.nickname;
-            personDetails.personFamilyName = person.name.familyName;
-            personDetails.personGivenName = person.name.givenName;
-            personDetails.personId = person._id;
+        if( foundPerson ) {
+            personDetails.name = (foundPerson.nickname === "") ? (foundPerson.name.givenName + " " + foundPerson.name.familyName) : foundPerson.nickname;
+            personDetails.personFamilyName = foundPerson.name.familyName;
+            personDetails.personGivenName = foundPerson.name.givenName;
+            personDetails.personId = foundPerson._id;
+        }
+        if( foundPhoneNumber ) {
+            personDetails.personAddressType = foundPhoneNumber.type;
         }
 
         if( endedVoiceCall.isIncoming ) {

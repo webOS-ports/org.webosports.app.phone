@@ -70,20 +70,8 @@ Item {
 
     VoiceCallMgrWrapper {
         id: voiceCallManagerId
-        onIncomingCall: {
-            if(voiceCall.lineId === "999") {
-                phoneWindow.hide();
-                simPinWindowId.show();
-            }
-            else if(!phoneWindow.visible) {
-                incomingCallAlert.voiceCall = voiceCall;
-                incomingCallAlert.show();
-            }
-        }
-        onEndingCall: {
-            if(incomingCallAlert.visible) incomingCallAlert.hide();
-            callHistoryModelId.addEndedCall(voiceCall, personListModelId.personByPhoneNumber(voiceCall.lineId));
-        }
+
+        onEndingCall: callHistoryModelId.addEndedCall(voiceCall);
     }
 
     /* models */
@@ -93,27 +81,18 @@ Item {
     }
     CallHistory {
         id: callHistoryModelId
-
         personListModel: personListModelId
     }
     FavoritesModel {
         id: favoritesModelId
     }
 
+    /* views */
     IncomingCallAlert {
-        id: incomingCallAlert
+        id: incomingCallAlertWindowId
         visible: false
         contacts: personListModelId
         voiceCallManager: voiceCallManagerId
-    }
-
-    PhoneWindow {
-        id: phoneWindow
-        simPinWindow: simPinWindowId
-        contacts: personListModelId
-        voiceCallManager: voiceCallManagerId
-        historyModel: callHistoryModelId
-        favoritesModel: favoritesModelId
     }
 
     SimPinWindow {
@@ -121,7 +100,13 @@ Item {
         visible: false
     }
 
-    function openSIMLockedPage() {
-        simPinWindowId.show();
+    PhoneWindow {
+        id: phoneWindow
+        simPinWindow: simPinWindowId
+        incomingCallAlertWindow: incomingCallAlertWindowId
+        contacts: personListModelId
+        voiceCallManager: voiceCallManagerId
+        historyModel: callHistoryModelId
+        favoritesModel: favoritesModelId
     }
 }

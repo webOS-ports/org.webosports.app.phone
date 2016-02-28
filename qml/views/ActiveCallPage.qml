@@ -34,11 +34,8 @@ BasePage {
 
     property bool voiceCallIsActive: voiceCall && voiceCall.status === VoiceCall.STATUS_ACTIVE
 
-    Component.onCompleted: lineIdText.updateText();
-
     function open(){
         root.visible = true
-        lineIdText.updateText();
     }
 
     function close(){
@@ -117,7 +114,7 @@ BasePage {
                 asynchronous:true
                 fillMode:Image.PreserveAspectCrop
                 smooth:true
-                source: voiceCallPerson ? voiceCallPerson.avatarPath : 'images/generic-details-view-avatar.png';
+                source: currentContact.avatarPath
             }
             CornerShader {
                 radius: 35
@@ -152,27 +149,8 @@ BasePage {
                 horizontalAlignment: Text.AlignHCenter
                 verticalAlignment: Text.AlignVCenter
                 color: appTheme.headerTitle
-                text: voiceCall.lineId
-
-                function updateText() {
-                    if(voiceCallPerson && voiceCallPerson.personId) {
-                        lineIdText.text = voiceCallPerson.displayLabel +"\n" +
-                                          voiceCallPerson.addr;
-                    }
-                    else {
-                        LibPhoneNumber.getNumberGeolocation(voiceCall.lineId, contacts.countryCode, lineIdText.setTextFromGeoLocation);
-                    }
-                }
-
-                function setTextFromGeoLocation(geoLocation) {
-                        if(geoLocation.parsed) {
-                            var location = geoLocation.location || "Unknown";
-                            var country = geoLocation.country || {};
-                            var countryShortName = country.sn || "Unknown Country";
-                            lineIdText.text = voiceCall.lineId + "\n"+
-                                              location + ", " + countryShortName;
-                        }
-                }
+                text: currentContact.personId ? (currentContact.displayLabel +"\n" + currentContact.addr) :
+                                                (currentContact.lineId + "\n"+ currentContact.geoLocation);
             }
         }
 

@@ -17,7 +17,7 @@
  */
 
 import QtQuick 2.0
-import "../views"
+
 import "../services"
 import "../model"
 import QtQuick.Controls 1.1
@@ -28,12 +28,16 @@ import LunaNext.Common 0.1
 import LuneOS.Application 1.0
 
 ApplicationWindow {
-    id: window
+    id: phoneWindow
 
     property alias historyModel: tabView.historyModel
     property alias favoritesModel: tabView.favoritesModel
     property ContactsModel contacts;
     property VoiceCallMgrWrapper voiceCallManager;
+    property IncomingCallAlert incomingCallAlertWindow;
+    property SimPinWindow simPinWindow
+
+    property Contact currentContact: Contact { contactsModel: contacts }
 
     keepAlive: true
     loadingAnimationDisabled: true
@@ -44,12 +48,10 @@ ApplicationWindow {
 
     property bool hideWindowWhenCallEnds: false
 
-    property QtObject simPinWindow
-
     PhoneUiTheme { id: phoneUiAppTheme }
 
     onWindowIdChanged: {
-        console.log("windowId: " + window.windowId);
+        console.log("windowId: " + phoneWindow.windowId);
     }
 
     /**
@@ -77,7 +79,6 @@ ApplicationWindow {
             });
 
             if (existingPage) {
-                existingPage.voiceCall = voiceCall;
                 stackView.pop(existingPage);
             }
             else {
@@ -85,7 +86,8 @@ ApplicationWindow {
                                 properties: {voiceCallManager: voiceCallManager,
                                              appTheme: phoneUiAppTheme,
                                              voiceCall: voiceCall,
-                                             contacts: window.contacts }});
+                                             currentContact: phoneWindow.currentContact,
+                                             contacts: phoneWindow.contacts }});
             }
         }
 
@@ -105,16 +107,33 @@ ApplicationWindow {
         target: voiceCallManager
 
         onIncomingCall: {
+            currentContact.lineId = voiceCall.lineId;
+
             if(voiceCall) {
-                incomingCall(voiceCall);
+                hideWindowWhenCallEnds = (phoneWindow.visible === false);
+
+                if(voiceCall.lineId === "999") {
+                    phoneWindow.hide();
+                    simPinWindow.show();
+                }
+                else if(!phoneWindow.visible) {
+                    // delegate management to incomingCallAlertWindow
+                    incomingCallAlertWindow.voiceCall = voiceCall;
+                    incomingCallAlertWindow.show();
+                }
+                else {
+                    incomingCall(voiceCall);
+                }
             }
         }
         onOutgoingCall: {
+            currentContact.lineId = voiceCall.lineId;
             console.log("Outgoing Call Status: ",voiceCall.status)
 
             activeCallDialog(voiceCall);
         }
         onActiveCall: {
+            currentContact.lineId = voiceCall.lineId;
             console.log("Active Call Status: ",voiceCall.status)
 
             activeCallDialog(voiceCall);
@@ -122,29 +141,29 @@ ApplicationWindow {
         onEndingCall: {
             console.log("VoiceCall " + voiceCall.lineId + " ended")
 
-            tabView.dialerPage.reset();
-            stackView.pop(null)
+            if(phoneWindow.visible) {
+                if(hideWindowWhenCallEnds) phoneWindow.hide();
 
-            // If we were going back to Voicemail tab, go to first tab instead
-            if (tabView.currentIndex == 3)
-                tabView.currentIndex = 0;
+                tabView.dialerPage.reset();
+                stackView.pop(null)
 
-            if(hideWindowWhenCallEnds) window.hide();
-
-            // reset for next time
-            hideWindowWhenCallEnds = false;
+                // If we were going back to Voicemail tab, go to first tab instead
+                if (tabView.currentIndex == 3)
+                    tabView.currentIndex = 0;
+            }
+            currentContact.lineId = "";
         }
     }
 
     function activeCallDialog(voiceCall) {
         console.log("Showing Active Call Dialog")
 
-        hideWindowWhenCallEnds = (window.visible === false);
+        hideWindowWhenCallEnds = (phoneWindow.visible === false);
 
         stackView.openPage("ActiveCall", voiceCall);
 
-        if (!window.visible) {
-            window.show();
+        if (!phoneWindow.visible) {
+            phoneWindow.show();
         }
     }
 
@@ -157,7 +176,7 @@ ApplicationWindow {
         id: tabView
 
         appTheme: phoneUiAppTheme
-        voiceCallManager: window.voiceCallManager
+        voiceCallManager: phoneWindow.voiceCallManager
         contactsModel: contacts
     }
 }
