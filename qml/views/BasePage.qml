@@ -16,17 +16,5 @@ Rectangle {
 
     property VoiceCallMgrWrapper voiceCallManager;
     property QtObject voiceCall;
-    property Contact voiceCallPerson: Contact { contactsModel: contacts }
-
-    onVoiceCallChanged: updateVoiceCallPerson();
-
-    function updateVoiceCallPerson() {
-        if( voiceCall ) {
-            voiceCallPerson.buildFromVoiceCall(voiceCall);
-        }
-        else {
-            // reset contact
-            voiceCallPerson.reset();
-        }
-    }
+    property Contact currentContact;
 }

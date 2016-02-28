@@ -34,7 +34,7 @@ Column {
 
     property string callGroupId: model.groupId ? model.groupId : model._id // keep backward read-only compatibility with Legacy db structure
     property var contactAddress: model.recentcall_address
-    property var remotePerson: (contactAddress && contactAddress.personId) ? contacts.personById(model.recentcall_address.personId) : null
+    property var remotePerson: (contactAddress && contactAddress.personId) ? contacts.personById(contactAddress.personId) : null
 
     property string _callGroupPhoneNumberForDisplay: LibPhoneNumber.formatPhoneNumberForDisplay(contactAddress.addr, contacts.countryCode);
 
