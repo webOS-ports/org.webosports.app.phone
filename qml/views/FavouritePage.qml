@@ -52,7 +52,7 @@ BasePage {
 
             MouseArea {
                 anchors.fill: parent
-                onClicked: voiceCallManager.dial(primaryPhoneNumber);
+                onClicked: voiceCallMgrWrapper.dial(primaryPhoneNumber);
             }
 
             Rectangle {

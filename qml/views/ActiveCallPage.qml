@@ -31,6 +31,7 @@ BasePage {
     pageName: "ActiveCall"
 
     property Item dtmfKeypadDialog
+    property VoiceCallManager voiceCallManager: voiceCallMgrWrapper.manager
 
     property bool voiceCallIsActive: voiceCall && voiceCall.status === VoiceCall.STATUS_ACTIVE
 

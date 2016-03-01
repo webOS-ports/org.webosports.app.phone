@@ -6,7 +6,7 @@ Item {
     property string defaultModem: "/dummy"
     property variant modems: [ "/dummy" ]
 
-    property bool available
+    property bool available: true
 
     signal modemAdded
     signal modemRemoved
