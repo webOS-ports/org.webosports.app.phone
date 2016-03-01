@@ -64,12 +64,13 @@ Item {
         }
     }
 
+
     TelephonyManager {
-        id: telephonyManager
+        id: telephonyManagerId
     }
 
     VoiceCallMgrWrapper {
-        id: voiceCallManagerId
+        id: voiceCallMgrWrapperId
 
         onEndingCall: callHistoryModelId.addEndedCall(voiceCall);
     }
@@ -77,7 +78,7 @@ Item {
     /* models */
     ContactsModel {
         id: personListModelId
-        countryCode: voiceCallManagerId.countryCode
+        countryCode: voiceCallMgrWrapperId.countryCode
     }
     CallHistory {
         id: callHistoryModelId
@@ -90,9 +91,9 @@ Item {
     /* views */
     IncomingCallAlert {
         id: incomingCallAlertWindowId
-        visible: false
         contacts: personListModelId
-        voiceCallManager: voiceCallManagerId
+        voiceCallManager: voiceCallMgrWrapperId
+        visible: false
     }
 
     SimPinWindow {
@@ -105,8 +106,14 @@ Item {
         simPinWindow: simPinWindowId
         incomingCallAlertWindow: incomingCallAlertWindowId
         contacts: personListModelId
-        voiceCallManager: voiceCallManagerId
+        voiceCallMgrWrapper: voiceCallMgrWrapperId
+        telephonyManager: telephonyManagerId
         historyModel: callHistoryModelId
         favoritesModel: favoritesModelId
+    }
+
+    IncomingUSSDAlert {
+        telephonyManager: telephonyManagerId
+        visible: false
     }
 }

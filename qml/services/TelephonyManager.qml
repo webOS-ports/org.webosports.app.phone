@@ -32,6 +32,12 @@ Item {
     property string mobileCountryCode: simManager.mobileCountryCode
     property string mobileNetworkCode: simManager.mobileNetworkCode
 
+    signal ussdResponse(string response);
+
+    function initiateUssd(command) {
+        ofonoUSSD.initiate(command);
+    }
+
     /**
      * private API
      **/
@@ -52,6 +58,33 @@ Item {
         onModemRemoved: console.log("modem removed")
     }
 
+    OfonoSimManager {
+        id: simManager
+        modemPath: modemManager.defaultModem
+
+        onPresentChanged: console.log("simManager->present:" , JSON.stringify(simManager.present));
+        onSubscriberNumbersChanged: console.log("simManager->subscriberNumbers:" , JSON.stringify(simManager.subscriberNumbers));
+        onMobileCountryCodeChanged: console.log("simManager->mobileCountryCode:" , JSON.stringify(simManager.mobileCountryCode));
+        onMobileNetworkCodeChanged: console.log("simManager->mobileNetworkCode:" , JSON.stringify(simManager.mobileNetworkCode));
+        onLockedPinsChanged: console.log("simManager->lockedPins:" , JSON.stringify(simManager.lockedPins));
+        onServiceNumbersChanged: console.log("simManager->serviceNumbers:" , JSON.stringify(simManager.serviceNumbers));
+        onPinRequiredChanged: console.log("simManager->pinRequired:" , JSON.stringify(simManager.pinRequired));
+        onPinRetriesChanged: console.log("simManager->pinRetries:" , JSON.stringify(simManager.pinRetries));
+
+        // these two may be sensitive, do not risk having them on a paste on internet
+        //onCardIdentifierChanged: console.log("simManager->CardIdentifier:" , JSON.stringify(simManager.cardIdentifier));
+        //onSubscriberIdentityChanged: console.log("simManager->SubscriberIdentity:" , JSON.stringify(simManager.subscriberIdentity));
+    }
+
+    OfonoSupplementaryServices {
+        id: ofonoUSSD
+        modemPath: modemManager.defaultModem
+
+        onUssdResponse: telephonyManager.ussdResponse(response);
+        onInitiateFailed: telephonyManager.ussdResponse("USSD request failed.");
+    }
+
+/*
     OfonoConnMan {
         id: ofono1
         modemPath: modemManager.defaultModem
@@ -81,24 +114,6 @@ Item {
         }
     }
 
-    OfonoSimManager {
-        id: simManager
-        modemPath: modemManager.defaultModem
-
-        onPresentChanged: console.log("simManager->present:" , JSON.stringify(simManager.present));
-        onSubscriberNumbersChanged: console.log("simManager->subscriberNumbers:" , JSON.stringify(simManager.subscriberNumbers));
-        onMobileCountryCodeChanged: console.log("simManager->mobileCountryCode:" , JSON.stringify(simManager.mobileCountryCode));
-        onMobileNetworkCodeChanged: console.log("simManager->mobileNetworkCode:" , JSON.stringify(simManager.mobileNetworkCode));
-        onLockedPinsChanged: console.log("simManager->lockedPins:" , JSON.stringify(simManager.lockedPins));
-        onServiceNumbersChanged: console.log("simManager->serviceNumbers:" , JSON.stringify(simManager.serviceNumbers));
-        onPinRequiredChanged: console.log("simManager->pinRequired:" , JSON.stringify(simManager.pinRequired));
-        onPinRetriesChanged: console.log("simManager->pinRetries:" , JSON.stringify(simManager.pinRetries));
-
-        // these two may be sensitive, do not risk having them on a paste on internet
-        //onCardIdentifierChanged: console.log("simManager->CardIdentifier:" , JSON.stringify(simManager.cardIdentifier));
-        //onSubscriberIdentityChanged: console.log("simManager->SubscriberIdentity:" , JSON.stringify(simManager.subscriberIdentity));
-    }
-
     OfonoNetworkRegistration {
         id: network
         modemPath: modemManager.defaultModem
@@ -119,5 +134,6 @@ Item {
     OfonoNetworkOperator {
         id: networkOperator
     }
+    */
 }
 

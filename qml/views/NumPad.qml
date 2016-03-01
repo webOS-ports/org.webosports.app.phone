@@ -167,7 +167,7 @@ Item {
             height: keysHeight
             label: (mode === "sim") ? '' : '#'
             disableSubLabel: true
-            keycode: Qt.Key_ssharp
+            keycode: Qt.Key_NumberSign
             posInPadGrid: Qt.point(2,2)
             onSendKey: numPad.sendKey(keycode)
         }

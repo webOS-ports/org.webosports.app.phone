@@ -33,12 +33,12 @@ Item {
         usePrivateBus: true
     }
 
-    VoiceCallManager {
-        id: manager
+    property VoiceCallManager manager: VoiceCallManager {
+        id: voiceCallManagerId
     }
 
-    property alias calls: manager.voiceCalls
-    property alias activeVoiceCall: manager.activeVoiceCall
+    property alias calls: voiceCallManagerId.voiceCalls
+    property alias activeVoiceCall: voiceCallManagerId.activeVoiceCall
 
     property string countryCode: 'US'
 

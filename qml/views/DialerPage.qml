@@ -89,7 +89,12 @@ BasePage {
 
         onClicked: {
             if(numEntry.text.length > 0) {
-                voiceCallManager.dial(numEntry.getPhoneNumber());
+                if(numEntry.text[0] === "*") {
+                    telephonyManager.initiateUssd(number);
+                }
+                else {
+                    voiceCallMgrWrapper.dial(numEntry.getPhoneNumber());
+                }
             } else {
                 console.log('Number entry is blank.');
             }

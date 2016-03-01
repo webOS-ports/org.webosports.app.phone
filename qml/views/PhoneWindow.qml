@@ -28,12 +28,13 @@ import LunaNext.Common 0.1
 import LuneOS.Application 1.0
 
 ApplicationWindow {
-    id: phoneWindow
+    id: phoneWindowId
 
-    property alias historyModel: tabView.historyModel
-    property alias favoritesModel: tabView.favoritesModel
+    property CallHistory historyModel
+    property FavoritesModel favoritesModel
     property ContactsModel contacts;
-    property VoiceCallMgrWrapper voiceCallManager;
+    property VoiceCallMgrWrapper voiceCallMgrWrapper;
+    property TelephonyManager telephonyManager;
     property IncomingCallAlert incomingCallAlertWindow;
     property SimPinWindow simPinWindow
 
@@ -51,7 +52,7 @@ ApplicationWindow {
     PhoneUiTheme { id: phoneUiAppTheme }
 
     onWindowIdChanged: {
-        console.log("windowId: " + phoneWindow.windowId);
+        console.log("windowId: " + phoneWindowId.windowId);
     }
 
     /**
@@ -60,7 +61,7 @@ ApplicationWindow {
     onVisibleChanged: {
         if(!visible) {
             console.log("Window not active - Cleaning up");
-            voiceCallManager.hangupAll();
+            voiceCallMgrWrapper.hangupAll();
             if (tabView.dialerPage)
                 tabView.dialerPage.reset();
         }
@@ -83,11 +84,12 @@ ApplicationWindow {
             }
             else {
                 stackView.push({item: Qt.resolvedUrl(pageName),
-                                properties: {voiceCallManager: voiceCallManager,
-                                             appTheme: phoneUiAppTheme,
-                                             voiceCall: voiceCall,
-                                             currentContact: phoneWindow.currentContact,
-                                             contacts: phoneWindow.contacts }});
+                                properties: {appTheme: phoneUiAppTheme,
+                                             contacts: phoneWindowId.contacts,
+                                             currentContact: phoneWindowId.currentContact,
+                                             voiceCallMgrWrapper: phoneWindowId.voiceCallMgrWrapper,
+                                             telephonyManager: phoneWindowId.telephonyManager,
+                                             voiceCall: voiceCall }});
             }
         }
 
@@ -104,19 +106,19 @@ ApplicationWindow {
     }
 
     Connections {
-        target: voiceCallManager
+        target: voiceCallMgrWrapper
 
         onIncomingCall: {
             currentContact.lineId = voiceCall.lineId;
 
             if(voiceCall) {
-                hideWindowWhenCallEnds = (phoneWindow.visible === false);
+                hideWindowWhenCallEnds = (phoneWindowId.visible === false);
 
                 if(voiceCall.lineId === "999") {
-                    phoneWindow.hide();
+                    phoneWindowId.hide();
                     simPinWindow.show();
                 }
-                else if(!phoneWindow.visible) {
+                else if(!phoneWindowId.visible) {
                     // delegate management to incomingCallAlertWindow
                     incomingCallAlertWindow.voiceCall = voiceCall;
                     incomingCallAlertWindow.show();
@@ -141,10 +143,10 @@ ApplicationWindow {
         onEndingCall: {
             console.log("VoiceCall " + voiceCall.lineId + " ended")
 
-            if(phoneWindow.visible) {
-                if(hideWindowWhenCallEnds) phoneWindow.hide();
+            if(phoneWindowId.visible) {
+                if(hideWindowWhenCallEnds) phoneWindowId.hide();
 
-                tabView.dialerPage.reset();
+                tabView.resetDialer();
                 stackView.pop(null)
 
                 // If we were going back to Voicemail tab, go to first tab instead
@@ -158,12 +160,12 @@ ApplicationWindow {
     function activeCallDialog(voiceCall) {
         console.log("Showing Active Call Dialog")
 
-        hideWindowWhenCallEnds = (phoneWindow.visible === false);
+        hideWindowWhenCallEnds = (phoneWindowId.visible === false);
 
         stackView.openPage("ActiveCall", voiceCall);
 
-        if (!phoneWindow.visible) {
-            phoneWindow.show();
+        if (!phoneWindowId.visible) {
+            phoneWindowId.show();
         }
     }
 
@@ -176,7 +178,10 @@ ApplicationWindow {
         id: tabView
 
         appTheme: phoneUiAppTheme
-        voiceCallManager: phoneWindow.voiceCallManager
-        contactsModel: contacts
+        historyModel: phoneWindowId.historyModel
+        favoritesModel: phoneWindowId.favoritesModel
+        voiceCallManager: phoneWindowId.voiceCallMgrWrapper
+        telephonyManager: phoneWindowId.telephonyManager
+        contacts: phoneWindowId.contacts
     }
 }

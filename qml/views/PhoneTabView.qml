@@ -25,27 +25,26 @@ import "../model"
 TabView {
     id: tabView
     tabPosition: Qt.BottomEdge
-    //currentIndex: 3
-    //frameVisible: true
-    //tabsVisible: true
 
-    property VoiceCallMgrWrapper voiceCallManager;
     property PhoneUiTheme appTheme;
 
-    property ContactsModel contactsModel;
+    property VoiceCallMgrWrapper voiceCallManager;
+    property TelephonyManager telephonyManager;
+    property ContactsModel contacts;
     property CallHistory historyModel;
     property FavoritesModel favoritesModel;
 
-    property alias dialerPage: tabDialer.item
-    property alias historyPage: tabHistory.item
-    property alias favoritesPage: tabFavorites.item
+    function resetDialer() {
+        tabDialer.item.reset();
+    }
 
     Tab {
         id: tabDialer
         title: "Dial"
         sourceComponent: DialerPage {
             appTheme: tabView.appTheme
-            voiceCallManager: tabView.voiceCallManager
+            voiceCallMgrWrapper: tabView.voiceCallManager
+            telephonyManager: tabView.telephonyManager
             anchors.horizontalCenter: parent.horizontalCenter
         }
     }
@@ -55,7 +54,6 @@ TabView {
         title: "Favorites"
         sourceComponent: FavouritePage{
             appTheme: tabView.appTheme;
-            voiceCallManager: tabView.voiceCallManager
             favoritesModel: tabView.favoritesModel
         }
     }
@@ -65,9 +63,8 @@ TabView {
         title: "Call Log"
         sourceComponent: HistoryPage{
             appTheme: tabView.appTheme;
-            voiceCallManager: tabView.voiceCallManager
             historyModel: tabView.historyModel
-            contacts: contactsModel
+            contacts: tabView.contacts
         }
     }
 
@@ -80,7 +77,7 @@ TabView {
 
     onCurrentIndexChanged: {
         if(currentIndex == 3) {
-            voiceCallManager.dial("453");
+            tabView.phoneWindow.voiceCallManager.dial("453");
         }
     }
 
