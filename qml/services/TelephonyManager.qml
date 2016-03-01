@@ -81,6 +81,7 @@ Item {
         modemPath: modemManager.defaultModem
 
         onUssdResponse: telephonyManager.ussdResponse(response);
+        onInitiateFailed: telephonyManager.ussdResponse("USSD request failed.");
     }
 
 /*

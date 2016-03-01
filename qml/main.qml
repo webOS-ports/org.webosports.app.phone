@@ -91,9 +91,9 @@ Item {
     /* views */
     IncomingCallAlert {
         id: incomingCallAlertWindowId
-        visible: false
         contacts: personListModelId
         voiceCallManager: voiceCallMgrWrapperId
+        visible: false
     }
 
     SimPinWindow {
@@ -110,5 +110,10 @@ Item {
         telephonyManager: telephonyManagerId
         historyModel: callHistoryModelId
         favoritesModel: favoritesModelId
+    }
+
+    IncomingUSSDAlert {
+        telephonyManager: telephonyManagerId
+        visible: false
     }
 }
