@@ -18,6 +18,7 @@
 import QtQuick 2.0
 import QtQuick.Controls 1.1
 import QtQuick.Layouts 1.0
+import QtMultimedia 5.5
 
 import LunaNext.Common 0.1
 
@@ -28,6 +29,22 @@ import "../services/IncomingCallsService.js" as IncomingCallsService
 BasePage {
     id: incommingCallDialog
     pageName: "IncomingCall"
+
+    Audio {
+         id: ringtone
+         loops: Audio.Infinite
+         source: "/usr/palm/sounds/ringtone.mp3"
+    }
+
+    Component.onCompleted: if(incommingCallDialog.visible) ringtone.play();
+    onVisibleChanged: {
+        if(incommingCallDialog.visible) {
+            ringtone.play();
+        }
+        else {
+            ringtone.stop();
+        }
+    }
 
     BorderImage {
         id: avatarBackground
@@ -118,6 +135,7 @@ BasePage {
             anchors.left: parent.left
             anchors.verticalCenter: parent.verticalCenter
             onClicked: {
+                ringtone.stop();
                 IncomingCallsService.setActionForCall(voiceCall.handlerId, IncomingCallsService.Accepted);
                 voiceCall.answer();
             }
@@ -129,6 +147,7 @@ BasePage {
             anchors.right: parent.right
             anchors.verticalCenter: parent.verticalCenter
             onClicked: {
+                ringtone.stop();
                 IncomingCallsService.setActionForCall(voiceCall.handlerId, IncomingCallsService.Ignored);
                 voiceCall.hangup();
             }
