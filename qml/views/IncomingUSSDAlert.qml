@@ -21,13 +21,13 @@ import QtQuick.Controls.Styles 1.1
 
 import LunaNext.Common 0.1
 import LunaNext.Compositor 0.1
-import LuneOS.Application 1.0 as LuneOS
+import LuneOS.Application 1.0
 
 import org.nemomobile.voicecall 1.0
 
 import "../services"
 
-LuneOS.ApplicationWindow {
+LuneOSWindow {
     id: incomingUSSDAlert
 
     property TelephonyManager telephonyManager;
@@ -35,7 +35,7 @@ LuneOS.ApplicationWindow {
     width: Settings.displayWidth
     height: Units.gu(24)
 
-    type: LuneOS.ApplicationWindow.PopupAlert
+    type: LuneOSWindow.PopupAlert
     color: "transparent"
 
     Connections {

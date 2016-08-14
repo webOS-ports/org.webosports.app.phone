@@ -21,12 +21,12 @@ import QtQuick.Layouts 1.0
 import QtQuick.Controls.Styles 1.1
 import LunaNext.Common 0.1
 import LuneOS.Service 1.0
-import LuneOS.Application 1.0 as LuneOS
+import LuneOS.Application 1.0
 import MeeGo.QOfono 0.2
 import "../services"
 import "../services/PinTypes.js" as PinTypes
 
-LuneOS.ApplicationWindow {
+LuneOSWindow {
     id: simPinWindow
 
     width: Settings.displayWidth

@@ -26,7 +26,7 @@ import QtQuick.Layouts 1.0
 
 import LunaNext.Common 0.1
 import LuneOS.Service 1.0
-import LuneOS.Application 1.0 as LuneOS
+import LuneOS.Application 1.0
 
 Item {
     id: root
@@ -43,7 +43,7 @@ Item {
         var params = JSON.parse(launchParams);
 
         if (params.mode && params.mode === "first-use") {
-            simPinWindowId.type = typeof application === "undefined" ? 0 : LuneOS.ApplicationWindow.Pin;
+            simPinWindowId.type = typeof application === "undefined" ? 0 : LuneOSWindow.Pin;
             // PIN window will now open automatically when the PIN is required
             return;
         }
