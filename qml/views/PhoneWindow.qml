@@ -27,7 +27,7 @@ import QtQuick.Layouts 1.0
 import LunaNext.Common 0.1
 import LuneOS.Application 1.0
 
-ApplicationWindow {
+LuneOSWindow {
     id: phoneWindowId
 
     property CallHistory historyModel

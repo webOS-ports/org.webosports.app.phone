@@ -20,7 +20,7 @@ import QtMultimedia 5.5
 
 import LunaNext.Common 0.1
 import LunaNext.Compositor 0.1
-import LuneOS.Application 1.0 as LuneOS
+import LuneOS.Application 1.0
 
 import org.nemomobile.voicecall 1.0
 
@@ -30,7 +30,7 @@ import "../services"
 import "../model"
 import "../services/IncomingCallsService.js" as IncomingCallsService
 
-LuneOS.ApplicationWindow {
+LuneOSWindow {
     id: incomingCallAlert
 
     property ContactsModel contacts;
@@ -42,7 +42,7 @@ LuneOS.ApplicationWindow {
     width: Settings.displayWidth
     height: Units.gu(24)
 
-    type: LuneOS.ApplicationWindow.PopupAlert
+    type: LuneOSWindow.PopupAlert
     color: "transparent"
 
     Audio {
