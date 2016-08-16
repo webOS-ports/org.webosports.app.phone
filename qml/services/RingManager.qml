@@ -30,7 +30,7 @@ import QtQuick 2.0
 import QtMultimedia 5.5
 
 Item {
-    id: ringingMgrItem
+    id: ringMgrItem
     property VoiceCallMgrWrapper voiceCallManager
 
     state: "default"
@@ -45,14 +45,6 @@ Item {
         }
     ]
 
-    transitions: [
-        Transition {
-            from: "default"
-            to: "ringing"
-
-        }
-    ]
-
     Audio {
          id: ringtone
          loops: Audio.Infinite
@@ -61,9 +53,9 @@ Item {
 
     Connections {
         target: voiceCallManager
-        onIncomingCall: ringingMgrItem.state = "ringing";
-        onActiveCall: ringingMgrItem.state = "default";
-        onEndingCall: ringingMgrItem.state = "default";
-        onResetCall: ringingMgrItem.state = "default";
+        onIncomingCall: ringMgrItem.state = "ringing";
+        onActiveCall: ringMgrItem.state = "default";
+        onEndingCall: ringMgrItem.state = "default";
+        onResetCall: ringMgrItem.state = "default";
     }
 }

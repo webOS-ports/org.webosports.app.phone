@@ -76,7 +76,6 @@ Item {
     }
 
     RingManager {
-        id: ringingManager
         voiceCallManager: voiceCallMgrWrapperId
     }
 
