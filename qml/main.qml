@@ -75,6 +75,10 @@ Item {
         onEndingCall: callHistoryModelId.addEndedCall(voiceCall);
     }
 
+    RingManager {
+        voiceCallManager: voiceCallMgrWrapperId
+    }
+
     /* models */
     ContactsModel {
         id: personListModelId

@@ -153,6 +153,10 @@ LuneOSWindow {
                 if (tabView.currentIndex == 3)
                     tabView.currentIndex = 0;
             }
+            if(incomingCallAlertWindow.visible) {
+                incomingCallAlertWindow.hide();
+                incomingCallAlertWindow.voiceCall = null;
+            }
             currentContact.lineId = "";
         }
     }

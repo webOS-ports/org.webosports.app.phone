@@ -16,7 +16,6 @@
  */
 
 import QtQuick 2.0
-import QtMultimedia 5.5
 
 import LunaNext.Common 0.1
 import LunaNext.Compositor 0.1
@@ -44,21 +43,6 @@ LuneOSWindow {
 
     type: LuneOSWindow.PopupAlert
     color: "transparent"
-
-    Audio {
-         id: ringtone
-         loops: Audio.Infinite
-         source: "/usr/palm/sounds/ringtone.mp3"
-    }
-
-    onVisibleChanged: {
-        if(incomingCallAlert.visible) {
-            ringtone.play();
-        }
-        else {
-            ringtone.stop();
-        }
-    }
 
     Text {
         id: lineIdText
@@ -94,7 +78,6 @@ LuneOSWindow {
             height: 210
             width: 210
             onClicked: {
-                ringtone.stop();
                 IncomingCallsService.setActionForCall(voiceCall.handlerId, IncomingCallsService.Accepted);
                 voiceCall.answer();
                 incomingCallAlert.hide();
@@ -128,7 +111,6 @@ LuneOSWindow {
             height: 210
             width: 210
             onClicked: {
-                ringtone.stop();
                 IncomingCallsService.setActionForCall(voiceCall.handlerId, IncomingCallsService.Ignored);
                 voiceCall.hangup();
                 incomingCallAlert.hide();
