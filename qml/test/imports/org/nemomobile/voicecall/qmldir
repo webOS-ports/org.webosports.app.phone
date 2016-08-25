@@ -1,6 +1,0 @@
-module org.nemomobile.voicecall 
-
-VoiceCallManager 1.0 VoiceCallManager.qml
-VoiceCall        1.0 VoiceCallStatusStub.js
-
-typeinfo org.nemomobile.voicecall.qmltypes
