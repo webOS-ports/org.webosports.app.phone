@@ -27,7 +27,7 @@ BasePage {
     id: historyPageId
     pageName: "History"
 
-    property alias historyModel: historyList.model
+    property alias historyModel: historyListViewModel.sourceModel
 
     // All / Missed button chooser
     Row {
@@ -52,6 +52,36 @@ BasePage {
             width: Units.gu(14)
             exclusiveGroup: allOrMissedGroup
         }
+        TextInput {
+            id: searchFieldInput
+            height: parent.height
+            width: Units.gu(14)
+            text: ""
+        }
+    }
+
+    ListModel {
+        id: historyListViewModel
+        property ListModel sourceModel
+        property string filter: searchFieldInput.text
+        onFilterChanged: _updateModel();
+        Component.onCompleted: _updateModel();
+
+        function _updateModel() {
+            //var currentIdxFilteredModel = 0;
+            //var currentFilteredModelObj = historyListViewModel.get(0);
+            historyListViewModel.clear(); // we can do better
+
+            for(var i=0; i<sourceModel.count; ++i) {
+                var eltSrc = sourceModel.get(i);
+                if(eltSrc.recentcall_address && eltSrc.recentcall_address.name) {
+                    if(eltSrc.recentcall_address.name.indexOf(filter) >= 0)
+                    {
+                        historyListViewModel.append(eltSrc);
+                    }
+                }
+            }
+        }
     }
 
     ListView {
@@ -64,6 +94,7 @@ BasePage {
         }
         spacing:4
         clip:true
+        model: historyListViewModel
 
         section.property: "timestamp_day"
         section.criteria: ViewSection.FullString
