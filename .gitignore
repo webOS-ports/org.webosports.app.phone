@@ -1,2 +1,4 @@
-phoneapp.qmlproject.user
+*.qmlproject.user
+*.qmlc
+*.jsc
 *.swp
