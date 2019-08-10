@@ -85,6 +85,7 @@ Column {
             Layout.minimumWidth: Units.gu(3.2)
             ClippedImage {
                 Layout.preferredHeight: Units.gu(3.2)
+                Layout.alignment: Qt.AlignHCenter
 
                 source: 'images/call-log-list-sprite.png'
 
@@ -96,7 +97,6 @@ Column {
                 patch: (model.recentcall_type==="missed") ? Qt.point(0,0) :
                        (model.recentcall_type === "incoming") ? Qt.point(0,1) :
                        (model.recentcall_type === "ignored") ? Qt.point(0,3) : Qt.point(0,2)
-                anchors.horizontalCenter: timeStampText.horizontalCenter
             }
             Text {
                 id: timeStampText
