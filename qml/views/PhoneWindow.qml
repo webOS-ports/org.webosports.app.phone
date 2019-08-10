@@ -16,13 +16,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>
  */
 
-import QtQuick 2.0
+import QtQuick 2.6
 
 import "../services"
 import "../model"
-import QtQuick.Controls 1.1
-import QtQuick.Controls.Styles 1.1
+import QtQuick.Controls 2.5
 import QtQuick.Layouts 1.0
+import QtQuick.Window 2.3
 
 import LunaNext.Common 0.1
 import LuneOS.Application 1.0
@@ -50,10 +50,6 @@ LuneOSWindow {
     property bool hideWindowWhenCallEnds: false
 
     PhoneUiTheme { id: phoneUiAppTheme }
-
-    onWindowIdChanged: {
-        console.log("windowId: " + phoneWindowId.windowId);
-    }
 
     /**
      * When PhoneApp is closed, hang up any active calls.
@@ -83,24 +79,13 @@ LuneOSWindow {
                 stackView.pop(existingPage);
             }
             else {
-                stackView.push({item: Qt.resolvedUrl(pageName),
-                                properties: {appTheme: phoneUiAppTheme,
+                stackView.push(Qt.resolvedUrl(pageName),
+                                {appTheme: phoneUiAppTheme,
                                              contacts: phoneWindowId.contacts,
                                              currentContact: phoneWindowId.currentContact,
                                              voiceCallMgrWrapper: phoneWindowId.voiceCallMgrWrapper,
                                              telephonyManager: phoneWindowId.telephonyManager,
-                                             voiceCall: voiceCall }});
-            }
-        }
-
-        delegate: StackViewDelegate {
-            function transitionFinished(properties) {
-                properties.exitItem.opacity = 1
-            }
-
-            pushTransition: StackViewTransition {
-                PropertyAnimation { target: enterItem; property: "opacity"; from: 0; to: 1 }
-                PropertyAnimation { target: exitItem; property: "opacity"; from: 1; to: 0 }
+                                             voiceCall: voiceCall });
             }
         }
     }

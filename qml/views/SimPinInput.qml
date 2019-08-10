@@ -51,7 +51,7 @@ Item {
             id: title
             font.pixelSize: FontUtils.sizeToPixels("large")
             color: appTheme.headerTitle
-            anchors.horizontalCenter: parent.horizontalCenter
+            Layout.alignment: Qt.AlignHCenter
             text: {
                 switch (requestedPinType) {
                 case PinTypes.SimPin:
@@ -70,7 +70,7 @@ Item {
             id: warning
             color: appTheme.headerTitle
             font.pixelSize: FontUtils.sizeToPixels("medium")
-            anchors.horizontalCenter: parent.horizontalCenter
+            Layout.alignment: Qt.AlignHCenter
             wrapMode: Text.Wrap
             horizontalAlignment: Text.AlignHCenter
             text: {
