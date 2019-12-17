@@ -52,12 +52,12 @@ Item {
     signal resetCall(var voiceCall);
 
     function __setCallModeError(message) {
-        console.log("Problem when calling luna://org.webosports.audio/setCallMode : " + message);
+        console.log("Problem when calling luna://org.webosports.service.audio/setCallMode : " + message);
     }
 
     onActiveVoiceCallChanged: {
         console.log("Active VoiceCall changed -> setting audio to " + !!activeVoiceCall);
-        __lunaNextLS2Service.call("luna://org.webosports.audio/setCallMode", JSON.stringify({ inCall: (!!activeVoiceCall) }),
+        __lunaNextLS2Service.call("luna://org.webosports.service.audio/setCallMode", JSON.stringify({ inCall: (!!activeVoiceCall) }),
                                   undefined, root.__setCallModeError);
     }
 
