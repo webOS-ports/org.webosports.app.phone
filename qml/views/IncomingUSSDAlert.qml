@@ -40,7 +40,7 @@ LuneOSWindow {
 
     Connections {
         target: telephonyManager
-        onUssdResponse: {
+        function onUssdResponse(ussdText) {
             ussdText.text = response;
             incomingUSSDAlert.show();
         }
