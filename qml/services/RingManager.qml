@@ -55,19 +55,19 @@ Item {
 
     Connections {
         target: voiceCallManager
-        function onIncomingCall() { 
+        function onIncomingCall(voiceCall) {
             ringMgrItem.state = "ringing";
         }
         
-        function onActiveCall() {
+        function onActiveCall(voiceCall) {
             ringMgrItem.state = "default";
         }
         
-        function onEndingCall() {
+        function onEndingCall(voiceCall) {
             ringMgrItem.state = "default";
         }
         
-        function onResetCall() {
+        function onResetCall(voiceCall) {
             ringMgrItem.state = "default";
         }
     }
