@@ -55,10 +55,21 @@ Item {
 
     Connections {
         target: voiceCallManager
-        onIncomingCall: ringMgrItem.state = "ringing";
-        onActiveCall: ringMgrItem.state = "default";
-        onEndingCall: ringMgrItem.state = "default";
-        onResetCall: ringMgrItem.state = "default";
+        function onIncomingCall(voiceCall) {
+            ringMgrItem.state = "ringing";
+        }
+        
+        function onActiveCall(voiceCall) {
+            ringMgrItem.state = "default";
+        }
+        
+        function onEndingCall(voiceCall) {
+            ringMgrItem.state = "default";
+        }
+        
+        function onResetCall(voiceCall) {
+            ringMgrItem.state = "default";
+        }
     }
 
     Component.onCompleted: {

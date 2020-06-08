@@ -9,6 +9,7 @@
 	"noWindow": true,
 	"icon": "icon.png",
 	"uiRevision": "2",
-	"keywords": [ "Dial" ]
+	"keywords": [ "Dial" ],
+	"requiredPermissions": ["networking", "networking.query", "settings", "applications.internal", "media", "database", "applications"]
 }
 

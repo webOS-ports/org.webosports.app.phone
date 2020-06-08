@@ -83,7 +83,9 @@ Db8Model {
 
     property Connections _personsDbConnections: Connections {
         target: personListModel
-        onModelReset:_updatePersonsInHistory();
+        function onModelReset() {
+            _updatePersonsInHistory();
+        }
     }
 
     function _updatePersonsInHistory() {

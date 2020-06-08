@@ -93,7 +93,7 @@ LuneOSWindow {
     Connections {
         target: voiceCallMgrWrapper
 
-        onIncomingCall: {
+        function onIncomingCall(voiceCall) {
             currentContact.lineId = voiceCall.lineId;
 
             if(voiceCall) {
@@ -113,19 +113,22 @@ LuneOSWindow {
                 }
             }
         }
-        onOutgoingCall: {
+        
+        function onOutgoingCall(voiceCall) {
             currentContact.lineId = voiceCall.lineId;
             console.log("Outgoing Call Status: ",voiceCall.status)
 
             activeCallDialog(voiceCall);
         }
-        onActiveCall: {
+        
+        function onActiveCall(voiceCall) {
             currentContact.lineId = voiceCall.lineId;
             console.log("Active Call Status: ",voiceCall.status)
 
             activeCallDialog(voiceCall);
         }
-        onEndingCall: {
+        
+        function onEndingCall(voiceCall) {
             console.log("VoiceCall " + voiceCall.lineId + " ended")
 
             if(phoneWindowId.visible) {

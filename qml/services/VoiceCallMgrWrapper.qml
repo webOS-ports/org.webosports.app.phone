@@ -138,7 +138,7 @@ Item {
 
     Connections {
         target: calls
-        onRowsInserted: {
+        function onRowsInserted(parent, first, last) {
             for(var i=first;i<=last;++i) {
                 var object = calls.instance(i);
                 addStatusObserver(object);

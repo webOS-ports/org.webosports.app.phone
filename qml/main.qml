@@ -51,7 +51,7 @@ Item {
 
     Connections {
         target: typeof application !== "undefined" ? application : null
-        onRelaunched: {
+        function onRelaunched(parameters) {
             console.log("DEBUG: Relaunched with parameters: " + parameters);
 
             // If we're launched at boot time we're not yet visible so bring our window
