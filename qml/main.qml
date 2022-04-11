@@ -25,19 +25,25 @@ import LunaNext.Common 0.1
 import LuneOS.Service 1.0
 import LuneOS.Application 1.0
 
-Item {
+import Eos.Window 0.1
+
+WebOSWindow {
     id: root
+
+    visible: false
 
     width: Settings.displayWidth
     height: Settings.displayHeight
 
     Component.onCompleted: {
-        var launchParams = "{\"mode\":\"first-use\"}";
+        var launchParams = {"mode": "first-use"};
         if (typeof application !== "undefined")
-            launchParams = application.launchParameters;
+            launchParams = JSON.parse(application.launchParameters);
+        else if(typeof root.launchParams !== "undefined")
+	    launchParams = root.launchParams;
 
-        console.log("Parsing Launch Params: " + launchParams);
-        var params = JSON.parse(launchParams);
+        console.warn("Parsing Launch Params: " + JSON.stringify(launchParams));
+        var params = launchParams;
 
         if (params.mode && params.mode === "first-use") {
             simPinWindowId.type = typeof application === "undefined" ? 0 : LuneOSWindow.Pin;
@@ -47,6 +53,12 @@ Item {
 
         if (!params.launchedAtBoot)
             phoneWindow.show();
+    }
+
+    onLaunchParamsChanged: {
+	console.log("DEBUG: Relaunched with parameters: " + launchParams);
+        if (!phoneWindow.visible)
+		phoneWindow.show();
     }
 
     Connections {

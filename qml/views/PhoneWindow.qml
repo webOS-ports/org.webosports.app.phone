@@ -27,7 +27,9 @@ import QtQuick.Window 2.3
 import LunaNext.Common 0.1
 import LuneOS.Application 1.0
 
-LuneOSWindow {
+import Eos.Window 0.1
+
+WebOSWindow {
     id: phoneWindowId
 
     property CallHistory historyModel
@@ -40,8 +42,7 @@ LuneOSWindow {
 
     property Contact currentContact: Contact { contactsModel: contacts }
 
-    keepAlive: true
-    loadingAnimationDisabled: true
+    visible: false
 
     width: Settings.displayWidth
     height: Settings.displayHeight
