@@ -36,14 +36,28 @@ WebOSWindow {
     height: Settings.displayHeight
 
     Component.onCompleted: {
-        var launchParams = {"mode": "first-use"};
-        if (typeof application !== "undefined")
-            launchParams = JSON.parse(application.launchParameters);
-        else if(typeof root.launchParams !== "undefined")
-	    launchParams = root.launchParams;
+        // with qml-runner, launchParams are set later on
+        if(typeof root.params === "undefined") {
+            var launchParams = {"mode": "first-use"};
+            if (typeof application !== "undefined")
+                launchParams = JSON.parse(application.launchParameters);
 
-        console.warn("Parsing Launch Params: " + JSON.stringify(launchParams));
-        var params = launchParams;
+            console.log("Parsing Launch Params: " + JSON.stringify(launchParams));
+            var params = launchParams;
+
+            if (params.mode && params.mode === "first-use") {
+                simPinWindowId.type = typeof application === "undefined" ? 0 : LuneOSWindow.Pin;
+                // PIN window will now open automatically when the PIN is required
+                return;
+            }
+
+            if (!params.launchedAtBoot)
+                phoneWindow.show();
+        }
+    }
+
+    onLaunchParamsChanged: {
+        console.log("DEBUG: Relaunched with parameters: " + launchParams);
 
         if (params.mode && params.mode === "first-use") {
             simPinWindowId.type = typeof application === "undefined" ? 0 : LuneOSWindow.Pin;
@@ -51,14 +65,8 @@ WebOSWindow {
             return;
         }
 
-        if (!params.launchedAtBoot)
+        if (!phoneWindow.visible && !params.launchedAtBoot)
             phoneWindow.show();
-    }
-
-    onLaunchParamsChanged: {
-	console.log("DEBUG: Relaunched with parameters: " + launchParams);
-        if (!phoneWindow.visible)
-		phoneWindow.show();
     }
 
     Connections {
