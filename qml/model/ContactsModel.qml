@@ -20,7 +20,6 @@ import QtQuick 2.0
 import LunaNext.Common 0.1
 
 import LuneOS.Service 1.0
-import LuneOS.Application 1.0
 import LuneOS.Telephony 1.0
 
 Db8Model {
