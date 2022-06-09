@@ -41,7 +41,14 @@ Item {
 
     Component.onCompleted: {
         var main = Qt.createComponent(Qt.resolvedUrl("main.qml"));
-        main.createObject(mainDesktop);
+
+        if (main.status === Component.Error) {
+            // Error Handling
+            console.error("Error loading main.qml: ", main.errorString());
+        }
+        else {
+            main.createObject(mainDesktop);
+        }
 
         relaunchMainAppTimer.start();
     }

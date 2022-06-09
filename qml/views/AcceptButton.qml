@@ -16,26 +16,23 @@
  */
 
 import QtQuick 2.0
-import QtQuick.Controls 1.1
-import QtQuick.Controls.Styles 1.1
+import QtQuick.Controls 2.0
 
 Button {
     width:630
     height:99
 
-    style: ButtonStyle {
-        background: Item {
-            clip: true
-            anchors.horizontalCenter: parent.horizontalCenter
-            anchors.verticalCenter: parent.verticalCenter
-            width: 630
-            height: 99
-            Image{
-                x: 0
-                y: control.pressed ? -198: 0
-                source: "images/dial-button.png"
+    background: Item {
+        clip: true
+        anchors.horizontalCenter: parent.horizontalCenter
+        anchors.verticalCenter: parent.verticalCenter
+        width: 630
+        height: 99
+        Image{
+            x: 0
+            y: control.pressed ? -198: 0
+            source: Qt.resolvedUrl("images/dial-button.png")
 
-            }
         }
     }
 }

@@ -83,7 +83,7 @@ Column {
               Layout.preferredHeight: callphoneDelegate.height
               Layout.preferredWidth: callphoneDelegate.height
 
-              source: 'images/call-log-list-sprite.png'
+              source: Qt.resolvedUrl('images/call-log-list-sprite.png')
 
               wantedWidth: callphoneDelegate.height
               wantedHeight: callphoneDelegate.height
@@ -130,7 +130,7 @@ Column {
                            text: contacts.getPhoneNumberTypeStr(model.type ? model.type : modelData.type);
                        }
                        ClippedImage {
-                           source: 'images/button-sprite.png'
+                           source: Qt.resolvedUrl('images/button-sprite.png')
 
                            wantedWidth: parent.height // square button
                            wantedHeight: parent.height // square button

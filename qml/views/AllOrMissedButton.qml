@@ -17,12 +17,12 @@
  */
 
 import QtQuick 2.0
-import QtQuick.Controls 1.1
-import QtQuick.Controls.Styles 1.1
+import QtQuick.Controls 2.0
+
 import LunaNext.Common 0.1
 
 Button {
-
+    id: buttonRoot
     property PhoneUiTheme appTheme: PhoneUiTheme{}
     property bool isMissed: false
 
@@ -30,19 +30,17 @@ Button {
     checkable: true
     text: isMissed ? "Missed" : "All"
 
-    style: ButtonStyle {
-        background: Rectangle {
-            radius: Units.gu(1)
-            gradient: control.checked ? appTheme.selectedGradient : appTheme.unSelectedGradient
-        }
-        label: Text {
-            text: control.text
-            color: "white"
-            font.pixelSize: FontUtils.sizeToPixels("medium")
-            font.bold: true
-            horizontalAlignment: Text.AlignHCenter
-            verticalAlignment: Text.AlignVCenter
-        }
+    background: Rectangle {
+        radius: Units.gu(1)
+        gradient: buttonRoot.checked ? appTheme.selectedGradient : appTheme.unSelectedGradient
+    }
+    contentItem: Text {
+        text: buttonRoot.text
+        color: "white"
+        font.pixelSize: FontUtils.sizeToPixels("medium")
+        font.bold: true
+        horizontalAlignment: Text.AlignHCenter
+        verticalAlignment: Text.AlignVCenter
     }
 
     onClicked: historyModel.showOnlyMissed = isMissed;

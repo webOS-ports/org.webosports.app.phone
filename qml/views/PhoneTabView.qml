@@ -17,14 +17,15 @@
  */
 
 import QtQuick 2.0
-import QtQuick.Controls 1.1
+import QtQuick.Controls 2.0
+
+import LunaNext.Common 0.1
 
 import "../services"
 import "../model"
 
-TabView {
+Item {
     id: tabView
-    tabPosition: Qt.BottomEdge
 
     property PhoneUiTheme appTheme;
 
@@ -38,62 +39,74 @@ TabView {
         tabDialer.item.reset();
     }
 
-    Tab {
-        id: tabDialer
-        title: "Dial"
-        sourceComponent: DialerPage {
+    TabBar {
+        id: tabBar
+        width: parent.width
+        anchors.bottom: parent.bottom
+
+        PhoneTabButton {
+            iconSource: Qt.resolvedUrl("images/menu-icon-dtmfpad.png")
             appTheme: tabView.appTheme
-            voiceCallMgrWrapper: tabView.voiceCallManager
-            telephonyManager: tabView.telephonyManager
-            anchors.horizontalCenter: parent.horizontalCenter
+        }
+
+        PhoneTabButton {
+            iconSource: Qt.resolvedUrl("images/menu-icon-favorites.png")
+            appTheme: tabView.appTheme
+        }
+
+        PhoneTabButton {
+            iconSource: Qt.resolvedUrl("images/menu-icon-call-log.png")
+            appTheme: tabView.appTheme
+        }
+
+        PhoneTabButton {
+            iconSource: Qt.resolvedUrl("images/menu-icon-voicemail.png")
+            appTheme: tabView.appTheme
+            imageWidth: 72
         }
     }
 
-    Tab {
-        id: tabFavorites
-        title: "Favorites"
-        sourceComponent: FavouritePage{
-            appTheme: tabView.appTheme;
-            favoritesModel: tabView.favoritesModel
-        }
-    }
+    SwipeView {
+        width: parent.width
+        anchors.top: parent.top
+        anchors.bottom: tabBar.top
 
-    Tab {
-        id: tabHistory
-        title: "Call Log"
-        sourceComponent: HistoryPage{
-            appTheme: tabView.appTheme;
-            historyModel: tabView.historyModel
-            contacts: tabView.contacts
-        }
-    }
+        currentIndex: tabBar.currentIndex
 
-    Tab {
-        id: tabVoiceMail
-        title: "Voicemail"
-        Item{}
-        //sourceComponent: VoiceMail{}
-    }
+        Loader {
+            id: tabDialer
+            sourceComponent: DialerPage {
+                appTheme: tabView.appTheme
+                voiceCallMgrWrapper: tabView.voiceCallManager
+                telephonyManager: tabView.telephonyManager
+                anchors.horizontalCenter: parent.horizontalCenter
+            }
+        }
+        Loader {
+            id: tabFavorites
+            sourceComponent: FavouritePage{
+                appTheme: tabView.appTheme;
+                favoritesModel: tabView.favoritesModel
+            }
+        }
+        Loader {
+            id: tabHistory
+            sourceComponent: HistoryPage{
+                appTheme: tabView.appTheme;
+                historyModel: tabView.historyModel
+                contacts: tabView.contacts
+            }
+        }
+        Loader {
+            id: tabVoiceMail
+            sourceComponent: Item{}
+            //sourceComponent: VoiceMail{}
+        }
 
-    onCurrentIndexChanged: {
-        if(currentIndex == 3) {
-            tabView.phoneWindow.voiceCallManager.dial("453");
-        }
-    }
-
-    style: PhoneTabViewStyle{ appTheme: tabView.appTheme }
-    function getIcon(title) {
-        if(title === "Dial") {
-            return "images/menu-icon-dtmfpad.png"
-        }
-        if(title === "Favorites") {
-            return "images/menu-icon-favorites.png"
-        }
-        if(title === "Call Log") {
-            return "images/menu-icon-call-log.png"
-        }
-        if(title === "Voicemail") {
-            return "images/menu-icon-voicemail.png"
+        onCurrentIndexChanged: {
+            if(currentIndex === 3) {
+                voiceCallManager.dial("453");
+            }
         }
     }
 }

@@ -18,7 +18,7 @@
 
 import QtQuick 2.0
 import QtQuick.Layouts 1.2
-import QtQuick.Controls 1.1
+import QtQuick.Controls 2.0
 
 import LunaNext.Common 0.1
 import LuneOS.Components 1.0
@@ -39,18 +39,18 @@ BasePage {
         height: Units.gu(3)
         spacing: Units.gu(3)
 
-        ExclusiveGroup { id: allOrMissedGroup }
+        ButtonGroup { buttons: [buttonAll,buttonMissed] }
         AllOrMissedButton {
+            id: buttonAll
             isMissed: false
             height: parent.height
             width: Units.gu(14)
-            exclusiveGroup: allOrMissedGroup
         }
         AllOrMissedButton {
+            id: buttonMissed
             isMissed: true
             height: parent.height
             width: Units.gu(14)
-            exclusiveGroup: allOrMissedGroup
         }
         TextInput {
             id: searchFieldInput

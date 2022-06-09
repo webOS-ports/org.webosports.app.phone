@@ -1,9 +1,10 @@
 import QtQuick 2.0
-import QtQuick.Controls 1.1
-import QtQuick.Controls.Styles 1.1
+import QtQuick.Controls 2.0
 import QtQuick.Layouts 1.1
 import MeeGo.QOfono 0.2
+
 import "../services/PinTypes.js" as PinTypes
+
 import LunaNext.Common 0.1
 
 Item {

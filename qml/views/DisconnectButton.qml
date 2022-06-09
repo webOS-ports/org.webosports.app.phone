@@ -26,7 +26,7 @@ Button {
         background: ClippedImage {
             id: bgClippedImage
 
-            source: "images/disconnect-button.png"
+            source: Qt.resolvedUrl("images/disconnect-button.png")
 
             wantedWidth: control.width
             imageSize: Qt.size(612, 297)
