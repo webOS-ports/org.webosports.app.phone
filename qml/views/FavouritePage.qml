@@ -59,11 +59,11 @@ BasePage {
             Rectangle {
                 anchors.fill:parent
                 border {
-                    color:appTheme.foregroundColor
+                    color:appTheme.headerColor
                     width: 1.5
                 }
                 radius:20
-                color:'#00000000'
+                color: '#25394A'
             }
 
             Row {
