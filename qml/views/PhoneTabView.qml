@@ -17,7 +17,7 @@
  */
 
 import QtQuick 2.0
-import QtQuick.Controls 2.0
+import QtQuick.Controls.LuneOS 2.0
 
 import LunaNext.Common 0.1
 
@@ -44,25 +44,28 @@ Item {
         width: parent.width
         anchors.bottom: parent.bottom
 
-        PhoneTabButton {
-            iconSource: Qt.resolvedUrl("images/menu-icon-dtmfpad.png")
-            appTheme: tabView.appTheme
+        TabButton {
+            LuneOSButton.image: Qt.resolvedUrl("images/menu-icon-dtmfpad.png")
+            anchors.verticalCenter: parent.verticalCenter
+            height: 48
         }
 
-        PhoneTabButton {
-            iconSource: Qt.resolvedUrl("images/menu-icon-favorites.png")
-            appTheme: tabView.appTheme
+        TabButton {
+            LuneOSButton.image: Qt.resolvedUrl("images/menu-icon-favorites.png")
+            anchors.verticalCenter: parent.verticalCenter
+            height: 48
         }
 
-        PhoneTabButton {
-            iconSource: Qt.resolvedUrl("images/menu-icon-call-log.png")
-            appTheme: tabView.appTheme
+        TabButton {
+            LuneOSButton.image: Qt.resolvedUrl("images/menu-icon-call-log.png")
+            anchors.verticalCenter: parent.verticalCenter
+            height: 48
         }
 
-        PhoneTabButton {
-            iconSource: Qt.resolvedUrl("images/menu-icon-voicemail.png")
-            appTheme: tabView.appTheme
-            imageWidth: 72
+        TabButton {
+            LuneOSButton.image: Qt.resolvedUrl("images/menu-icon-voicemail.png")
+            anchors.verticalCenter: parent.verticalCenter
+            height: 48
         }
     }
 
