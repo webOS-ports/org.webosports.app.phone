@@ -153,7 +153,7 @@ Item {
     }
 
     Component.onCompleted: {
-        __lunaNextLS2Service.call("luna://com.palm.systemservice/getPreferences", JSON.stringify({ keys: ["region"], subscribe: false }), _getPreferencesSuccess, _getPreferencesFailure)
+        __lunaNextLS2Service.call("luna://com.webos.service.systemservice/getPreferences", JSON.stringify({ keys: ["region"], subscribe: false }), _getPreferencesSuccess, _getPreferencesFailure)
     }
     function _getPreferencesSuccess(message) {
         var response = JSON.parse(message.payload)
