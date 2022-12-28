@@ -56,7 +56,7 @@ Item {
     ClippedImage {
         id: box
 
-        source: mouseArea.pressed ? "images/buttons-numpad-pressed.png" : "images/buttons-numpad.png"
+        source: mouseArea.pressed ? Qt.resolvedUrl("images/buttons-numpad-pressed.png") : Qt.resolvedUrl("images/buttons-numpad.png")
 
         wantedWidth: parent.width
         wantedHeight: parent.height

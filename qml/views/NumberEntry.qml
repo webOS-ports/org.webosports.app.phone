@@ -16,8 +16,8 @@
  */
 
 import QtQuick 2.0
-import QtQuick.Controls 1.1
-import QtQuick.Controls.Styles 1.1
+import QtQuick.Controls 2.0
+
 import LunaNext.Common 0.1
 
 Item {
@@ -139,7 +139,7 @@ Item {
         activeFocusOnPress: false
         inputMethodHints: Qt.ImhDialableCharactersOnly
         font.pixelSize: FontUtils.sizeToPixels("large")
-        textColor: "white"
+        color: "white"
         horizontalAlignment: TextInput.AlignLeft
         placeholderText: isPhoneNumber ? "Enter phone number" : ""
 
@@ -149,12 +149,9 @@ Item {
                 textEdit.passwordCharacter = "\u2022";
         }
 
-        style: TextFieldStyle {
-            textColor: "white"
-            placeholderTextColor: "white"
-            background: Rectangle {
-                color: 'transparent'
-            }
+        placeholderTextColor: "white"
+        background: Rectangle {
+            color: 'transparent'
         }
     }
 

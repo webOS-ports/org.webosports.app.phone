@@ -16,36 +16,35 @@
  */
 
 import QtQuick 2.0
-import QtQuick.Controls 1.1
-import QtQuick.Controls.Styles 1.1
+import QtQuick.Controls 2.0
+
 import LunaNext.Common 0.1
 
 Button {
+    id: addCallButton
     width: Units.gu(5)
     height:Units.gu(5)
 
     property PhoneUiTheme appTheme: PhoneUiTheme{}
 
-    style: ButtonStyle {
-        background: Rectangle{
-            color: control.pressed ? appTheme.callActionBtnFgColorActive : appTheme.callActionBtnFgColor
-            border.color:  'white'
-            implicitWidth: Units.gu(5)
-            implicitHeight: Units.gu(5)
-            radius: 10
+    background: Rectangle{
+        color: addCallButton.pressed ? appTheme.callActionBtnFgColorActive : appTheme.callActionBtnFgColor
+        border.color:  'white'
+        implicitWidth: Units.gu(5)
+        implicitHeight: Units.gu(5)
+        radius: 10
 
-            Item {
-                id: icon
-                clip: true
-                anchors.horizontalCenter: parent.horizontalCenter
-                anchors.verticalCenter: parent.verticalCenter
-                width: 48
-                height: 48
-                Image{
-                    x: 0
-                    y: control.pressed ? -48: 0
-                    source: "images/menu-icon-addcall.png"
-                }
+        Item {
+            id: icon
+            clip: true
+            anchors.horizontalCenter: parent.horizontalCenter
+            anchors.verticalCenter: parent.verticalCenter
+            width: 48
+            height: 48
+            Image{
+                x: 0
+                y: addCallButton.pressed ? -48: 0
+                source: "images/menu-icon-addcall.png"
             }
         }
     }

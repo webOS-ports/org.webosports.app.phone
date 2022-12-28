@@ -27,7 +27,7 @@ Button {
 
     style: ButtonStyle {
         background: ClippedImage {
-            source: 'images/button-sprite.png'
+            source: Qt.resolvedUrl('images/button-sprite.png')
 
             wantedWidth: control.width
 

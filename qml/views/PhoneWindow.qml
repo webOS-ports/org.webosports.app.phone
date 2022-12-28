@@ -24,10 +24,9 @@ import QtQuick.Controls 2.5
 import QtQuick.Layouts 1.0
 import QtQuick.Window 2.3
 
-import LunaNext.Common 0.1
-import LuneOS.Application 1.0
-
 import Eos.Window 0.1
+
+import LunaNext.Common 0.1
 
 WebOSWindow {
     id: phoneWindowId
