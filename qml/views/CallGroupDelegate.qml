@@ -87,7 +87,7 @@ Column {
                 Layout.preferredHeight: Units.gu(3.2)
                 Layout.alignment: Qt.AlignHCenter
 
-                source: 'images/call-log-list-sprite.png'
+                source: Qt.resolvedUrl('images/call-log-list-sprite.png')
 
                 wantedWidth: Units.gu(3.2)
                 wantedHeight: Units.gu(3.2)
@@ -136,16 +136,17 @@ Column {
                 fillMode: Image.PreserveAspectCrop
                 visible: false
             }
+            /*
             CornerShader {
                 id: cornerShader
                 anchors.fill: avatarPhotoImage
                 sourceItem: avatarPhotoImage
                 radius: 5*avatarDisclosureMask.height/90
             }
-
+            */
             ClippedImage {
                 id: avatarDisclosureMask
-                source: 'images/avatar-disclosure.png'
+                source: Qt.resolvedUrl('images/avatar-disclosure.png')
 
                 anchors.fill: parent
 

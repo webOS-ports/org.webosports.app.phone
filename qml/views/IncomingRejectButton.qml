@@ -16,25 +16,23 @@
  */
 
 import QtQuick 2.0
-import QtQuick.Controls 1.1
-import QtQuick.Controls.Styles 1.1
+import QtQuick.Controls 2.0
 
 import LuneOS.Components 1.0
 
 Button {
+    id: buttonRoot
     width:210
     height:210
 
-    style: ButtonStyle {
-        background: ClippedImage {
-            source: "images/button-ignore-answer.png"
+    background: ClippedImage {
+        source: Qt.resolvedUrl("images/button-ignore-answer.png")
 
-            wantedHeight: control.height
-            wantedWidth: control.width
+        wantedHeight: buttonRoot.height
+        wantedWidth: buttonRoot.width
 
-            imageSize: Qt.size(420, 420)
-            patchGridSize: Qt.size(2, 2)
-            patch: control.pressed ? Qt.point(0,1): Qt.point(0,0)
-        }
+        imageSize: Qt.size(420, 420)
+        patchGridSize: Qt.size(2, 2)
+        patch: buttonRoot.pressed ? Qt.point(0,1): Qt.point(0,0)
     }
 }

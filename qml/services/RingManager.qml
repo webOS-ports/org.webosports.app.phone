@@ -27,7 +27,7 @@ f  o|  o|__     "`-.
  */
 
 import QtQuick 2.0
-import QtMultimedia 5.5
+import QtMultimedia 6.3
 
 import LuneOS.Service 1.0
 
@@ -47,10 +47,11 @@ Item {
         }
     ]
 
-    Audio {
+    MediaPlayer {
          id: ringtone
-         loops: Audio.Infinite
+         loops: MediaPlayer.Infinite
          source: "/usr/palm/sounds/ringtone.mp3"
+         audioOutput: AudioOutput {}
     }
 
     Connections {

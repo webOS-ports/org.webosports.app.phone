@@ -17,7 +17,8 @@
  */
 
 import QtQuick 2.0
-import QtQuick.Controls 1.1
+import QtQuick.Controls 2.0
+
 import LunaNext.Common 0.1
 import "../model"
 
@@ -58,11 +59,11 @@ BasePage {
             Rectangle {
                 anchors.fill:parent
                 border {
-                    color:appTheme.foregroundColor
+                    color:appTheme.headerColor
                     width: 1.5
                 }
                 radius:20
-                color:'#00000000'
+                color: '#25394A'
             }
 
             Row {
@@ -93,7 +94,7 @@ BasePage {
                 spacing:10
                 Button {
                     width:Units.gu(5);height:Units.gu(5)
-                    iconSource:'images/generic-details-view-avatar-small.png'
+                    icon.source:'images/generic-details-view-avatar-small.png'
                 }
             }
         }

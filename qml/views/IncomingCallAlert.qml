@@ -17,9 +17,9 @@
 
 import QtQuick 2.0
 
+import Eos.Window 0.1
+
 import LunaNext.Common 0.1
-import LunaNext.Compositor 0.1
-import LuneOS.Application 1.0
 
 import org.nemomobile.voicecall 1.0
 
@@ -29,7 +29,7 @@ import "../services"
 import "../model"
 import "../services/IncomingCallsService.js" as IncomingCallsService
 
-LuneOSWindow {
+WebOSWindow {
     id: incomingCallAlert
 
     property ContactsModel contacts;
@@ -41,7 +41,7 @@ LuneOSWindow {
     width: Settings.displayWidth
     height: Units.gu(24)
 
-    type: LuneOSWindow.PopupAlert
+    windowType: "_WEBOS_WINDOW_TYPE_POPUP"
     color: "transparent"
 
     Text {
@@ -99,11 +99,13 @@ LuneOSWindow {
                 smooth:true
                 source: currentContact.avatarPath
             }
+            /*
             CornerShader {
                 radius: 30
                 sourceItem: imageAvatar
                 anchors.fill: imageAvatar
             }
+            */
         }
 
         IncomingRejectButton {

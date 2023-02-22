@@ -18,7 +18,7 @@
 
 import QtQuick 2.0
 import QtQuick.Layouts 1.2
-import QtQuick.Controls 1.1
+import QtQuick.Controls.LuneOS 2.0
 
 import LunaNext.Common 0.1
 import LuneOS.Components 1.0
@@ -32,34 +32,49 @@ BasePage {
     // All / Missed button chooser
     Row {
         id: allOrMissedRect
-        anchors {
-            top:parent.top
-            horizontalCenter: parent.horizontalCenter
-        }
-        height: Units.gu(3)
+        anchors.horizontalCenter: parent.horizontalCenter
+        height: Units.gu(4)
         spacing: Units.gu(3)
 
-        ExclusiveGroup { id: allOrMissedGroup }
-        AllOrMissedButton {
-            isMissed: false
+        Row {
+            anchors.verticalCenter: parent.verticalCenter
             height: parent.height
-            width: Units.gu(14)
-            exclusiveGroup: allOrMissedGroup
+            RadioButton {
+                text: "All"
+                LuneOSRadioButton.useCollapsedLayout: true
+                checked: true
+                width: Units.gu(14)
+                height: parent.height
+            }
+            RadioButton {
+                id: buttonOnlyMissed
+                text: "Missed"
+                LuneOSRadioButton.useCollapsedLayout: true
+                width: Units.gu(14)
+                height: parent.height
+            }
         }
-        AllOrMissedButton {
-            isMissed: true
-            height: parent.height
-            width: Units.gu(14)
-            exclusiveGroup: allOrMissedGroup
+        Binding {
+            target: historyModel
+            property: "showOnlyMissed"
+            value: buttonOnlyMissed.checked
         }
-        TextInput {
+        TextField {
             id: searchFieldInput
             height: parent.height
             width: Units.gu(14)
             text: ""
+            placeholderText: "🔍 Filter..."
         }
     }
 
+    Connections {
+        target: historyListViewModel.sourceModel
+        function onCountChanged()
+        {
+            historyListViewModel._updateModel();
+        }
+    }
     ListModel {
         id: historyListViewModel
         property ListModel sourceModel
@@ -68,14 +83,12 @@ BasePage {
         Component.onCompleted: _updateModel();
 
         function _updateModel() {
-            //var currentIdxFilteredModel = 0;
-            //var currentFilteredModelObj = historyListViewModel.get(0);
             historyListViewModel.clear(); // we can do better
 
             for(var i=0; i<sourceModel.count; ++i) {
                 var eltSrc = sourceModel.get(i);
                 if(eltSrc.recentcall_address && eltSrc.recentcall_address.name) {
-                    if(eltSrc.recentcall_address.name.indexOf(filter) >= 0)
+                    if(eltSrc.recentcall_address.name.toLowerCase().indexOf(filter.toLowerCase()) >= 0)
                     {
                         historyListViewModel.append(eltSrc);
                     }
