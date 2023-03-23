@@ -42,6 +42,7 @@ WebOSWindow {
     property Contact currentContact: Contact { contactsModel: contacts }
 
     visible: false
+    keepAlive: true
 
     width: Settings.displayWidth
     height: Settings.displayHeight

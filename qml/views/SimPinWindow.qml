@@ -34,6 +34,8 @@ WebOSWindow {
     width: Settings.displayWidth
     height: Settings.displayHeight
     color: phoneUiAppTheme.backgroundColor
+    windowType: "_WEBOS_WINDOW_TYPE_SYSTEM_UI"
+    keepAlive: true
 
     property string _enteredPuk: ""
     property int _confirmedPinType

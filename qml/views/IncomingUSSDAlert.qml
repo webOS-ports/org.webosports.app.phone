@@ -34,6 +34,7 @@ WebOSWindow {
     width: Settings.displayWidth
     height: Units.gu(24)
 
+    keepAlive: true
     windowType: "_WEBOS_WINDOW_TYPE_POPUP"
     color: "transparent"
 

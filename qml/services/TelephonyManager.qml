@@ -50,7 +50,7 @@ Item {
         id: modemManager
 
         onAvailableChanged: {
-            console.log("oFono is " + (available ? "available" :"not available"))
+            console.log("oFono is " + (modemManager.available ? "available" :"not available"))
         }
         onModemAdded: {
             console.log("modem added "+modem)
