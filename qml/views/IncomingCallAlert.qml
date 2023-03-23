@@ -41,7 +41,9 @@ WebOSWindow {
     width: Settings.displayWidth
     height: Units.gu(24)
 
-    windowType: "_WEBOS_WINDOW_TYPE_POPUP"
+    keepAlive: true
+    windowType: "_WEBOS_WINDOW_TYPE_SYSTEM_UI"
+    windowProperties: { "LuneOS_window": "popupalert" }
     color: "transparent"
 
     Text {

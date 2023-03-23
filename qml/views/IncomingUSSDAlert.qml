@@ -35,7 +35,8 @@ WebOSWindow {
     height: Units.gu(24)
 
     keepAlive: true
-    windowType: "_WEBOS_WINDOW_TYPE_POPUP"
+    windowType: "_WEBOS_WINDOW_TYPE_SYSTEM_UI"
+    windowProperties: { "LuneOS_window": "popupalert" }
     color: "transparent"
 
     Connections {
