@@ -143,6 +143,7 @@ BasePage {
         }
 
         delegate: CallGroupDelegate {
+            width: historyList.width
             historyModel: historyPageId.historyModel
             contacts: historyPageId.contacts
         }

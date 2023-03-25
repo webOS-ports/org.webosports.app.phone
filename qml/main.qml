@@ -92,7 +92,7 @@ WebOSWindow {
     VoiceCallMgrWrapper {
         id: voiceCallMgrWrapperId
 
-        onEndingCall: callHistoryModelId.addEndedCall(voiceCall);
+        onEndingCall: (voiceCall) => { callHistoryModelId.addEndedCall(voiceCall); }
     }
 
     RingManager {

@@ -18,6 +18,7 @@
 
 import QtQuick 2.0
 import QtQuick.Layouts 1.2
+import QtQml
 
 import LunaNext.Common 0.1
 import LuneOS.Components 1.0
@@ -27,7 +28,6 @@ import "../model"
 
 Column {
     id: callGroupDelegate
-    width:parent.width
 
     property var historyModel;
     property ContactsModel contacts;
@@ -136,14 +136,12 @@ Column {
                 fillMode: Image.PreserveAspectCrop
                 visible: false
             }
-            /*
             CornerShader {
                 id: cornerShader
                 anchors.fill: avatarPhotoImage
-                sourceItem: avatarPhotoImage
+                source: avatarPhotoImage
                 radius: 5*avatarDisclosureMask.height/90
             }
-            */
             ClippedImage {
                 id: avatarDisclosureMask
                 source: Qt.resolvedUrl('images/avatar-disclosure.png')

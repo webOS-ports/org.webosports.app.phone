@@ -16,8 +16,7 @@
  */
 
 import QtQuick 2.0
-import QtQuick.Controls 1.1
-import QtQuick.Layouts 1.0
+import Qt5Compat.GraphicalEffects
 
 import LunaNext.Common 0.1
 
@@ -60,11 +59,13 @@ BasePage {
         fillMode:Image.PreserveAspectCrop
         smooth:true
         source: currentContact.avatarPath
+
+        visible: false
     }
     CornerShader {
-        radius: 35
-        sourceItem: imageAvatar
         anchors.fill: imageAvatar
+        source: imageAvatar
+        radius: 35
     }
     Image {
         id: avatarFrame

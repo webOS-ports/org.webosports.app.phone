@@ -17,6 +17,7 @@
 
 import QtQuick 2.0
 import QtQuick.Layouts 1.2
+import QtQml
 
 import LunaNext.Common 0.1
 import LuneOS.Components 1.0
