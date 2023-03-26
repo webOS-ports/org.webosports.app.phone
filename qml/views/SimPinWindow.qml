@@ -35,8 +35,11 @@ WebOSWindow {
     height: Settings.displayHeight
     color: phoneUiAppTheme.backgroundColor
     windowType: "_WEBOS_WINDOW_TYPE_SYSTEM_UI"
-    windowProperties: { "LuneOS_window": "pin" }
     keepAlive: true
+
+    Component.onCompleted: {
+        simPinWindow.setWindowProperty("LuneOS_window", "pin");
+    }
 
     property string _enteredPuk: ""
     property int _confirmedPinType
