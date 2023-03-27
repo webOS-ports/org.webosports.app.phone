@@ -16,25 +16,24 @@
  */
 
 import QtQuick 2.0
-import QtQuick.Controls 1.1
-import QtQuick.Controls.Styles 1.1
+import QtQuick.Controls 2.0
 import LunaNext.Common 0.1
 
 import LuneOS.Components 1.0
 
 Button {
+    id: buttonRoot
+
     property PhoneUiTheme appTheme: PhoneUiTheme{}
 
-    style: ButtonStyle {
-        background: ClippedImage {
-            source: Qt.resolvedUrl('images/button-sprite.png')
+    background: ClippedImage {
+        source: Qt.resolvedUrl('images/button-sprite.png')
 
-            wantedWidth: control.width
+        wantedWidth: buttonRoot.width
 
-            imageSize: Qt.size(183, 244)
-            patchGridSize: Qt.size(3, 4)
-            patch: control.checked ? (control.pressed ? Qt.point(0,3) : Qt.point(0,2) ) :
-                                     (control.pressed ? Qt.point(0,1) : Qt.point(0,0) )
-        }
+        imageSize: Qt.size(183, 244)
+        patchGridSize: Qt.size(3, 4)
+        patch: buttonRoot.checked ? (buttonRoot.pressed ? Qt.point(0,3) : Qt.point(0,2) ) :
+                                    (buttonRoot.pressed ? Qt.point(0,1) : Qt.point(0,0) )
     }
 }

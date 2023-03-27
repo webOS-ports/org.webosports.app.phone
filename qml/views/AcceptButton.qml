@@ -19,6 +19,8 @@ import QtQuick 2.0
 import QtQuick.Controls 2.0
 
 Button {
+    id: acceptButtonRoot
+
     width:630
     height:99
 
@@ -30,9 +32,8 @@ Button {
         height: 99
         Image{
             x: 0
-            y: control.pressed ? -198: 0
+            y: acceptButtonRoot.pressed ? -198: 0
             source: Qt.resolvedUrl("images/dial-button.png")
-
         }
     }
 }

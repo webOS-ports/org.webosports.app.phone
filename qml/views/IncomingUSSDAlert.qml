@@ -19,9 +19,7 @@ import QtQuick 2.0
 import QtQuick.Controls 2.0
 
 import Eos.Window 0.1
-
 import LunaNext.Common 0.1
-
 import org.nemomobile.voicecall 1.0
 
 import "../services"
