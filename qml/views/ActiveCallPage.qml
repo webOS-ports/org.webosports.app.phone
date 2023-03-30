@@ -108,11 +108,11 @@ BasePage {
                     horizontalCenter: parent.horizontalCenter
                 }
 
-                width: parent.width * 0.6
+                width: Math.min(parent.width*0.6, parent.height*0.6)
                 height:width
 
                 asynchronous:true
-                fillMode:Image.PreserveAspectCrop
+                fillMode:Image.PreserveAspectFit
                 smooth:true
                 source: currentContact.avatarPath
             }

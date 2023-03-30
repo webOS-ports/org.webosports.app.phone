@@ -38,6 +38,7 @@ WebOSWindow {
     property TelephonyManager telephonyManager;
     property IncomingCallAlert incomingCallAlertWindow;
     property SimPinWindow simPinWindow
+    property PhoneUiTheme phoneUiAppTheme;
 
     property Contact currentContact: Contact { contactsModel: contacts }
 
@@ -49,8 +50,6 @@ WebOSWindow {
     color: phoneUiAppTheme.backgroundColor
 
     property bool hideWindowWhenCallEnds: false
-
-    PhoneUiTheme { id: phoneUiAppTheme }
 
     /**
      * When PhoneApp is closed, hang up any active calls.

@@ -113,10 +113,15 @@ WebOSWindow {
     }
 
     /* views */
+    PhoneUiTheme {
+        id: phoneUiTheme
+    }
+
     IncomingCallAlert {
         id: incomingCallAlertWindowId
         contacts: personListModelId
         voiceCallManager: voiceCallMgrWrapperId
+        appTheme: phoneUiTheme
         visible: false
     }
 
@@ -134,6 +139,7 @@ WebOSWindow {
         telephonyManager: telephonyManagerId
         historyModel: callHistoryModelId
         favoritesModel: favoritesModelId
+        phoneUiAppTheme: phoneUiTheme
     }
 
     IncomingUSSDAlert {

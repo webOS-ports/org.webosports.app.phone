@@ -51,11 +51,11 @@ BasePage {
             horizontalCenter:avatarBackground.horizontalCenter
         }
 
-        width: avatarBackground.width*0.6
+        width: Math.min(avatarBackground.width*0.6, avatarBackground.height*0.6)
         height: width
 
         asynchronous:true
-        fillMode:Image.PreserveAspectCrop
+        fillMode:Image.PreserveAspectFit
         smooth:true
         source: currentContact.avatarPath
 
@@ -102,10 +102,10 @@ BasePage {
 
     Item {
         id: answerRejectBtns
-        height: Units.gu(12)
+        height: Units.gu(13)
         anchors {
             bottom: parent.bottom
-            bottomMargin: Units.gu(2)
+            bottomMargin: Units.gu(1)
             left: parent.left
             leftMargin: Units.gu(3)
             right: parent.right
@@ -113,8 +113,8 @@ BasePage {
         }
 
         IncomingAcceptButton {
-            height: 210
-            width: 210
+            height: answerRejectBtns.height
+            width: answerRejectBtns.height
             anchors.left: parent.left
             anchors.verticalCenter: parent.verticalCenter
             onClicked: {
@@ -124,8 +124,8 @@ BasePage {
         }
 
         IncomingRejectButton {
-            height: 210
-            width: 210
+            height: answerRejectBtns.height
+            width: answerRejectBtns.height
             anchors.right: parent.right
             anchors.verticalCenter: parent.verticalCenter
             onClicked: {
