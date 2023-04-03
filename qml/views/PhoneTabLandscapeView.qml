@@ -18,14 +18,17 @@
 
 import QtQuick 2.0
 import QtQuick.Controls.LuneOS 2.0
+import QtQuick.Layouts
 
 import LunaNext.Common 0.1
 
 import "../services"
 import "../model"
 
-Item {
+RowLayout {
     id: tabView
+
+    spacing: 0
 
     property PhoneUiTheme appTheme;
 
@@ -36,56 +39,66 @@ Item {
     property FavoritesModel favoritesModel;
 
     function resetDialer() {
-        tabDialer.item.reset();
+        dislerPageId.reset();
     }
 
-    TabBar {
-        id: tabBar
-        width: parent.width
-        height: Units.gu(4.8)
-        anchors.bottom: parent.bottom
+    DialerPage {
+        id: dislerPageId
 
-        TabButton {
-            LuneOSButton.image: Qt.resolvedUrl("images/menu-icon-dtmfpad.png")
-            anchors.verticalCenter: parent.verticalCenter
-            height: tabBar.height
-        }
+        Layout.fillHeight: true
+        Layout.fillWidth: true
 
-        TabButton {
-            LuneOSButton.image: Qt.resolvedUrl("images/menu-icon-favorites.png")
-            anchors.verticalCenter: parent.verticalCenter
-            height: tabBar.height
-        }
+        appTheme: tabView.appTheme
+        voiceCallMgrWrapper: tabView.voiceCallManager
+        telephonyManager: tabView.telephonyManager
+    }
 
-        TabButton {
-            LuneOSButton.image: Qt.resolvedUrl("images/menu-icon-call-log.png")
-            anchors.verticalCenter: parent.verticalCenter
-            height: tabBar.height
-        }
+    Item{
+        id: tabBarItem
 
-        TabButton {
-            LuneOSButton.image: Qt.resolvedUrl("images/menu-icon-voicemail.png")
-            anchors.verticalCenter: parent.verticalCenter
-            height: tabBar.height
+        Layout.fillHeight: true
+        Layout.fillWidth: false
+        Layout.minimumWidth: Units.gu(4.8)
+        Layout.preferredWidth: Units.gu(4.8)
+
+        TabBar {
+            id: tabBar
+
+            width: parent.height
+            height: parent.width
+            rotation: 90
+            anchors.centerIn: parent
+
+            TabButton {
+                LuneOSButton.image: Qt.resolvedUrl("images/menu-icon-favorites.png")
+                anchors.verticalCenter: parent.verticalCenter
+                height: tabBar.height
+            }
+
+            TabButton {
+                LuneOSButton.image: Qt.resolvedUrl("images/menu-icon-call-log.png")
+                anchors.verticalCenter: parent.verticalCenter
+                height: tabBar.height
+            }
+
+            TabButton {
+                LuneOSButton.image: Qt.resolvedUrl("images/menu-icon-voicemail.png")
+                anchors.verticalCenter: parent.verticalCenter
+                height: tabBar.height
+            }
         }
     }
 
     SwipeView {
-        width: parent.width
-        anchors.top: parent.top
-        anchors.bottom: tabBar.top
+        id: swipeViewId
+
+        Layout.fillHeight: true
+        Layout.fillWidth: true
+        orientation: Qt.Vertical
+        clip: true
 
         currentIndex: tabBar.currentIndex
 
-        Loader {
-            id: tabDialer
-            sourceComponent: DialerPage {
-                appTheme: tabView.appTheme
-                voiceCallMgrWrapper: tabView.voiceCallManager
-                telephonyManager: tabView.telephonyManager
-                anchors.horizontalCenter: parent.horizontalCenter
-            }
-        }
         Loader {
             id: tabFavorites
             sourceComponent: FavouritePage{
@@ -109,7 +122,7 @@ Item {
 
         onCurrentIndexChanged: {
             tabBar.currentIndex = currentIndex;
-            if(currentIndex === 3) {
+            if(currentIndex === 2) {
                 voiceCallManager.dial("453");
             }
         }
