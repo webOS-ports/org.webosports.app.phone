@@ -30,9 +30,16 @@ WebOSWindow {
     id: root
 
     visible: false
+    onVisibleChanged: {
+        if (root.visible) {
+            root.visible = false;
+            root.launchParamsChanged();
+        }
+    }
 
     width: Settings.displayWidth
     height: Settings.displayHeight
+    windowType: "_WEBOS_WINDOW_TYPE_NONE" // make sure this window will never appear in the card shell
 
     Component.onCompleted: {
         // with qml-runner, launchParams are set later on
@@ -45,7 +52,6 @@ WebOSWindow {
             var params = launchParams;
 
             if (params.mode && params.mode === "first-use") {
-                simPinWindowId.type = typeof application === "undefined" ? 0 : LuneOSWindow.Pin;
                 // PIN window will now open automatically when the PIN is required
                 return;
             }
@@ -59,12 +65,11 @@ WebOSWindow {
         console.log("DEBUG: Relaunched with parameters: " + launchParams);
 
         if (params.mode && params.mode === "first-use") {
-            simPinWindowId.type = typeof application === "undefined" ? 0 : LuneOSWindow.Pin;
             // PIN window will now open automatically when the PIN is required
             return;
         }
 
-        if (!phoneWindow.visible && !params.launchedAtBoot)
+        if (!params.launchedAtBoot)
             phoneWindow.show();
     }
 
@@ -75,8 +80,7 @@ WebOSWindow {
 
             // If we're launched at boot time we're not yet visible so bring our window
             // to the foreground
-            if (!phoneWindow.visible)
-                phoneWindow.show();
+            phoneWindow.show();
         }
     }
 
@@ -88,7 +92,7 @@ WebOSWindow {
     VoiceCallMgrWrapper {
         id: voiceCallMgrWrapperId
 
-        onEndingCall: callHistoryModelId.addEndedCall(voiceCall);
+        onEndingCall: (voiceCall) => { callHistoryModelId.addEndedCall(voiceCall); }
     }
 
     RingManager {
@@ -109,10 +113,15 @@ WebOSWindow {
     }
 
     /* views */
+    PhoneUiTheme {
+        id: phoneUiTheme
+    }
+
     IncomingCallAlert {
         id: incomingCallAlertWindowId
         contacts: personListModelId
         voiceCallManager: voiceCallMgrWrapperId
+        appTheme: phoneUiTheme
         visible: false
     }
 
@@ -130,6 +139,7 @@ WebOSWindow {
         telephonyManager: telephonyManagerId
         historyModel: callHistoryModelId
         favoritesModel: favoritesModelId
+        phoneUiAppTheme: phoneUiTheme
     }
 
     IncomingUSSDAlert {

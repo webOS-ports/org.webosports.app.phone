@@ -74,7 +74,7 @@ Item {
     }
 
     Component.onCompleted: {
-        __lunaNextLS2Service.call("luna://com.palm.systemservice/getPreferences", JSON.stringify({ keys: ["ringtone"], subscribe: true }), _getPreferencesSuccess, _getPreferencesFailure)
+        __lunaNextLS2Service.subscribe("luna://com.palm.systemservice/getPreferences", JSON.stringify({ keys: ["ringtone"], subscribe: true }), _getPreferencesSuccess, _getPreferencesFailure)
     }
     LunaService {
         id: __lunaNextLS2Service

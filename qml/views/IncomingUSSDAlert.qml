@@ -19,9 +19,7 @@ import QtQuick 2.0
 import QtQuick.Controls 2.0
 
 import Eos.Window 0.1
-
 import LunaNext.Common 0.1
-
 import org.nemomobile.voicecall 1.0
 
 import "../services"
@@ -34,8 +32,13 @@ WebOSWindow {
     width: Settings.displayWidth
     height: Units.gu(24)
 
-    windowType: "_WEBOS_WINDOW_TYPE_POPUP"
+    keepAlive: true
+    windowType: "_WEBOS_WINDOW_TYPE_SYSTEM_UI"
     color: "transparent"
+
+    Component.onCompleted: {
+        incomingUSSDAlert.setWindowProperty("LuneOS_window", "popupalert");
+    }
 
     Connections {
         target: telephonyManager

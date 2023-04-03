@@ -18,11 +18,8 @@
 import QtQuick 2.0
 
 import Eos.Window 0.1
-
 import LunaNext.Common 0.1
-
 import org.nemomobile.voicecall 1.0
-
 import LuneOS.Telephony 1.0
 
 import "../services"
@@ -35,14 +32,24 @@ WebOSWindow {
     property ContactsModel contacts;
     property VoiceCallMgrWrapper voiceCallManager
     property QtObject voiceCall;
+    property PhoneUiTheme appTheme;
 
     property Contact currentContact: Contact { contactsModel: contacts; lineId: voiceCall ? voiceCall.lineId : "" }
 
     width: Settings.displayWidth
     height: Units.gu(24)
 
-    windowType: "_WEBOS_WINDOW_TYPE_POPUP"
-    color: "transparent"
+    keepAlive: true
+    windowType: "_WEBOS_WINDOW_TYPE_SYSTEM_UI"
+
+    Rectangle {
+        anchors.fill: parent
+        gradient: appTheme ? appTheme.mainGradient : undefined
+    }
+
+    Component.onCompleted: {
+        incomingCallAlert.setWindowProperty("LuneOS_window", "popupalert");
+    }
 
     Text {
         id: lineIdText
@@ -75,8 +82,8 @@ WebOSWindow {
 
         IncomingAcceptButton {
             anchors.verticalCenter: buttons.verticalCenter
-            height: 210
-            width: 210
+            height: parent.height
+            width: parent.height
             onClicked: {
                 IncomingCallsService.setActionForCall(voiceCall.handlerId, IncomingCallsService.Accepted);
                 voiceCall.answer();
@@ -88,30 +95,29 @@ WebOSWindow {
         Item {
             anchors.verticalCenter: buttons.verticalCenter
 
-            width: incomingCallAlert.width - 2*210 - Units.gu(1)
+            width: incomingCallAlert.width - 2*parent.height - Units.gu(1)
             height: buttons.height
 
             Image {
                 id: imageAvatar
                 anchors.fill: parent
                 asynchronous:true
-                fillMode:Image.PreserveAspectCrop
+                fillMode:Image.PreserveAspectFit
                 smooth:true
                 source: currentContact.avatarPath
+                visible: false
             }
-            /*
             CornerShader {
                 radius: 30
-                sourceItem: imageAvatar
+                source: imageAvatar
                 anchors.fill: imageAvatar
             }
-            */
         }
 
         IncomingRejectButton {
             anchors.verticalCenter: buttons.verticalCenter
-            height: 210
-            width: 210
+            height: parent.height
+            width: parent.height
             onClicked: {
                 IncomingCallsService.setActionForCall(voiceCall.handlerId, IncomingCallsService.Ignored);
                 voiceCall.hangup();

@@ -22,6 +22,7 @@ import QtQuick.Controls.LuneOS 2.0
 
 import LunaNext.Common 0.1
 import LuneOS.Components 1.0
+import LuneOS.Service 1.0
 
 BasePage {
     id: historyPageId
@@ -77,13 +78,14 @@ BasePage {
     }
     ListModel {
         id: historyListViewModel
-        property ListModel sourceModel
+        property Db8Model sourceModel
         property string filter: searchFieldInput.text
         onFilterChanged: _updateModel();
         Component.onCompleted: _updateModel();
 
         function _updateModel() {
             historyListViewModel.clear(); // we can do better
+            if (!sourceModel) return;
 
             for(var i=0; i<sourceModel.count; ++i) {
                 var eltSrc = sourceModel.get(i);
@@ -141,6 +143,7 @@ BasePage {
         }
 
         delegate: CallGroupDelegate {
+            width: historyList.width
             historyModel: historyPageId.historyModel
             contacts: historyPageId.contacts
         }

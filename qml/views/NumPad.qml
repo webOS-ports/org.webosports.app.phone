@@ -49,7 +49,7 @@ Item {
             keycode: Qt.Key_1
             disableSubLabel: (mode === "sim")
             posInPadGrid: Qt.point(0,0)
-            onSendKey: numPad.sendKey(keycode)
+            onSendKey: (keycode) => { numPad.sendKey(keycode) }
         }
 
         NumPadButton {
@@ -60,7 +60,7 @@ Item {
             disableSubLabel: (mode === "sim")
             keycode: Qt.Key_2
             posInPadGrid: Qt.point(1,0)
-            onSendKey: numPad.sendKey(keycode)
+            onSendKey: (keycode) => { numPad.sendKey(keycode) }
         }
 
         NumPadButton {
@@ -71,7 +71,7 @@ Item {
             disableSubLabel: (mode === "sim")
             keycode: Qt.Key_3
             posInPadGrid: Qt.point(2,0)
-            onSendKey: numPad.sendKey(keycode)
+            onSendKey: (keycode) => { numPad.sendKey(keycode) }
         }
 
         NumPadButton {
@@ -82,7 +82,7 @@ Item {
             disableSubLabel: (mode === "sim")
             keycode: Qt.Key_4
             posInPadGrid: Qt.point(0,1)
-            onSendKey: numPad.sendKey(keycode)
+            onSendKey: (keycode) => { numPad.sendKey(keycode) }
         }
 
         NumPadButton {
@@ -93,7 +93,7 @@ Item {
             disableSubLabel: (mode === "sim")
             keycode: Qt.Key_5
             posInPadGrid: Qt.point(1,1)
-            onSendKey: numPad.sendKey(keycode)
+            onSendKey: (keycode) => { numPad.sendKey(keycode) }
         }
 
         NumPadButton {
@@ -104,7 +104,7 @@ Item {
             disableSubLabel: (mode === "sim")
             keycode: Qt.Key_6
             posInPadGrid: Qt.point(2,1)
-            onSendKey: numPad.sendKey(keycode)
+            onSendKey: (keycode) => { numPad.sendKey(keycode) }
         }
 
         NumPadButton {
@@ -115,7 +115,7 @@ Item {
             disableSubLabel: (mode === "sim")
             keycode: Qt.Key_7
             posInPadGrid: Qt.point(0,1)
-            onSendKey: numPad.sendKey(keycode)
+            onSendKey: (keycode) => { numPad.sendKey(keycode) }
         }
 
         NumPadButton {
@@ -126,7 +126,7 @@ Item {
             disableSubLabel: (mode === "sim")
             keycode: Qt.Key_8
             posInPadGrid: Qt.point(1,1)
-            onSendKey: numPad.sendKey(keycode)
+            onSendKey: (keycode) => { numPad.sendKey(keycode) }
         }
 
         NumPadButton {
@@ -137,7 +137,7 @@ Item {
             disableSubLabel: (mode === "sim")
             keycode: Qt.Key_9
             posInPadGrid: Qt.point(2,1)
-            onSendKey: numPad.sendKey(keycode)
+            onSendKey: (keycode) => { numPad.sendKey(keycode) }
         }
 
         NumPadButton {
@@ -147,7 +147,7 @@ Item {
             disableSubLabel: true
             keycode: Qt.Key_Asterisk
             posInPadGrid: Qt.point(0,2)
-            onSendKey: numPad.sendKey(keycode)
+            onSendKey: (keycode) => { numPad.sendKey(keycode) }
         }
 
         NumPadButton {
@@ -159,7 +159,7 @@ Item {
             keycode: Qt.Key_0
             longpresskeycode: Qt.Key_Plus
             posInPadGrid: Qt.point(1,2)
-            onSendKey: numPad.sendKey(keycode)
+            onSendKey: (keycode) => { numPad.sendKey(keycode) }
         }
 
         NumPadButton {
@@ -169,7 +169,7 @@ Item {
             disableSubLabel: true
             keycode: Qt.Key_NumberSign
             posInPadGrid: Qt.point(2,2)
-            onSendKey: numPad.sendKey(keycode)
+            onSendKey: (keycode) => { numPad.sendKey(keycode) }
         }
     }
 }

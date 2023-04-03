@@ -165,6 +165,6 @@ Item {
     function _getPreferencesFailure(message) {
         console.log("No region found, default to US: " + message);
         countryCode = 'US'
-        console.log("phone: set current country code to: " + response.region.countryCode);
+        console.log("phone: set current country code to: " + countryCode);
     }
 }

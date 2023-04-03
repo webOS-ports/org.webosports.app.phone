@@ -16,11 +16,11 @@
  */
 
 import QtQuick 2.0
-import QtQuick.Controls 1.1
-import QtQuick.Controls.Styles 1.1
+import QtQuick.Controls 2.0
 import LunaNext.Common 0.1
 
 Button {
+    id: buttonRoot
     width: Units.gu(5)
     height:Units.gu(5)
 
@@ -28,27 +28,24 @@ Button {
 
     property bool btnActive: false
 
-    style: ButtonStyle {
-        background: Rectangle{
-            color: btnActive ? appTheme.callActionBtnFgColorActive : appTheme.callActionBtnFgColor
-            border.color:  'white'
-            implicitWidth: Units.gu(5)
-            implicitHeight: Units.gu(5)
-            radius: 10
+    background: Rectangle{
+        color: btnActive ? appTheme.callActionBtnFgColorActive : appTheme.callActionBtnFgColor
+        border.color:  'white'
+        implicitWidth: Units.gu(5)
+        implicitHeight: Units.gu(5)
+        radius: 10
 
-            Item {
-                clip: true
-                anchors.horizontalCenter: parent.horizontalCenter
-                anchors.verticalCenter: parent.verticalCenter
-                width: 36
-                height: 66
-                Image{
-                    x: 0
-                    y: control.pressed ? -132: 10
-                    source: "images/mute_on_off.png"
-                }
+        Item {
+            clip: true
+            anchors.horizontalCenter: parent.horizontalCenter
+            anchors.verticalCenter: parent.verticalCenter
+            width: 36
+            height: 66
+            Image{
+                x: 0
+                y: buttonRoot.pressed ? -132: 10
+                source: "images/mute_on_off.png"
             }
         }
-
     }
 }

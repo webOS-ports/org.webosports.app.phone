@@ -62,7 +62,7 @@ BasePage {
             right:dialButton.right
         }
 
-        onSendKey: {
+        onSendKey: (keycode) => {
             if(AppTweaks.dialpadFeedbackTweakValue === "vibrateSound" || AppTweaks.dialpadFeedbackTweakValue === "vibrateOnly") {
                 service.call("luna://com.palm.vibrate/vibrate", JSON.stringify({
                                                               period: 100, duration: 10

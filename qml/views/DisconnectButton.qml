@@ -16,24 +16,23 @@
  */
 
 import QtQuick 2.0
-import QtQuick.Controls 1.1
-import QtQuick.Controls.Styles 1.1
+import QtQuick.Controls 2.0
 
 import LuneOS.Components 1.0
 
 Button {
-    style: ButtonStyle {
-        background: ClippedImage {
-            id: bgClippedImage
+    id: disconnectButtonRoot
 
-            source: Qt.resolvedUrl("images/disconnect-button.png")
+    background: ClippedImage {
+        id: bgClippedImage
 
-            wantedWidth: control.width
-            imageSize: Qt.size(612, 297)
-            patchGridSize: Qt.size(1, 3)
-            patch: control.pressed ? Qt.point(0,2): Qt.point(0,0)
+        source: Qt.resolvedUrl("images/disconnect-button.png")
 
-            onHeightChanged: control.height = bgClippedImage.height
-        }
+        wantedWidth: disconnectButtonRoot.width
+        imageSize: Qt.size(612, 297)
+        patchGridSize: Qt.size(1, 3)
+        patch: disconnectButtonRoot.pressed ? Qt.point(0,2): Qt.point(0,0)
+
+        onHeightChanged: disconnectButtonRoot.height = bgClippedImage.height
     }
 }

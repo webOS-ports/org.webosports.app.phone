@@ -16,28 +16,17 @@
  */
 
 import QtQuick 2.0
-import QtQuick.Controls 2.0
+import Qt5Compat.GraphicalEffects
 
-import LunaNext.Common 0.1
+OpacityMask {
+    property alias radius: roundedRect.radius
 
-
-
-ButtonStyle {
-    background: Rectangle{
-        width: Units.gu(10)
-        height: Units.gu(2)
-        border.width: control.activeFocus ? 2 : 1
-        border.color: "#888"
-        radius: 4
-        gradient: Gradient {
-            GradientStop { position: 0 ; color: control.pressed ? "#ccc" : "#eee" }
-            GradientStop { position: 1 ; color: control.pressed ? "#aaa" : "#ccc" }
-        }
+    Rectangle {
+        id: roundedRect
+        visible: false
+        anchors.fill: parent
+        color: "black"
     }
 
-    label : Text {
-        text: control.text
-        font.pixelSize: Units.dp(18)
-        anchors.horizontalCenter:parent.horizontalCenter
-    }
+    maskSource: roundedRect
 }

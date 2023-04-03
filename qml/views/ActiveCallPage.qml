@@ -17,7 +17,6 @@
 
 import QtQuick 2.0
 import QtQuick.Layouts 1.0
-import QtGraphicalEffects 1.0
 
 import org.nemomobile.voicecall 1.0
 
@@ -109,17 +108,17 @@ BasePage {
                     horizontalCenter: parent.horizontalCenter
                 }
 
-                width: parent.width * 0.6
+                width: Math.min(parent.width*0.6, parent.height*0.6)
                 height:width
 
                 asynchronous:true
-                fillMode:Image.PreserveAspectCrop
+                fillMode:Image.PreserveAspectFit
                 smooth:true
                 source: currentContact.avatarPath
             }
             CornerShader {
                 radius: 35
-                sourceItem: imageAvatar
+                source: imageAvatar
                 anchors.fill: imageAvatar
             }
             Image {
