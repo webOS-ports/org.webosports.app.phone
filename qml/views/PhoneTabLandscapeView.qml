@@ -80,12 +80,6 @@ RowLayout {
                 anchors.verticalCenter: parent.verticalCenter
                 height: tabBar.height
             }
-
-            TabButton {
-                LuneOSButton.image: Qt.resolvedUrl("images/menu-icon-voicemail.png")
-                anchors.verticalCenter: parent.verticalCenter
-                height: tabBar.height
-            }
         }
     }
 
@@ -94,7 +88,6 @@ RowLayout {
 
         Layout.fillHeight: true
         Layout.fillWidth: true
-        orientation: Qt.Vertical
         clip: true
 
         currentIndex: tabBar.currentIndex
@@ -114,17 +107,9 @@ RowLayout {
                 contacts: tabView.contacts
             }
         }
-        Loader {
-            id: tabVoiceMail
-            sourceComponent: Item{}
-            //sourceComponent: VoiceMail{}
-        }
 
         onCurrentIndexChanged: {
             tabBar.currentIndex = currentIndex;
-            if(currentIndex === 2) {
-                voiceCallManager.dial("453");
-            }
         }
     }
 }

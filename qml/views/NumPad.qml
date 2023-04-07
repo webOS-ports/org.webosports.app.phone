@@ -47,6 +47,7 @@ Item {
             label:'1'
             sublabel: 'voicemail'
             keycode: Qt.Key_1
+            longpresskeycode: Qt.Key_LaunchMail
             disableSubLabel: (mode === "sim")
             posInPadGrid: Qt.point(0,0)
             onSendKey: (keycode) => { numPad.sendKey(keycode) }
