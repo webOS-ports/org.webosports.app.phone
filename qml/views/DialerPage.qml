@@ -88,7 +88,6 @@ BasePage {
 
         anchors {
             bottom: parent.bottom
-            bottomMargin: Units.gu(2)
             left: parent.left
             right: parent.right
         }
