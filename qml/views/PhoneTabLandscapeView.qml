@@ -46,28 +46,26 @@ RowLayout {
         id: dislerPageId
 
         Layout.fillHeight: true
-        Layout.fillWidth: true
+        Layout.fillWidth: false
+        Layout.minimumWidth: Math.min(tabView.height, tabView.width/2)
+        Layout.preferredWidth: Math.min(tabView.height, tabView.width/2)
 
         appTheme: tabView.appTheme
         voiceCallMgrWrapper: tabView.voiceCallManager
         telephonyManager: tabView.telephonyManager
     }
 
-    Item{
+    Item {
         id: tabBarItem
 
         Layout.fillHeight: true
-        Layout.fillWidth: false
-        Layout.minimumWidth: Units.gu(4.8)
-        Layout.preferredWidth: Units.gu(4.8)
+        Layout.fillWidth: true
 
         TabBar {
             id: tabBar
-
-            width: parent.height
-            height: parent.width
-            rotation: 90
-            anchors.centerIn: parent
+            width: parent.width
+            height: Units.gu(4.8)
+            anchors.bottom: parent.bottom
 
             TabButton {
                 LuneOSButton.image: Qt.resolvedUrl("images/menu-icon-favorites.png")
@@ -81,35 +79,34 @@ RowLayout {
                 height: tabBar.height
             }
         }
-    }
 
-    SwipeView {
-        id: swipeViewId
+        SwipeView {
+            width: parent.width
+            anchors.top: parent.top
+            anchors.bottom: tabBar.top
+            clip: true
 
-        Layout.fillHeight: true
-        Layout.fillWidth: true
-        clip: true
+            currentIndex: tabBar.currentIndex
 
-        currentIndex: tabBar.currentIndex
-
-        Loader {
-            id: tabFavorites
-            sourceComponent: FavouritePage{
-                appTheme: tabView.appTheme;
-                favoritesModel: tabView.favoritesModel
+            Loader {
+                id: tabFavorites
+                sourceComponent: FavouritePage{
+                    appTheme: tabView.appTheme;
+                    favoritesModel: tabView.favoritesModel
+                }
             }
-        }
-        Loader {
-            id: tabHistory
-            sourceComponent: HistoryPage{
-                appTheme: tabView.appTheme;
-                historyModel: tabView.historyModel
-                contacts: tabView.contacts
+            Loader {
+                id: tabHistory
+                sourceComponent: HistoryPage{
+                    appTheme: tabView.appTheme;
+                    historyModel: tabView.historyModel
+                    contacts: tabView.contacts
+                }
             }
-        }
 
-        onCurrentIndexChanged: {
-            tabBar.currentIndex = currentIndex;
+            onCurrentIndexChanged: {
+                tabBar.currentIndex = currentIndex;
+            }
         }
     }
 }
