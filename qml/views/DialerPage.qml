@@ -62,6 +62,10 @@ BasePage {
             right:dialButton.right
         }
 
+        function vibrateFailure(message) {
+            console.log("Unable to vibrate");
+        }
+
         onSendKey: (keycode) => {
             if(AppTweaks.dialpadFeedbackTweakValue === "vibrateSound" || AppTweaks.dialpadFeedbackTweakValue === "vibrateOnly") {
                 service.call("luna://com.palm.vibrate/vibrate", JSON.stringify({
@@ -69,11 +73,13 @@ BasePage {
                                                           }), undefined,
                                            vibrateFailure)
             }
-            function vibrateFailure(message) {
-                console.log("Unable to vibrate");
+            if (keycode === Qt.Key_LaunchMail) {
+                // call voicemail
+                voiceCallMgrWrapper.dial("453");
             }
-
-            numEntry.insert(String.fromCharCode(keycode));
+            else {
+                numEntry.insert(String.fromCharCode(keycode));
+            }
         }
     }
 
@@ -82,7 +88,6 @@ BasePage {
 
         anchors {
             bottom: parent.bottom
-            bottomMargin: Units.gu(2)
             left: parent.left
             right: parent.right
         }

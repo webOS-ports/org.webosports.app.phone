@@ -166,14 +166,41 @@ WebOSWindow {
         stackView.openPage("IncomingCall", voiceCall);
     }
 
-    PhoneTabView {
+    Component {
+        id: tabViewComp
+        PhoneTabView {
+            appTheme: phoneUiAppTheme
+            historyModel: phoneWindowId.historyModel
+            favoritesModel: phoneWindowId.favoritesModel
+            voiceCallManager: phoneWindowId.voiceCallMgrWrapper
+            telephonyManager: phoneWindowId.telephonyManager
+            contacts: phoneWindowId.contacts
+        }
+    }
+    Component {
+        id: tabViewLandscapeComp
+        PhoneTabLandscapeView {
+            appTheme: phoneUiAppTheme
+            historyModel: phoneWindowId.historyModel
+            favoritesModel: phoneWindowId.favoritesModel
+            voiceCallManager: phoneWindowId.voiceCallMgrWrapper
+            telephonyManager: phoneWindowId.telephonyManager
+            contacts: phoneWindowId.contacts
+        }
+    }
+
+    Loader {
         id: tabView
 
-        appTheme: phoneUiAppTheme
-        historyModel: phoneWindowId.historyModel
-        favoritesModel: phoneWindowId.favoritesModel
-        voiceCallManager: phoneWindowId.voiceCallMgrWrapper
-        telephonyManager: phoneWindowId.telephonyManager
-        contacts: phoneWindowId.contacts
+        function resetDialer() {
+            item.resetDialer();
+        }
+
+        sourceComponent: {
+            if (phoneWindowId.height/phoneWindowId.width > 1)
+                return tabViewComp;
+            else
+                return tabViewLandscapeComp;
+        }
     }
 }

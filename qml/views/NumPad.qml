@@ -25,8 +25,8 @@ Item {
 
     signal sendKey(int keycode)
 
-    property int keysWidth: (numPad.width / keys.columns) - Units.gu(2)
-    property int keysHeight: (numPad.height / keys.rows) - Units.gu(2)
+    property int keysWidth: ((numPad.width-Units.gu(2)) / keys.columns)
+    property int keysHeight: ((numPad.height-Units.gu(2)) / keys.rows)
 
     Image {
         source: "images/dialpad-bg.png"
@@ -47,6 +47,7 @@ Item {
             label:'1'
             sublabel: 'voicemail'
             keycode: Qt.Key_1
+            longpresskeycode: Qt.Key_LaunchMail
             disableSubLabel: (mode === "sim")
             posInPadGrid: Qt.point(0,0)
             onSendKey: (keycode) => { numPad.sendKey(keycode) }

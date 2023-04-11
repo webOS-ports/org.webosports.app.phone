@@ -42,30 +42,25 @@ Item {
     TabBar {
         id: tabBar
         width: parent.width
+        height: Units.gu(4.8)
         anchors.bottom: parent.bottom
 
         TabButton {
             LuneOSButton.image: Qt.resolvedUrl("images/menu-icon-dtmfpad.png")
             anchors.verticalCenter: parent.verticalCenter
-            height: 48
+            height: tabBar.height
         }
 
         TabButton {
             LuneOSButton.image: Qt.resolvedUrl("images/menu-icon-favorites.png")
             anchors.verticalCenter: parent.verticalCenter
-            height: 48
+            height: tabBar.height
         }
 
         TabButton {
             LuneOSButton.image: Qt.resolvedUrl("images/menu-icon-call-log.png")
             anchors.verticalCenter: parent.verticalCenter
-            height: 48
-        }
-
-        TabButton {
-            LuneOSButton.image: Qt.resolvedUrl("images/menu-icon-voicemail.png")
-            anchors.verticalCenter: parent.verticalCenter
-            height: 48
+            height: tabBar.height
         }
     }
 
@@ -100,16 +95,9 @@ Item {
                 contacts: tabView.contacts
             }
         }
-        Loader {
-            id: tabVoiceMail
-            sourceComponent: Item{}
-            //sourceComponent: VoiceMail{}
-        }
 
         onCurrentIndexChanged: {
-            if(currentIndex === 3) {
-                voiceCallManager.dial("453");
-            }
+            tabBar.currentIndex = currentIndex;
         }
     }
 }
