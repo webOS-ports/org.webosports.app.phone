@@ -26,14 +26,25 @@ Button {
 
     property PhoneUiTheme appTheme: PhoneUiTheme{}
 
-    background: ClippedImage {
-        source: Qt.resolvedUrl('images/button-sprite.png')
+    checkable: true
 
-        wantedWidth: buttonRoot.width
+    background: Rectangle{
+        color: buttonRoot.checked ? appTheme.callActionBtnFgColorActive : appTheme.callActionBtnFgColor
+        border.color:  'white'
+        implicitWidth: buttonRoot.width
+        implicitHeight: buttonRoot.height
+        radius: buttonRoot.width*0.2
 
-        imageSize: Qt.size(183, 244)
-        patchGridSize: Qt.size(3, 4)
-        patch: buttonRoot.checked ? (buttonRoot.pressed ? Qt.point(0,3) : Qt.point(0,2) ) :
-                                    (buttonRoot.pressed ? Qt.point(0,1) : Qt.point(0,0) )
+        ClippedImage {
+            source: Qt.resolvedUrl('images/button-sprite.png')
+
+            wantedWidth: buttonRoot.width
+            wantedHeight: buttonRoot.height
+
+            imageSize: Qt.size(183, 244)
+            patchGridSize: Qt.size(3, 4)
+            patch: buttonRoot.checked ? (buttonRoot.pressed ? Qt.point(0,3) : Qt.point(0,2) ) :
+                                        (buttonRoot.pressed ? Qt.point(0,1) : Qt.point(0,0) )
+        }
     }
 }

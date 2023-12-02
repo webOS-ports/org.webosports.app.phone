@@ -246,7 +246,6 @@ BasePage {
         SpeakerButton {
             width: Units.gu(5)
             height: parent.height
-            checkable: true
             visible:root.voiceCallIsActive
             onClicked: {
                 voiceCallManager.setAudioMode(voiceCallManager.audioMode === 'ihf' ? 'earpiece' : 'ihf');
@@ -256,7 +255,6 @@ BasePage {
         MuteButton {
             visible:root.voiceCallIsActive
             onClicked: {
-                btnActive = !btnActive
                 if(root.state == 'incoming') { // TODO: Take in to account unmuting audio when call is answered.
                     voiceCallManager.setMuteSpeaker(true);
                 } else {
@@ -268,7 +266,6 @@ BasePage {
         KeypadButton {
             visible:root.voiceCallIsActive
             onClicked: {
-                btnActive = !btnActive
                 console.log("Numpad Button tapped");
                 flipable.flipped = !flipable.flipped;
             }
