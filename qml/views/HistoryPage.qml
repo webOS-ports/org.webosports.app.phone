@@ -89,11 +89,11 @@ BasePage {
 
             for(var i=0; i<sourceModel.count; ++i) {
                 var eltSrc = sourceModel.get(i);
-                if(eltSrc.recentcall_address && eltSrc.recentcall_address.name) {
-                    if(eltSrc.recentcall_address.name.toLowerCase().indexOf(filter.toLowerCase()) >= 0)
-                    {
-                        historyListViewModel.append(eltSrc);
-                    }
+                if(filter.length === 0 ||
+                   (eltSrc.recentcall_address && eltSrc.recentcall_address.name &&
+                    eltSrc.recentcall_address.name.toLowerCase().indexOf(filter.toLowerCase()) >= 0))
+                {
+                    historyListViewModel.append(eltSrc);
                 }
             }
         }
