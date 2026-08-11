@@ -44,6 +44,77 @@ Db8Model {
         return LibPhoneNumber.getPhoneNumberTypeStr(phoneNumberType);
     }
 
+    /// Phone numbers of a person, as a plain array regardless of whether the
+    /// record came from db8 or from the test data file.
+    function phoneNumbersOf(person)
+    {
+        if (!person || !person.phoneNumbers) return [];
+
+        var list = person.phoneNumbers;
+        var count = (typeof list.length !== 'undefined') ? list.length : list.count;
+        var result = [];
+        for (var i = 0; i < count; ++i)
+            result.push(Array.isArray(list) ? list[i] : list.get(i));
+
+        return result;
+    }
+
+    /**
+     * Contacts the user is likely to mean while typing on the dialpad: those
+     * with a number starting with the digits typed so far, plus -- for the
+     * letters on the dialpad keys -- those whose name starts with the same
+     * text. This is the type-ahead the legacy ContactLookup scene provided.
+     */
+    function matchByNumberPrefix(prefix, limit)
+    {
+        var digits = String(prefix).replace(/[^0-9+]/g, '');
+        if (digits.length === 0) return [];
+
+        var maximum = limit || 20;
+        var matches = [];
+
+        for (var i = 0; i < db8model.count && matches.length < maximum; ++i) {
+            var person = db8model.get(i);
+            var numbers = phoneNumbersOf(person);
+
+            for (var j = 0; j < numbers.length; ++j) {
+                var value = String(numbers[j].value || "").replace(/[^0-9+]/g, '');
+                // Match on the start of the number, and also on the national
+                // part so that typing a local number finds a stored +316... one.
+                if (value.indexOf(digits) === 0 ||
+                    value.replace(/^\+[0-9]{1,3}/, '').indexOf(digits.replace(/^0/, '')) === 0) {
+                    matches.push({ person: person, phoneNumber: numbers[j] });
+                    break;
+                }
+            }
+        }
+
+        return matches;
+    }
+
+    /// Contacts whose display name contains `text`, for the contact lookup list.
+    function matchByName(text, limit)
+    {
+        var needle = String(text).toLowerCase().trim();
+        if (needle.length === 0) return [];
+
+        var maximum = limit || 50;
+        var matches = [];
+
+        for (var i = 0; i < db8model.count && matches.length < maximum; ++i) {
+            var person = db8model.get(i);
+            var haystack = [person.nickname,
+                            person.name ? person.name.givenName : "",
+                            person.name ? person.name.familyName : ""]
+                               .join(" ").toLowerCase();
+
+            if (haystack.indexOf(needle) >= 0)
+                matches.push({ person: person, phoneNumber: null });
+        }
+
+        return matches;
+    }
+
     function personById(personId)
     {
         console.log("Looking up contacts for personId: " + personId);

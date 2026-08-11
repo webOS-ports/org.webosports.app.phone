@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2014 Roshan Gunasekara <roshan@mobileteck.com>
+ * Copyright (C) 2026 WebOS Ports
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -24,6 +25,7 @@ import LuneOS.Components 1.0
 import LunaNext.Common 0.1
 
 import "../AppTweaks"
+import "../services/PhoneNumberUtils.js" as PhoneNumberUtils
 
 BasePage {
     id: pDialPage
@@ -31,9 +33,24 @@ BasePage {
     pageName: "Dialer"
     property alias number: numEntry.text
 
+    /// Emitted when the user wants to pick a contact instead of typing.
+    signal contactLookupRequested(string prefix);
+
     function reset() {
-        numEntry.text = "";
+        numEntry.clear();
     }
+
+    /// Fills the dialpad from contact lookup without dialling yet.
+    function setContact(name, phoneNumber) {
+        numEntry.setContact(name, phoneNumber);
+    }
+
+    // Contacts with a number starting with what has been typed so far. The
+    // legacy dialer showed the same running match above the dialpad.
+    property var matchingContacts: (contacts && numEntry.text.length >= 3 &&
+                                    numEntry.contactName.length === 0)
+                                       ? contacts.matchByNumberPrefix(numEntry.text)
+                                       : []
 
     LunaService {
         id: service
@@ -41,25 +58,83 @@ BasePage {
         usePrivateBus: true
     }
 
-    NumberEntry {
-        id: numEntry
+    // The dialpad keeps a fixed, phone-sized footprint and is centred, rather
+    // than stretching to whatever the window happens to be. A key is about
+    // 4:3, so the pad's height follows from its width.
+    readonly property real padWidth: Math.min(width - Units.gu(2), Units.gu(32))
+    // Keys are roughly 4:3, so four rows come to about the pad's own width.
+    readonly property real padKeysHeight: padWidth * 0.95
 
-        anchors {
-            top: pDialPage.top
-            left:dialButton.left
-            right:dialButton.right
+    Item {
+        id: dialpadPanel
+
+        anchors.horizontalCenter: parent.horizontalCenter
+        anchors.verticalCenter: parent.verticalCenter
+        width: pDialPage.padWidth
+        height: numEntry.height + matchStrip.height + pDialPage.padKeysHeight + dialButton.height
+
+        NumberEntry {
+            id: numEntry
+
+            anchors {
+                top: parent.top
+                left: parent.left
+                right: parent.right
+            }
+
+            textColor: '#ffffff'
+            countryCode: contacts ? contacts.countryCode : "US"
+
+            onEmptyFieldClicked: pDialPage.contactLookupRequested("")
         }
 
-        textColor: '#ffffff'
+    // A single match fills the field; several open the full contact list.
+    Rectangle {
+        id: matchStrip
+
+        anchors {
+            top: numEntry.bottom
+            left: parent.left
+            right: parent.right
+        }
+        height: visible ? Units.gu(3.5) : 0
+        visible: pDialPage.matchingContacts.length > 0
+
+        color: appTheme.panelFooterColor
+
+        Text {
+            anchors.fill: parent
+            anchors.leftMargin: Units.gu(2)
+            verticalAlignment: Text.AlignVCenter
+            color: 'white'
+            elide: Text.ElideRight
+            font.pixelSize: FontUtils.sizeToPixels("small")
+            text: pDialPage.matchingContacts.length === 1
+                      ? PhoneNumberUtils.personDisplayName(pDialPage.matchingContacts[0].person)
+                      : qsTr("%1 matching contacts").arg(pDialPage.matchingContacts.length)
+        }
+
+        MouseArea {
+            anchors.fill: parent
+            onClicked: {
+                if (pDialPage.matchingContacts.length === 1) {
+                    var match = pDialPage.matchingContacts[0];
+                    numEntry.setContact(PhoneNumberUtils.personDisplayName(match.person),
+                                        match.phoneNumber.value);
+                } else {
+                    pDialPage.contactLookupRequested(numEntry.text);
+                }
+            }
+        }
     }
 
     NumPad {
         id: numPad
         anchors {
-            top: numEntry.bottom
+            top: matchStrip.bottom
             bottom: dialButton.top
-            left:dialButton.left
-            right:dialButton.right
+            left: parent.left
+            right: parent.right
         }
 
         function vibrateFailure(message) {
@@ -67,19 +142,33 @@ BasePage {
         }
 
         onSendKey: (keycode) => {
-            if(AppTweaks.dialpadFeedbackTweakValue === "vibrateSound" || AppTweaks.dialpadFeedbackTweakValue === "vibrateOnly") {
+            var feedback = AppTweaks.dialpadFeedbackTweakValue;
+
+            if (feedback === "vibrateSound" || feedback === "vibrateOnly") {
                 service.call("luna://com.palm.vibrate/vibrate", JSON.stringify({
                                                               period: 100, duration: 10
                                                           }), undefined,
                                            vibrateFailure)
             }
+
             if (keycode === Qt.Key_LaunchMail) {
-                // call voicemail
-                voiceCallMgrWrapper.dial("453");
+                // Long press on 1 calls voicemail, as on the original dialpad.
+                pDialPage.dialHandler.dialVoicemail();
+                return;
             }
-            else {
-                numEntry.insert(String.fromCharCode(keycode));
+
+            var character = String.fromCharCode(keycode);
+
+            // With a call up, the dialpad doubles as a DTMF pad.
+            if (voiceCallMgrWrapper && voiceCallMgrWrapper.activeVoiceCall) {
+                voiceCallMgrWrapper.sendDtmf(character);
+                return;
             }
+
+            if ((feedback === "vibrateSound" || feedback === "soundOnly") && voiceCallMgrWrapper)
+                voiceCallMgrWrapper.manager.startDtmfTone(character);
+
+            numEntry.insert(character);
         }
     }
 
@@ -93,16 +182,21 @@ BasePage {
         }
 
         onClicked: {
-            if(numEntry.text.length > 0) {
-                if(numEntry.text[0] === "*") {
-                    telephonyManager.initiateUssd(number);
-                }
-                else {
-                    voiceCallMgrWrapper.dial(numEntry.getPhoneNumber());
-                }
-            } else {
-                console.log('Number entry is blank.');
+            if (numEntry.text.length === 0) {
+                // Dial on an empty field brings back the last number dialled,
+                // ready to be sent again, as the original dialer did.
+                var last = pDialPage.dialHandler ? pDialPage.dialHandler.lastDialedNumber : "";
+                if (last.length > 0)
+                    numEntry.text = last;
+                else
+                    pDialPage.contactLookupRequested("");
+                return;
             }
+
+            // Every dial string -- number, MMI code, USSD, in-call digit --
+            // goes through the dial handler so the GSM rules apply uniformly.
+            pDialPage.dialHandler.dial(numEntry.getPhoneNumber());
         }
+    }
     }
 }

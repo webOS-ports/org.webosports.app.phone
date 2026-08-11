@@ -83,15 +83,30 @@ BasePage {
         onFilterChanged: _updateModel();
         Component.onCompleted: _updateModel();
 
+        // A call from a number that is not in Contacts has no name to search,
+        // so the filter has to look at the number itself as well.
+        function _matches(callGroup, needle) {
+            var address = callGroup.recentcall_address;
+            if (!address) return false;
+
+            if (address.name && address.name.toLowerCase().indexOf(needle) >= 0)
+                return true;
+
+            var digits = needle.replace(/[^0-9+]/g, '');
+            if (digits.length === 0) return false;
+
+            return !!address.addr && String(address.addr).replace(/[^0-9+]/g, '').indexOf(digits) >= 0;
+        }
+
         function _updateModel() {
             historyListViewModel.clear(); // we can do better
             if (!sourceModel) return;
 
+            var needle = filter.toLowerCase();
+
             for(var i=0; i<sourceModel.count; ++i) {
                 var eltSrc = sourceModel.get(i);
-                if(filter.length === 0 ||
-                   (eltSrc.recentcall_address && eltSrc.recentcall_address.name &&
-                    eltSrc.recentcall_address.name.toLowerCase().indexOf(filter.toLowerCase()) >= 0))
+                if(filter.length === 0 || historyListViewModel._matches(eltSrc, needle))
                 {
                     historyListViewModel.append(eltSrc);
                 }
@@ -118,7 +133,7 @@ BasePage {
             height: childrenRect.height
             Rectangle {
                 width: Units.gu(1) //parent.width
-                color: '#25394A'
+                color: appTheme.panelBorderColor
                 height: sectionTextId.height/5
                 anchors.left: parent.left
                 anchors.verticalCenter: sectionTextId.verticalCenter
@@ -134,7 +149,7 @@ BasePage {
             }
             Rectangle {
                 width: parent.width - sectionTextId.contentWidth - Units.gu(3) //Units.gu(1) //parent.width
-                color: '#25394A'
+                color: appTheme.panelBorderColor
                 height: sectionTextId.height/5
                 anchors.right: parent.right
                 anchors.verticalCenter: sectionTextId.verticalCenter
@@ -146,15 +161,18 @@ BasePage {
             width: historyList.width
             historyModel: historyPageId.historyModel
             contacts: historyPageId.contacts
+            dialHandler: historyPageId.dialHandler
+            callTransports: historyPageId.callTransports
+            appTheme: historyPageId.appTheme
         }
 
-        Rectangle {
+        Text {
+            anchors.centerIn: parent
             visible: historyList.count === 0
-            Text {
-                color: "white"
-                font.pixelSize: FontUtils.sizeToPixels("20pt")
-                text: "No calls yet"
-            }
+            color: "white"
+            font.pixelSize: FontUtils.sizeToPixels("20pt")
+            text: buttonOnlyMissed.checked ? qsTr("Your missed call history is empty")
+                                           : qsTr("Your call history is empty")
         }
     }
 }
