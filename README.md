@@ -11,6 +11,52 @@ The phone application is completely written in Qt/QML to give the best performan
 user experience. Having a stable and fast phone application is crucial for the system as
 this is one of the main usage aspects and needs to work reliable.
 
+Running on the desktop
+======================
+
+The app can be run on a development machine, against mock services, without a
+device. Open `phoneapp.qmlproject` in Qt Creator and press Run.
+
+It expects `luneos-components` checked out next to this repository:
+
+    <parent>/org.webosports.app.phone
+    <parent>/luneos-components
+
+The mocks live in `luneos-components/test/imports` and stand in for the modem
+(QOfono), the calling backend (nemo voicecall), the luna bus and db8. The sample
+records they serve are the JSON files in `qml/test`:
+
+* `persons.json`          contacts, including the IM addresses Synergy calls over
+* `phonecallgroup.json`   call log groups
+* `phonecall.json`        the individual calls in those groups
+* `accounts.json`         the calling accounts (cellular plus WhatsApp/Telegram/Signal)
+* `callcapabilities.json` what each of those accounts reports at runtime
+* `imbuddystatus.json`    buddy presence
+
+Edit those to change what the app comes up with -- removing the entries in
+`accounts.json`, for instance, leaves only cellular and makes the "which
+service?" chooser go away.
+
+The mock SIM starts unlocked. To exercise the PIN screens, set `pinRequired` in
+`luneos-components/test/imports/QOfono/OfonoSimManager.qml` to `SimPin` (the
+mock accepts `1234`) or `SimPuk` (`12345678`). Dialling `*100#` returns a
+balance; any other USSD code opens an interactive menu.
+
+To start the app on something other than the dialler, put a launch action in
+`launchParameters` in `qml/main-desktop.qml`, e.g.
+`{"action":"dial","address":"+31612345678"}`.
+
+Requirements beyond Qt itself: the `Qt5Compat.GraphicalEffects` QML module
+(Debian/Ubuntu: `qml6-module-qt5compat-graphicaleffects`), which the app uses
+for the rounded avatars.
+
+Note that `QML_XHR_ALLOW_FILE_READ=1` must be set for the mock data to load --
+the qmlproject sets it, but if you run `qml` by hand you need it too:
+
+    qml -I ../luneos-components/modules -I ../luneos-components/test/imports \
+        qml/main-desktop.qml
+
+
 How to Build on Linux
 =====================
 
