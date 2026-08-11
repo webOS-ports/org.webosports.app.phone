@@ -1,6 +1,7 @@
 /*
  * Copyright (C) 2014 Roshan Gunasekara <roshan@mobileteck.com>
  * Copyright (C) 2016 Christophe Chapuis <chris.chapuis@gmail.com>
+ * Copyright (C) 2026 WebOS Ports
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -40,6 +41,13 @@ WebOSWindow {
     property SimPinWindow simPinWindow
     property PhoneUiTheme phoneUiAppTheme;
 
+    property var dialHandler;
+    property var supplementaryServices;
+    property var audioRouteManager;
+    property var dialingShortcuts;
+    property var callTransports;
+    property var imBuddyStatus;
+
     property Contact currentContact: Contact { contactsModel: contacts }
 
     visible: false
@@ -52,14 +60,43 @@ WebOSWindow {
     property bool hideWindowWhenCallEnds: false
 
     /**
+     * Navigation, driven both by the tabs and by launch parameters coming from
+     * other apps (see LaunchActionHandler).
+     */
+    function showDialpad() {
+        show();
+        stackView.pop(null);
+        if (tabView.item) tabView.item.showDialer();
+    }
+
+    function showCallLog() {
+        show();
+        stackView.pop(null);
+        if (tabView.item) tabView.item.showCallLog();
+    }
+
+    function showFavorites() {
+        show();
+        stackView.pop(null);
+        if (tabView.item) tabView.item.showFavorites();
+    }
+
+    function showActiveCall(force) {
+        if (!voiceCallMgrWrapper.activeVoiceCall && voiceCallMgrWrapper.callCount === 0)
+            return;
+
+        activeCallDialog(voiceCallMgrWrapper.activeVoiceCall || voiceCallMgrWrapper.callAt(0));
+    }
+
+    /**
      * When PhoneApp is closed, hang up any active calls.
      */
     onVisibleChanged: {
         if(!visible) {
             console.log("Window not active - Cleaning up");
             voiceCallMgrWrapper.hangupAll();
-            if (tabView.dialerPage)
-                tabView.dialerPage.reset();
+            if (tabView.item)
+                tabView.item.resetDialer();
         }
     }
 
@@ -77,6 +114,10 @@ WebOSWindow {
 
             if (existingPage) {
                 stackView.pop(existingPage);
+                // Point the page at the call that triggered this, which the
+                // previous code forgot to do -- a second call reused the page
+                // but kept showing the first call.
+                existingPage.voiceCall = voiceCall;
             }
             else {
                 stackView.push(Qt.resolvedUrl(pageName),
@@ -85,6 +126,10 @@ WebOSWindow {
                                              currentContact: phoneWindowId.currentContact,
                                              voiceCallMgrWrapper: phoneWindowId.voiceCallMgrWrapper,
                                              telephonyManager: phoneWindowId.telephonyManager,
+                                             dialHandler: phoneWindowId.dialHandler,
+                                             audioRouteManager: phoneWindowId.audioRouteManager,
+                                             supplementaryServices: phoneWindowId.supplementaryServices,
+                                             callTransports: phoneWindowId.callTransports,
                                              voiceCall: voiceCall });
             }
         }
@@ -113,33 +158,43 @@ WebOSWindow {
                 }
             }
         }
-        
+
         function onOutgoingCall(voiceCall) {
             currentContact.lineId = voiceCall.lineId;
             console.log("Outgoing Call Status: ",voiceCall.status)
 
             activeCallDialog(voiceCall);
         }
-        
+
         function onActiveCall(voiceCall) {
             currentContact.lineId = voiceCall.lineId;
             console.log("Active Call Status: ",voiceCall.status)
 
             activeCallDialog(voiceCall);
+
+            // Pick the audio route the moment the call goes live, so a docked
+            // device or a plugged-in headset is honoured without the user
+            // having to reach for the route button.
+            if (audioRouteManager)
+                audioRouteManager.applyDefaultRoute();
         }
-        
+
         function onEndingCall(voiceCall) {
             console.log("VoiceCall " + voiceCall.lineId + " ended")
+
+            // With another call still up, stay on the active call screen rather
+            // than tearing the whole stack down.
+            if (voiceCallMgrWrapper.callCount > 1) {
+                currentContact.lineId = voiceCallMgrWrapper.activeVoiceCall
+                                            ? voiceCallMgrWrapper.activeVoiceCall.lineId : "";
+                return;
+            }
 
             if(phoneWindowId.visible) {
                 if(hideWindowWhenCallEnds) phoneWindowId.hide();
 
                 tabView.resetDialer();
                 stackView.pop(null)
-
-                // If we were going back to Voicemail tab, go to first tab instead
-                if (tabView.currentIndex == 3)
-                    tabView.currentIndex = 0;
             }
             if(incomingCallAlertWindow.visible) {
                 incomingCallAlertWindow.hide();
@@ -147,6 +202,39 @@ WebOSWindow {
             }
             currentContact.lineId = "";
         }
+    }
+
+    // Something went wrong placing a call, or a connected call dropped.
+    Connections {
+        target: voiceCallMgrWrapper
+
+        function onDialFailed(number, reason) {
+            dialFailAlert.showDialFailure(number, reason);
+        }
+    }
+
+    Connections {
+        target: dialHandler
+
+        function onMessage(text) {
+            messageAlert.showMessage("", text, "");
+        }
+
+        function onDialFailed(number, reason) {
+            dialFailAlert.showDialFailure(number, reason);
+        }
+    }
+
+    DialFailAlert {
+        id: dialFailAlert
+        appTheme: phoneUiAppTheme
+        dialHandler: phoneWindowId.dialHandler
+        telephonyManager: phoneWindowId.telephonyManager
+    }
+
+    MessageAlert {
+        id: messageAlert
+        appTheme: phoneUiAppTheme
     }
 
     function activeCallDialog(voiceCall) {
@@ -175,6 +263,11 @@ WebOSWindow {
             voiceCallManager: phoneWindowId.voiceCallMgrWrapper
             telephonyManager: phoneWindowId.telephonyManager
             contacts: phoneWindowId.contacts
+            dialHandler: phoneWindowId.dialHandler
+            supplementaryServices: phoneWindowId.supplementaryServices
+            dialingShortcuts: phoneWindowId.dialingShortcuts
+            callTransports: phoneWindowId.callTransports
+            imBuddyStatus: phoneWindowId.imBuddyStatus
         }
     }
     Component {
@@ -186,6 +279,11 @@ WebOSWindow {
             voiceCallManager: phoneWindowId.voiceCallMgrWrapper
             telephonyManager: phoneWindowId.telephonyManager
             contacts: phoneWindowId.contacts
+            dialHandler: phoneWindowId.dialHandler
+            supplementaryServices: phoneWindowId.supplementaryServices
+            dialingShortcuts: phoneWindowId.dialingShortcuts
+            callTransports: phoneWindowId.callTransports
+            imBuddyStatus: phoneWindowId.imBuddyStatus
         }
     }
 
@@ -193,7 +291,7 @@ WebOSWindow {
         id: tabView
 
         function resetDialer() {
-            item.resetDialer();
+            if (item) item.resetDialer();
         }
 
         sourceComponent: {
@@ -201,6 +299,18 @@ WebOSWindow {
                 return tabViewComp;
             else
                 return tabViewLandscapeComp;
+        }
+    }
+
+    // "Add call" from the in-call screen puts the dialpad back in front while
+    // the call carries on in the background.
+    Connections {
+        target: stackView.currentItem
+        ignoreUnknownSignals: true
+
+        function onAddCallRequested() {
+            stackView.pop(null);
+            if (tabView.item) tabView.item.showDialer();
         }
     }
 }
