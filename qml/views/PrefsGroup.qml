@@ -16,12 +16,19 @@
  */
 
 import QtQuick 2.0
-import QtQuick.Layouts 1.2
 
 import LunaNext.Common 0.1
 
-/// A titled group of preference rows, in the style of the legacy groupboxes.
-Column {
+/**
+ * A titled group of preference rows.
+ *
+ * Drawn with the framework's own group artwork rather than a panel of our
+ * own: group-labeled.png carries the caption band across its top, and
+ * group-unlabeled.png is the same frame without one. Both are translucent, so
+ * the band is the page showing through at a quarter darkness -- which is why
+ * a group looks right whatever it is laid over.
+ */
+Item {
     id: prefsGroup
 
     default property alias content: rowsColumn.data
@@ -29,29 +36,51 @@ Column {
     property PhoneUiTheme appTheme: PhoneUiTheme {}
     property string title: ""
 
-    spacing: Units.gu(0.5)
+    readonly property bool labelled: title.length > 0
+    /// The caption band of group-labeled.png, at the size it is drawn here.
+    readonly property real bandHeight: Units.gu(3.4)
 
-    Text {
-        color: 'grey'
-        font.pixelSize: FontUtils.sizeToPixels("small")
-        text: prefsGroup.title
-        visible: prefsGroup.title.length > 0
+    implicitHeight: rowsColumn.height + (labelled ? bandHeight : Units.gu(1)) + Units.gu(1)
+    height: implicitHeight
+
+    BorderImage {
+        anchors.fill: parent
+
+        source: Qt.resolvedUrl(prefsGroup.labelled ? "images/group-labeled.png"
+                                                   : "images/group-unlabeled.png")
+        border {
+            left: 21; right: 21; bottom: 21
+            top: prefsGroup.labelled ? 54 : 21
+        }
+        horizontalTileMode: BorderImage.Repeat
+        verticalTileMode: BorderImage.Repeat
     }
 
-    Rectangle {
-        width: prefsGroup.width
-        height: rowsColumn.height + Units.gu(1)
-        radius: Units.gu(1)
-        color: appTheme.panelColor
+    Text {
+        anchors {
+            left: parent.left
+            leftMargin: Units.gu(1)
+            top: parent.top
+            topMargin: Units.gu(0.6)
+        }
+        visible: prefsGroup.labelled
+        color: appTheme.prefsGroupLabelColor
+        font.bold: true
+        font.capitalization: Font.AllUppercase
+        font.pixelSize: FontUtils.sizeToPixels("small")
+        text: prefsGroup.title
+    }
 
-        Column {
-            id: rowsColumn
-            anchors {
-                left: parent.left
-                right: parent.right
-                verticalCenter: parent.verticalCenter
-                margins: Units.gu(1)
-            }
+    Column {
+        id: rowsColumn
+
+        anchors {
+            left: parent.left
+            right: parent.right
+            top: parent.top
+            topMargin: prefsGroup.labelled ? prefsGroup.bandHeight : Units.gu(0.5)
+            leftMargin: Units.gu(0.8)
+            rightMargin: Units.gu(0.8)
         }
     }
 }

@@ -83,6 +83,7 @@
         <file>qml/views/PinInputButton.qml</file>
         <file>qml/views/PreferredServiceAlert.qml</file>
         <file>qml/views/PrefsButtonRow.qml</file>
+        <file>qml/views/PrefsDoneBar.qml</file>
         <file>qml/views/PrefsGroup.qml</file>
         <file>qml/views/PrefsInfoRow.qml</file>
         <file>qml/views/PrefsSwitchRow.qml</file>
@@ -123,6 +124,8 @@
         <file>qml/views/images/generic-details-view-avatar.png</file>
         <file>qml/views/images/glass-panel.png</file>
         <file>qml/views/images/icon-m-common-backspace.svg</file>
+        <file>qml/views/images/group-labeled.png</file>
+        <file>qml/views/images/group-unlabeled.png</file>
         <file>qml/views/images/icon-videocall-list.png</file>
         <file>qml/views/images/list-avatar-default.png</file>
         <file>qml/views/images/menu-icon-Phone.png</file>

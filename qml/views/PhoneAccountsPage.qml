@@ -39,6 +39,45 @@ BasePage {
 
     pageName: "PhoneAccounts"
 
+    // A preference scene is light, and belongs to the settings world rather
+    // than to the call -- so it does not take the call card's gradient.
+    gradient: null
+    color: appTheme.prefsBackgroundColor
+
+    Rectangle {
+        id: prefsHeader
+
+        anchors { top: parent.top; left: parent.left; right: parent.right }
+        height: Units.gu(5)
+        color: appTheme.prefsHeaderColor
+
+        Row {
+            anchors.centerIn: parent
+            spacing: Units.gu(0.8)
+
+            Image {
+                anchors.verticalCenter: parent.verticalCenter
+                width: Units.gu(2.8)
+                height: Units.gu(2.8)
+                fillMode: Image.PreserveAspectFit
+                source: Qt.resolvedUrl("../../icon.png")
+            }
+
+            Text {
+                anchors.verticalCenter: parent.verticalCenter
+                color: appTheme.prefsTextColor
+                font.pixelSize: FontUtils.sizeToPixels("large")
+                text: qsTr("Phone Accounts")
+            }
+        }
+
+        Rectangle {
+            anchors { left: parent.left; right: parent.right; bottom: parent.bottom }
+            height: 1
+            color: appTheme.prefsRowDividerColor
+        }
+    }
+
 
     signal closed();
 
@@ -46,14 +85,14 @@ BasePage {
         id: header
 
         anchors {
-            top: parent.top
+            top: prefsHeader.bottom
             left: parent.left
             right: parent.right
             margins: Units.gu(1.5)
         }
         horizontalAlignment: Text.AlignHCenter
         wrapMode: Text.Wrap
-        color: 'white'
+        color: accountsPage.appTheme.prefsTextColor
         font.bold: true
         font.pixelSize: FontUtils.sizeToPixels("large")
         text: qsTr("Your phone accounts")
@@ -70,7 +109,7 @@ BasePage {
         }
         horizontalAlignment: Text.AlignHCenter
         wrapMode: Text.Wrap
-        color: 'grey'
+        color: accountsPage.appTheme.prefsSecondaryTextColor
         font.pixelSize: FontUtils.sizeToPixels("small")
         text: accountsPage.callTransports && accountsPage.callTransports.callableTransportIds().length > 0
                   ? qsTr("Calls can be placed over any of these.")
@@ -122,14 +161,14 @@ BasePage {
 
                     Text {
                         Layout.fillWidth: true
-                        color: 'white'
+                        color: accountsPage.appTheme.prefsTextColor
                         elide: Text.ElideRight
                         font.pixelSize: FontUtils.sizeToPixels("medium")
                         text: accountsPage.callTransports.labelFor(modelData)
                     }
                     Text {
                         Layout.fillWidth: true
-                        color: 'grey'
+                        color: accountsPage.appTheme.prefsSecondaryTextColor
                         elide: Text.ElideRight
                         font.pixelSize: FontUtils.sizeToPixels("small")
                         text: {
@@ -154,7 +193,7 @@ BasePage {
         Text {
             anchors.centerIn: parent
             visible: accountList.count === 0
-            color: 'white'
+            color: accountsPage.appTheme.prefsTextColor
             wrapMode: Text.Wrap
             width: parent.width - Units.gu(4)
             horizontalAlignment: Text.AlignHCenter
@@ -180,17 +219,11 @@ BasePage {
                                     function(error) { console.log("Could not open Accounts: " + error); })
     }
 
-    Button {
+    PrefsDoneBar {
         id: doneButton
 
-        anchors {
-            bottom: parent.bottom
-            left: parent.left
-            right: parent.right
-            margins: Units.gu(1)
-        }
-        height: Units.gu(5)
-        text: qsTr("Done")
+        anchors { bottom: parent.bottom; left: parent.left; right: parent.right }
+        appTheme: accountsPage.appTheme
 
         onClicked: accountsPage.closed()
     }

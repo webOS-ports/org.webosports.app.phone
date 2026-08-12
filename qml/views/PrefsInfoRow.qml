@@ -32,7 +32,7 @@ Item {
     Text {
         anchors.left: parent.left
         anchors.verticalCenter: parent.verticalCenter
-        color: 'white'
+        color: appTheme.prefsTextColor
         font.pixelSize: FontUtils.sizeToPixels("small")
         text: prefsInfoRow.label
     }
@@ -43,7 +43,7 @@ Item {
         width: parent.width / 2
         horizontalAlignment: Text.AlignRight
         elide: Text.ElideRight
-        color: 'grey'
+        color: appTheme.prefsSecondaryTextColor
         font.pixelSize: FontUtils.sizeToPixels("small")
         text: prefsInfoRow.value
     }

@@ -44,7 +44,7 @@ Item {
         anchors.verticalCenter: parent.verticalCenter
         width: parent.width * 0.5
         elide: Text.ElideRight
-        color: 'white'
+        color: appTheme.prefsTextColor
         font.pixelSize: FontUtils.sizeToPixels("small")
         text: prefsTextRow.label
     }
@@ -58,7 +58,7 @@ Item {
         horizontalAlignment: TextInput.AlignRight
         inputMethodHints: Qt.ImhDialableCharactersOnly
         placeholderText: prefsTextRow.placeholder
-        color: 'white'
+        color: appTheme.prefsTextColor
         placeholderTextColor: 'grey'
         font.pixelSize: FontUtils.sizeToPixels("small")
 

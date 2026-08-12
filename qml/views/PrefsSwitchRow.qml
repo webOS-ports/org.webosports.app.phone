@@ -39,7 +39,7 @@ Item {
     Text {
         anchors.left: parent.left
         anchors.verticalCenter: parent.verticalCenter
-        color: 'white'
+        color: appTheme.prefsTextColor
         font.pixelSize: FontUtils.sizeToPixels("small")
         text: prefsSwitchRow.label
     }

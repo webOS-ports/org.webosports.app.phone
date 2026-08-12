@@ -154,6 +154,25 @@ QtObject {
     property real callLogRowHeight: Units.gu(7.9)
 
     /**
+     * Preferences
+     *
+     * The preference scenes are light where the rest of the app is dark, as
+     * they are in webOS -- they belong to the settings world rather than to
+     * the call. Groups are drawn with the framework's own nine-slices, whose
+     * caption band is black at a quarter opacity: over this background that
+     * resolves to exactly the grey the device shows.
+     */
+    property color prefsBackgroundColor: '#d8d8d8'
+    property color prefsHeaderColor: '#e0e0e0'
+    property color prefsFooterColor: '#b1b1b1'
+    property color prefsTextColor: '#2a2a2a'
+    property color prefsSecondaryTextColor: '#5a5a5a'
+    property color prefsGroupLabelColor: '#ffffff'
+    property color prefsRowDividerColor: '#00000040'
+    /// The button that closes a preference scene.
+    property color prefsDoneColor: '#62b246'
+
+    /**
      * Gradients
      **/
 

@@ -39,13 +39,57 @@ BasePage {
 
     pageName: "PhonePrefs"
 
+    // A preference scene is light, and belongs to the settings world rather
+    // than to the call -- so it does not take the call card's gradient.
+    gradient: null
+    color: appTheme.prefsBackgroundColor
+
+    Rectangle {
+        id: prefsHeader
+
+        anchors { top: parent.top; left: parent.left; right: parent.right }
+        height: Units.gu(5)
+        color: appTheme.prefsHeaderColor
+
+        Row {
+            anchors.centerIn: parent
+            spacing: Units.gu(0.8)
+
+            Image {
+                anchors.verticalCenter: parent.verticalCenter
+                width: Units.gu(2.8)
+                height: Units.gu(2.8)
+                fillMode: Image.PreserveAspectFit
+                source: Qt.resolvedUrl("../../icon.png")
+            }
+
+            Text {
+                anchors.verticalCenter: parent.verticalCenter
+                color: appTheme.prefsTextColor
+                font.pixelSize: FontUtils.sizeToPixels("large")
+                text: qsTr("Phone Preferences")
+            }
+        }
+
+        Rectangle {
+            anchors { left: parent.left; right: parent.right; bottom: parent.bottom }
+            height: 1
+            color: appTheme.prefsRowDividerColor
+        }
+    }
+
     property var dialingShortcuts
 
     signal closed();
 
     Flickable {
-        anchors.fill: parent
-        anchors.margins: Units.gu(1)
+        anchors {
+            top: prefsHeader.bottom
+            left: parent.left
+            right: parent.right
+            bottom: doneBar.top
+            margins: Units.gu(1.5)
+        }
         contentHeight: prefsColumn.height
         clip: true
 
@@ -53,14 +97,6 @@ BasePage {
             id: prefsColumn
             width: parent.width
             spacing: Units.gu(1)
-
-            Text {
-                Layout.fillWidth: true
-                color: 'white'
-                font.bold: true
-                font.pixelSize: FontUtils.sizeToPixels("large")
-                text: qsTr("Phone Preferences")
-            }
 
             // ---- Call forwarding -------------------------------------------
 
@@ -189,12 +225,15 @@ BasePage {
                 }
             }
 
-            PrefsButtonRow {
-                Layout.fillWidth: true
-                label: qsTr("Done")
-                onClicked: prefsPage.closed()
-            }
         }
+    }
+
+    PrefsDoneBar {
+        id: doneBar
+
+        anchors { bottom: parent.bottom; left: parent.left; right: parent.right }
+        appTheme: prefsPage.appTheme
+        onClicked: prefsPage.closed()
     }
 
     Dialog {

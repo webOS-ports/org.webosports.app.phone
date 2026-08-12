@@ -32,7 +32,7 @@ Item {
 
     Text {
         anchors.centerIn: parent
-        color: mouseArea.pressed ? 'grey' : 'white'
+        color: mouseArea.pressed ? appTheme.prefsSecondaryTextColor : appTheme.prefsTextColor
         font.pixelSize: FontUtils.sizeToPixels("small")
         text: prefsButtonRow.label
     }
