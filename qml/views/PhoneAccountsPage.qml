@@ -17,6 +17,10 @@
 
 import QtQuick 2.0
 import QtQuick.Controls 2.5
+
+// The menus, switches and fields here are the platform's, so they have to
+// be drawn by the platform's style rather than whatever Controls defaults to.
+import QtQuick.Controls.LuneOS 2.0
 import QtQuick.Layouts 1.2
 
 import LunaNext.Common 0.1

@@ -18,6 +18,10 @@
 import QtQuick 2.0
 import QtQuick.Controls 2.5
 
+// The menus, switches and fields here are the platform's, so they have to
+// be drawn by the platform's style rather than whatever Controls defaults to.
+import QtQuick.Controls.LuneOS 2.0
+
 import LuneOS.Service 1.0
 
 /**
@@ -63,12 +67,12 @@ Menu {
     }
 
     MenuItem {
-        text: qsTr("Sounds && Ringtones")
+        text: qsTr("Sounds & Ringtones")
         onTriggered: phoneAppMenu._launch("com.palm.app.soundsandalerts")
     }
 
     MenuItem {
-        text: qsTr("Preferences && Accounts")
+        text: qsTr("Preferences & Accounts")
         onTriggered: phoneAppMenu._launch("com.palm.app.accounts")
     }
 
