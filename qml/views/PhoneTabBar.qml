@@ -88,7 +88,9 @@ Item {
                         width: Units.gu(2.6)
                         height: Units.gu(2.6)
                         source: modelData.icon
-                        opacity: parent.parent.selected ? 1.0 : 0.65
+                        // These carry their own lit state as a second frame,
+                        // rather than needing the dark one faded down.
+                        frame: parent.parent.selected ? 1 : 0
                     }
 
                     Text {
