@@ -47,6 +47,10 @@ BasePage {
     /// The Video tab lists only contacts reachable by a video-capable account.
     property bool videoOnly: false
 
+    /// The Phone tab offers the dialpad above the list.
+    property bool showDialpadButton: false
+    signal dialpadRequested();
+
     /// Pre-fills the search field, e.g. with what was typed on the dialpad.
     property string initialFilter: ""
 
@@ -89,8 +93,10 @@ BasePage {
             if (options.length === 0)
                 return;
 
+            var name = PhoneNumberUtils.personDisplayName(match.person);
             result.push({ header: true, person: match.person,
-                          name: PhoneNumberUtils.personDisplayName(match.person),
+                          name: name,
+                          nameMarkup: _highlight(name, searchField.text.trim()),
                           favorite: match.person.favorite === true });
 
             options.forEach(function(option) {
@@ -110,6 +116,25 @@ BasePage {
         function onRevisionChanged() { contactLookupPage._rebuildRows(); }
     }
 
+    /// Underlines the part of `name` the search matched, in blue.
+    function _highlight(name, needle) {
+        var plain = _escape(name);
+        if (needle.length === 0)
+            return plain;
+
+        var at = name.toLowerCase().indexOf(needle.toLowerCase());
+        if (at < 0)
+            return plain;
+
+        return _escape(name.slice(0, at)) +
+               "<font color=\"#5a9bd8\"><u>" + _escape(name.substr(at, needle.length)) + "</u></font>" +
+               _escape(name.slice(at + needle.length));
+    }
+
+    function _escape(text) {
+        return String(text).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+    }
+
     function _allContacts() {
         var all = [];
         for (var i = 0; i < contacts.count && i < 200; ++i)
@@ -123,13 +148,34 @@ BasePage {
         _rebuildRows();
     }
 
+    Button {
+        id: dialpadButton
+
+        anchors {
+            top: parent.top
+            topMargin: Units.gu(0.8)
+            horizontalCenter: parent.horizontalCenter
+        }
+        height: visible ? Units.gu(4) : 0
+        width: Units.gu(24)
+        visible: contactLookupPage.showDialpadButton
+
+        text: qsTr("Dialpad")
+        onClicked: contactLookupPage.dialpadRequested()
+    }
+
     // The search field and the list share one bordered group box, which is how
     // the reference frames them.
     Rectangle {
         id: groupBox
 
-        anchors.fill: parent
-        anchors.margins: Units.gu(0.8)
+        anchors {
+            top: dialpadButton.visible ? dialpadButton.bottom : parent.top
+            bottom: parent.bottom
+            left: parent.left
+            right: parent.right
+            margins: Units.gu(0.8)
+        }
 
         color: appTheme.listBackgroundColor
         radius: Units.gu(0.8)
@@ -230,7 +276,8 @@ BasePage {
                         font.bold: true
                         font.capitalization: Font.AllUppercase
                         font.pixelSize: FontUtils.sizeToPixels("small")
-                        text: sectionRow.rowData ? sectionRow.rowData.name : ""
+                        textFormat: Text.StyledText
+                        text: sectionRow.rowData ? sectionRow.rowData.nameMarkup : ""
                     }
 
                     // A favourite is starred, as on the reference.
@@ -258,7 +305,7 @@ BasePage {
                             verticalCenter: parent.verticalCenter
                         }
                         height: 1
-                        color: appTheme.panelBorderColor
+                        color: appTheme.listBorderColor
                     }
                 }
             }

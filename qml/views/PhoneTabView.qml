@@ -53,9 +53,6 @@ Item {
     property var callTransports;
     property var imBuddyStatus;
 
-    /// Wide enough to show the dialpad next to whatever tab is selected.
-    readonly property bool wideLayout: width > height && width >= Units.gu(70)
-
     readonly property bool hasVideoService: callTransports &&
                                             callTransports.videoCallableImTypes().length > 0
 
@@ -65,15 +62,12 @@ Item {
     readonly property var allTabs: [
         { key: "phone",     stackIndex: 0, icon: Qt.resolvedUrl("images/menu-icon-dial.png"),      label: qsTr("Phone") },
         { key: "video",     stackIndex: 1, icon: Qt.resolvedUrl("images/menu-icon-video.png"),     label: qsTr("Video") },
-        { key: "contacts",  stackIndex: 2, icon: Qt.resolvedUrl("images/menu-icon-contacts.png"),  label: qsTr("Contacts") },
-        { key: "favorites", stackIndex: 3, icon: Qt.resolvedUrl("images/menu-icon-favorites.png"), label: qsTr("Favorites") },
-        { key: "calllog",   stackIndex: 4, icon: Qt.resolvedUrl("images/menu-icon-call-log.png"),  label: qsTr("Call Log") }
+        { key: "favorites", stackIndex: 2, icon: Qt.resolvedUrl("images/menu-icon-favorites.png"), label: qsTr("Favorites") },
+        { key: "calllog",   stackIndex: 3, icon: Qt.resolvedUrl("images/menu-icon-call-log.png"),  label: qsTr("Call Log") }
     ]
 
     readonly property var tabs: allTabs.filter(function(tab) {
-        if (tab.key === "video") return tabView.hasVideoService;
-        if (tab.key === "phone") return !tabView.wideLayout;
-        return true;
+        return tab.key !== "video" || tabView.hasVideoService;
     })
 
     function _stackIndexOf(key) {
@@ -86,26 +80,20 @@ Item {
     property alias currentIndex: contentStack.currentIndex
 
     function resetDialer() {
-        if (tabDialer.item) tabDialer.item.reset();
-        if (sideDialer.item) sideDialer.item.reset();
+        if (dialpadOverlay.contentItem && dialpadOverlay.contentItem.reset)
+            dialpadOverlay.contentItem.reset();
     }
 
+    /// Opens the Phone tab and its dialpad, which is what a dial request means.
     function showDialer() {
-        // With the dialpad always on screen there is no tab to switch to.
-        if (wideLayout) { resetDialer(); return; }
         currentIndex = _stackIndexOf("phone");
+        dialpadOverlay.open();
     }
-    function showContacts() { currentIndex = _stackIndexOf("contacts"); }
+    /// Contacts live on the Phone tab, as they do on the reference.
+    function showContacts() { currentIndex = _stackIndexOf("phone"); }
     function showFavorites() { currentIndex = _stackIndexOf("favorites"); }
     function showCallLog() { currentIndex = _stackIndexOf("calllog"); }
     function showVideo() { currentIndex = _stackIndexOf("video"); }
-
-    // Rotating into the wide layout while on the Phone tab would leave the
-    // stack sitting on a page that no longer has a tab.
-    onWideLayoutChanged: {
-        if (wideLayout && contentStack.currentIndex === _stackIndexOf("phone"))
-            contentStack.currentIndex = _stackIndexOf("contacts");
-    }
 
     Rectangle {
         anchors.fill: parent
@@ -189,108 +177,100 @@ Item {
      * Content
      **/
 
-    RowLayout {
+    // A plain stack rather than a SwipeView: the reference app switches tabs on
+    // tap only, and swiping fights the swipe-to-delete in the call log.
+    StackLayout {
+        id: contentStack
+
         anchors {
             top: header.bottom
             bottom: parent.bottom
             left: parent.left
             right: parent.right
         }
-        spacing: 0
 
-        // On a wide screen the dialpad keeps its place beside the content, so
-        // a number can be dialled without leaving the call log or contacts.
         Loader {
-            id: sideDialer
-
-            Layout.fillHeight: true
-            Layout.preferredWidth: Units.gu(34)
-            visible: tabView.wideLayout
-            active: tabView.wideLayout
-
-            sourceComponent: DialerPage {
+            id: tabPhone
+            sourceComponent: ContactLookupPage {
                 appTheme: tabView.appTheme
+                contacts: tabView.contacts
                 voiceCallMgrWrapper: tabView.voiceCallManager
-                telephonyManager: tabView.telephonyManager
+                dialHandler: tabView.dialHandler
+                callTransports: tabView.callTransports
+                imBuddyStatus: tabView.imBuddyStatus
+                showDialpadButton: true
+
+                onDialpadRequested: dialpadOverlay.open()
+            }
+        }
+        Loader {
+            id: tabVideo
+            active: tabView.hasVideoService
+            sourceComponent: ContactLookupPage {
+                appTheme: tabView.appTheme
+                contacts: tabView.contacts
+                voiceCallMgrWrapper: tabView.voiceCallManager
+                dialHandler: tabView.dialHandler
+                callTransports: tabView.callTransports
+                imBuddyStatus: tabView.imBuddyStatus
+                videoOnly: true
+            }
+        }
+        Loader {
+            id: tabFavorites
+            sourceComponent: FavouritePage{
+                appTheme: tabView.appTheme;
+                favoritesModel: tabView.favoritesModel
                 contacts: tabView.contacts
                 dialHandler: tabView.dialHandler
+                callTransports: tabView.callTransports
+            }
+        }
+        Loader {
+            id: tabHistory
+            sourceComponent: HistoryPage{
+                appTheme: tabView.appTheme;
+                historyModel: tabView.historyModel
+                contacts: tabView.contacts
+                dialHandler: tabView.dialHandler
+                callTransports: tabView.callTransports
+            }
+        }
+    }
 
-                onContactLookupRequested: (prefix) => {
-                    tabView.showContacts();
-                    if (tabContacts.item) tabContacts.item.initialFilter = prefix;
-                }
+    // The dialpad sits over the page it was opened from, as on the reference,
+    // rather than taking a column of its own.
+    Popup {
+        id: dialpadOverlay
+
+        parent: Overlay.overlay
+        modal: true
+        dim: true
+        padding: 0
+
+        width: Math.min(tabView.width - Units.gu(4), Units.gu(34))
+        height: Math.min(tabView.height - Units.gu(8), Units.gu(52))
+        // Popup positions itself with x/y rather than anchors.
+        x: parent ? Math.round((parent.width - width) / 2) : 0
+        y: parent ? Math.round((parent.height - height) / 2) : 0
+
+        background: Item {}
+
+        contentItem: DialerPage {
+            appTheme: tabView.appTheme
+            voiceCallMgrWrapper: tabView.voiceCallManager
+            telephonyManager: tabView.telephonyManager
+            contacts: tabView.contacts
+            dialHandler: tabView.dialHandler
+
+            onContactLookupRequested: (prefix) => {
+                dialpadOverlay.close();
+                tabView.showContacts();
+                if (tabPhone.item) tabPhone.item.initialFilter = prefix;
             }
         }
 
-        // A plain stack rather than a SwipeView: the reference app switches
-        // tabs on tap only, and swiping fights the swipe-to-delete in the log.
-        StackLayout {
-            id: contentStack
-
-            Layout.fillWidth: true
-            Layout.fillHeight: true
-
-            Loader {
-                id: tabDialer
-                active: !tabView.wideLayout
-                sourceComponent: DialerPage {
-                    appTheme: tabView.appTheme
-                    voiceCallMgrWrapper: tabView.voiceCallManager
-                    telephonyManager: tabView.telephonyManager
-                    contacts: tabView.contacts
-                    dialHandler: tabView.dialHandler
-
-                    onContactLookupRequested: (prefix) => {
-                        tabView.showContacts();
-                        if (tabContacts.item) tabContacts.item.initialFilter = prefix;
-                    }
-                }
-            }
-            Loader {
-                id: tabVideo
-                active: tabView.hasVideoService
-                sourceComponent: ContactLookupPage {
-                    appTheme: tabView.appTheme
-                    contacts: tabView.contacts
-                    voiceCallMgrWrapper: tabView.voiceCallManager
-                    dialHandler: tabView.dialHandler
-                    callTransports: tabView.callTransports
-                    imBuddyStatus: tabView.imBuddyStatus
-                    videoOnly: true
-                }
-            }
-            Loader {
-                id: tabContacts
-                sourceComponent: ContactLookupPage {
-                    appTheme: tabView.appTheme
-                    contacts: tabView.contacts
-                    voiceCallMgrWrapper: tabView.voiceCallManager
-                    dialHandler: tabView.dialHandler
-                    callTransports: tabView.callTransports
-                    imBuddyStatus: tabView.imBuddyStatus
-                }
-            }
-            Loader {
-                id: tabFavorites
-                sourceComponent: FavouritePage{
-                    appTheme: tabView.appTheme;
-                    favoritesModel: tabView.favoritesModel
-                    contacts: tabView.contacts
-                    dialHandler: tabView.dialHandler
-                    callTransports: tabView.callTransports
-                }
-            }
-            Loader {
-                id: tabHistory
-                sourceComponent: HistoryPage{
-                    appTheme: tabView.appTheme;
-                    historyModel: tabView.historyModel
-                    contacts: tabView.contacts
-                    dialHandler: tabView.dialHandler
-                    callTransports: tabView.callTransports
-                }
-            }
-        }
+        onClosed: if (contentItem && contentItem.reset) contentItem.reset()
     }
 
     /**
