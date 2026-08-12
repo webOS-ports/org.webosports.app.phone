@@ -17,7 +17,6 @@
 
 import QtQuick 2.0
 
-import Eos.Window 0.1
 import LunaNext.Common 0.1
 import LuneOS.Components 1.0 as LuneComponents
 
@@ -29,7 +28,7 @@ import LuneOS.Components 1.0 as LuneComponents
  * One button per transport, built from the registry, so a newly installed
  * connector appears here without any code change.
  */
-WebOSWindow {
+Item {
     id: preferredServiceAlert
 
     property PhoneUiTheme appTheme;
@@ -46,25 +45,17 @@ WebOSWindow {
     readonly property int _serviceCount: serviceButtons.count
     readonly property real _dialogHeight: Units.gu(16) + (_serviceCount + 1) * Units.gu(5.4)
 
-    width: Settings.displayWidth
-    height: Settings.displayHeight
-
-    keepAlive: true
-    windowType: "_WEBOS_WINDOW_TYPE_SYSTEM_UI"
+    anchors.fill: parent
     visible: false
-
-    Component.onCompleted: {
-        preferredServiceAlert.setWindowProperty("LuneOS_window", "popupalert");
-    }
 
     function ask(data) {
         callData = data || {};
         remember = false;
-        show();
+        visible = true;
     }
 
     function _choose(transportId) {
-        hide();
+        visible = false;
 
         if (remember)
             dialProxy.setPreferredService(transportId, callData.isInternational === true);
@@ -73,6 +64,11 @@ WebOSWindow {
     }
 
     /*
+     * Centred over the app with the rest of it dimmed, which is what the
+     * legacy dialog's openAtCenter() does. It is not a system alert: an alert
+     * is docked into the strip along the foot of the screen, and a dialog
+     * asking a question belongs over the app that asked it.
+     *
      * The platform's own dialog, which is the webOS one: the frame, the
      * buttons and the scrim all come from LuneOS.Components rather than being
      * drawn here. The legacy app got the same look for the same reason -- its
@@ -129,7 +125,7 @@ WebOSWindow {
             fontcolor: "white"
             buttonWidth: dialog.dialogWidth - Units.gu(4)
 
-            onClicked: preferredServiceAlert.hide()
+            onClicked: preferredServiceAlert.visible = false
         }
     }
 }

@@ -237,6 +237,28 @@ WebOSWindow {
         appTheme: phoneUiAppTheme
     }
 
+    /**
+     * Asked when a call could go over more than one account and the user has
+     * not said which they prefer. It sits over the app rather than in the
+     * shell's alert strip: the legacy dialog is a child of the dialer opened
+     * with openAtCenter(), not a system popup.
+     */
+    PreferredServiceAlert {
+        id: preferredServiceAlert
+
+        anchors.fill: parent
+        appTheme: phoneUiAppTheme
+        callTransports: phoneWindowId.callTransports
+        dialProxy: phoneWindowId.dialHandler ? phoneWindowId.dialHandler.dialProxy : null
+        dialHandler: phoneWindowId.dialHandler
+        contacts: phoneWindowId.contacts
+        visible: false
+    }
+
+    function askPreferredService(callData) {
+        preferredServiceAlert.ask(callData);
+    }
+
     function activeCallDialog(voiceCall) {
         console.log("Showing Active Call Dialog")
 

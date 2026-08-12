@@ -187,7 +187,7 @@ WebOSWindow {
         callTransports: callTransportsId
 
         // More than one calling account and no stored preference: ask.
-        onTransportChoiceRequired: (callData) => preferredServiceAlertId.ask(callData)
+        onTransportChoiceRequired: (callData) => phoneWindow.askPreferredService(callData)
     }
 
     AudioRouteManager {
@@ -238,16 +238,6 @@ WebOSWindow {
         id: missedCallAlertId
         appTheme: phoneUiTheme
         dialHandler: dialHandlerId
-        visible: false
-    }
-
-    PreferredServiceAlert {
-        id: preferredServiceAlertId
-        appTheme: phoneUiTheme
-        callTransports: callTransportsId
-        dialProxy: dialProxyId
-        dialHandler: dialHandlerId
-        contacts: personListModelId
         visible: false
     }
 
