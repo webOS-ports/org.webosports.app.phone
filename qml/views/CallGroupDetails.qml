@@ -29,10 +29,12 @@ import "../model"
 import "../services/PhoneNumberUtils.js" as PhoneNumberUtils
 
 /**
- * The expanded call group: every individual call in it, then what you can do
- * with the number -- call it back, text it, and add it to (or open it in)
- * Contacts. The legacy call log offered the same actions as "drawer sub-items";
- * the QML version listed the calls but none of the actions.
+ * The opened call group: first every call in it, then the contact's other
+ * numbers, then their card -- the order com.palm.app.phone uses.
+ *
+ * The individual calls carry the grey call-type icon; only the group's own row
+ * above uses the coloured one. Their icon and time line up with the columns of
+ * that row, so the drawer reads as a continuation of it.
  */
 Column {
     id: callGroupDetailsId
@@ -44,6 +46,7 @@ Column {
     property string callGroupId;
     property var dialHandler;
     property var callTransports;
+    property PhoneUiTheme appTheme: PhoneUiTheme {}
 
     readonly property string callService: (callGroupAddress && callGroupAddress.service)
                                               ? callGroupAddress.service : ""
@@ -51,182 +54,261 @@ Column {
 
     readonly property string groupPhoneNumber: callGroupAddress ? (callGroupAddress.addr || "") : ""
 
+    // The trailing columns of the group's own row, so the icons and times in
+    // here sit under the ones up there.
+    readonly property real iconColumn: Units.gu(2.2)
+    readonly property real timeColumn: Units.gu(5)
+    readonly property real trailingColumn: Units.gu(3.4)
+
+    /// "(19 sec)", as the original writes it. Nothing at all for a call that
+    /// was never answered, rather than an empty pair of brackets.
+    function _durationText(milliseconds) {
+        var spoken = PhoneNumberUtils.formatDurationLong(Math.round(milliseconds / 1000));
+        return spoken.length > 0 ? "(" + spoken + ")" : "";
+    }
+
+    /**
+     * What a call went over: the network's name for a Synergy call, and for a
+     * cellular one the type of the number it reached -- MOBILE, HOME, WORK --
+     * which is what com.palm.app.phone puts in this column.
+     */
+    function _prefixLabelFor(address) {
+        if (!address)
+            return "";
+
+        var service = address.service;
+        if (service && service !== "com.palm.telephony")
+            return callTransports ? callTransports.labelFor(service).toUpperCase() : "";
+
+        if (!address.personAddressType)
+            return "";
+
+        return contacts.getPhoneNumberTypeStr(address.personAddressType).toUpperCase();
+    }
+
+    // 1. Every call in the group.
     Repeater {
-      id: modelRepeater
-      width:parent.width
-      model: CallGroupItems { callGroupId: callGroupDetailsId.callGroupId }
-      delegate: RowLayout {
-          id: callphoneDelegate
-          spacing: Units.gu(0.5)
+        id: modelRepeater
 
-          property date _timestamp: new Date(model.timestamp)
-          property var _remotePerson: (model.type !== "outgoing") ? model.from : (Array.isArray(model.to) ? model.to[0] : model.to.get(0))
-          property string _duration: PhoneNumberUtils.formatDurationShort(model.duration/1000)
-          property string _callPhoneNumberForDisplay: LibPhoneNumber.formatPhoneNumberForDisplay(_remotePerson.addr, contacts.countryCode);
+        width: parent.width
+        model: CallGroupItems { callGroupId: callGroupDetailsId.callGroupId }
 
-          width:modelRepeater.width
-          height: Units.gu(3.2)
-          Text {
-              font.pixelSize: FontUtils.sizeToPixels("12pt")
-              color:'white'
-              text: _remotePerson.personAddressType ? contacts.getPhoneNumberTypeStr(_remotePerson.personAddressType): "";
-          }
-          Text {
-              font.pixelSize: FontUtils.sizeToPixels("12pt")
-              color:'grey'
-              text: _callPhoneNumberForDisplay
-          }
-          Text {
-              Layout.fillWidth: true
-              font.pixelSize: FontUtils.sizeToPixels("12pt")
-              color:'grey'
-              text: _duration.length > 0 ? "(" + _duration + ")" : "";
-          }
-          ClippedImage {
-              Layout.preferredHeight: callphoneDelegate.height
-              Layout.preferredWidth: callphoneDelegate.height
+        delegate: Item {
+            id: callphoneDelegate
 
-              source: Qt.resolvedUrl('images/call-log-list-sprite.png')
+            width: modelRepeater.width
+            height: Units.gu(4.2)
 
-              wantedWidth: callphoneDelegate.height
-              wantedHeight: callphoneDelegate.height
+            property date _timestamp: new Date(model.timestamp)
+            property var _remotePerson: (model.type !== "outgoing") ? model.from
+                                                                    : (Array.isArray(model.to) ? model.to[0] : model.to.get(0))
+            property string _service: callGroupDetailsId._prefixLabelFor(_remotePerson)
+            property string _number: LibPhoneNumber.formatPhoneNumberForDisplay(_remotePerson.addr,
+                                                                                contacts.countryCode)
 
-              imageSize: Qt.size(44, 182)
-              patchGridSize: Qt.size(1, 4)
-              patch: (model.type==="missed") ? Qt.point(0,0) :
-                     (model.type === "incoming") ? Qt.point(0,1) :
-                     (model.type === "ignored") ? Qt.point(0,3) : Qt.point(0,2)
-          }
-          Text {
-              font.pixelSize: FontUtils.sizeToPixels("12pt")
-              color:'grey'
-              text: Qt.formatTime(_timestamp, Qt.locale().timeFormat(Locale.ShortFormat));
-          }
-      }
-   }
+            RowLayout {
+                anchors.fill: parent
+                anchors.leftMargin: Units.gu(2.4)
+                anchors.rightMargin: Units.gu(0.8)
+                spacing: Units.gu(0.8)
 
-   // Calling back and texting are already on the rows themselves -- tapping a
-   // row calls it, and each number carries a messaging button -- so the only
-   // thing left worth offering here is the contact card.
-   Item {
-       width: parent.width
-       height: Units.gu(4)
-       visible: callGroupDetailsId.groupPhoneNumber.length > 0
+                Text {
+                    Layout.preferredWidth: Units.gu(7)
+                    color: appTheme.serviceTextColor
+                    elide: Text.ElideRight
+                    font.pixelSize: FontUtils.sizeToPixels("small")
+                    text: callphoneDelegate._service
+                }
 
-       Text {
-           anchors {
-               left: parent.left
-               leftMargin: Units.gu(2.4)
-               verticalCenter: parent.verticalCenter
-           }
-           font.pixelSize: FontUtils.sizeToPixels("12pt")
-           color: 'white'
-           text: callGroupDetailsId.callGroupRemotePerson ? qsTr("View Contact")
-                                                          : qsTr("Add to Contacts")
+                Text {
+                    Layout.fillWidth: true
+                    color: appTheme.listSecondaryTextColor
+                    elide: Text.ElideRight
+                    font.pixelSize: FontUtils.sizeToPixels("small")
+                    text: callphoneDelegate._number + " " +
+                          callGroupDetailsId._durationText(model.duration)
+                }
 
-           MouseArea {
-               anchors.fill: parent
-               anchors.margins: -Units.gu(1)
-               onClicked: {
-                   if (callGroupDetailsId.callGroupRemotePerson)
-                       callGroupDetailsId.viewContact(callGroupDetailsId.callGroupRemotePerson._id);
-                   else
-                       callGroupDetailsId.addToContacts(callGroupDetailsId.groupPhoneNumber);
-               }
-           }
-       }
-   }
+                // Grey here; the group's own row above carries the coloured one.
+                ClippedImage {
+                    Layout.preferredWidth: callGroupDetailsId.iconColumn
+                    Layout.preferredHeight: callGroupDetailsId.iconColumn
 
-   // Now put the phone numbers of the remote person, if it is available
-   Loader {
-       active: callGroupRemotePerson !== null
-       width: parent.width
-       sourceComponent: Component {
-           Column {
-               width: parent.width
-               Repeater {
-                   width: parent.width
-                   model: callGroupRemotePerson.phoneNumbers
-                   delegate: RowLayout {
-                       width: parent.width
-                       height: Units.gu(5)
+                    source: Qt.resolvedUrl('images/call-log-list-light-sprite.png')
+                    wantedWidth: callGroupDetailsId.iconColumn
+                    wantedHeight: callGroupDetailsId.iconColumn
+                    imageSize: Qt.size(22, 91)
+                    patchGridSize: Qt.size(1, 4)
+                    patch: (model.type === "missed") ? Qt.point(0,0) :
+                           (model.type === "incoming") ? Qt.point(0,1) :
+                           (model.type === "ignored") ? Qt.point(0,3) : Qt.point(0,2)
+                }
 
-                       property string _phoneNumberValue: model.value ? model.value : modelData.value
-                       property string _callGroupDetailPhoneNumberForDisplay: LibPhoneNumber.formatPhoneNumberForDisplay(_phoneNumberValue, contacts.countryCode);
+                Text {
+                    Layout.preferredWidth: callGroupDetailsId.timeColumn
+                    horizontalAlignment: Text.AlignRight
+                    color: appTheme.listSecondaryTextColor
+                    font.pixelSize: FontUtils.sizeToPixels("small")
+                    text: Qt.formatTime(callphoneDelegate._timestamp,
+                                        Qt.locale().timeFormat(Locale.ShortFormat))
+                }
 
-                       Text {
-                           Layout.fillWidth: true
-                           font.pixelSize: FontUtils.sizeToPixels("12pt")
-                           color:'white'
-                           text: _callGroupDetailPhoneNumberForDisplay;
+                // Keeps these columns lined up under the expand button above.
+                Item { Layout.preferredWidth: callGroupDetailsId.trailingColumn }
+            }
+        }
+    }
 
-                           MouseArea {
-                               anchors.fill: parent
-                               onClicked: {
-                                   if (callGroupDetailsId.dialHandler)
-                                       callGroupDetailsId.dialHandler.dial(_phoneNumberValue);
-                               }
-                           }
-                       }
-                       Text {
-                           font.pixelSize: FontUtils.sizeToPixels("12pt")
-                           color:'grey'
-                           text: contacts.getPhoneNumberTypeStr(model.type ? model.type : modelData.type);
-                       }
-                       ClippedImage {
-                           source: Qt.resolvedUrl('images/button-sprite.png')
+    // 2. The contact's numbers, each of which can be called or messaged.
+    Loader {
+        active: callGroupRemotePerson !== null
+        width: parent.width
 
-                           wantedWidth: parent.height // square button
-                           wantedHeight: parent.height // square button
+        sourceComponent: Component {
+            Column {
+                width: parent.width
 
-                           imageSize: Qt.size(184, 246)
-                           patchGridSize: Qt.size(3, 4)
-                           patch: smsButtonMouseArea.pressed ? Qt.point(2,1) : Qt.point(2,0)
+                Repeater {
+                    width: parent.width
+                    model: callGroupRemotePerson.phoneNumbers
 
-                           MouseArea {
-                               id: smsButtonMouseArea
-                               anchors.fill: parent
-                               onClicked: callGroupDetailsId.sendMessage(_phoneNumberValue, "")
-                           }
-                       }
-                   }
-               }
-           }
-       }
-   }
+                    delegate: Item {
+                        width: parent.width
+                        height: Units.gu(4.6)
 
-   /// Opens the messaging app on a conversation with this address. A Synergy
-   /// address opens the conversation on its own service rather than as an SMS.
-   function sendMessage(address, service) {
-       var compose = { messageText: "", personId: "", address: address };
-       if (service && service.length > 0 && callTransports) {
-           var transport = callTransports.transportFor(service);
-           if (transport && transport.serviceName)
-               compose.serviceName = transport.serviceName;
-       }
+                        property string _phoneNumberValue: model.value ? model.value : modelData.value
+                        property string _phoneNumberType: model.type ? model.type : modelData.type
 
-       _launch("com.palm.app.messaging", { compose: compose });
-   }
+                        Rectangle {
+                            anchors.fill: parent
+                            color: numberArea.pressed ? appTheme.listSelectedColor : 'transparent'
+                        }
 
-   /// Opens the contact in the Contacts app.
-   function viewContact(personId) {
-       _launch("com.palm.app.contacts", { personId: personId });
-   }
+                        RowLayout {
+                            anchors.fill: parent
+                            anchors.leftMargin: Units.gu(2.4)
+                            anchors.rightMargin: Units.gu(0.8)
+                            spacing: Units.gu(0.8)
 
-   /// Starts a new contact in the Contacts app, pre-filled with this number.
-   function addToContacts(phoneNumber) {
-       _launch("com.palm.app.contacts", { newContact: { phoneNumbers: [ { value: phoneNumber, type: "type_mobile" } ] } });
-   }
+                            Text {
+                                Layout.fillWidth: true
+                                color: appTheme.listTextColor
+                                elide: Text.ElideRight
+                                font.pixelSize: FontUtils.sizeToPixels("medium")
+                                text: LibPhoneNumber.formatPhoneNumberForDisplay(_phoneNumberValue,
+                                                                                 contacts.countryCode)
+                            }
 
-   function _launch(appId, params) {
-       lunaService.call("luna://com.webos.applicationManager/launch",
-                        JSON.stringify({ id: appId, params: params }), undefined,
-                        function(error) { console.log("Could not launch " + appId + ": " + error); });
-   }
+                            Text {
+                                color: appTheme.serviceTextColor
+                                font.capitalization: Font.AllUppercase
+                                font.pixelSize: FontUtils.sizeToPixels("small")
+                                text: contacts.getPhoneNumberTypeStr(_phoneNumberType)
+                            }
 
-   LunaService {
-       id: lunaService
-       name: "org.webosports.app.phone"
-       usePrivateBus: true
-   }
+                            // The teal bubble from the original's button sprite.
+                            Item {
+                                Layout.preferredWidth: Units.gu(3.4)
+                                Layout.preferredHeight: Units.gu(3.4)
+
+                                ClippedImage {
+                                    anchors.centerIn: parent
+                                    source: Qt.resolvedUrl('images/button-sprite.png')
+                                    wantedWidth: Units.gu(3.4)
+                                    wantedHeight: Units.gu(3.4)
+                                    imageSize: Qt.size(184, 246)
+                                    patchGridSize: Qt.size(3, 4)
+                                    patch: smsButtonMouseArea.pressed ? Qt.point(2,1) : Qt.point(2,0)
+                                }
+
+                                MouseArea {
+                                    id: smsButtonMouseArea
+                                    anchors.fill: parent
+                                    onClicked: callGroupDetailsId.sendMessage(_phoneNumberValue, "")
+                                }
+                            }
+                        }
+
+                        MouseArea {
+                            id: numberArea
+                            anchors.fill: parent
+                            z: -1
+                            onClicked: {
+                                if (callGroupDetailsId.dialHandler)
+                                    callGroupDetailsId.dialHandler.dial(_phoneNumberValue, "", false);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    // 3. The contact card, last.
+    Item {
+        width: parent.width
+        height: Units.gu(4.6)
+        visible: callGroupDetailsId.groupPhoneNumber.length > 0
+
+        Rectangle {
+            anchors.fill: parent
+            color: viewArea.pressed ? appTheme.listSelectedColor : 'transparent'
+        }
+
+        Text {
+            anchors {
+                left: parent.left
+                leftMargin: Units.gu(2.4)
+                verticalCenter: parent.verticalCenter
+            }
+            color: appTheme.listTextColor
+            font.pixelSize: FontUtils.sizeToPixels("medium")
+            text: callGroupDetailsId.callGroupRemotePerson ? qsTr("View Contact")
+                                                           : qsTr("Add to Contacts")
+        }
+
+        MouseArea {
+            id: viewArea
+            anchors.fill: parent
+            onClicked: {
+                if (callGroupDetailsId.callGroupRemotePerson)
+                    callGroupDetailsId.viewContact(callGroupDetailsId.callGroupRemotePerson._id);
+                else
+                    callGroupDetailsId.addToContacts(callGroupDetailsId.groupPhoneNumber);
+            }
+        }
+    }
+
+    /// Opens the messaging app on a conversation with this address. A Synergy
+    /// address opens the conversation on its own service rather than as an SMS.
+    function sendMessage(address, service) {
+        var compose = { messageText: "", personId: "", address: address };
+        if (service && service.length > 0 && callTransports) {
+            var transport = callTransports.transportFor(service);
+            if (transport && transport.serviceName)
+                compose.serviceName = transport.serviceName;
+        }
+
+        _launch("com.palm.app.messaging", { compose: compose });
+    }
+
+    function viewContact(personId) {
+        _launch("com.palm.app.contacts", { personId: personId });
+    }
+
+    function addToContacts(phoneNumber) {
+        _launch("com.palm.app.contacts", { newContact: { phoneNumbers: [ { value: phoneNumber, type: "type_mobile" } ] } });
+    }
+
+    function _launch(appId, params) {
+        lunaService.call("luna://com.webos.applicationManager/launch",
+                         JSON.stringify({ id: appId, params: params }), undefined,
+                         function(error) { console.log("Could not launch " + appId + ": " + error); });
+    }
+
+    LunaService {
+        id: lunaService
+        name: "org.webosports.app.phone"
+        usePrivateBus: true
+    }
 }

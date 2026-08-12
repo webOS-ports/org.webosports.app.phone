@@ -93,8 +93,13 @@ function formatDuration(seconds) {
     return (h > 0) ? (h + ":" + mm + ":" + ss) : (mm + ":" + ss);
 }
 
-/// "1h 2m 3s", as the call log shows next to each individual call.
-function formatDurationShort(seconds) {
+/**
+ * "46 sec", "1 min 1 sec", "1 hr 5 min 3 sec" -- the abbreviated-but-worded
+ * style the call log uses next to each individual call, matching what the
+ * legacy app got out of enyo.g11n.DurationFmt in its "long" style. Components
+ * that are zero are left out; a call of no length has nothing to say.
+ */
+function formatDurationLong(seconds) {
     var total = Math.max(0, Math.round(seconds));
     if (total === 0)
         return "";
@@ -104,14 +109,18 @@ function formatDurationShort(seconds) {
     var s = total - h * 3600 - m * 60;
 
     var parts = [];
-    if (h > 0) parts.push(h + "h");
-    if (m > 0) parts.push(m + "m");
-    if (s > 0 || parts.length === 0) parts.push(s + "s");
+    if (h > 0) parts.push(h + " " + qsTr("hr"));
+    if (m > 0) parts.push(m + " " + qsTr("min"));
+    if (s > 0 || parts.length === 0) parts.push(s + " " + qsTr("sec"));
 
     return parts.join(" ");
 }
 
-/// "Today" / "Yesterday" / a short date, for call log day headers.
+/**
+ * The day a call log section stands for: "Today", "Yesterday", the weekday
+ * within the last week, and a short numeric date beyond that -- which is what
+ * com.palm.app.phone shows. The long locale date is far too wide for a header.
+ */
 function formatRelativeDay(date, locale) {
     var today = new Date();
     var startOfToday = new Date(today.getFullYear(), today.getMonth(), today.getDate());
@@ -120,8 +129,11 @@ function formatRelativeDay(date, locale) {
 
     if (diffDays <= 0) return qsTr("Today");
     if (diffDays === 1) return qsTr("Yesterday");
+    if (diffDays < 7) return date.toLocaleDateString(locale, "dddd");
 
-    return date.toLocaleDateString(locale);
+    // Locale.ShortFormat is not reachable from a .pragma library, so
+    // ask for the numeric pattern directly.
+    return date.toLocaleDateString(locale, "d/M/yy");
 }
 
 /// Display name for a com.palm.person record, mirroring the legacy

@@ -153,7 +153,12 @@ Column {
                         spacing: Units.gu(0.6)
 
                         Text {
-                            Layout.maximumWidth: parent.width * 0.7
+                            // Grow no further than the text needs, but give way
+                            // to the count and star when the row is narrow.
+                            // Measuring against parent.width would feed the
+                            // layout its own result.
+                            Layout.fillWidth: true
+                            Layout.maximumWidth: implicitWidth
                             color: appTheme.listTextColor
                             elide: Text.ElideRight
                             font.pixelSize: FontUtils.sizeToPixels("medium")
@@ -193,27 +198,47 @@ Column {
                         Item { Layout.fillWidth: true }
                     }
 
-                    // "WHATSAPP +31 6 1342 2104": the service, then the number.
-                    Text {
+                    // "WHATSAPP +31 6 1342 2104": the service, then the number,
+                    // with the small video marker where that account carries it.
+                    RowLayout {
                         Layout.fillWidth: true
-                        color: appTheme.listSecondaryTextColor
-                        elide: Text.ElideRight
-                        font.pixelSize: FontUtils.sizeToPixels("small")
-                        text: (callGroupDelegate.serviceLabel.length > 0
-                                   ? callGroupDelegate.serviceLabel + " " : "") +
-                              callGroupDelegate.numberForDisplay
+                        spacing: Units.gu(0.5)
+
+                        Text {
+                            Layout.fillWidth: true
+                            Layout.maximumWidth: implicitWidth
+                            color: appTheme.listSecondaryTextColor
+                            elide: Text.ElideRight
+                            font.pixelSize: FontUtils.sizeToPixels("small")
+                            text: (callGroupDelegate.serviceLabel.length > 0
+                                       ? callGroupDelegate.serviceLabel + " " : "") +
+                                  callGroupDelegate.numberForDisplay
+                        }
+
+                        Image {
+                            Layout.preferredWidth: Units.gu(2)
+                            Layout.preferredHeight: Units.gu(1.2)
+                            fillMode: Image.PreserveAspectFit
+                            source: Qt.resolvedUrl('images/icon-videocall-list.png')
+                            visible: callGroupDelegate.isSynergyCall &&
+                                     !!callGroupDelegate.callTransports &&
+                                     callGroupDelegate.callTransports.supportsVideo(callGroupDelegate.callService)
+                        }
+
+                        Item { Layout.fillWidth: true }
                     }
                 }
 
-                // What kind of call it was, from the original's list sprite.
+                // What kind of call it was. Coloured here, because this is the
+                // most recent call; the ones inside the drawer are grey.
                 ClippedImage {
                     Layout.preferredWidth: Units.gu(2.2)
                     Layout.preferredHeight: Units.gu(2.2)
 
-                    source: Qt.resolvedUrl('images/call-log-list-light-sprite.png')
+                    source: Qt.resolvedUrl('images/call-log-list-sprite.png')
                     wantedWidth: Units.gu(2.2)
                     wantedHeight: Units.gu(2.2)
-                    imageSize: Qt.size(22, 91)
+                    imageSize: Qt.size(44, 182)
                     patchGridSize: Qt.size(1, 4)
                     patch: (model.recentcall_type === "missed") ? Qt.point(0,0) :
                            (model.recentcall_type === "incoming") ? Qt.point(0,1) :
@@ -283,10 +308,9 @@ Column {
     }
 
     // No divider before a day header: the header brings its own rule.
-    Rectangle {
+    ListSeparator {
         width: parent.width
-        height: callGroupDelegate.lastOfDay ? 0 : 1
-        color: appTheme.listDividerColor
+        drawn: !callGroupDelegate.lastOfDay
     }
 
     Loader {
