@@ -66,6 +66,7 @@
         <file>qml/views/IncomingRejectButton.qml</file>
         <file>qml/views/IncomingUSSDAlert.qml</file>
         <file>qml/views/KeypadButton.qml</file>
+        <file>qml/views/ListSeparator.qml</file>
         <file>qml/views/MessageAlert.qml</file>
         <file>qml/views/MissedCallAlert.qml</file>
         <file>qml/views/MuteButton.qml</file>
@@ -89,12 +90,17 @@
         <file>qml/views/SimPinInput.qml</file>
         <file>qml/views/SimPinWindow.qml</file>
         <file>qml/views/SpeakerButton.qml</file>
+        <file>qml/views/images/Camera-Icon.png</file>
         <file>qml/views/images/avatar-disclosure.png</file>
         <file>qml/views/images/button-ignore-answer.png</file>
         <file>qml/views/images/button-sprite.png</file>
         <file>qml/views/images/buttons-numpad-pressed.png</file>
         <file>qml/views/images/buttons-numpad.png</file>
+        <file>qml/views/images/call-log-button-down.png</file>
+        <file>qml/views/images/call-log-button-up.png</file>
         <file>qml/views/images/call-log-count-pill.png</file>
+        <file>qml/views/images/call-log-list-light-sprite.png</file>
+        <file>qml/views/images/call-log-list-separator.png</file>
         <file>qml/views/images/call-log-list-sprite.png</file>
         <file>qml/views/images/contacts-icon-frame.png</file>
         <file>qml/views/images/contacts-unknown-icon-large.png</file>

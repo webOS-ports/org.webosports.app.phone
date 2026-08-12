@@ -346,10 +346,9 @@ BasePage {
                         color: rowArea.pressed ? appTheme.listSelectedColor : 'transparent'
                     }
 
-                    Rectangle {
+                    ListSeparator {
                         anchors { left: parent.left; right: parent.right; bottom: parent.bottom }
-                        height: (row.rowData && row.rowData.lastOfContact) ? 0 : 1
-                        color: appTheme.listDividerColor
+                        drawn: !(row.rowData && row.rowData.lastOfContact)
                     }
 
                     RowLayout {

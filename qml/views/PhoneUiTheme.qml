@@ -89,7 +89,6 @@ QtObject {
      */
     property color listBackgroundColor: '#3a3c3e'
     property color listAlternateColor: '#343638'
-    property color listDividerColor: '#2a2c2e'
     property color listBorderColor: '#1e2021'
     property color listTextColor: '#ffffff'
     property color listSecondaryTextColor: '#c8c8c8'

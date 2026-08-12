@@ -185,10 +185,8 @@ BasePage {
                     }
                 }
 
-                Rectangle {
+                ListSeparator {
                     width: parent.width
-                    height: 1
-                    color: appTheme.listDividerColor
                 }
 
                 // Opened: every way to call, each with a button to message instead.
@@ -315,10 +313,9 @@ BasePage {
                     }
                 }
 
-                Rectangle {
+                ListSeparator {
                     width: parent.width
-                    height: favouriteEntry.expanded ? 1 : 0
-                    color: appTheme.listDividerColor
+                    drawn: favouriteEntry.expanded
                 }
             }
 
