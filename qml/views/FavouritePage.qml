@@ -79,7 +79,7 @@ BasePage {
                 // The collapsed row: photo, name, and the way a tap would call.
                 Item {
                     width: parent.width
-                    height: Units.gu(6)
+                    height: appTheme.listRowHeight
 
                     Rectangle {
                         anchors.fill: parent

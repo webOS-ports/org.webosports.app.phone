@@ -34,8 +34,9 @@ QtObject {
      * Chrome
      **/
 
-    /// The page behind everything.
-    property color backgroundColor: '#2a2b2d'
+    /// The page behind everything. The same grey the list rows sit on -- the
+    /// group box is told apart by its border alone, not by a fill of its own.
+    property color backgroundColor: '#57595c'
     property color foregroundColor: '#ffffff'
 
     /// Panels that sit on the page: the call card, the dialpad, popups.
@@ -46,10 +47,10 @@ QtObject {
     property color panelFooterColor: '#242627'
     property color panelBorderColor: '#4a4a4a'
 
-    /// Tab bar.
-    property color tabBarColor: '#333537'
-    property color tabBarSelectedColor: '#222324'
-    property color tabBarBorderColor: '#1a1a1a'
+    /// Tab bar. The tab in use is the darker one: it reads as pressed in.
+    property color tabBarColor: '#5a5d61'
+    property color tabBarSelectedColor: '#424446'
+    property color tabBarBorderColor: '#2c2e30'
 
     /**
      * Text
@@ -59,7 +60,8 @@ QtObject {
     /// Secondary information: numbers under a name, timestamps, hints.
     property color secondaryTextColor: '#9a9a9a'
     /// The service a contact point or call belongs to, shown in caps.
-    property color serviceTextColor: '#8d8d8d'
+    /// #6f7070 is the original's own .call-history-subitem colour.
+    property color serviceTextColor: '#6f7070'
     property color disabledTextColor: '#5a5a5a'
 
     /**
@@ -85,18 +87,25 @@ QtObject {
      **/
 
     /**
-     * Lists sit in a bordered group box and are the same charcoal family as
-     * the chrome, with light text -- an earlier reading of a screenshot taken
-     * behind a dimming scrim made them look like a light-on-white list.
+     * Lists sit in a bordered group box, a mid grey with light text.
+     *
+     * These were read off the device twice and got it wrong both times: first
+     * from a capture taken behind a dimming scrim, which made the list look
+     * light-on-white, and then from the same capture again, which made it far
+     * darker than it is. The values here are from an undimmed capture and are
+     * corroborated -- the row separator's own alpha resolves to exactly the
+     * pixels the device shows over this background, and the selection blue
+     * matches to the digit.
      */
-    property color listBackgroundColor: '#3a3c3e'
-    property color listAlternateColor: '#343638'
-    property color listBorderColor: '#1e2021'
+    property color listBackgroundColor: '#57595c'
+    property color listAlternateColor: '#525457'
+    property color listBorderColor: '#1f2121'
     property color listTextColor: '#ffffff'
-    property color listSecondaryTextColor: '#c8c8c8'
-    property color listSectionTextColor: '#ffffff'
-    /// The band a contact's name sits on, above its rows.
-    property color listSectionColor: '#1c1d1e'
+    property color listSecondaryTextColor: '#d4d5d5'
+    property color listSectionTextColor: '#8b8c8e'
+    /// The drawer a row opens, and the band a contact's name sits on: both
+    /// recede behind the rows themselves.
+    property color listSectionColor: '#2d2e30'
     /// A row the user is acting on.
     property color listSelectedColor: '#4a7298'
 
@@ -113,6 +122,11 @@ QtObject {
     property real drawerRowHeight: Units.gu(5)
     property real drawerCallRowHeight: Units.gu(3.6)
     property real drawerIndent: Units.gu(6)
+
+    /// A list row carrying a photo and two lines of text. The call log's is a
+    /// little taller than the favourites', as it is on the device.
+    property real listRowHeight: Units.gu(7.4)
+    property real callLogRowHeight: Units.gu(7.9)
 
     /**
      * Gradients
