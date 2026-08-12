@@ -182,7 +182,13 @@ Db8Model {
         // get the group ID of that call
         var callGroupID = _buildCallGroupID(endedVoiceCall, foundPerson, startTime);
 
-        var actionForCall = IncomingCallsService.getActionForCall(endedVoiceCall.handlerId);
+        // Only an incoming call has an action recorded against it. Asking for
+        // one on an outgoing call answers "missed", because that is what the
+        // register says about a call it has never heard of -- and a call the
+        // user placed and then cancelled would be filed as one they missed.
+        var actionForCall = endedVoiceCall.isIncoming
+                                ? IncomingCallsService.getActionForCall(endedVoiceCall.handlerId)
+                                : IncomingCallsService.Accepted;
 
         var newCallItem = {
             _kind: "com.palm.phonecall:1",
@@ -192,8 +198,6 @@ Db8Model {
             timestampInSecs: Math.floor(startTime.getTime()/1000),
             to: []
         };
-        if( actionForCall===IncomingCallsService.Missed ) newCallItem.groups.push(callGroupID+"missed");
-
         var normalizedLineId = LibPhoneNumber.normalizePhoneNumber(endedVoiceCall.lineId, personListModel.countryCode);
 
         // With Synergy a call can go over any calling account, so the log has
@@ -235,6 +239,10 @@ Db8Model {
             newCallItem.to.push(personDetails);
             newCallItem.type = "outgoing";
         }
+
+        // Now the type is settled, file the call under the missed group too if
+        // that is what it was.
+        if( newCallItem.type === "missed" ) newCallItem.groups.push(callGroupID+"missed");
 
         // In all cases, a call item must be added
         __queryDB('put', { objects: [ newCallItem ] }, function(result) {});

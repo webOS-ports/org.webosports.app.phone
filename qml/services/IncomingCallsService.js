@@ -29,7 +29,11 @@ var __callsActions = {};
 // possible values for 'action' are:
 //  Accepted: the call has been answered
 //  Ignored: the call has been rejected
-//  Missed: the call was not missed
+//  Missed: the call rang out without either
+//
+// Only ask about an incoming call. An id that was never registered answers
+// Missed, which is the right answer for an incoming call that ended without
+// the user doing anything, and the wrong one for every outgoing call.
 
 function setActionForCall(handlerId, action) {
     __callsActions[handlerId] = action;
