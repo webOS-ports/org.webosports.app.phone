@@ -17,8 +17,7 @@
  */
 
 import QtQuick 2.6
-
-import LunaNext.Common 0.1
+import QtQuick.Window 2.3
 
 /**
  * Desktop entry point.
@@ -26,57 +25,24 @@ import LunaNext.Common 0.1
  * On a device the phone app has no window of its own until something asks for
  * one -- the launcher, an incoming call, a dial request. On the desktop there
  * is nothing to ask, so this stands in for the system manager: it loads
- * main.qml, then sends the relaunch that brings the phone window up.
+ * main.qml and sends the relaunch that brings the phone window up.
+ *
+ * This host is itself a window, but never a visible one. Showing it would put a
+ * second, pointless window on screen next to the phone -- the app's own windows
+ * are the only ones worth looking at.
  *
  * Everything underneath runs against the mocks in
  * luneos-components/test/imports, so there is a modem, a set of Synergy
  * accounts and a contact list without a device attached.
  */
-Item {
+Window {
     id: mainDesktop
 
-    width: Settings.displayWidth
-    height: Settings.displayHeight
-
-    Rectangle {
-        anchors.fill: parent
-        color: "black"
-
-        Column {
-            anchors.centerIn: parent
-            spacing: Units.gu(1)
-
-            Text {
-                anchors.horizontalCenter: parent.horizontalCenter
-                color: "#666666"
-                font.pixelSize: FontUtils.sizeToPixels("medium")
-                text: qsTr("Phone app running against mock services")
-            }
-            Text {
-                anchors.horizontalCenter: parent.horizontalCenter
-                color: "#444444"
-                font.pixelSize: FontUtils.sizeToPixels("small")
-                text: qsTr("Close the phone window to get back here")
-            }
-        }
-
-        Text {
-            anchors {
-                bottom: parent.bottom
-                horizontalCenter: parent.horizontalCenter
-                margins: Units.gu(2)
-            }
-            color: "#aa3333"
-            font.pixelSize: FontUtils.sizeToPixels("large")
-            text: qsTr("Quit")
-
-            MouseArea {
-                anchors.fill: parent
-                anchors.margins: -Units.gu(2)
-                onClicked: Qt.quit();
-            }
-        }
-    }
+    // Never shown: it exists only to own the app and drive the relaunch.
+    visible: false
+    width: 1
+    height: 1
+    title: "LuneOS phone app (mock host)"
 
     /**
      * Stands in for the host application object the device provides.
@@ -98,12 +64,23 @@ Item {
         interval: 500
         running: false
         repeat: false
-        // An empty relaunch is how the app is told to show its window, which is
-        // what tapping the launcher icon does on a device.
-        onTriggered: application.relaunched("{}");
+        onTriggered: {
+            // An empty relaunch is how the app is told to show its window,
+            // which is what tapping the launcher icon does on a device.
+            application.relaunched("{}");
+
+            // Safe to restore now that the phone window is up: closing it ends
+            // the session, the way closing the card does.
+            Qt.application.quitOnLastWindowClosed = true;
+        }
     }
 
     Component.onCompleted: {
+        // Nothing is on screen until the relaunch above, and with this host
+        // invisible that would otherwise count as "the last window closed" and
+        // quit before the app ever appears.
+        Qt.application.quitOnLastWindowClosed = false;
+
         var main = Qt.createComponent(Qt.resolvedUrl("main.qml"));
 
         if (main.status === Component.Error) {

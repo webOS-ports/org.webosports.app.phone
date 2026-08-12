@@ -25,6 +25,7 @@ import LuneOS.Service 1.0
 import LuneOS.Telephony 1.0
 
 import LunaNext.Common 0.1
+import LuneOS.Components 1.0
 
 import "../services/PhoneNumberUtils.js" as PhoneNumberUtils
 import "../services/CallMessages.js" as CallMessages

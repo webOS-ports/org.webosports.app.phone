@@ -270,22 +270,6 @@ WebOSWindow {
             imBuddyStatus: phoneWindowId.imBuddyStatus
         }
     }
-    Component {
-        id: tabViewLandscapeComp
-        PhoneTabLandscapeView {
-            appTheme: phoneUiAppTheme
-            historyModel: phoneWindowId.historyModel
-            favoritesModel: phoneWindowId.favoritesModel
-            voiceCallManager: phoneWindowId.voiceCallMgrWrapper
-            telephonyManager: phoneWindowId.telephonyManager
-            contacts: phoneWindowId.contacts
-            dialHandler: phoneWindowId.dialHandler
-            supplementaryServices: phoneWindowId.supplementaryServices
-            dialingShortcuts: phoneWindowId.dialingShortcuts
-            callTransports: phoneWindowId.callTransports
-            imBuddyStatus: phoneWindowId.imBuddyStatus
-        }
-    }
 
     Loader {
         id: tabView
@@ -294,12 +278,7 @@ WebOSWindow {
             if (item) item.resetDialer();
         }
 
-        sourceComponent: {
-            if (phoneWindowId.height/phoneWindowId.width > 1)
-                return tabViewComp;
-            else
-                return tabViewLandscapeComp;
-        }
+        sourceComponent: tabViewComp
     }
 
     // "Add call" from the in-call screen puts the dialpad back in front while

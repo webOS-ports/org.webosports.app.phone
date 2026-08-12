@@ -16,7 +16,7 @@
  */
 
 import QtQuick 2.0
-import QtQuick.Controls 2.0
+import QtQuick.Controls 2.5
 import QtQuick.Layouts 1.2
 
 import LunaNext.Common 0.1
@@ -28,11 +28,12 @@ import "../services/ContactCallOptions.js" as ContactCallOptions
 /**
  * Contact lookup: search contacts and pick how to reach them.
  *
- * Laid out like the webOS 3.x contact list on the TouchPad -- a light list, the
- * contact's name as a bold header, and one row per way to call them with the
- * service in grey caps on the right. That shape is what makes Synergy legible:
- * a contact's mobile number, their WhatsApp and their Telegram sit side by side
- * and the user picks one.
+ * Laid out like the webOS contact list -- a bordered group box holding a white
+ * search pill and, under it, each contact's name on a dark band followed by one
+ * row per way to call them, with the service in grey caps on the right.
+ *
+ * That shape is what makes Synergy legible: a contact's mobile number, their
+ * WhatsApp and their Telegram sit side by side and the user picks one.
  *
  * Ports the legacy ContactLookup / AllContactLookup scenes.
  */
@@ -89,7 +90,8 @@ BasePage {
                 return;
 
             result.push({ header: true, person: match.person,
-                          name: PhoneNumberUtils.personDisplayName(match.person) });
+                          name: PhoneNumberUtils.personDisplayName(match.person),
+                          favorite: match.person.favorite === true });
 
             options.forEach(function(option) {
                 result.push({ header: false, person: match.person, option: option });
@@ -121,48 +123,74 @@ BasePage {
         _rebuildRows();
     }
 
-    TextField {
-        id: searchField
-
-        anchors {
-            top: parent.top
-            left: parent.left
-            right: parent.right
-            margins: Units.gu(0.8)
-        }
-        height: Units.gu(4)
-
-        placeholderText: qsTr("Enter name or number")
-        color: appTheme.listTextColor
-        placeholderTextColor: appTheme.listSecondaryTextColor
-        font.pixelSize: FontUtils.sizeToPixels("medium")
-
-        background: Rectangle {
-            color: '#f4f4f4'
-            radius: Units.gu(0.5)
-            border.color: '#9a9a9a'
-            border.width: 1
-        }
-    }
-
-    // The list is light, in contrast with the dark chrome around it.
+    // The search field and the list share one bordered group box, which is how
+    // the reference frames them.
     Rectangle {
-        anchors {
-            top: searchField.bottom
-            bottom: parent.bottom
-            left: parent.left
-            right: parent.right
-            margins: Units.gu(0.8)
-            topMargin: 0
-        }
+        id: groupBox
+
+        anchors.fill: parent
+        anchors.margins: Units.gu(0.8)
+
         color: appTheme.listBackgroundColor
-        radius: Units.gu(0.5)
+        radius: Units.gu(0.8)
+        border.color: appTheme.listBorderColor
+        border.width: 1
         clip: true
+
+        // A white pill: the one light element on the page.
+        TextField {
+            id: searchField
+
+            anchors {
+                top: parent.top
+                left: parent.left
+                right: parent.right
+                margins: Units.gu(0.8)
+            }
+            height: Units.gu(4)
+
+            placeholderText: qsTr("Enter Name")
+            color: '#2a2929'
+            placeholderTextColor: '#8a8a8a'
+            font.pixelSize: FontUtils.sizeToPixels("medium")
+            leftPadding: Units.gu(1.2)
+            rightPadding: Units.gu(3.5)
+
+            background: Rectangle {
+                color: '#ffffff'
+                radius: height / 2
+            }
+
+            // A magnifier while empty, a clear cross once something is typed.
+            Text {
+                anchors {
+                    right: parent.right
+                    rightMargin: Units.gu(1.2)
+                    verticalCenter: parent.verticalCenter
+                }
+                color: '#8a8a8a'
+                font.pixelSize: FontUtils.sizeToPixels("medium")
+                text: searchField.text.length > 0 ? "✕" : "\u2315"
+
+                MouseArea {
+                    anchors.fill: parent
+                    anchors.margins: -Units.gu(1)
+                    enabled: searchField.text.length > 0
+                    onClicked: searchField.text = ""
+                }
+            }
+        }
 
         ListView {
             id: contactList
 
-            anchors.fill: parent
+            anchors {
+                top: searchField.bottom
+                topMargin: Units.gu(0.8)
+                bottom: parent.bottom
+                left: parent.left
+                right: parent.right
+            }
             clip: true
             model: contactLookupPage.rows
 
@@ -181,26 +209,56 @@ BasePage {
                 id: headerRow
 
                 Item {
+                    id: sectionRow
+
                     property var rowData
 
                     width: contactList.width
-                    height: Units.gu(3.4)
+                    height: Units.gu(3.6)
 
                     Text {
+                        id: sectionName
+
                         anchors {
                             left: parent.left
-                            right: parent.right
-                            bottom: parent.bottom
-                            bottomMargin: Units.gu(0.2)
                             leftMargin: Units.gu(1.2)
-                            rightMargin: Units.gu(1.2)
+                            verticalCenter: parent.verticalCenter
                         }
+                        width: Math.min(implicitWidth, parent.width - Units.gu(4))
                         elide: Text.ElideRight
                         color: appTheme.listSectionTextColor
                         font.bold: true
                         font.capitalization: Font.AllUppercase
                         font.pixelSize: FontUtils.sizeToPixels("small")
-                        text: parent.rowData ? parent.rowData.name : ""
+                        text: sectionRow.rowData ? sectionRow.rowData.name : ""
+                    }
+
+                    // A favourite is starred, as on the reference.
+                    Text {
+                        id: favouriteStar
+
+                        anchors {
+                            left: sectionName.right
+                            leftMargin: Units.gu(0.5)
+                            verticalCenter: sectionName.verticalCenter
+                        }
+                        visible: sectionRow.rowData ? sectionRow.rowData.favorite === true : false
+                        color: appTheme.buttonActiveColor
+                        font.pixelSize: FontUtils.sizeToPixels("small")
+                        text: "★"
+                    }
+
+                    // The rule that runs from the name out to the edge.
+                    Rectangle {
+                        anchors {
+                            left: favouriteStar.visible ? favouriteStar.right : sectionName.right
+                            leftMargin: Units.gu(1)
+                            right: parent.right
+                            rightMargin: Units.gu(1.2)
+                            verticalCenter: parent.verticalCenter
+                        }
+                        height: 1
+                        color: appTheme.panelBorderColor
                     }
                 }
             }
@@ -219,7 +277,7 @@ BasePage {
 
                     Rectangle {
                         anchors.fill: parent
-                        color: rowArea.pressed ? '#cdcdcd' : 'transparent'
+                        color: rowArea.pressed ? appTheme.listSelectedColor : 'transparent'
                     }
 
                     Rectangle {
@@ -235,14 +293,9 @@ BasePage {
                         spacing: Units.gu(1)
 
                         Text {
-                            Layout.fillWidth: true
                             elide: Text.ElideRight
-                            // Dimmed when the connector says the buddy is offline.
-                            color: (row.option && row.option.kind === "im" &&
-                                    contactLookupPage.imBuddyStatus &&
-                                    !contactLookupPage.imBuddyStatus.isAvailable(row.option.type,
-                                                                                 row.option.value))
-                                       ? '#9a9a9a' : appTheme.listSecondaryTextColor
+                            Layout.maximumWidth: parent.width * 0.55
+                            color: appTheme.listSecondaryTextColor
                             font.pixelSize: FontUtils.sizeToPixels("medium")
                             text: row.option
                                       ? PhoneNumberUtils.formatForDisplay(row.option.value,
@@ -251,9 +304,52 @@ BasePage {
                                       : ""
                         }
 
+                        // Presence sits next to the address, as "(Busy)" does
+                        // on the reference, rather than only dimming the row.
+                        Text {
+                            Layout.fillWidth: true
+                            elide: Text.ElideRight
+                            color: appTheme.disabledTextColor
+                            font.pixelSize: FontUtils.sizeToPixels("small")
+                            text: {
+                                if (!row.option || row.option.kind !== "im") return "";
+                                if (!contactLookupPage.imBuddyStatus) return "";
+
+                                return contactLookupPage.imBuddyStatus.isAvailable(row.option.type,
+                                                                                   row.option.value)
+                                           ? "" : qsTr("(Offline)");
+                            }
+                        }
+
+                        // A video-capable row gets its own camera button, so a
+                        // video call does not need a separate gesture.
+                        Rectangle {
+                            Layout.preferredWidth: Units.gu(3.4)
+                            Layout.preferredHeight: Units.gu(2.4)
+                            visible: !!row.option && row.option.supportsVideo
+                            radius: Units.gu(0.4)
+                            color: videoArea.pressed ? appTheme.buttonPressedColor : '#d1d1d2'
+
+                            SpriteIcon {
+                                anchors.centerIn: parent
+                                width: Units.gu(2)
+                                height: Units.gu(2)
+                                source: Qt.resolvedUrl("images/menu-icon-video.png")
+                            }
+
+                            MouseArea {
+                                id: videoArea
+                                anchors.fill: parent
+                                onClicked: contactLookupPage._dial(row.rowData.person, row.option, true)
+                            }
+                        }
+
                         // The service this row would call over, as on the original.
                         Text {
-                            color: appTheme.listSecondaryTextColor
+                            Layout.preferredWidth: Units.gu(9)
+                            horizontalAlignment: Text.AlignRight
+                            elide: Text.ElideRight
+                            color: appTheme.serviceTextColor
                             font.capitalization: Font.AllUppercase
                             font.pixelSize: FontUtils.sizeToPixels("small")
                             text: row.option ? (row.option.kind === "im" ? row.option.transportLabel

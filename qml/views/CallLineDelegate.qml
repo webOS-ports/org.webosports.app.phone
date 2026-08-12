@@ -19,6 +19,7 @@ import QtQuick 2.0
 import QtQuick.Layouts 1.2
 
 import LunaNext.Common 0.1
+import LuneOS.Components 1.0
 import org.nemomobile.voicecall 1.0
 
 import "../model"

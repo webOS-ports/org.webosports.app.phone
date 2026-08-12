@@ -18,19 +18,24 @@
 
 import QtQuick 2.0
 import QtQuick.Controls 2.5
+import QtQuick.Controls.LuneOS 2.0
 import QtQuick.Layouts 1.3
 
 import LunaNext.Common 0.1
+import LuneOS.Components 1.0 as LuneComponents
 
 import "../services"
 import "../model"
 
 /**
- * The app's main screen: a tab bar across the top and the selected tab below,
- * laid out like the webOS 3.x phone app on the TouchPad.
+ * The app's main screen: the app menu and the tabs across the top, the
+ * selected tab below.
  *
- * The Video tab only appears when a Synergy account that supports video is
- * signed in, so the bar matches what the device can actually do.
+ * One view serves both orientations. There used to be a separate landscape
+ * copy with its own tab bar at the bottom and its own subset of tabs, which
+ * meant two layouts to keep in step and a jarring change when the device
+ * turned. Here the difference is only that a wide screen has room to keep the
+ * dialpad permanently beside the content instead of behind a tab.
  */
 Item {
     id: tabView
@@ -48,11 +53,15 @@ Item {
     property var callTransports;
     property var imBuddyStatus;
 
+    /// Wide enough to show the dialpad next to whatever tab is selected.
+    readonly property bool wideLayout: width > height && width >= Units.gu(70)
+
     readonly property bool hasVideoService: callTransports &&
                                             callTransports.videoCallableImTypes().length > 0
 
     // The stack always holds the same pages in the same order; the bar only
     // shows the ones that apply, so each tab carries the stack index it opens.
+    // On a wide screen the dialpad is always on screen, so it loses its tab.
     readonly property var allTabs: [
         { key: "phone",     stackIndex: 0, icon: Qt.resolvedUrl("images/menu-icon-dial.png"),      label: qsTr("Phone") },
         { key: "video",     stackIndex: 1, icon: Qt.resolvedUrl("images/menu-icon-video.png"),     label: qsTr("Video") },
@@ -62,7 +71,9 @@ Item {
     ]
 
     readonly property var tabs: allTabs.filter(function(tab) {
-        return tab.key !== "video" || tabView.hasVideoService;
+        if (tab.key === "video") return tabView.hasVideoService;
+        if (tab.key === "phone") return !tabView.wideLayout;
+        return true;
     })
 
     function _stackIndexOf(key) {
@@ -76,32 +87,216 @@ Item {
 
     function resetDialer() {
         if (tabDialer.item) tabDialer.item.reset();
+        if (sideDialer.item) sideDialer.item.reset();
     }
 
-    function showDialer() { currentIndex = _stackIndexOf("phone"); }
+    function showDialer() {
+        // With the dialpad always on screen there is no tab to switch to.
+        if (wideLayout) { resetDialer(); return; }
+        currentIndex = _stackIndexOf("phone");
+    }
     function showContacts() { currentIndex = _stackIndexOf("contacts"); }
     function showFavorites() { currentIndex = _stackIndexOf("favorites"); }
     function showCallLog() { currentIndex = _stackIndexOf("calllog"); }
     function showVideo() { currentIndex = _stackIndexOf("video"); }
+
+    // Rotating into the wide layout while on the Phone tab would leave the
+    // stack sitting on a page that no longer has a tab.
+    onWideLayoutChanged: {
+        if (wideLayout && contentStack.currentIndex === _stackIndexOf("phone"))
+            contentStack.currentIndex = _stackIndexOf("contacts");
+    }
 
     Rectangle {
         anchors.fill: parent
         color: appTheme.backgroundColor
     }
 
-    // The app menu the legacy app had and this one never did: clearing the
-    // call log, calling voicemail, and getting to the preferences.
-    PhoneAppMenu {
-        id: appMenu
-        dialHandler: tabView.dialHandler
+    /**
+     * Header: the app menu where webOS users look for it, then the tabs.
+     **/
 
-        onPreferencesRequested: prefsLoader.active = true
-        onAccountsRequested: accountsLoader.active = true
-        onClearHistoryRequested: clearHistoryDialog.open()
+    Rectangle {
+        id: header
+
+        anchors { top: parent.top; left: parent.left; right: parent.right }
+        height: Units.gu(6)
+        color: appTheme.tabBarColor
+
+        LuneComponents.AppMenuButton {
+            id: appMenuButton
+
+            anchors {
+                left: parent.left
+                leftMargin: Units.gu(0.8)
+                verticalCenter: parent.verticalCenter
+            }
+            height: Units.gu(3.6)
+
+            text: qsTr("Phone")
+            textColor: appTheme.primaryTextColor
+            backgroundColor: appTheme.buttonColor
+            pressedColor: appTheme.buttonPressedColor
+            borderColor: appTheme.buttonBorderColor
+
+            menu: PhoneAppMenu {
+                dialHandler: tabView.dialHandler
+
+                onPreferencesRequested: prefsLoader.active = true
+                onAccountsRequested: accountsLoader.active = true
+                onClearHistoryRequested: clearHistoryDialog.open()
+            }
+        }
+
+        // The platform TabBar can stack an icon over a caption since this
+        // branch, but in this app it kept rendering icon-only; until that is
+        // understood the app draws its own bar rather than ship a bar with no
+        // labels. The style change stands for other apps.
+        PhoneTabBar {
+            id: tabBar
+
+            anchors {
+                left: appMenuButton.right
+                leftMargin: Units.gu(0.8)
+                right: parent.right
+                top: parent.top
+                bottom: parent.bottom
+            }
+
+            appTheme: tabView.appTheme
+            tabs: tabView.tabs
+
+            // Translate between the bar's visible position and the stack's
+            // fixed one, since which tabs exist depends on the layout.
+            currentIndex: {
+                for (var i = 0; i < tabView.tabs.length; ++i) {
+                    if (tabView.tabs[i].stackIndex === contentStack.currentIndex) return i;
+                }
+                return 0;
+            }
+
+            onTabSelected: (index) => contentStack.currentIndex = tabView.tabs[index].stackIndex
+        }
+
+        Rectangle {
+            anchors { left: parent.left; right: parent.right; bottom: parent.bottom }
+            height: 1
+            color: appTheme.tabBarBorderColor
+        }
     }
 
-    // Owned by the page rather than the menu: anything declared inside a Menu
-    // becomes one of its entries.
+    /**
+     * Content
+     **/
+
+    RowLayout {
+        anchors {
+            top: header.bottom
+            bottom: parent.bottom
+            left: parent.left
+            right: parent.right
+        }
+        spacing: 0
+
+        // On a wide screen the dialpad keeps its place beside the content, so
+        // a number can be dialled without leaving the call log or contacts.
+        Loader {
+            id: sideDialer
+
+            Layout.fillHeight: true
+            Layout.preferredWidth: Units.gu(34)
+            visible: tabView.wideLayout
+            active: tabView.wideLayout
+
+            sourceComponent: DialerPage {
+                appTheme: tabView.appTheme
+                voiceCallMgrWrapper: tabView.voiceCallManager
+                telephonyManager: tabView.telephonyManager
+                contacts: tabView.contacts
+                dialHandler: tabView.dialHandler
+
+                onContactLookupRequested: (prefix) => {
+                    tabView.showContacts();
+                    if (tabContacts.item) tabContacts.item.initialFilter = prefix;
+                }
+            }
+        }
+
+        // A plain stack rather than a SwipeView: the reference app switches
+        // tabs on tap only, and swiping fights the swipe-to-delete in the log.
+        StackLayout {
+            id: contentStack
+
+            Layout.fillWidth: true
+            Layout.fillHeight: true
+
+            Loader {
+                id: tabDialer
+                active: !tabView.wideLayout
+                sourceComponent: DialerPage {
+                    appTheme: tabView.appTheme
+                    voiceCallMgrWrapper: tabView.voiceCallManager
+                    telephonyManager: tabView.telephonyManager
+                    contacts: tabView.contacts
+                    dialHandler: tabView.dialHandler
+
+                    onContactLookupRequested: (prefix) => {
+                        tabView.showContacts();
+                        if (tabContacts.item) tabContacts.item.initialFilter = prefix;
+                    }
+                }
+            }
+            Loader {
+                id: tabVideo
+                active: tabView.hasVideoService
+                sourceComponent: ContactLookupPage {
+                    appTheme: tabView.appTheme
+                    contacts: tabView.contacts
+                    voiceCallMgrWrapper: tabView.voiceCallManager
+                    dialHandler: tabView.dialHandler
+                    callTransports: tabView.callTransports
+                    imBuddyStatus: tabView.imBuddyStatus
+                    videoOnly: true
+                }
+            }
+            Loader {
+                id: tabContacts
+                sourceComponent: ContactLookupPage {
+                    appTheme: tabView.appTheme
+                    contacts: tabView.contacts
+                    voiceCallMgrWrapper: tabView.voiceCallManager
+                    dialHandler: tabView.dialHandler
+                    callTransports: tabView.callTransports
+                    imBuddyStatus: tabView.imBuddyStatus
+                }
+            }
+            Loader {
+                id: tabFavorites
+                sourceComponent: FavouritePage{
+                    appTheme: tabView.appTheme;
+                    favoritesModel: tabView.favoritesModel
+                    contacts: tabView.contacts
+                    dialHandler: tabView.dialHandler
+                    callTransports: tabView.callTransports
+                }
+            }
+            Loader {
+                id: tabHistory
+                sourceComponent: HistoryPage{
+                    appTheme: tabView.appTheme;
+                    historyModel: tabView.historyModel
+                    contacts: tabView.contacts
+                    dialHandler: tabView.dialHandler
+                    callTransports: tabView.callTransports
+                }
+            }
+        }
+    }
+
+    /**
+     * Things the app menu opens
+     **/
+
     Dialog {
         id: clearHistoryDialog
 
@@ -153,118 +348,4 @@ Item {
             onClosed: accountsLoader.active = false
         }
     }
-
-    PhoneTabBar {
-        id: tabBar
-
-        anchors { top: parent.top; left: parent.left; right: menuButton.left }
-        appTheme: tabView.appTheme
-        tabs: tabView.tabs
-
-        // Translate between the bar's visible position and the stack's fixed one.
-        currentIndex: {
-            for (var i = 0; i < tabView.tabs.length; ++i) {
-                if (tabView.tabs[i].stackIndex === contentStack.currentIndex) return i;
-            }
-            return 0;
-        }
-
-        onTabSelected: (index) => contentStack.currentIndex = tabView.tabs[index].stackIndex
-    }
-
-    ToolButton {
-        id: menuButton
-
-        anchors { top: parent.top; right: parent.right }
-        height: tabBar.height
-        width: Units.gu(5)
-
-        text: "⋮"
-        font.pixelSize: FontUtils.sizeToPixels("large")
-
-        background: Rectangle { color: tabView.appTheme.tabBarColor }
-        contentItem: Text {
-            text: menuButton.text
-            font: menuButton.font
-            color: tabView.appTheme.primaryTextColor
-            horizontalAlignment: Text.AlignHCenter
-            verticalAlignment: Text.AlignVCenter
-        }
-
-        onClicked: appMenu.popup(menuButton, 0, menuButton.height)
-    }
-
-    // A plain stack rather than a SwipeView: the reference app switches tabs on
-    // tap only, and swiping conflicts with the swipe-to-delete in the call log.
-    StackLayout {
-        id: contentStack
-
-        anchors {
-            top: tabBar.bottom
-            bottom: parent.bottom
-            left: parent.left
-            right: parent.right
-        }
-
-        Loader {
-            id: tabDialer
-            sourceComponent: DialerPage {
-                appTheme: tabView.appTheme
-                voiceCallMgrWrapper: tabView.voiceCallManager
-                telephonyManager: tabView.telephonyManager
-                contacts: tabView.contacts
-                dialHandler: tabView.dialHandler
-
-                onContactLookupRequested: (prefix) => {
-                    tabView.showContacts();
-                    if (tabContacts.item) tabContacts.item.initialFilter = prefix;
-                }
-            }
-        }
-        Loader {
-            id: tabVideo
-            active: tabView.hasVideoService
-            sourceComponent: ContactLookupPage {
-                appTheme: tabView.appTheme
-                contacts: tabView.contacts
-                voiceCallMgrWrapper: tabView.voiceCallManager
-                dialHandler: tabView.dialHandler
-                callTransports: tabView.callTransports
-                imBuddyStatus: tabView.imBuddyStatus
-                videoOnly: true
-            }
-        }
-        Loader {
-            id: tabContacts
-            sourceComponent: ContactLookupPage {
-                appTheme: tabView.appTheme
-                contacts: tabView.contacts
-                voiceCallMgrWrapper: tabView.voiceCallManager
-                dialHandler: tabView.dialHandler
-                callTransports: tabView.callTransports
-                imBuddyStatus: tabView.imBuddyStatus
-            }
-        }
-        Loader {
-            id: tabFavorites
-            sourceComponent: FavouritePage{
-                appTheme: tabView.appTheme;
-                favoritesModel: tabView.favoritesModel
-                contacts: tabView.contacts
-                dialHandler: tabView.dialHandler
-                callTransports: tabView.callTransports
-            }
-        }
-        Loader {
-            id: tabHistory
-            sourceComponent: HistoryPage{
-                appTheme: tabView.appTheme;
-                historyModel: tabView.historyModel
-                contacts: tabView.contacts
-                dialHandler: tabView.dialHandler
-                callTransports: tabView.callTransports
-            }
-        }
-    }
-
 }

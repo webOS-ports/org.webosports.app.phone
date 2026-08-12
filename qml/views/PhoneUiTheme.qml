@@ -82,13 +82,22 @@ QtObject {
      * Lists
      **/
 
-    /// Lists are light on this design, in contrast with the dark chrome.
-    property color listBackgroundColor: '#e8e8e8'
-    property color listAlternateColor: '#dcdcdc'
-    property color listDividerColor: '#bdbdbd'
-    property color listTextColor: '#2a2929'
-    property color listSecondaryTextColor: '#6c6c6c'
-    property color listSectionTextColor: '#4a4a4a'
+    /**
+     * Lists sit in a bordered group box and are the same charcoal family as
+     * the chrome, with light text -- an earlier reading of a screenshot taken
+     * behind a dimming scrim made them look like a light-on-white list.
+     */
+    property color listBackgroundColor: '#3a3c3e'
+    property color listAlternateColor: '#343638'
+    property color listDividerColor: '#2a2c2e'
+    property color listBorderColor: '#1e2021'
+    property color listTextColor: '#ffffff'
+    property color listSecondaryTextColor: '#c8c8c8'
+    property color listSectionTextColor: '#ffffff'
+    /// The band a contact's name sits on, above its rows.
+    property color listSectionColor: '#1c1d1e'
+    /// A row the user is acting on.
+    property color listSelectedColor: '#4a7298'
 
     /**
      * Gradients
