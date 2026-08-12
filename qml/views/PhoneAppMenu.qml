@@ -36,6 +36,11 @@ import LuneOS.Service 1.0
 Menu {
     id: phoneAppMenu
 
+    // The app menu is the dark one. The style draws a light panel by default,
+    // which is right for a menu opened from within a page and wrong for the
+    // one that drops out of the corner of the screen.
+    LuneOSMenu.appMenuStyle: true
+
     property var dialHandler
 
     /// Asked to empty the call log; the owner confirms before it happens.
