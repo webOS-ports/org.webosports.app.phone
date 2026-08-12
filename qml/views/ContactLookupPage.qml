@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>
  */
 
-import QtQuick 2.0
+import QtQuick 2.4
 import QtQuick.Controls 2.5
 import QtQuick.Layouts 1.2
 
@@ -102,7 +102,8 @@ BasePage {
             var name = PhoneNumberUtils.personDisplayName(match.person);
             result.push({ header: true, person: match.person,
                           name: name,
-                          nameMarkup: _highlight(name, searchField.text.trim()),
+                          matchAt: _matchIndex(name, searchField.text.trim()),
+                          matchLength: searchField.text.trim().length,
                           favorite: match.person.favorite === true });
 
             options.forEach(function(option) {
@@ -126,23 +127,12 @@ BasePage {
         function onRevisionChanged() { contactLookupPage._rebuildRows(); }
     }
 
-    /// Underlines the part of `name` the search matched, in blue.
-    function _highlight(name, needle) {
-        var plain = _escape(name);
+    /// Where in `name` the search matched, or -1.
+    function _matchIndex(name, needle) {
         if (needle.length === 0)
-            return plain;
+            return -1;
 
-        var at = name.toLowerCase().indexOf(needle.toLowerCase());
-        if (at < 0)
-            return plain;
-
-        return _escape(name.slice(0, at)) +
-               "<font color=\"#5a9bd8\"><u>" + _escape(name.substr(at, needle.length)) + "</u></font>" +
-               _escape(name.slice(at + needle.length));
-    }
-
-    function _escape(text) {
-        return String(text).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+        return name.toLowerCase().indexOf(needle.toLowerCase());
     }
 
     function _allContacts() {
@@ -258,8 +248,42 @@ BasePage {
                         font.bold: true
                         font.capitalization: Font.AllUppercase
                         font.pixelSize: FontUtils.sizeToPixels("small")
-                        textFormat: Text.StyledText
-                        text: sectionRow.rowData ? sectionRow.rowData.nameMarkup : ""
+                        text: sectionRow.rowData ? sectionRow.rowData.name : ""
+                    }
+
+                    /*
+                     * What the search matched, marked the way the framework
+                     * marks it: filter-highlight.png laid along the foot of
+                     * those letters. .enyo-text-filter-highlight sets a
+                     * background and nothing else -- the text itself keeps the
+                     * colour it already had.
+                     */
+                    TextMetrics {
+                        id: beforeMatch
+                        font: sectionName.font
+                        text: (sectionRow.rowData && sectionRow.rowData.matchAt > 0)
+                                  ? sectionRow.rowData.name.slice(0, sectionRow.rowData.matchAt) : ""
+                    }
+
+                    TextMetrics {
+                        id: matched
+                        font: sectionName.font
+                        text: (sectionRow.rowData && sectionRow.rowData.matchAt >= 0)
+                                  ? sectionRow.rowData.name.substr(sectionRow.rowData.matchAt,
+                                                                   sectionRow.rowData.matchLength) : ""
+                    }
+
+                    Image {
+                        x: sectionName.x + beforeMatch.width
+                        y: sectionName.y + sectionName.height - height
+
+                        width: Math.max(0, Math.min(matched.width,
+                                                    sectionName.width - beforeMatch.width))
+                        height: Units.gu(0.4)
+
+                        visible: matched.text.length > 0
+                        source: Qt.resolvedUrl("images/filter-highlight.png")
+                        fillMode: Image.TileHorizontally
                     }
 
                     // A favourite is starred, as on the reference.

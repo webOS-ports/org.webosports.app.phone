@@ -114,6 +114,7 @@
         <file>qml/views/images/expand-button.png</file>
         <file>qml/views/images/favorites-icon-drawer-open.png</file>
         <file>qml/views/images/favorites-star-blue.png</file>
+        <file>qml/views/images/filter-highlight.png</file>
         <file>qml/views/images/flight-mode-icon.png</file>
         <file>qml/views/images/frame-background.png</file>
         <file>qml/views/images/generic-details-view-avatar-small.png</file>
