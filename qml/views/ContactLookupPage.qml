@@ -19,6 +19,8 @@ import QtQuick 2.0
 import QtQuick.Controls 2.5
 import QtQuick.Layouts 1.2
 
+import QtQuick.Controls.LuneOS 2.0
+
 import LunaNext.Common 0.1
 import LuneOS.Components 1.0
 
@@ -161,6 +163,8 @@ BasePage {
         visible: contactLookupPage.showDialpadButton
 
         text: qsTr("Dialpad")
+        LuneOSButton.mainColor: '#2071bb'
+        LuneOSButton.textColor: '#ffffff'
         onClicked: contactLookupPage.dialpadRequested()
     }
 
@@ -260,7 +264,7 @@ BasePage {
                     property var rowData
 
                     width: contactList.width
-                    height: Units.gu(3.6)
+                    height: Units.gu(2.4)
 
                     Text {
                         id: sectionName
@@ -268,7 +272,8 @@ BasePage {
                         anchors {
                             left: parent.left
                             leftMargin: Units.gu(1.2)
-                            verticalCenter: parent.verticalCenter
+                            bottom: parent.bottom
+                            bottomMargin: Units.gu(0.3)
                         }
                         width: Math.min(implicitWidth, parent.width - Units.gu(4))
                         elide: Text.ElideRight
@@ -287,7 +292,7 @@ BasePage {
                         anchors {
                             left: sectionName.right
                             leftMargin: Units.gu(0.5)
-                            verticalCenter: sectionName.verticalCenter
+                            baseline: sectionName.baseline
                         }
                         visible: sectionRow.rowData ? sectionRow.rowData.favorite === true : false
                         color: appTheme.buttonActiveColor
@@ -302,7 +307,7 @@ BasePage {
                             leftMargin: Units.gu(1)
                             right: parent.right
                             rightMargin: Units.gu(1.2)
-                            verticalCenter: parent.verticalCenter
+                            verticalCenter: sectionName.verticalCenter
                         }
                         height: 1
                         color: appTheme.listBorderColor
@@ -320,7 +325,7 @@ BasePage {
                     readonly property var option: rowData ? rowData.option : null
 
                     width: contactList.width
-                    height: Units.gu(4.6)
+                    height: Units.gu(5.4)
 
                     Rectangle {
                         anchors.fill: parent
@@ -368,25 +373,20 @@ BasePage {
                             }
                         }
 
-                        // A video-capable row gets its own camera button, so a
-                        // video call does not need a separate gesture.
-                        Rectangle {
-                            Layout.preferredWidth: Units.gu(3.4)
-                            Layout.preferredHeight: Units.gu(2.4)
+                        // A video-capable row offers video, using the original
+                        // app's own list icon.
+                        Image {
+                            Layout.preferredWidth: Units.gu(2.4)
+                            Layout.preferredHeight: Units.gu(1.5)
+                            fillMode: Image.PreserveAspectFit
+                            source: Qt.resolvedUrl("images/icon-videocall-list.png")
                             visible: !!row.option && row.option.supportsVideo
-                            radius: Units.gu(0.4)
-                            color: videoArea.pressed ? appTheme.buttonPressedColor : '#d1d1d2'
-
-                            SpriteIcon {
-                                anchors.centerIn: parent
-                                width: Units.gu(2)
-                                height: Units.gu(2)
-                                source: Qt.resolvedUrl("images/menu-icon-video.png")
-                            }
+                            opacity: videoArea.pressed ? 0.6 : 1.0
 
                             MouseArea {
                                 id: videoArea
                                 anchors.fill: parent
+                                anchors.margins: -Units.gu(0.8)
                                 onClicked: contactLookupPage._dial(row.rowData.person, row.option, true)
                             }
                         }

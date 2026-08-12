@@ -105,56 +105,28 @@ Column {
       }
    }
 
-   // Actions on the number this group is about, whether or not it belongs to a
-   // known contact.
-   RowLayout {
+   // Calling back and texting are already on the rows themselves -- tapping a
+   // row calls it, and each number carries a messaging button -- so the only
+   // thing left worth offering here is the contact card.
+   Item {
        width: parent.width
-       height: Units.gu(5)
-       spacing: Units.gu(1)
+       height: Units.gu(4)
        visible: callGroupDetailsId.groupPhoneNumber.length > 0
 
        Text {
-           Layout.fillWidth: true
-           font.pixelSize: FontUtils.sizeToPixels("12pt")
-           color: 'white'
-           elide: Text.ElideRight
-           // Naming the service makes it obvious the call goes back out the
-           // same way it came in.
-           text: callGroupDetailsId.isSynergyCall && callGroupDetailsId.callTransports
-                     ? qsTr("Call back on %1").arg(callGroupDetailsId.callTransports.labelFor(callGroupDetailsId.callService))
-                     : qsTr("Call back")
-
-           MouseArea {
-               anchors.fill: parent
-               onClicked: {
-                   if (callGroupDetailsId.dialHandler)
-                       callGroupDetailsId.dialHandler.dial(callGroupDetailsId.groupPhoneNumber,
-                                                           callGroupDetailsId.isSynergyCall ? callGroupDetailsId.callService : "",
-                                                           false);
-               }
+           anchors {
+               left: parent.left
+               leftMargin: Units.gu(2.4)
+               verticalCenter: parent.verticalCenter
            }
-       }
-
-       Text {
            font.pixelSize: FontUtils.sizeToPixels("12pt")
            color: 'white'
-           text: qsTr("Text")
+           text: callGroupDetailsId.callGroupRemotePerson ? qsTr("View Contact")
+                                                          : qsTr("Add to Contacts")
 
            MouseArea {
                anchors.fill: parent
-               onClicked: callGroupDetailsId.sendMessage(callGroupDetailsId.groupPhoneNumber,
-                                                         callGroupDetailsId.isSynergyCall ? callGroupDetailsId.callService : "")
-           }
-       }
-
-       Text {
-           Layout.rightMargin: Units.gu(2)
-           font.pixelSize: FontUtils.sizeToPixels("12pt")
-           color: 'white'
-           text: callGroupDetailsId.callGroupRemotePerson ? qsTr("View contact") : qsTr("Add to contacts")
-
-           MouseArea {
-               anchors.fill: parent
+               anchors.margins: -Units.gu(1)
                onClicked: {
                    if (callGroupDetailsId.callGroupRemotePerson)
                        callGroupDetailsId.viewContact(callGroupDetailsId.callGroupRemotePerson._id);
@@ -207,7 +179,7 @@ Column {
                            wantedWidth: parent.height // square button
                            wantedHeight: parent.height // square button
 
-                           imageSize: Qt.size(183, 244)
+                           imageSize: Qt.size(184, 246)
                            patchGridSize: Qt.size(3, 4)
                            patch: smsButtonMouseArea.pressed ? Qt.point(2,1) : Qt.point(2,0)
 

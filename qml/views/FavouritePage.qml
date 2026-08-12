@@ -147,32 +147,21 @@ BasePage {
                             }
                         }
 
-                        // The chevron that opens the rest of the ways to call.
-                        Rectangle {
-                            Layout.preferredWidth: Units.gu(3.6)
-                            Layout.preferredHeight: Units.gu(2.8)
-                            radius: Units.gu(0.4)
-                            color: expandArea.pressed ? appTheme.buttonPressedColor : '#8e9092'
-                            border.color: appTheme.listBorderColor
-                            border.width: 1
+                        // The expand button, from the original app's artwork.
+                        Item {
+                            Layout.preferredWidth: Units.gu(3.4)
+                            Layout.preferredHeight: Units.gu(3.4)
 
-                            Canvas {
+                            ClippedImage {
                                 anchors.centerIn: parent
-                                width: Units.gu(1.2)
-                                height: Units.gu(0.8)
-                                rotation: favouriteEntry.expanded ? 180 : 0
-
-                                onPaint: {
-                                    var ctx = getContext("2d");
-                                    ctx.reset();
-                                    ctx.fillStyle = "#2a2a2a";
-                                    ctx.beginPath();
-                                    ctx.moveTo(0, 0);
-                                    ctx.lineTo(width, 0);
-                                    ctx.lineTo(width / 2, height);
-                                    ctx.closePath();
-                                    ctx.fill();
-                                }
+                                source: Qt.resolvedUrl(favouriteEntry.expanded
+                                                           ? "images/favorites-icon-drawer-open.png"
+                                                           : "images/expand-button.png")
+                                wantedWidth: Units.gu(3.4)
+                                wantedHeight: Units.gu(3.4)
+                                imageSize: favouriteEntry.expanded ? Qt.size(36, 72) : Qt.size(50, 100)
+                                patchGridSize: Qt.size(1, 2)
+                                patch: expandArea.pressed ? Qt.point(0, 1) : Qt.point(0, 0)
                             }
 
                             MouseArea {
@@ -242,34 +231,38 @@ BasePage {
                                                               : modelData.typeLabel
                             }
 
-                            // Message rather than call, over whichever service
-                            // the row belongs to.
-                            Rectangle {
-                                Layout.preferredWidth: Units.gu(3.2)
-                                Layout.preferredHeight: Units.gu(3.2)
-                                radius: width / 2
-                                color: messageArea.pressed ? '#1c7f86' : '#2aa8b0'
+                            // Video, where the account behind this row can carry it.
+                            Image {
+                                Layout.preferredWidth: Units.gu(2.4)
+                                Layout.preferredHeight: Units.gu(1.5)
+                                fillMode: Image.PreserveAspectFit
+                                source: Qt.resolvedUrl("images/icon-videocall-list.png")
+                                visible: modelData.supportsVideo
 
-                                Canvas {
-                                    anchors.centerIn: parent
-                                    width: Units.gu(1.8)
-                                    height: Units.gu(1.4)
-
-                                    onPaint: {
-                                        // A speech bubble with a tail.
-                                        var ctx = getContext("2d");
-                                        ctx.reset();
-                                        ctx.fillStyle = "#ffffff";
-                                        ctx.beginPath();
-                                        ctx.ellipse(0, 0, width, height * 0.8);
-                                        ctx.fill();
-                                        ctx.beginPath();
-                                        ctx.moveTo(width * 0.25, height * 0.7);
-                                        ctx.lineTo(width * 0.2, height);
-                                        ctx.lineTo(width * 0.5, height * 0.75);
-                                        ctx.closePath();
-                                        ctx.fill();
+                                MouseArea {
+                                    anchors.fill: parent
+                                    anchors.margins: -Units.gu(0.8)
+                                    onClicked: {
+                                        if (dialHandler)
+                                            dialHandler.dial(modelData.value, modelData.transport, true);
                                     }
+                                }
+                            }
+
+                            // Message rather than call, over the same service.
+                            // The teal bubble is the original's own button art.
+                            Item {
+                                Layout.preferredWidth: Units.gu(3.4)
+                                Layout.preferredHeight: Units.gu(3.4)
+
+                                ClippedImage {
+                                    anchors.centerIn: parent
+                                    source: Qt.resolvedUrl("images/button-sprite.png")
+                                    wantedWidth: Units.gu(3.4)
+                                    wantedHeight: Units.gu(3.4)
+                                    imageSize: Qt.size(184, 246)
+                                    patchGridSize: Qt.size(3, 4)
+                                    patch: messageArea.pressed ? Qt.point(2, 1) : Qt.point(2, 0)
                                 }
 
                                 MouseArea {
