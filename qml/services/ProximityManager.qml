@@ -39,6 +39,10 @@ Item {
                                           audioRouteManager.currentRoute === audioRouteManager.routeEarpiece)
 
     property bool _enabled: false
+    /// What subscribe() handed back. cancel() lives on that, not on the
+    /// LunaService itself, which has no such method -- releasing the sensor
+    /// used to throw instead.
+    property var _subscription: null
 
     onShouldEnableChanged: shouldEnable ? _enable() : _disable()
 
@@ -46,7 +50,8 @@ Item {
         if (_enabled) return;
 
         console.log("Enabling the proximity sensor for the call in progress");
-        proximitySubscription.subscribe(JSON.stringify({ proximityEnabled: true, client: "phoneapp" }));
+        _subscription = proximitySubscription.subscribe(
+                            JSON.stringify({ proximityEnabled: true, client: "phoneapp" }));
         _enabled = true;
     }
 
@@ -54,7 +59,10 @@ Item {
         if (!_enabled) return;
 
         console.log("Disabling the proximity sensor");
-        proximitySubscription.cancel();
+        if (_subscription) {
+            _subscription.cancel();
+            _subscription = null;
+        }
         _enabled = false;
     }
 
