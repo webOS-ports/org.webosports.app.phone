@@ -486,16 +486,27 @@ Item {
             break;
         case VoiceCall.STATUS_DIALING:
         case VoiceCall.STATUS_ALERTING:
+            IncomingCallsService.setIncomingForCall(voiceCall.handlerId, false);
             root.outgoingCall(voiceCall);
             break;
         case VoiceCall.STATUS_INCOMING:
         case VoiceCall.STATUS_WAITING:
+            IncomingCallsService.setIncomingForCall(voiceCall.handlerId, true);
             root.incomingCall(voiceCall);
             break;
         case VoiceCall.STATUS_HELD:
             root.heldCall = voiceCall;
             break;
         case VoiceCall.STATUS_DISCONNECTED:
+            /*
+             * Which way the call went, from the states it actually passed
+             * through rather than from what it said about itself when the row
+             * first appeared. isIncoming is read the instant the handler is
+             * inserted, before the call has settled, and a call we placed that
+             * reads as incoming there is filed as one the user missed.
+             */
+            isIncoming = IncomingCallsService.wasIncoming(voiceCall.handlerId, isIncoming);
+
             // the voicecall object is soon to be destroyed, so save its state before sending the signal
             var endedVoiceCall = {
                 handlerId: voiceCall.handlerId,
