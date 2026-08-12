@@ -58,6 +58,17 @@ Column {
 
     readonly property string groupPhoneNumber: callGroupAddress ? (callGroupAddress.addr || "") : ""
 
+    /**
+     * How wide the column naming what each call went over has to be.
+     *
+     * A transport can be called anything -- "WHATSAPP" already overruns the
+     * sixty pixels the original allowed, which is why the reference runs the
+     * network name and the number into each other. Widen the column to the
+     * longest name in this drawer instead, so the numbers still line up
+     * underneath one another without anything being cut short.
+     */
+    property real prefixColumn: Units.gu(7)
+
     // The trailing columns of the group's own row, so the icons and times in
     // here sit under the ones up there.
     readonly property real iconColumn: Units.gu(2.2)
@@ -122,11 +133,17 @@ Column {
                 spacing: Units.gu(0.8)
 
                 Text {
-                    Layout.preferredWidth: Units.gu(7)
+                    id: prefixLabel
+
+                    Layout.preferredWidth: callGroupDetailsId.prefixColumn
                     color: appTheme.serviceTextColor
-                    elide: Text.ElideRight
                     font.pixelSize: FontUtils.sizeToPixels("small")
                     text: callphoneDelegate._service
+
+                    onImplicitWidthChanged: callGroupDetailsId.prefixColumn =
+                        Math.max(callGroupDetailsId.prefixColumn, implicitWidth)
+                    Component.onCompleted: callGroupDetailsId.prefixColumn =
+                        Math.max(callGroupDetailsId.prefixColumn, implicitWidth)
                 }
 
                 Text {
