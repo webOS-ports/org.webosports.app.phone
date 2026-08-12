@@ -8,7 +8,7 @@
    "duration": 15683,
    "from": {
     "addr": "0622101234",
-    "normalizedAddr": "-43210122---",
+    "normalizedAddr": "-432101226-0--+",
     "service": "com.palm.telephony"
    },
    "groups": [
@@ -35,7 +35,7 @@
    "duration": 14515,
    "from": {
     "addr": "0622101234",
-    "normalizedAddr": "-43210122---",
+    "normalizedAddr": "-432101226-0--+",
     "service": "com.palm.telephony"
    },
    "groups": [
@@ -76,7 +76,7 @@
      "_id": "a825",
      "addr": "+46699051234",
      "name": "Mary Spetzler",
-     "normalizedAddr": "-43215099--64-+",
+     "normalizedAddr": "-432150996--64-+",
      "personAddressType": "type_mobile",
      "personFamilyName": "Spetzler",
      "personGivenName": "Mary",
@@ -107,7 +107,7 @@
     {
      "_id": "b672",
      "addr": "0143571234",
-     "normalizedAddr": "-43217534-1--",
+     "normalizedAddr": "-432175341-0--+",
      "service": "com.palm.telephony"
     }
    ],
@@ -134,7 +134,7 @@
     {
      "_id": "b677",
      "addr": "0143571234",
-     "normalizedAddr": "-43217534-1--",
+     "normalizedAddr": "-432175341-0--+",
      "service": "com.palm.telephony"
     }
    ],
@@ -161,7 +161,7 @@
     {
      "_id": "b681",
      "addr": "0143571234",
-     "normalizedAddr": "-43217534-1--",
+     "normalizedAddr": "-432175341-0--+",
      "service": "com.palm.telephony"
     }
    ],
@@ -189,7 +189,7 @@
      "_id": "e442",
      "addr": "+46699051234",
      "name": "Mary Spetzler",
-     "normalizedAddr": "-43215099--64-+",
+     "normalizedAddr": "-432150996--64-+",
      "personAddressType": "type_mobile",
      "personFamilyName": "Spetzler",
      "personGivenName": "Mary",
@@ -221,7 +221,7 @@
      "_id": "e449",
      "addr": "+46699051234",
      "name": "Mary Spetzler",
-     "normalizedAddr": "-43215099--64-+",
+     "normalizedAddr": "-432150996--64-+",
      "personAddressType": "type_mobile",
      "personFamilyName": "Spetzler",
      "personGivenName": "Mary",
@@ -240,7 +240,7 @@
    "from": {
     "addr": "0675011234",
     "name": "John Smith",
-    "normalizedAddr": "-43211057---",
+    "normalizedAddr": "-432110576-0--+",
     "personAddressType": "type_mobile",
     "personFamilyName": "Smith",
     "personGivenName": "John",
@@ -272,7 +272,7 @@
    "from": {
     "addr": "0675011234",
     "name": "John Smith",
-    "normalizedAddr": "-43211057---",
+    "normalizedAddr": "-432110576-0--+",
     "personAddressType": "type_mobile",
     "personFamilyName": "Smith",
     "personGivenName": "John",
@@ -304,7 +304,7 @@
    "from": {
     "addr": "0675011234",
     "name": "John Smith",
-    "normalizedAddr": "-43211057---",
+    "normalizedAddr": "-432110576-0--+",
     "personAddressType": "type_mobile",
     "personFamilyName": "Smith",
     "personGivenName": "John",
@@ -336,7 +336,7 @@
    "from": {
     "addr": "0675011234",
     "name": "John Smith",
-    "normalizedAddr": "-43211057---",
+    "normalizedAddr": "-432110576-0--+",
     "personAddressType": "type_mobile",
     "personFamilyName": "Smith",
     "personGivenName": "John",
@@ -367,7 +367,7 @@
    "duration": 345320,
    "from": {
     "addr": "+46496261234",
-    "normalizedAddr": "-432162--23-+",
+    "normalizedAddr": "-432162694--64-+",
     "service": "com.palm.telephony"
    },
    "groups": [
@@ -394,7 +394,7 @@
    "duration": 33168,
    "from": {
     "addr": "0650801234",
-    "normalizedAddr": "-43210805---",
+    "normalizedAddr": "-432108056-0--+",
     "service": "com.palm.telephony"
    },
    "groups": [
@@ -435,7 +435,7 @@
      "_id": "49a6b",
      "addr": "0146361234",
      "name": "Martin Turén",
-     "normalizedAddr": "-43216364-1--",
+     "normalizedAddr": "-432163641-0--+",
      "personAddressType": "type_work",
      "personFamilyName": "Turén",
      "personGivenName": "Martin",
@@ -467,7 +467,7 @@
      "_id": "49a6e",
      "addr": "0146361234",
      "name": "Martin Turén",
-     "normalizedAddr": "-43216364-1--",
+     "normalizedAddr": "-432163641-0--+",
      "personAddressType": "type_work",
      "personFamilyName": "Turén",
      "personGivenName": "Martin",
@@ -499,7 +499,7 @@
      "_id": "22525",
      "addr": "0675011234",
      "name": "John Smith",
-     "normalizedAddr": "-43211057---",
+     "normalizedAddr": "-432110576-0--+",
      "personFamilyName": "Smith",
      "personGivenName": "John",
      "personId": "++HcfNEQzPgKH0Kb",
@@ -517,7 +517,7 @@
    "from": {
     "addr": "0675011234",
     "name": "John Smith",
-    "normalizedAddr": "-43211057---",
+    "normalizedAddr": "-432110576-0--+",
     "personAddressType": "type_mobile",
     "personFamilyName": "Smith",
     "personGivenName": "John",
@@ -565,7 +565,7 @@
      "_id": "2253d",
      "addr": "0675011234",
      "name": "John Smith",
-     "normalizedAddr": "-43211057---",
+     "normalizedAddr": "-432110576-0--+",
      "personAddressType": "type_mobile",
      "personFamilyName": "Smith",
      "personGivenName": "John",
@@ -584,7 +584,7 @@
    "from": {
     "addr": "0675011234",
     "name": "John Smith",
-    "normalizedAddr": "-43211057---",
+    "normalizedAddr": "-432110576-0--+",
     "personAddressType": "type_mobile",
     "personFamilyName": "Smith",
     "personGivenName": "John",
@@ -616,7 +616,7 @@
    "from": {
     "addr": "123",
     "name": "Voice Mail",
-    "normalizedAddr": "-321---",
+    "normalizedAddr": "-321---+",
     "service": "com.palm.telephony"
    },
    "groups": [
@@ -657,7 +657,7 @@
      "_id": "22595",
      "addr": "0675011234",
      "name": "John Smith",
-     "normalizedAddr": "-43211057---",
+     "normalizedAddr": "-432110576-0--+",
      "personFamilyName": "Smith",
      "personGivenName": "John",
      "personId": "++HcfNEQzPgKH0Kb",
@@ -688,7 +688,7 @@
      "_id": "2259c",
      "addr": "0675011234",
      "name": "John Smith",
-     "normalizedAddr": "-43211057---",
+     "normalizedAddr": "-432110576-0--+",
      "personFamilyName": "Smith",
      "personGivenName": "John",
      "personId": "++HcfNEQzPgKH0Kb",
@@ -706,7 +706,7 @@
    "from": {
     "addr": "0674231234",
     "name": null,
-    "normalizedAddr": "-43213247---",
+    "normalizedAddr": "-432132476-0--+",
     "personAddressType": null,
     "personFamilyName": null,
     "personGivenName": null,
@@ -751,7 +751,7 @@
      "_id": "49a37",
      "addr": "+46674231234",
      "name": "Xavier Lingberg",
-     "normalizedAddr": "-43213247--64-+",
+     "normalizedAddr": "-432132476--64-+",
      "personAddressType": "type_mobile",
      "personFamilyName": "Lingberg",
      "personGivenName": "Xavier",
@@ -783,7 +783,7 @@
      "_id": "27e9a",
      "addr": "+46677221234",
      "name": "Claire Meyer",
-     "normalizedAddr": "-43212277--64-+",
+     "normalizedAddr": "-432122776--64-+",
      "personAddressType": "type_mobile",
      "personFamilyName": "Meyer",
      "personGivenName": "Claire",
@@ -815,7 +815,7 @@
      "_id": "27ea6",
      "addr": "+46677221234",
      "name": "Claire Meyer",
-     "normalizedAddr": "-43212277--64-+",
+     "normalizedAddr": "-432122776--64-+",
      "personAddressType": "type_mobile",
      "personFamilyName": "Meyer",
      "personGivenName": "Claire",
@@ -847,7 +847,7 @@
      "_id": "27eae",
      "addr": "+46677221234",
      "name": "Claire Meyer",
-     "normalizedAddr": "-43212277--64-+",
+     "normalizedAddr": "-432122776--64-+",
      "personAddressType": "type_mobile",
      "personFamilyName": "Meyer",
      "personGivenName": "Claire",
@@ -879,7 +879,7 @@
      "_id": "27fcd",
      "addr": "+46677221234",
      "name": "Claire Meyer",
-     "normalizedAddr": "-43212277--64-+",
+     "normalizedAddr": "-432122776--64-+",
      "personAddressType": "type_mobile",
      "personFamilyName": "Meyer",
      "personGivenName": "Claire",
@@ -911,7 +911,7 @@
      "_id": "28018",
      "addr": "+46677221234",
      "name": "Claire Meyer",
-     "normalizedAddr": "-43212277--64-+",
+     "normalizedAddr": "-432122776--64-+",
      "personAddressType": "type_mobile",
      "personFamilyName": "Meyer",
      "personGivenName": "Claire",
@@ -943,7 +943,7 @@
      "_id": "499ed",
      "addr": "+46684481234",
      "name": "John Farser",
-     "normalizedAddr": "-43218448--64-+",
+     "normalizedAddr": "-432184486--64-+",
      "personAddressType": "type_mobile",
      "personFamilyName": "Farser",
      "personGivenName": "John",
@@ -961,7 +961,7 @@
    "duration": 0,
    "from": {
     "addr": "0899031234",
-    "normalizedAddr": "-43213099-8--",
+    "normalizedAddr": "-432130998-0--+",
     "service": "com.palm.telephony"
    },
    "groups": [
@@ -992,7 +992,7 @@
    "from": {
     "addr": "0675011234",
     "name": "John Smith",
-    "normalizedAddr": "-43211057---",
+    "normalizedAddr": "-432110576-0--+",
     "personAddressType": "type_mobile",
     "personFamilyName": "Smith",
     "personGivenName": "John",
@@ -1027,7 +1027,7 @@
    "from": {
     "addr": "0675011234",
     "name": "John Smith",
-    "normalizedAddr": "-43211057---",
+    "normalizedAddr": "-432110576-0--+",
     "personAddressType": "type_mobile",
     "personFamilyName": "Smith",
     "personGivenName": "John",
@@ -1075,7 +1075,7 @@
      "_id": "499ef",
      "addr": "+46684481234",
      "name": "John Farser",
-     "normalizedAddr": "-43218448--64-+",
+     "normalizedAddr": "-432184486--64-+",
      "personAddressType": "type_mobile",
      "personFamilyName": "Farser",
      "personGivenName": "John",
@@ -1094,7 +1094,7 @@
    "from": {
     "addr": "0684481234",
     "name": null,
-    "normalizedAddr": "-43218448---",
+    "normalizedAddr": "-432184486-0--+",
     "personAddressType": null,
     "personFamilyName": null,
     "personGivenName": null,
@@ -1138,7 +1138,7 @@
     {
      "_id": "341b4",
      "addr": "0142021234",
-     "normalizedAddr": "-43212024-1--",
+     "normalizedAddr": "-432120241-0--+",
      "service": "com.palm.telephony"
     }
    ],
@@ -1166,7 +1166,7 @@
      "_id": "49b1c",
      "addr": "+46153101234",
      "name": "The Fun Place",
-     "normalizedAddr": "-43210135-1-64-+",
+     "normalizedAddr": "-432101351--64-+",
      "personAddressType": "type_work",
      "personFamilyName": "",
      "personGivenName": "",
@@ -1198,7 +1198,7 @@
      "_id": "3604e",
      "addr": "+46699051234",
      "name": "Mary Spetzler",
-     "normalizedAddr": "-43215099--64-+",
+     "normalizedAddr": "-432150996--64-+",
      "personAddressType": "type_mobile",
      "personFamilyName": "Spetzler",
      "personGivenName": "Mary",
@@ -1230,7 +1230,7 @@
      "_id": "4ba3f",
      "addr": "+46699051234",
      "name": "Mary Spetzler",
-     "normalizedAddr": "-43215099--64-+",
+     "normalizedAddr": "-432150996--64-+",
      "personAddressType": "type_mobile",
      "personFamilyName": "Spetzler",
      "personGivenName": "Mary",
@@ -1249,7 +1249,7 @@
    "from": {
     "addr": "0699051234",
     "name": "Mary Spetzler",
-    "normalizedAddr": "-43215099---",
+    "normalizedAddr": "-432150996-0--+",
     "personAddressType": "type_mobile",
     "personFamilyName": "Spetzler",
     "personGivenName": "Mary",
@@ -1294,7 +1294,7 @@
      "_id": "4cd98",
      "addr": "+46680441234",
      "name": "Ulf Willer",
-     "normalizedAddr": "-43214408--64-+",
+     "normalizedAddr": "-432144086--64-+",
      "personAddressType": "type_mobile",
      "personFamilyName": "Willer",
      "personGivenName": "Ulf",
@@ -1312,7 +1312,7 @@
    "duration": 19574,
    "from": {
     "addr": "0144841234",
-    "normalizedAddr": "-43214844-1--",
+    "normalizedAddr": "-432148441-0--+",
     "service": "com.palm.telephony"
    },
    "groups": [
@@ -1353,7 +1353,7 @@
      "_id": "4d0fb",
      "addr": "+46680441234",
      "name": "Ulf Willer",
-     "normalizedAddr": "-43214408--64-+",
+     "normalizedAddr": "-432144086--64-+",
      "personAddressType": "type_mobile",
      "personFamilyName": "Willer",
      "personGivenName": "Ulf",
@@ -1372,7 +1372,7 @@
    "from": {
     "addr": "0699051234",
     "name": "Mary Spetzler",
-    "normalizedAddr": "-43215099---",
+    "normalizedAddr": "-432150996-0--+",
     "personAddressType": "type_mobile",
     "personFamilyName": "Spetzler",
     "personGivenName": "Mary",
@@ -1417,7 +1417,7 @@
      "_id": "5004e",
      "addr": "0699051234",
      "name": "Mary Spetzler",
-     "normalizedAddr": "-43215099---",
+     "normalizedAddr": "-432150996-0--+",
      "personFamilyName": "Spetzler",
      "personGivenName": "Mary",
      "personId": "++HcfNECvl_R+ZiA",
@@ -1448,7 +1448,7 @@
      "_id": "50065",
      "addr": "0699051234",
      "name": "Mary Spetzler",
-     "normalizedAddr": "-43215099---",
+     "normalizedAddr": "-432150996-0--+",
      "personFamilyName": "Spetzler",
      "personGivenName": "Mary",
      "personId": "++HcfNECvl_R+ZiA",
@@ -1479,7 +1479,7 @@
      "_id": "50cfa",
      "addr": "0699051234",
      "name": "Mary Spetzler",
-     "normalizedAddr": "-43215099---",
+     "normalizedAddr": "-432150996-0--+",
      "personFamilyName": "Spetzler",
      "personGivenName": "Mary",
      "personId": "++HcfNECvl_R+ZiA",
@@ -1510,7 +1510,7 @@
      "_id": "50d01",
      "addr": "0699051234",
      "name": "Mary Spetzler",
-     "normalizedAddr": "-43215099---",
+     "normalizedAddr": "-432150996-0--+",
      "personFamilyName": "Spetzler",
      "personGivenName": "Mary",
      "personId": "++HcfNECvl_R+ZiA",
@@ -1541,7 +1541,7 @@
      "_id": "50d09",
      "addr": "+46950751234",
      "name": "Bob Willer",
-     "normalizedAddr": "-43215705-9-64-+",
+     "normalizedAddr": "-432157059--64-+",
      "personAddressType": "type_other",
      "personFamilyName": "Willer",
      "personGivenName": "Bob",
@@ -1573,7 +1573,7 @@
      "_id": "50d33",
      "addr": "+46950751234",
      "name": "Bob Willer",
-     "normalizedAddr": "-43215705-9-64-+",
+     "normalizedAddr": "-432157059--64-+",
      "personAddressType": "type_other",
      "personFamilyName": "Willer",
      "personGivenName": "Bob",
@@ -1605,7 +1605,7 @@
      "_id": "52d53",
      "addr": "0699051234",
      "name": "Mary Spetzler",
-     "normalizedAddr": "-43215099---",
+     "normalizedAddr": "-432150996-0--+",
      "personFamilyName": "Spetzler",
      "personGivenName": "Mary",
      "personId": "++HcfNECvl_R+ZiA",
@@ -1636,7 +1636,7 @@
      "_id": "5383f",
      "addr": "0758111234",
      "name": "Glenn Trellan",
-     "normalizedAddr": "-43211185---",
+     "normalizedAddr": "-432111857-0--+",
      "personAddressType": "type_mobile",
      "personFamilyName": "Trellan",
      "personGivenName": "Glenn",
@@ -1668,7 +1668,7 @@
      "_id": "53846",
      "addr": "0758111234",
      "name": "Glenn Trellan",
-     "normalizedAddr": "-43211185---",
+     "normalizedAddr": "-432111857-0--+",
      "personAddressType": "type_mobile",
      "personFamilyName": "Trellan",
      "personGivenName": "Glenn",
@@ -1721,7 +1721,7 @@
    "duration": 0,
    "from": {
     "addr": "+38261711234",
-    "normalizedAddr": "-43211716--283-+",
+    "normalizedAddr": "-43211716283---+",
     "service": "com.palm.telephony"
    },
    "groups": [
@@ -1764,7 +1764,7 @@
     {
      "_id": "53ff6",
      "addr": "0385551234",
-     "normalizedAddr": "-43215558-3--",
+     "normalizedAddr": "-432155583-0--+",
      "service": "com.palm.telephony"
     }
    ],
@@ -1792,7 +1792,7 @@
      "_id": "54002",
      "addr": "0699051234",
      "name": "Mary Spetzler",
-     "normalizedAddr": "-43215099---",
+     "normalizedAddr": "-432150996-0--+",
      "personFamilyName": "Spetzler",
      "personGivenName": "Mary",
      "personId": "++HcfNECvl_R+ZiA",
@@ -1823,7 +1823,7 @@
      "_id": "54009",
      "addr": "0699051234",
      "name": "Mary Spetzler",
-     "normalizedAddr": "-43215099---",
+     "normalizedAddr": "-432150996-0--+",
      "personFamilyName": "Spetzler",
      "personGivenName": "Mary",
      "personId": "++HcfNECvl_R+ZiA",
@@ -1886,7 +1886,7 @@
      "_id": "54019",
      "addr": "+46677221234",
      "name": "Claire Meyer",
-     "normalizedAddr": "-43212277--64-+",
+     "normalizedAddr": "-432122776--64-+",
      "personAddressType": "type_mobile",
      "personFamilyName": "Meyer",
      "personGivenName": "Claire",
@@ -1905,7 +1905,7 @@
    "from": {
     "addr": "0677221234",
     "name": "Claire Meyer",
-    "normalizedAddr": "-43212277---",
+    "normalizedAddr": "-432122776-0--+",
     "personAddressType": "type_mobile",
     "personFamilyName": "Meyer",
     "personGivenName": "Claire",
@@ -1950,7 +1950,7 @@
      "_id": "540f3",
      "addr": "+46385801234",
      "name": "Tara Norman",
-     "normalizedAddr": "-43210858-3-64-+",
+     "normalizedAddr": "-432108583--64-+",
      "personAddressType": "type_other",
      "personFamilyName": "Norman",
      "personGivenName": "Tara",
@@ -1982,7 +1982,7 @@
      "_id": "540fa",
      "addr": "+46680441234",
      "name": "Ulf Willer",
-     "normalizedAddr": "-43214408--64-+",
+     "normalizedAddr": "-432144086--64-+",
      "personAddressType": "type_mobile",
      "personFamilyName": "Willer",
      "personGivenName": "Ulf",
@@ -2014,7 +2014,7 @@
      "_id": "543a0",
      "addr": "+46674681234",
      "name": "Peter Dörn",
-     "normalizedAddr": "-43218647--64-+",
+     "normalizedAddr": "-432186476--64-+",
      "personAddressType": "type_mobile",
      "personFamilyName": "Dörn",
      "personGivenName": "Peter",
@@ -2032,7 +2032,7 @@
    "duration": 0,
    "from": {
     "addr": "0385731234",
-    "normalizedAddr": "-43213758-3--",
+    "normalizedAddr": "-432137583-0--+",
     "service": "com.palm.telephony"
    },
    "groups": [
@@ -2075,7 +2075,7 @@
     {
      "_id": "543bd",
      "addr": "0385731234",
-     "normalizedAddr": "-43213758-3--",
+     "normalizedAddr": "-432137583-0--+",
      "service": "com.palm.telephony"
     }
    ],
@@ -2089,7 +2089,7 @@
    "duration": 312519,
    "from": {
     "addr": "0385731234",
-    "normalizedAddr": "-43213758-3--",
+    "normalizedAddr": "-432137583-0--+",
     "service": "com.palm.telephony"
    },
    "groups": [
@@ -2117,7 +2117,7 @@
    "from": {
     "addr": "0142661234",
     "name": "Cindy Kate",
-    "normalizedAddr": "-43216624-1--",
+    "normalizedAddr": "-432166241-0--+",
     "personAddressType": "type_mobile",
     "personFamilyName": "",
     "personGivenName": "",
@@ -2149,7 +2149,7 @@
    "from": {
     "addr": "0142661234",
     "name": "Cindy Kate",
-    "normalizedAddr": "-43216624-1--",
+    "normalizedAddr": "-432166241-0--+",
     "personAddressType": "type_mobile",
     "personFamilyName": "",
     "personGivenName": "",
@@ -2194,7 +2194,7 @@
      "_id": "544c0",
      "addr": "0699051234",
      "name": "Mary Spetzler",
-     "normalizedAddr": "-43215099---",
+     "normalizedAddr": "-432150996-0--+",
      "personFamilyName": "Spetzler",
      "personGivenName": "Mary",
      "personId": "++HcfNECvl_R+ZiA",
@@ -2225,7 +2225,7 @@
      "_id": "544c7",
      "addr": "0699051234",
      "name": "Mary Spetzler",
-     "normalizedAddr": "-43215099---",
+     "normalizedAddr": "-432150996-0--+",
      "personFamilyName": "Spetzler",
      "personGivenName": "Mary",
      "personId": "++HcfNECvl_R+ZiA",
@@ -2243,7 +2243,7 @@
    "from": {
     "addr": "0699051234",
     "name": "Mary Spetzler",
-    "normalizedAddr": "-43215099---",
+    "normalizedAddr": "-432150996-0--+",
     "personAddressType": "type_mobile",
     "personFamilyName": "Spetzler",
     "personGivenName": "Mary",
@@ -2288,7 +2288,7 @@
      "_id": "544ee",
      "addr": "123",
      "name": "Voice Mail",
-     "normalizedAddr": "-321---",
+     "normalizedAddr": "-321---+",
      "service": "com.palm.telephony"
     }
    ],
@@ -2316,7 +2316,7 @@
      "_id": "544f5",
      "addr": "0699051234",
      "name": "Mary Spetzler",
-     "normalizedAddr": "-43215099---",
+     "normalizedAddr": "-432150996-0--+",
      "personFamilyName": "Spetzler",
      "personGivenName": "Mary",
      "personId": "++HcfNECvl_R+ZiA",
@@ -2334,7 +2334,7 @@
    "from": {
     "addr": "0142661234",
     "name": "Cindy Kate",
-    "normalizedAddr": "-43216624-1--",
+    "normalizedAddr": "-432166241-0--+",
     "personAddressType": "type_mobile",
     "personFamilyName": "",
     "personGivenName": "",
@@ -2366,7 +2366,7 @@
    "from": {
     "addr": "0142661234",
     "name": "Cindy Kate",
-    "normalizedAddr": "-43216624-1--",
+    "normalizedAddr": "-432166241-0--+",
     "personAddressType": "type_mobile",
     "personFamilyName": "",
     "personGivenName": "",
@@ -2411,7 +2411,7 @@
      "_id": "54819",
      "addr": "0699051234",
      "name": "Mary Spetzler",
-     "normalizedAddr": "-43215099---",
+     "normalizedAddr": "-432150996-0--+",
      "personFamilyName": "Spetzler",
      "personGivenName": "Mary",
      "personId": "++HcfNECvl_R+ZiA",
@@ -2442,7 +2442,7 @@
      "_id": "54820",
      "addr": "0699051234",
      "name": "Mary Spetzler",
-     "normalizedAddr": "-43215099---",
+     "normalizedAddr": "-432150996-0--+",
      "personFamilyName": "Spetzler",
      "personGivenName": "Mary",
      "personId": "++HcfNECvl_R+ZiA",
@@ -2460,7 +2460,7 @@
    "from": {
     "addr": "0699051234",
     "name": "Mary Spetzler",
-    "normalizedAddr": "-43215099---",
+    "normalizedAddr": "-432150996-0--+",
     "personAddressType": "type_mobile",
     "personFamilyName": "Spetzler",
     "personGivenName": "Mary",
@@ -2495,7 +2495,7 @@
    "from": {
     "addr": "123",
     "name": "Voice Mail",
-    "normalizedAddr": "-321---",
+    "normalizedAddr": "-321---+",
     "service": "com.palm.telephony"
    },
    "groups": [
@@ -2538,7 +2538,7 @@
     {
      "_id": "54853",
      "addr": "0385551234",
-     "normalizedAddr": "-43215558-3--",
+     "normalizedAddr": "-432155583-0--+",
      "service": "com.palm.telephony"
     }
    ],
@@ -2566,7 +2566,7 @@
      "_id": "5485b",
      "addr": "123",
      "name": "Voice Mail",
-     "normalizedAddr": "-321---",
+     "normalizedAddr": "-321---+",
      "service": "com.palm.telephony"
     }
    ],
@@ -2594,7 +2594,7 @@
      "_id": "54860",
      "addr": "123",
      "name": "Voice Mail",
-     "normalizedAddr": "-321---",
+     "normalizedAddr": "-321---+",
      "service": "com.palm.telephony"
     }
    ],
@@ -2609,7 +2609,7 @@
    "from": {
     "addr": "0674851234",
     "name": "Marina Skolowksy",
-    "normalizedAddr": "-43215847---",
+    "normalizedAddr": "-432158476-0--+",
     "personAddressType": "",
     "personFamilyName": "Skolowksy",
     "personGivenName": "Marina",
@@ -2654,7 +2654,7 @@
      "_id": "54986",
      "addr": "0677221234",
      "name": "Claire Meyer",
-     "normalizedAddr": "-43212277---",
+     "normalizedAddr": "-432122776-0--+",
      "personFamilyName": "Meyer",
      "personGivenName": "Claire",
      "personId": "++HcfNHQmcgjuHSX",
@@ -2685,7 +2685,7 @@
      "_id": "549a1",
      "addr": "0677221234",
      "name": "Claire Meyer",
-     "normalizedAddr": "-43212277---",
+     "normalizedAddr": "-432122776-0--+",
      "personFamilyName": "Meyer",
      "personGivenName": "Claire",
      "personId": "++HcfNHQmcgjuHSX",
@@ -2703,7 +2703,7 @@
    "from": {
     "addr": "0674851234",
     "name": "Marina Skolowksy",
-    "normalizedAddr": "-43215847---",
+    "normalizedAddr": "-432158476-0--+",
     "personAddressType": "type_other",
     "personFamilyName": "Skolowksy",
     "personGivenName": "Marina",
@@ -2748,7 +2748,7 @@
      "_id": "5524b",
      "addr": "0758111234",
      "name": "Glenn Trellan",
-     "normalizedAddr": "-43211185---",
+     "normalizedAddr": "-432111857-0--+",
      "personAddressType": "type_mobile",
      "personFamilyName": "Trellan",
      "personGivenName": "Glenn",
@@ -2780,7 +2780,7 @@
      "_id": "55e10",
      "addr": "0699051234",
      "name": "Mary Spetzler",
-     "normalizedAddr": "-43215099---",
+     "normalizedAddr": "-432150996-0--+",
      "personFamilyName": "Spetzler",
      "personGivenName": "Mary",
      "personId": "++HcfNECvl_R+ZiA",
@@ -2797,7 +2797,7 @@
    "duration": 0,
    "from": {
     "addr": "0892231234",
-    "normalizedAddr": "-43213229-8--",
+    "normalizedAddr": "-432132298-0--+",
     "service": "com.palm.telephony"
    },
    "groups": [
@@ -2840,7 +2840,7 @@
     {
      "_id": "56b3d",
      "addr": "15",
-     "normalizedAddr": "-51----",
+     "normalizedAddr": "-51---+",
      "service": "com.palm.telephony"
     }
    ],
@@ -2868,7 +2868,7 @@
      "_id": "56c11",
      "addr": "0146361234",
      "name": "Martin Turén",
-     "normalizedAddr": "-43216364-1--",
+     "normalizedAddr": "-432163641-0--+",
      "personAddressType": "type_work",
      "personFamilyName": "Turén",
      "personGivenName": "Martin",
@@ -2900,7 +2900,7 @@
      "_id": "56c28",
      "addr": "0146361234",
      "name": "Martin Turén",
-     "normalizedAddr": "-43216364-1--",
+     "normalizedAddr": "-432163641-0--+",
      "personAddressType": "type_work",
      "personFamilyName": "Turén",
      "personGivenName": "Martin",
@@ -2932,7 +2932,7 @@
      "_id": "56dee",
      "addr": "+46677221234",
      "name": "Claire Meyer",
-     "normalizedAddr": "-43212277--64-+",
+     "normalizedAddr": "-432122776--64-+",
      "personAddressType": "type_mobile",
      "personFamilyName": "Meyer",
      "personGivenName": "Claire",
@@ -2951,7 +2951,7 @@
    "from": {
     "addr": "0758111234",
     "name": "Glenn Trellan",
-    "normalizedAddr": "-43211185---",
+    "normalizedAddr": "-432111857-0--+",
     "personAddressType": "type_mobile",
     "personFamilyName": "Trellan",
     "personGivenName": "Glenn",
@@ -2986,7 +2986,7 @@
    "from": {
     "addr": "123",
     "name": "Voice Mail",
-    "normalizedAddr": "-321---",
+    "normalizedAddr": "-321---+",
     "service": "com.palm.telephony"
    },
    "groups": [
@@ -3017,7 +3017,7 @@
    "from": {
     "addr": "123",
     "name": "Voice Mail",
-    "normalizedAddr": "-321---",
+    "normalizedAddr": "-321---+",
     "service": "com.palm.telephony"
    },
    "groups": [
@@ -3058,7 +3058,7 @@
      "_id": "56ea3",
      "addr": "0758111234",
      "name": "Glenn Trellan",
-     "normalizedAddr": "-43211185---",
+     "normalizedAddr": "-432111857-0--+",
      "personAddressType": "type_mobile",
      "personFamilyName": "Trellan",
      "personGivenName": "Glenn",
@@ -3090,7 +3090,7 @@
      "_id": "56edd",
      "addr": "0699051234",
      "name": "Mary Spetzler",
-     "normalizedAddr": "-43215099---",
+     "normalizedAddr": "-432150996-0--+",
      "personFamilyName": "Spetzler",
      "personGivenName": "Mary",
      "personId": "++HcfNECvl_R+ZiA",
@@ -3108,7 +3108,7 @@
    "from": {
     "addr": "0758111234",
     "name": "Glenn Trellan",
-    "normalizedAddr": "-43211185---",
+    "normalizedAddr": "-432111857-0--+",
     "personAddressType": "type_mobile",
     "personFamilyName": "Trellan",
     "personGivenName": "Glenn",
@@ -3153,7 +3153,7 @@
      "_id": "575a9",
      "addr": "0758111234",
      "name": "Glenn Trellan",
-     "normalizedAddr": "-43211185---",
+     "normalizedAddr": "-432111857-0--+",
      "personAddressType": "type_mobile",
      "personFamilyName": "Trellan",
      "personGivenName": "Glenn",
@@ -3185,7 +3185,7 @@
      "_id": "575b0",
      "addr": "0758111234",
      "name": "Glenn Trellan",
-     "normalizedAddr": "-43211185---",
+     "normalizedAddr": "-432111857-0--+",
      "personAddressType": "type_mobile",
      "personFamilyName": "Trellan",
      "personGivenName": "Glenn",
@@ -3204,7 +3204,7 @@
    "from": {
     "addr": "0758111234",
     "name": "Glenn Trellan",
-    "normalizedAddr": "-43211185---",
+    "normalizedAddr": "-432111857-0--+",
     "personAddressType": "type_mobile",
     "personFamilyName": "Trellan",
     "personGivenName": "Glenn",
@@ -3249,7 +3249,7 @@
      "_id": "57613",
      "addr": "0699051234",
      "name": "Mary Spetzler",
-     "normalizedAddr": "-43215099---",
+     "normalizedAddr": "-432150996-0--+",
      "personFamilyName": "Spetzler",
      "personGivenName": "Mary",
      "personId": "++HcfNECvl_R+ZiA",
@@ -3280,7 +3280,7 @@
      "_id": "5761f",
      "addr": "0699051234",
      "name": "Mary Spetzler",
-     "normalizedAddr": "-43215099---",
+     "normalizedAddr": "-432150996-0--+",
      "personFamilyName": "Spetzler",
      "personGivenName": "Mary",
      "personId": "++HcfNECvl_R+ZiA",
@@ -3298,7 +3298,7 @@
    "from": {
     "addr": "0699051234",
     "name": "Mary Spetzler",
-    "normalizedAddr": "-43215099---",
+    "normalizedAddr": "-432150996-0--+",
     "personAddressType": "type_mobile",
     "personFamilyName": "Spetzler",
     "personGivenName": "Mary",
@@ -3346,7 +3346,7 @@
      "_id": "57643",
      "addr": "0699051234",
      "name": "Mary Spetzler",
-     "normalizedAddr": "-43215099---",
+     "normalizedAddr": "-432150996-0--+",
      "personAddressType": "type_mobile",
      "personFamilyName": "Spetzler",
      "personGivenName": "Mary",
@@ -3365,7 +3365,7 @@
    "from": {
     "addr": "0699051234",
     "name": "Mary Spetzler",
-    "normalizedAddr": "-43215099---",
+    "normalizedAddr": "-432150996-0--+",
     "personAddressType": "type_mobile",
     "personFamilyName": "Spetzler",
     "personGivenName": "Mary",
@@ -3413,7 +3413,7 @@
      "_id": "5764f",
      "addr": "0699051234",
      "name": "Mary Spetzler",
-     "normalizedAddr": "-43215099---",
+     "normalizedAddr": "-432150996-0--+",
      "personAddressType": "type_mobile",
      "personFamilyName": "Spetzler",
      "personGivenName": "Mary",
@@ -3432,7 +3432,7 @@
    "from": {
     "addr": "0675011234",
     "name": "John Smith",
-    "normalizedAddr": "-43211057---",
+    "normalizedAddr": "-432110576-0--+",
     "personAddressType": "type_mobile",
     "personFamilyName": "Smith",
     "personGivenName": "John",
@@ -3479,7 +3479,7 @@
     {
      "_id": "59cf1",
      "addr": "323",
-     "normalizedAddr": "-321---",
+     "normalizedAddr": "-323---+",
      "service": "com.palm.telephony"
     }
    ],
@@ -3506,7 +3506,7 @@
     {
      "_id": "59cf8",
      "addr": "323",
-     "normalizedAddr": "-321---",
+     "normalizedAddr": "-323---+",
      "service": "com.palm.telephony"
     }
    ],
@@ -3534,7 +3534,7 @@
      "_id": "59cff",
      "addr": "0699051234",
      "name": "Mary Spetzler",
-     "normalizedAddr": "-43215099---",
+     "normalizedAddr": "-432150996-0--+",
      "personAddressType": "type_mobile",
      "personFamilyName": "Spetzler",
      "personGivenName": "Mary",
@@ -3566,7 +3566,7 @@
      "_id": "59ed5",
      "addr": "0661871234",
      "name": "Bob Willer",
-     "normalizedAddr": "-43217816---",
+     "normalizedAddr": "-432178166-0--+",
      "personAddressType": "type_mobile",
      "personFamilyName": "Willer",
      "personGivenName": "Bob",
@@ -3585,7 +3585,7 @@
    "from": {
     "addr": "+46661871234",
     "name": "Bob Willer",
-    "normalizedAddr": "-43217816--64-+",
+    "normalizedAddr": "-432178166--64-+",
     "personAddressType": "type_mobile",
     "personFamilyName": "Willer",
     "personGivenName": "Bob",
@@ -3633,7 +3633,7 @@
      "_id": "59eea",
      "addr": "0661871234",
      "name": "Bob Willer",
-     "normalizedAddr": "-43217816---",
+     "normalizedAddr": "-432178166-0--+",
      "personAddressType": "type_mobile",
      "personFamilyName": "Willer",
      "personGivenName": "Bob",
@@ -3652,7 +3652,7 @@
    "from": {
     "addr": "+31621489831",
     "name": "John Smith",
-    "normalizedAddr": "+31621489831",
+    "normalizedAddr": "-138984126--13-+",
     "personAddressType": "type_whatsapp",
     "personFamilyName": "Smith",
     "personGivenName": "John",
@@ -3687,7 +3687,7 @@
    "from": {
     "addr": "+31621489831",
     "name": "John Smith",
-    "normalizedAddr": "+31621489831",
+    "normalizedAddr": "-138984126--13-+",
     "personAddressType": "type_whatsapp",
     "personFamilyName": "Smith",
     "personGivenName": "John",
@@ -3725,7 +3725,7 @@
     {
      "addr": "+31621489831",
      "name": "John Smith",
-     "normalizedAddr": "+31621489831",
+     "normalizedAddr": "-138984126--13-+",
      "personAddressType": "type_whatsapp",
      "personFamilyName": "Smith",
      "personGivenName": "John",
@@ -3783,7 +3783,7 @@
    "from": {
     "addr": "+46661871234",
     "name": "Bob Willer",
-    "normalizedAddr": "+46661871234",
+    "normalizedAddr": "-432178166--64-+",
     "personAddressType": "type_whatsapp",
     "personFamilyName": "Willer",
     "personGivenName": "Bob",
@@ -3818,7 +3818,7 @@
    "from": {
     "addr": "+46661871234",
     "name": "Bob Willer",
-    "normalizedAddr": "+46661871234",
+    "normalizedAddr": "-432178166--64-+",
     "personAddressType": "type_whatsapp",
     "personFamilyName": "Willer",
     "personGivenName": "Bob",
@@ -3859,7 +3859,7 @@
     {
      "addr": "+46952611234",
      "name": "Peter Dörn",
-     "normalizedAddr": "+46952611234",
+     "normalizedAddr": "-432116259--64-+",
      "personAddressType": "type_signal",
      "personFamilyName": "Dörn",
      "personGivenName": "Peter",
@@ -3885,7 +3885,7 @@
    "from": {
     "addr": "+46952611234",
     "name": "Peter Dörn",
-    "normalizedAddr": "+46952611234",
+    "normalizedAddr": "-432116259--64-+",
     "personAddressType": "type_signal",
     "personFamilyName": "Dörn",
     "personGivenName": "Peter",
@@ -3917,7 +3917,7 @@
    "from": {
     "addr": "+420505521234",
     "name": "Mary Spetzler",
-    "normalizedAddr": "+420505521234",
+    "normalizedAddr": "-432125505--024-+",
     "personAddressType": "type_whatsapp",
     "personFamilyName": "Spetzler",
     "personGivenName": "Mary",

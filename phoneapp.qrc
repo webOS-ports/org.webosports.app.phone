@@ -93,9 +93,8 @@
         <file>qml/views/SpeakerButton.qml</file>
         <file>qml/views/images/Camera-Icon.png</file>
         <file>qml/views/images/active-photo-overlay.png</file>
-        <file>qml/views/images/glass-panel.png</file>
-        <file>qml/views/images/backdrop-phone.png</file>
         <file>qml/views/images/avatar-disclosure.png</file>
+        <file>qml/views/images/backdrop-phone.png</file>
         <file>qml/views/images/button-ignore-answer.png</file>
         <file>qml/views/images/button-sprite.png</file>
         <file>qml/views/images/buttons-numpad-pressed.png</file>
@@ -122,6 +121,7 @@
         <file>qml/views/images/frame-background.png</file>
         <file>qml/views/images/generic-details-view-avatar-small.png</file>
         <file>qml/views/images/generic-details-view-avatar.png</file>
+        <file>qml/views/images/glass-panel.png</file>
         <file>qml/views/images/icon-m-common-backspace.svg</file>
         <file>qml/views/images/icon-videocall-list.png</file>
         <file>qml/views/images/list-avatar-default.png</file>
