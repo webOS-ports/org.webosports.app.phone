@@ -16,13 +16,10 @@
  */
 
 import QtQuick 2.0
-import QtQuick.Controls 2.5
-import QtQuick.Layouts 1.2
 
 import Eos.Window 0.1
 import LunaNext.Common 0.1
-
-import "../services/PhoneNumberUtils.js" as PhoneNumberUtils
+import LuneOS.Components 1.0 as LuneComponents
 
 /**
  * "Which service would you like to use?"
@@ -44,8 +41,13 @@ WebOSWindow {
     property var callData: ({})
     property bool remember: false
 
+    /// One row per transport, plus the title, the question, the reminder
+    /// checkbox and Cancel.
+    readonly property int _serviceCount: serviceButtons.count
+    readonly property real _dialogHeight: Units.gu(16) + (_serviceCount + 1) * Units.gu(5.4)
+
     width: Settings.displayWidth
-    height: Units.gu(34)
+    height: Settings.displayHeight
 
     keepAlive: true
     windowType: "_WEBOS_WINDOW_TYPE_SYSTEM_UI"
@@ -70,77 +72,63 @@ WebOSWindow {
         dialHandler.dialWithTransport(callData.address, transportId, callData.video === true);
     }
 
-    Rectangle {
+    /*
+     * The platform's own dialog, which is the webOS one: the frame, the
+     * buttons and the scrim all come from LuneOS.Components rather than being
+     * drawn here. The legacy app got the same look for the same reason -- its
+     * PreferredPhSvcDlg is a plain enyo ModalDialog and inherits it.
+     */
+    LuneComponents.Dialog {
+        id: dialog
+
         anchors.fill: parent
-        gradient: appTheme ? appTheme.mainGradient : undefined
-    }
 
-    ColumnLayout {
-        anchors.fill: parent
-        anchors.margins: Units.gu(1.5)
-        spacing: Units.gu(0.5)
+        title: preferredServiceAlert.callData.isInternational === true
+                   ? qsTr("International Call") : qsTr("Call")
+        message: qsTr("Which service would you like to use?\nThis preference can be set in Preferences & Accounts.")
 
-        Text {
-            Layout.fillWidth: true
-            horizontalAlignment: Text.AlignHCenter
-            color: "white"
-            font.bold: true
-            font.pixelSize: FontUtils.sizeToPixels("large")
-            text: preferredServiceAlert.callData.isInternational === true
-                      ? qsTr("International call") : qsTr("Call")
-        }
+        dialogWidth: Math.min(Units.gu(40), preferredServiceAlert.width - Units.gu(6))
+        dialogHeight: preferredServiceAlert._dialogHeight
 
-        Text {
-            Layout.fillWidth: true
-            horizontalAlignment: Text.AlignHCenter
-            wrapMode: Text.Wrap
-            color: "white"
-            font.pixelSize: FontUtils.sizeToPixels("small")
-            text: qsTr("Which service would you like to use to call %1?")
-                      .arg(PhoneNumberUtils.formatForDisplay(preferredServiceAlert.callData.address || "",
-                                                             contacts ? contacts.countryCode : "US", false))
-        }
-
-        // One button per calling account. Unavailable transports are shown but
-        // disabled, so the user can see why a service is not on offer.
+        // One button per calling account, so a newly installed connector
+        // appears here without any code change. A transport whose network is
+        // down is left out rather than offered and refused.
         Repeater {
+            id: serviceButtons
+
             model: preferredServiceAlert.callTransports
                        ? preferredServiceAlert.callTransports.callableTransportIds() : []
 
-            delegate: Button {
+            delegate: LuneComponents.DialogButton {
                 required property var modelData
 
-                Layout.fillWidth: true
-                Layout.preferredHeight: Units.gu(5)
-
-                enabled: preferredServiceAlert.callTransports.isAvailable(modelData)
                 text: preferredServiceAlert.callTransports.labelFor(modelData)
+                color: preferredServiceAlert.callTransports.isAvailable(modelData) ? "#4b4b4b" : "#333333"
+                fontcolor: preferredServiceAlert.callTransports.isAvailable(modelData) ? "white" : "#7a7a7a"
+                buttonWidth: dialog.dialogWidth - Units.gu(4)
 
-                onClicked: preferredServiceAlert._choose(modelData)
+                onClicked: {
+                    if (preferredServiceAlert.callTransports.isAvailable(modelData))
+                        preferredServiceAlert._choose(modelData);
+                }
             }
         }
 
-        RowLayout {
-            Layout.fillWidth: true
+        LuneComponents.DialogCheckBox {
+            checked: preferredServiceAlert.remember
+            labelWidth: dialog.dialogWidth - Units.gu(7)
+            text: qsTr("Always use this service for these calls")
 
-            CheckBox {
-                id: rememberBox
-                checked: preferredServiceAlert.remember
-                onToggled: preferredServiceAlert.remember = rememberBox.checked
-            }
-            Text {
-                Layout.fillWidth: true
-                color: "white"
-                wrapMode: Text.Wrap
-                font.pixelSize: FontUtils.sizeToPixels("x-small")
-                text: qsTr("Always use this service for these calls")
-            }
+            onCheckedChanged: preferredServiceAlert.remember = checked
         }
 
-        Button {
-            Layout.fillWidth: true
-            Layout.preferredHeight: Units.gu(5)
+        // Red, as .enyo-button-negative is in the theme the legacy dialog used.
+        LuneComponents.DialogButton {
             text: qsTr("Cancel")
+            color: "#be0003"
+            fontcolor: "white"
+            buttonWidth: dialog.dialogWidth - Units.gu(4)
+
             onClicked: preferredServiceAlert.hide()
         }
     }
