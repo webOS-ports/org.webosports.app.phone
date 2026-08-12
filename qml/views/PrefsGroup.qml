@@ -37,10 +37,18 @@ Item {
     property string title: ""
 
     readonly property bool labelled: title.length > 0
-    /// The caption band of group-labeled.png, at the size it is drawn here.
-    readonly property real bandHeight: Units.gu(3.4)
 
-    implicitHeight: rowsColumn.height + (labelled ? bandHeight : Units.gu(1)) + Units.gu(1)
+    /*
+     * The artwork's own slices. A labelled group holds thirty-six pixels at
+     * the top, of which the last eight are transparent -- so the caption band
+     * reads as twenty-eight pixels tall while the rows start below all
+     * thirty-six.
+     */
+    readonly property real bandHeight: 28
+    readonly property real topInset: labelled ? 36 : 14
+    readonly property real sideInset: 14
+
+    implicitHeight: rowsColumn.height + topInset + sideInset
     height: implicitHeight
 
     BorderImage {
@@ -49,8 +57,8 @@ Item {
         source: Qt.resolvedUrl(prefsGroup.labelled ? "images/group-labeled.png"
                                                    : "images/group-unlabeled.png")
         border {
-            left: 21; right: 21; bottom: 21
-            top: prefsGroup.labelled ? 54 : 21
+            left: prefsGroup.sideInset; right: prefsGroup.sideInset; bottom: prefsGroup.sideInset
+            top: prefsGroup.topInset
         }
         horizontalTileMode: BorderImage.Repeat
         verticalTileMode: BorderImage.Repeat
@@ -59,10 +67,12 @@ Item {
     Text {
         anchors {
             left: parent.left
-            leftMargin: Units.gu(1)
+            leftMargin: Units.gu(1.1)
             top: parent.top
-            topMargin: Units.gu(0.6)
+            verticalCenterOffset: 0
         }
+        height: prefsGroup.bandHeight
+        verticalAlignment: Text.AlignVCenter
         visible: prefsGroup.labelled
         color: appTheme.prefsGroupLabelColor
         font.bold: true
@@ -78,9 +88,33 @@ Item {
             left: parent.left
             right: parent.right
             top: parent.top
-            topMargin: prefsGroup.labelled ? prefsGroup.bandHeight : Units.gu(0.5)
+            topMargin: prefsGroup.topInset
             leftMargin: Units.gu(0.8)
             rightMargin: Units.gu(0.8)
+        }
+    }
+
+    /*
+     * The rule between one row and the next: .enyo-row's bottom border, which
+     * on this background is a grey line with a lighter one under it. Drawn
+     * here rather than by the rows themselves so the last one in a group has
+     * none, as the group's own edge closes it off.
+     */
+    Repeater {
+        model: Math.max(0, rowsColumn.children.length - 1)
+
+        delegate: Item {
+            required property int index
+            readonly property Item row: rowsColumn.children[index]
+
+            x: rowsColumn.x
+            width: rowsColumn.width
+            y: rowsColumn.y + (row ? row.y + row.height : 0)
+            height: 2
+            visible: !!row && row.visible
+
+            Rectangle { width: parent.width; height: 1; color: '#acacac' }
+            Rectangle { y: 1; width: parent.width; height: 1; color: '#eaeaea' }
         }
     }
 }
