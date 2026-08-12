@@ -93,8 +93,17 @@
         <file>qml/views/SimPinInput.qml</file>
         <file>qml/views/SimPinWindow.qml</file>
         <file>qml/views/SpeakerButton.qml</file>
+        <file>qml/views/VideoCallHeaderButton.qml</file>
+        <file>qml/views/VideoCallPage.qml</file>
         <file>qml/views/images/Camera-Icon.png</file>
         <file>qml/views/images/active-photo-overlay.png</file>
+        <file>qml/views/images/scenetall.png</file>
+        <file>qml/views/images/vidHeader.png</file>
+        <file>qml/views/images/dropshadowboarder_PIP.png</file>
+        <file>qml/views/images/video_on_off.png</file>
+        <file>qml/views/images/selected_button_bg.png</file>
+        <file>qml/views/images/button_divider.png</file>
+        <file>qml/views/images/hangup_dartfish.png</file>
         <file>qml/views/images/avatar-disclosure.png</file>
         <file>qml/views/images/backdrop-phone.png</file>
         <file>qml/views/images/button-ignore-answer.png</file>

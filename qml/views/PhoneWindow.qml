@@ -259,12 +259,18 @@ WebOSWindow {
         preferredServiceAlert.ask(callData);
     }
 
+    /// A call carries video only if the account placing it does; a cellular
+    /// call has no such property at all.
+    function _isVideoCall(voiceCall) {
+        return !!voiceCall && voiceCall.isVideo === true;
+    }
+
     function activeCallDialog(voiceCall) {
         console.log("Showing Active Call Dialog")
 
         hideWindowWhenCallEnds = (phoneWindowId.visible === false);
 
-        stackView.openPage("ActiveCall", voiceCall);
+        stackView.openPage(_isVideoCall(voiceCall) ? "VideoCall" : "ActiveCall", voiceCall);
 
         if (!phoneWindowId.visible) {
             phoneWindowId.show();
