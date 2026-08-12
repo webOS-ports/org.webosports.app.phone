@@ -24,8 +24,23 @@ Item {
     property string label: ""
     property bool dividerOnLeft: false
     /// Whether what the button controls is currently on, which the artwork
-    /// shows as its last frame.
+    /// shows as its last state.
     property bool on: false
+
+    /*
+     * Where each state sits in the strip.
+     *
+     * mute_on_off and video_on_off hold three states apiece, but not on an
+     * even pitch -- their artwork starts at one, seventy-one and a hundred
+     * and thirty-seven. Dividing the file into equal frames, which is all a
+     * sprite can do, lands between them: the icon comes out stretched and
+     * shifts as the state changes. Taking the three rectangles out of the
+     * source directly is exact.
+     */
+    readonly property var _stateTop: [1, 71, 137]
+    /// Wider than either strip, so the clip takes the whole width of one.
+    readonly property int _stateWidth: 64
+    readonly property int _stateHeight: 44
 
     signal clicked();
 
@@ -50,18 +65,20 @@ Item {
         fillMode: Image.TileVertically
     }
 
-    SpriteIcon {
+    Image {
         anchors {
             horizontalCenter: parent.horizontalCenter
             top: parent.top
-            topMargin: Units.gu(1.2)
+            topMargin: Units.gu(0.8)
         }
-        width: Units.gu(3.6)
-        height: Units.gu(3.6)
-
+        // Sized by the clip, and drawn at the size the artwork is -- which is
+        // what the original does, offsetting the strip inside the button
+        // rather than scaling it. Deriving the width from sourceSize instead
+        // would leave the icon at nothing until the file had loaded.
         source: headerButton.iconSource
-        frameCount: 4
-        frame: headerButton.on ? 3 : 0
+        sourceClipRect: Qt.rect(0, headerButton._stateTop[headerButton.on ? 2 : 0],
+                                headerButton._stateWidth, headerButton._stateHeight)
+        smooth: true
     }
 
     Text {

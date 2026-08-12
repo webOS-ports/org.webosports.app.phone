@@ -97,17 +97,11 @@
         <file>qml/views/VideoCallPage.qml</file>
         <file>qml/views/images/Camera-Icon.png</file>
         <file>qml/views/images/active-photo-overlay.png</file>
-        <file>qml/views/images/scenetall.png</file>
-        <file>qml/views/images/vidHeader.png</file>
-        <file>qml/views/images/dropshadowboarder_PIP.png</file>
-        <file>qml/views/images/video_on_off.png</file>
-        <file>qml/views/images/selected_button_bg.png</file>
-        <file>qml/views/images/button_divider.png</file>
-        <file>qml/views/images/hangup_dartfish.png</file>
         <file>qml/views/images/avatar-disclosure.png</file>
         <file>qml/views/images/backdrop-phone.png</file>
         <file>qml/views/images/button-ignore-answer.png</file>
         <file>qml/views/images/button-sprite.png</file>
+        <file>qml/views/images/button_divider.png</file>
         <file>qml/views/images/buttons-numpad-pressed.png</file>
         <file>qml/views/images/buttons-numpad.png</file>
         <file>qml/views/images/call-log-button-down.png</file>
@@ -123,6 +117,7 @@
         <file>qml/views/images/dialer-entry-bg.png</file>
         <file>qml/views/images/dialpad-bg.png</file>
         <file>qml/views/images/disconnect-button.png</file>
+        <file>qml/views/images/dropshadowboarder_PIP.png</file>
         <file>qml/views/images/empty-calllog-phone.png</file>
         <file>qml/views/images/expand-button.png</file>
         <file>qml/views/images/favorites-icon-drawer-open.png</file>
@@ -135,6 +130,7 @@
         <file>qml/views/images/glass-panel.png</file>
         <file>qml/views/images/group-labeled.png</file>
         <file>qml/views/images/group-unlabeled.png</file>
+        <file>qml/views/images/hangup_dartfish.png</file>
         <file>qml/views/images/icon-m-common-backspace.svg</file>
         <file>qml/views/images/icon-videocall-list.png</file>
         <file>qml/views/images/list-avatar-default.png</file>
@@ -166,8 +162,12 @@
         <file>qml/views/images/popup-icon-dropped.png</file>
         <file>qml/views/images/popup-icon-error.png</file>
         <file>qml/views/images/popup-icon-missed.png</file>
+        <file>qml/views/images/scenetall.png</file>
         <file>qml/views/images/search-button-cancel.png</file>
         <file>qml/views/images/search-button.png</file>
+        <file>qml/views/images/selected_button_bg.png</file>
+        <file>qml/views/images/vidHeader.png</file>
+        <file>qml/views/images/video_on_off.png</file>
         <file>qml/views/images/voicemail-icon.png</file>
     </qresource>
 </RCC>

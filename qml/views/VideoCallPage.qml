@@ -70,25 +70,53 @@ BasePage {
             text: qsTr("No video")
         }
 
-        // This side, inset into the corner in its own frame.
+        /*
+         * This side, in its own frame. The original pins it to the corner;
+         * here it can be dragged anywhere over the far side's picture, and is
+         * kept inside it however the window is resized.
+         */
         BorderImage {
-            anchors {
-                top: parent.top
-                left: parent.left
-                topMargin: Units.gu(1.6)
-                leftMargin: Units.gu(0.6)
-            }
+            id: pip
+
             width: Units.gu(20.2)
             height: Units.gu(15.4)
 
+            x: Units.gu(0.6)
+            y: Units.gu(1.6)
+
             source: Qt.resolvedUrl("images/dropshadowboarder_PIP.png")
             border { left: 7; right: 7; top: 7; bottom: 7 }
+
+            function keepInside() {
+                x = Math.max(0, Math.min(x, remoteVideo.width - width));
+                y = Math.max(0, Math.min(y, remoteVideo.height - height));
+            }
+
+            Connections {
+                target: remoteVideo
+                function onWidthChanged() { pip.keepInside(); }
+                function onHeightChanged() { pip.keepInside(); }
+            }
 
             Rectangle {
                 id: localVideo
                 anchors.fill: parent
                 anchors.margins: 7
                 color: '#0d0d0d'
+            }
+
+            MouseArea {
+                anchors.fill: parent
+
+                drag.target: pip
+                drag.axis: Drag.XAndYAxis
+                drag.minimumX: 0
+                drag.minimumY: 0
+                drag.maximumX: Math.max(0, remoteVideo.width - pip.width)
+                drag.maximumY: Math.max(0, remoteVideo.height - pip.height)
+                drag.threshold: 0
+
+                cursorShape: Qt.OpenHandCursor
             }
         }
     }
