@@ -185,19 +185,20 @@ BasePage {
                     }
                 }
 
-                ListSeparator {
-                    width: parent.width
-                }
-
                 // Opened: every way to call, each with a button to message instead.
                 Repeater {
                     model: favouriteEntry.expanded ? favouriteEntry.callOptions : []
 
-                    delegate: Item {
+                    delegate: Column {
                         required property var modelData
 
                         width: favouriteEntry.width
-                        height: Units.gu(4.6)
+
+                        ListSeparator { width: parent.width }
+
+                    Item {
+                        width: parent.width
+                        height: appTheme.drawerRowHeight
 
                         Rectangle {
                             anchors.fill: parent
@@ -207,7 +208,7 @@ BasePage {
 
                         RowLayout {
                             anchors.fill: parent
-                            anchors.leftMargin: Units.gu(2.4)
+                            anchors.leftMargin: appTheme.drawerIndent
                             anchors.rightMargin: Units.gu(0.8)
                             spacing: Units.gu(1)
 
@@ -281,12 +282,18 @@ BasePage {
                             }
                         }
                     }
+                    }
                 }
 
                 // Opening a favourite also offers their contact card.
+                ListSeparator {
+                    width: parent.width
+                    drawn: favouriteEntry.expanded
+                }
+
                 Item {
                     width: parent.width
-                    height: favouriteEntry.expanded ? Units.gu(4.6) : 0
+                    height: favouriteEntry.expanded ? appTheme.drawerRowHeight : 0
                     visible: favouriteEntry.expanded
 
                     Rectangle {
@@ -298,7 +305,7 @@ BasePage {
                     Text {
                         anchors {
                             left: parent.left
-                            leftMargin: Units.gu(2.4)
+                            leftMargin: appTheme.drawerIndent
                             verticalCenter: parent.verticalCenter
                         }
                         color: appTheme.listTextColor
@@ -313,9 +320,9 @@ BasePage {
                     }
                 }
 
+                // Closes the entry off, drawer and all.
                 ListSeparator {
                     width: parent.width
-                    drawn: favouriteEntry.expanded
                 }
             }
 

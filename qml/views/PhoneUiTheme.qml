@@ -18,6 +18,8 @@
 
 import QtQuick 2.0
 
+import LunaNext.Common 0.1
+
 /**
  * The phone app's palette, matched to the webOS 3.x phone app as it runs on the
  * TouchPad.
@@ -97,6 +99,20 @@ QtObject {
     property color listSectionColor: '#1c1d1e'
     /// A row the user is acting on.
     property color listSelectedColor: '#4a7298'
+
+    /**
+     * The drawer a list row opens.
+     *
+     * A row of its own -- another number to call, "View Contact" -- is fifty
+     * pixels tall. A past call is only thirty-six, because it is a record
+     * rather than something to act on; com.palm.app.phone sets that height
+     * outright in .call-history-subitem. Both indent past the photo so their
+     * text lines up with the name of the row that opened them, which is what
+     * the original's `padding-left: 60px` on .drawer-subitem does.
+     */
+    property real drawerRowHeight: Units.gu(5)
+    property real drawerCallRowHeight: Units.gu(3.6)
+    property real drawerIndent: Units.gu(6)
 
     /**
      * Gradients

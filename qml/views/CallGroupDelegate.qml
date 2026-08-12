@@ -307,12 +307,6 @@ Column {
         }
     }
 
-    // No divider before a day header: the header brings its own rule.
-    ListSeparator {
-        width: parent.width
-        drawn: !callGroupDelegate.lastOfDay
-    }
-
     Loader {
         id: callgroupDetail
 
@@ -330,5 +324,13 @@ Column {
                 callTransports: callGroupDelegate.callTransports
             }
         }
+    }
+
+    // Closes the group off, after its drawer rather than before it -- an open
+    // drawer belongs to the row above it. Left out before a day header, which
+    // brings its own rule.
+    ListSeparator {
+        width: parent.width
+        drawn: !callGroupDelegate.lastOfDay
     }
 }

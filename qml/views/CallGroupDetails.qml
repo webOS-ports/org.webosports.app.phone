@@ -35,6 +35,10 @@ import "../services/PhoneNumberUtils.js" as PhoneNumberUtils
  * The individual calls carry the grey call-type icon; only the group's own row
  * above uses the coloured one. Their icon and time line up with the columns of
  * that row, so the drawer reads as a continuation of it.
+ *
+ * A past call is a shorter row than one the user can act on, and the two kinds
+ * are told apart by rule as well as by height: only the actionable rows are
+ * separated from one another.
  */
 Column {
     id: callGroupDetailsId
@@ -97,7 +101,12 @@ Column {
             id: callphoneDelegate
 
             width: modelRepeater.width
-            height: Units.gu(4.2)
+            height: appTheme.drawerCallRowHeight
+
+            Rectangle {
+                anchors.fill: parent
+                color: appTheme.listSectionColor
+            }
 
             property date _timestamp: new Date(model.timestamp)
             property var _remotePerson: (model.type !== "outgoing") ? model.from
@@ -108,7 +117,7 @@ Column {
 
             RowLayout {
                 anchors.fill: parent
-                anchors.leftMargin: Units.gu(2.4)
+                anchors.leftMargin: appTheme.drawerIndent
                 anchors.rightMargin: Units.gu(0.8)
                 spacing: Units.gu(0.8)
 
@@ -172,21 +181,27 @@ Column {
                     width: parent.width
                     model: callGroupRemotePerson.phoneNumbers
 
-                    delegate: Item {
+                    delegate: Column {
                         width: parent.width
-                        height: Units.gu(4.6)
 
                         property string _phoneNumberValue: model.value ? model.value : modelData.value
                         property string _phoneNumberType: model.type ? model.type : modelData.type
 
+                        ListSeparator { width: parent.width }
+
+                    Item {
+                        width: parent.width
+                        height: appTheme.drawerRowHeight
+
                         Rectangle {
                             anchors.fill: parent
-                            color: numberArea.pressed ? appTheme.listSelectedColor : 'transparent'
+                            color: numberArea.pressed ? appTheme.listSelectedColor
+                                                      : appTheme.listSectionColor
                         }
 
                         RowLayout {
                             anchors.fill: parent
-                            anchors.leftMargin: Units.gu(2.4)
+                            anchors.leftMargin: appTheme.drawerIndent
                             anchors.rightMargin: Units.gu(0.8)
                             spacing: Units.gu(0.8)
 
@@ -239,26 +254,33 @@ Column {
                             }
                         }
                     }
+                    }
                 }
             }
         }
     }
 
     // 3. The contact card, last.
+    ListSeparator {
+        width: parent.width
+        drawn: callGroupDetailsId.groupPhoneNumber.length > 0
+    }
+
     Item {
         width: parent.width
-        height: Units.gu(4.6)
+        height: appTheme.drawerRowHeight
         visible: callGroupDetailsId.groupPhoneNumber.length > 0
 
         Rectangle {
             anchors.fill: parent
-            color: viewArea.pressed ? appTheme.listSelectedColor : 'transparent'
+            color: viewArea.pressed ? appTheme.listSelectedColor
+                                    : appTheme.listSectionColor
         }
 
         Text {
             anchors {
                 left: parent.left
-                leftMargin: Units.gu(2.4)
+                leftMargin: appTheme.drawerIndent
                 verticalCenter: parent.verticalCenter
             }
             color: appTheme.listTextColor
