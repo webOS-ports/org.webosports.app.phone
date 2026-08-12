@@ -218,7 +218,7 @@ Column {
 
                         Text {
                             Layout.maximumWidth: callGroupDelegate.width * 0.62
-                            color: appTheme.listSecondaryTextColor
+                            color: appTheme.callLogDetailColor
                             elide: Text.ElideRight
                             font.pixelSize: FontUtils.sizeToPixels("small")
                             text: (callGroupDelegate.serviceLabel.length > 0
@@ -259,7 +259,7 @@ Column {
                 Text {
                     Layout.preferredWidth: Units.gu(5)
                     horizontalAlignment: Text.AlignRight
-                    color: appTheme.listSecondaryTextColor
+                    color: appTheme.callLogDetailColor
                     font.pixelSize: FontUtils.sizeToPixels("small")
 
                     property date timeStamp: new Date(model.timestamp)

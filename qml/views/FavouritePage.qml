@@ -42,6 +42,10 @@ BasePage {
 
     pageName: "Favourite"
 
+    // A list page is a flat grey: the gradient belongs to the call card.
+    gradient: null
+    color: appTheme.backgroundColor
+
     property alias favoritesModel: favouriteList.model
 
     /// Which favourite is open, by person id; only one at a time.
@@ -51,12 +55,12 @@ BasePage {
         id: groupBox
 
         anchors.fill: parent
-        anchors.margins: Units.gu(0.8)
+        anchors.margins: appTheme.listMargin
 
         color: appTheme.listBackgroundColor
-        radius: Units.gu(0.8)
+        radius: appTheme.listBorderRadius
         border.color: appTheme.listBorderColor
-        border.width: 1
+        border.width: appTheme.listBorderWidth
         clip: true
 
         ListView {
@@ -126,7 +130,7 @@ BasePage {
                             }
                             Text {
                                 Layout.fillWidth: true
-                                color: appTheme.listSecondaryTextColor
+                                color: appTheme.favoritesDetailColor
                                 elide: Text.ElideRight
                                 font.pixelSize: FontUtils.sizeToPixels("small")
                                 // "MOBILE +31 6 2148 9831": the service, then the
@@ -223,7 +227,7 @@ BasePage {
                             }
 
                             Text {
-                                color: appTheme.serviceTextColor
+                                color: appTheme.listSecondaryTextColor
                                 font.capitalization: Font.AllUppercase
                                 font.pixelSize: FontUtils.sizeToPixels("small")
                                 text: modelData.kind === "im" ? modelData.transportLabel

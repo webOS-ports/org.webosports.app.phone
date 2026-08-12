@@ -99,15 +99,40 @@ QtObject {
      */
     property color listBackgroundColor: '#57595c'
     property color listAlternateColor: '#525457'
-    property color listBorderColor: '#1f2121'
     property color listTextColor: '#ffffff'
-    property color listSecondaryTextColor: '#d4d5d5'
+
+    /**
+     * Each list names its own second line, and the original gives each a
+     * different grey: the call log's is the dimmest of them, the contact list
+     * sits between, and favourites is nearly as bright as the name above it.
+     * They are .call-log .clv-drawerItem-displayLbl, .contact-list .enyo-item
+     * and .drawerItem-favorites-displayLbl respectively.
+     */
+    property color listSecondaryTextColor: '#cccccc'
+    property color callLogDetailColor: '#9d9e9f'
+    property color favoritesDetailColor: '#c5c5c6'
+    /// A number inside an opened call group: .drawer-subItem-itemTextLbl.
+    property color drawerNumberColor: '#cbcbcb'
+    /// The name above a run of rows: .enyo-divider-caption.
     property color listSectionTextColor: '#8b8c8e'
-    /// The drawer a row opens, and the band a contact's name sits on: both
-    /// recede behind the rows themselves.
-    property color listSectionColor: '#2d2e30'
-    /// A row the user is acting on.
+
+    /**
+     * The drawer a row opens. Favourites fills it flat; the call log lays a
+     * nine-slice over it that darkens the top and bottom edges, so an open
+     * drawer looks sunk into the row that opened it.
+     */
+    property color listSectionColor: '#3b3d3f'
+    property url drawerBackgroundSource: Qt.resolvedUrl('images/call-log-drawer-sub-item-bg.png')
+
+    /// A row the user is acting on: .enyo-addressing-item-selected.
     property color listSelectedColor: '#4a7298'
+
+    /// The rule around a list: `2px solid #1f2121` with a six-pixel radius,
+    /// set thirty pixels in from the edge of the page.
+    property color listBorderColor: '#1f2121'
+    property real listBorderWidth: 2
+    property real listBorderRadius: Units.gu(0.6)
+    property real listMargin: Units.gu(3)
 
     /**
      * The drawer a list row opens.

@@ -44,6 +44,10 @@ BasePage {
 
     pageName: "ContactLookup"
 
+    // A list page is a flat grey: the gradient belongs to the call card.
+    gradient: null
+    color: appTheme.backgroundColor
+
     property var imBuddyStatus
 
     /// The Video tab lists only contacts reachable by a video-capable account.
@@ -182,13 +186,13 @@ BasePage {
             bottom: parent.bottom
             left: parent.left
             right: parent.right
-            margins: Units.gu(0.8)
+            margins: appTheme.listMargin
         }
 
         color: appTheme.listBackgroundColor
-        radius: Units.gu(0.8)
+        radius: appTheme.listBorderRadius
         border.color: appTheme.listBorderColor
-        border.width: 1
+        border.width: appTheme.listBorderWidth
         clip: true
 
         SearchField {
@@ -368,7 +372,7 @@ BasePage {
                             Layout.preferredWidth: Units.gu(9)
                             horizontalAlignment: Text.AlignRight
                             elide: Text.ElideRight
-                            color: appTheme.serviceTextColor
+                            color: appTheme.listSecondaryTextColor
                             font.capitalization: Font.AllUppercase
                             font.pixelSize: FontUtils.sizeToPixels("small")
                             text: row.option ? (row.option.kind === "im" ? row.option.transportLabel

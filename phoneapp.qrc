@@ -99,6 +99,7 @@
         <file>qml/views/images/buttons-numpad.png</file>
         <file>qml/views/images/call-log-button-down.png</file>
         <file>qml/views/images/call-log-button-up.png</file>
+        <file>qml/views/images/call-log-drawer-sub-item-bg.png</file>
         <file>qml/views/images/call-log-list-light-sprite.png</file>
         <file>qml/views/images/call-log-list-separator.png</file>
         <file>qml/views/images/call-log-list-sprite.png</file>
@@ -120,6 +121,7 @@
         <file>qml/views/images/icon-m-common-backspace.svg</file>
         <file>qml/views/images/icon-videocall-list.png</file>
         <file>qml/views/images/list-avatar-default.png</file>
+        <file>qml/views/images/menu-icon-Phone.png</file>
         <file>qml/views/images/menu-icon-addcall.png</file>
         <file>qml/views/images/menu-icon-addcontact.png</file>
         <file>qml/views/images/menu-icon-call-log.png</file>

@@ -30,6 +30,10 @@ BasePage {
     id: historyPageId
     pageName: "History"
 
+    // A list page is a flat grey: the gradient belongs to the call card.
+    gradient: null
+    color: appTheme.backgroundColor
+
     property alias historyModel: historyListViewModel.sourceModel
 
     // All / Missed button chooser
@@ -127,12 +131,12 @@ BasePage {
             bottom: parent.bottom
             left: parent.left
             right: parent.right
-            margins: Units.gu(0.8)
+            margins: appTheme.listMargin
         }
         color: appTheme.listBackgroundColor
-        radius: Units.gu(0.8)
+        radius: appTheme.listBorderRadius
         border.color: appTheme.listBorderColor
-        border.width: 1
+        border.width: appTheme.listBorderWidth
         clip: true
 
         ListView {

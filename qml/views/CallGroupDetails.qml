@@ -40,8 +40,10 @@ import "../services/PhoneNumberUtils.js" as PhoneNumberUtils
  * are told apart by rule as well as by height: only the actionable rows are
  * separated from one another.
  */
-Column {
+Item {
     id: callGroupDetailsId
+
+    implicitHeight: drawerContent.height
 
     property ContactsModel contacts;
 
@@ -101,6 +103,25 @@ Column {
         return contacts.getPhoneNumberTypeStr(address.personAddressType).toUpperCase();
     }
 
+    /*
+     * The drawer is sunk into the row that opened it: call-log-drawer-sub-item-bg
+     * darkens ten pixels at its top and bottom and is flat between, so it fits
+     * a drawer of any depth. In the original this is the border of the two
+     * .hidden-drawer-item halves, which between them cover the whole drawer.
+     */
+    BorderImage {
+        anchors.fill: drawerContent
+        source: appTheme.drawerBackgroundSource
+        border { left: 10; right: 10; top: 10; bottom: 10 }
+        horizontalTileMode: BorderImage.Repeat
+        verticalTileMode: BorderImage.Repeat
+    }
+
+    Column {
+        id: drawerContent
+
+        width: parent.width
+
     // 1. Every call in the group.
     Repeater {
         id: modelRepeater
@@ -113,11 +134,6 @@ Column {
 
             width: modelRepeater.width
             height: appTheme.drawerCallRowHeight
-
-            Rectangle {
-                anchors.fill: parent
-                color: appTheme.listSectionColor
-            }
 
             property date _timestamp: new Date(model.timestamp)
             property var _remotePerson: (model.type !== "outgoing") ? model.from
@@ -148,7 +164,7 @@ Column {
 
                 Text {
                     Layout.fillWidth: true
-                    color: appTheme.listSecondaryTextColor
+                    color: appTheme.drawerNumberColor
                     elide: Text.ElideRight
                     font.pixelSize: FontUtils.sizeToPixels("small")
                     text: callphoneDelegate._number + " " +
@@ -173,7 +189,7 @@ Column {
                 Text {
                     Layout.preferredWidth: callGroupDetailsId.timeColumn
                     horizontalAlignment: Text.AlignRight
-                    color: appTheme.listSecondaryTextColor
+                    color: appTheme.drawerNumberColor
                     font.pixelSize: FontUtils.sizeToPixels("small")
                     text: Qt.formatTime(callphoneDelegate._timestamp,
                                         Qt.locale().timeFormat(Locale.ShortFormat))
@@ -213,7 +229,7 @@ Column {
                         Rectangle {
                             anchors.fill: parent
                             color: numberArea.pressed ? appTheme.listSelectedColor
-                                                      : appTheme.listSectionColor
+                                                      : 'transparent'
                         }
 
                         RowLayout {
@@ -232,7 +248,7 @@ Column {
                             }
 
                             Text {
-                                color: appTheme.serviceTextColor
+                                color: appTheme.listSecondaryTextColor
                                 font.capitalization: Font.AllUppercase
                                 font.pixelSize: FontUtils.sizeToPixels("small")
                                 text: contacts.getPhoneNumberTypeStr(_phoneNumberType)
@@ -290,8 +306,7 @@ Column {
 
         Rectangle {
             anchors.fill: parent
-            color: viewArea.pressed ? appTheme.listSelectedColor
-                                    : appTheme.listSectionColor
+            color: viewArea.pressed ? appTheme.listSelectedColor : 'transparent'
         }
 
         Text {
@@ -316,6 +331,8 @@ Column {
                     callGroupDetailsId.addToContacts(callGroupDetailsId.groupPhoneNumber);
             }
         }
+    }
+
     }
 
     /// Opens the messaging app on a conversation with this address. A Synergy
