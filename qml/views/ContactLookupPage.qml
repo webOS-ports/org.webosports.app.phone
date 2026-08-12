@@ -191,8 +191,7 @@ BasePage {
         border.width: 1
         clip: true
 
-        // A white pill: the one light element on the page.
-        TextField {
+        SearchField {
             id: searchField
 
             anchors {
@@ -201,48 +200,8 @@ BasePage {
                 right: parent.right
                 margins: Units.gu(0.8)
             }
-            height: Units.gu(4)
 
             placeholderText: qsTr("Enter Name")
-            color: '#2a2929'
-            placeholderTextColor: '#8a8a8a'
-            font.pixelSize: FontUtils.sizeToPixels("medium")
-            leftPadding: Units.gu(1.2)
-            rightPadding: Units.gu(3.5)
-
-            background: Rectangle {
-                color: '#ffffff'
-                radius: height / 2
-            }
-
-            // The magnifier and clear cross are the phone app's own artwork.
-            // A Unicode glyph stood in here before, which came out small and
-            // mirrored -- U+2315 is a telephone recorder, not a magnifier.
-            Image {
-                id: searchIcon
-
-                anchors {
-                    right: parent.right
-                    rightMargin: Units.gu(1)
-                    verticalCenter: parent.verticalCenter
-                }
-                width: Units.gu(2.4)
-                height: Units.gu(2.4)
-                fillMode: Image.PreserveAspectFit
-                smooth: true
-
-                source: Qt.resolvedUrl(searchField.text.length > 0 ? "images/search-button-cancel.png"
-                                                                   : "images/search-button.png")
-                opacity: clearArea.pressed ? 0.6 : 1.0
-
-                MouseArea {
-                    id: clearArea
-                    anchors.fill: parent
-                    anchors.margins: -Units.gu(1)
-                    enabled: searchField.text.length > 0
-                    onClicked: searchField.text = ""
-                }
-            }
         }
 
         ListView {

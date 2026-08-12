@@ -62,12 +62,15 @@ BasePage {
             property: "showOnlyMissed"
             value: buttonOnlyMissed.checked
         }
-        TextField {
+        // The same white pill the Phone tab is searched with, rather than a
+        // bare field with a Unicode magnifier in its placeholder.
+        SearchField {
             id: searchFieldInput
-            height: parent.height
-            width: Units.gu(14)
-            text: ""
-            placeholderText: "🔍 Filter..."
+
+            anchors.verticalCenter: parent.verticalCenter
+            width: Units.gu(20)
+
+            placeholderText: qsTr("Filter")
         }
     }
 

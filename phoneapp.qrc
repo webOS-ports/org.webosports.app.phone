@@ -87,6 +87,7 @@
         <file>qml/views/PrefsInfoRow.qml</file>
         <file>qml/views/PrefsSwitchRow.qml</file>
         <file>qml/views/PrefsTextRow.qml</file>
+        <file>qml/views/SearchField.qml</file>
         <file>qml/views/SimPinInput.qml</file>
         <file>qml/views/SimPinWindow.qml</file>
         <file>qml/views/SpeakerButton.qml</file>
@@ -101,9 +102,9 @@
         <file>qml/views/images/call-log-list-light-sprite.png</file>
         <file>qml/views/images/call-log-list-separator.png</file>
         <file>qml/views/images/call-log-list-sprite.png</file>
-        <file>qml/views/images/dashboard-unread.png</file>
         <file>qml/views/images/contacts-icon-frame.png</file>
         <file>qml/views/images/contacts-unknown-icon-large.png</file>
+        <file>qml/views/images/dashboard-unread.png</file>
         <file>qml/views/images/dial-button.png</file>
         <file>qml/views/images/dialer-entry-bg.png</file>
         <file>qml/views/images/dialpad-bg.png</file>
