@@ -233,10 +233,10 @@ BasePage {
 
                             // Video, where the account behind this row can carry it.
                             Image {
-                                Layout.preferredWidth: Units.gu(2.4)
-                                Layout.preferredHeight: Units.gu(1.5)
+                                Layout.preferredWidth: Units.gu(3.4)
+                                Layout.preferredHeight: Units.gu(3.2)
                                 fillMode: Image.PreserveAspectFit
-                                source: Qt.resolvedUrl("images/icon-videocall-list.png")
+                                source: Qt.resolvedUrl("images/Camera-Icon.png")
                                 visible: modelData.supportsVideo
 
                                 MouseArea {

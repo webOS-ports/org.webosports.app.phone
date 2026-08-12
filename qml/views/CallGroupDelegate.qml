@@ -25,7 +25,19 @@ import LuneOS.Components 1.0
 import LuneOS.Telephony 1.0
 
 import "../model"
+import "../services/PhoneNumberUtils.js" as PhoneNumberUtils
 
+/**
+ * One call group in the call log.
+ *
+ * Laid out like com.palm.app.phone: the contact's photo on the left, their
+ * name with the number of calls and a star if they are a favourite, the
+ * service and number underneath, then the type of call, the time, and a button
+ * that opens the individual calls.
+ *
+ * The artwork is the original's: call-log-list-light-sprite for the call type,
+ * call-log-count-pill for the count, expand-button for the disclosure.
+ */
 Column {
     id: callGroupDelegate
 
@@ -35,22 +47,32 @@ Column {
     property var callTransports;
     property PhoneUiTheme appTheme: PhoneUiTheme {}
 
-    // Which calling account this group's calls went over. Cellular is the
-    // default and stays unlabelled; a Synergy call says which service it used.
-    property string callService: (contactAddress && contactAddress.service) ? contactAddress.service : ""
-    property bool isSynergyCall: callService.length > 0 && callService !== "com.palm.telephony"
+    /// True for the last group of its day, so the row above a day header does
+    /// not also draw a divider.
+    property bool lastOfDay: false
 
     property string callGroupId: model.groupId ? model.groupId : model._id // keep backward read-only compatibility with Legacy db structure
     property var contactAddress: model.recentcall_address
     property var remotePerson: (contactAddress && contactAddress.personId) ? contacts.personById(contactAddress.personId) : null
 
-    property string _callGroupPhoneNumberForDisplay: LibPhoneNumber.formatPhoneNumberForDisplay(contactAddress.addr, contacts.countryCode);
+    /// Which account the calls in this group went over; cellular is unlabelled.
+    readonly property string callService: (contactAddress && contactAddress.service)
+                                              ? contactAddress.service : ""
+    readonly property bool isSynergyCall: callService.length > 0 &&
+                                          callService !== "com.palm.telephony"
+
+    readonly property string serviceLabel: {
+        if (!isSynergyCall || !callTransports) return "";
+        return callTransports.labelFor(callService).toUpperCase();
+    }
+
+    readonly property string numberForDisplay:
+        LibPhoneNumber.formatPhoneNumberForDisplay(contactAddress.addr, contacts.countryCode)
 
     /// True while the row is swiped aside to show its delete button.
     property bool pendingDelete: false
 
-    // Swipe-to-delete, as on the legacy call log's SwipeableItem rows: the row
-    // slides left to uncover a delete button rather than deleting straight away.
+    // Swipe-to-delete, as on the legacy call log's SwipeableItem rows.
     Item {
         id: swipeRow
 
@@ -59,7 +81,7 @@ Column {
 
         Rectangle {
             anchors.fill: parent
-            color: '#8B2020'
+            color: appTheme.deleteColor
             visible: callGroupDelegate.pendingDelete
 
             Text {
@@ -89,16 +111,155 @@ Column {
 
             Behavior on x { NumberAnimation { duration: 150 } }
 
-            // Tapping the description calls the number back and dragging it
-            // sideways reveals the delete button. It sits outside the layout so
-            // the layout does not try to manage it as a cell.
+            Rectangle {
+                anchors.fill: parent
+                color: rowArea.pressed ? appTheme.listSelectedColor : 'transparent'
+            }
+
+            RowLayout {
+                anchors.fill: parent
+                anchors.leftMargin: Units.gu(0.8)
+                anchors.rightMargin: Units.gu(0.8)
+                spacing: Units.gu(1)
+
+                // The contact's photo, on the left as on the original.
+                Item {
+                    Layout.preferredWidth: Units.gu(4.4)
+                    Layout.preferredHeight: Units.gu(4.4)
+
+                    Image {
+                        id: avatarPhotoImage
+                        anchors.fill: parent
+                        source: callGroupDelegate.remotePerson
+                                    ? callGroupDelegate.remotePerson.photos.listPhotoPath
+                                    : Qt.resolvedUrl('images/list-avatar-default.png')
+                        fillMode: Image.PreserveAspectCrop
+                        asynchronous: true
+                        visible: false
+                    }
+                    CornerShader {
+                        anchors.fill: avatarPhotoImage
+                        source: avatarPhotoImage
+                        radius: Units.gu(0.4)
+                    }
+                }
+
+                ColumnLayout {
+                    Layout.fillWidth: true
+                    spacing: Units.gu(0.2)
+
+                    RowLayout {
+                        Layout.fillWidth: true
+                        spacing: Units.gu(0.6)
+
+                        Text {
+                            Layout.maximumWidth: parent.width * 0.7
+                            color: appTheme.listTextColor
+                            elide: Text.ElideRight
+                            font.pixelSize: FontUtils.sizeToPixels("medium")
+                            text: (callGroupDelegate.remotePerson && contactAddress.name)
+                                      ? contactAddress.name
+                                      : callGroupDelegate.numberForDisplay
+                        }
+
+                        // How many calls this group stands for.
+                        Item {
+                            Layout.preferredWidth: Units.gu(2.4)
+                            Layout.preferredHeight: Units.gu(2.4)
+                            visible: model.callcount > 1
+
+                            Image {
+                                anchors.fill: parent
+                                source: Qt.resolvedUrl('images/call-log-count-pill.png')
+                                fillMode: Image.PreserveAspectFit
+                            }
+                            Text {
+                                anchors.centerIn: parent
+                                color: 'white'
+                                font.pixelSize: FontUtils.sizeToPixels("x-small")
+                                text: model.callcount
+                            }
+                        }
+
+                        Image {
+                            Layout.preferredWidth: Units.gu(1.6)
+                            Layout.preferredHeight: Units.gu(1.6)
+                            fillMode: Image.PreserveAspectFit
+                            source: Qt.resolvedUrl('images/favorites-star-blue.png')
+                            visible: !!callGroupDelegate.remotePerson &&
+                                     callGroupDelegate.remotePerson.favorite === true
+                        }
+
+                        Item { Layout.fillWidth: true }
+                    }
+
+                    // "WHATSAPP +31 6 1342 2104": the service, then the number.
+                    Text {
+                        Layout.fillWidth: true
+                        color: appTheme.listSecondaryTextColor
+                        elide: Text.ElideRight
+                        font.pixelSize: FontUtils.sizeToPixels("small")
+                        text: (callGroupDelegate.serviceLabel.length > 0
+                                   ? callGroupDelegate.serviceLabel + " " : "") +
+                              callGroupDelegate.numberForDisplay
+                    }
+                }
+
+                // What kind of call it was, from the original's list sprite.
+                ClippedImage {
+                    Layout.preferredWidth: Units.gu(2.2)
+                    Layout.preferredHeight: Units.gu(2.2)
+
+                    source: Qt.resolvedUrl('images/call-log-list-light-sprite.png')
+                    wantedWidth: Units.gu(2.2)
+                    wantedHeight: Units.gu(2.2)
+                    imageSize: Qt.size(22, 91)
+                    patchGridSize: Qt.size(1, 4)
+                    patch: (model.recentcall_type === "missed") ? Qt.point(0,0) :
+                           (model.recentcall_type === "incoming") ? Qt.point(0,1) :
+                           (model.recentcall_type === "ignored") ? Qt.point(0,3) : Qt.point(0,2)
+                }
+
+                Text {
+                    Layout.preferredWidth: Units.gu(5)
+                    horizontalAlignment: Text.AlignRight
+                    color: appTheme.listSecondaryTextColor
+                    font.pixelSize: FontUtils.sizeToPixels("small")
+
+                    property date timeStamp: new Date(model.timestamp)
+                    text: Qt.formatTime(timeStamp, Qt.locale().timeFormat(Locale.ShortFormat))
+                }
+
+                // Opens the individual calls in this group.
+                Item {
+                    Layout.preferredWidth: Units.gu(3.4)
+                    Layout.preferredHeight: Units.gu(3.4)
+
+                    ClippedImage {
+                        anchors.centerIn: parent
+                        source: Qt.resolvedUrl('images/expand-button.png')
+                        wantedWidth: Units.gu(3.4)
+                        wantedHeight: Units.gu(3.4)
+                        imageSize: Qt.size(50, 100)
+                        patchGridSize: Qt.size(1, 2)
+                        patch: expandArea.pressed ? Qt.point(0,1) : Qt.point(0,0)
+                        rotation: callgroupDetail.active ? 180 : 0
+                    }
+
+                    MouseArea {
+                        id: expandArea
+                        anchors.fill: parent
+                        onClicked: callgroupDetail.active = !callgroupDetail.active
+                    }
+                }
+            }
+
+            // Tapping the row calls back over whichever account it used;
+            // dragging it sideways reveals the delete button.
             MouseArea {
-                anchors.left: parent.left
-                anchors.top: parent.top
-                anchors.bottom: parent.bottom
-                anchors.right: parent.right
-                anchors.rightMargin: callGroupRowLayout.height * 2
-                z: 1
+                id: rowArea
+                anchors.fill: parent
+                z: -1
 
                 property real _pressX: 0
 
@@ -112,204 +273,38 @@ Column {
                         callGroupDelegate.pendingDelete = false;
                     } else if (!callGroupDelegate.pendingDelete &&
                                callGroupDelegate.dialHandler && callGroupDelegate.contactAddress.addr) {
-                        // Call back over whichever account the call used.
                         callGroupDelegate.dialHandler.dial(callGroupDelegate.contactAddress.addr,
                                                            callGroupDelegate.isSynergyCall ? callGroupDelegate.callService : "",
                                                            false);
                     }
                 }
             }
-
-            // Description of the call group
-            RowLayout {
-                id: callGroupRowLayout
-                anchors.left: parent.left
-                anchors.right: parent.right
-                anchors.leftMargin: Units.gu(1)
-                anchors.rightMargin: Units.gu(1)
-                height:Units.gu(7)
-                spacing: 5
-                // On the left: details of the person
-                ColumnLayout {
-                    id: descriptionColumn
-
-                    Layout.fillWidth: true
-                    Layout.fillHeight: true
-                    Text {
-                        Layout.fillWidth: true
-                        color: 'white'
-                        font.pixelSize: FontUtils.sizeToPixels("18pt")
-                        text:(remotePerson) ? contactAddress.name : _callGroupPhoneNumberForDisplay
-                    }
-                    Text {
-                        id: detailTextId
-                        Layout.fillWidth: true
-                        elide: Text.ElideRight
-                        color: 'white'
-                        font.pixelSize: FontUtils.sizeToPixels("14pt")
-
-                        // A Synergy call names its service rather than trying to
-                        // geolocate an address that is not a phone number.
-                        readonly property string _servicePrefix:
-                            callGroupDelegate.isSynergyCall && callGroupDelegate.callTransports
-                                ? (callGroupDelegate.callTransports.labelFor(callGroupDelegate.callService) + " · ")
-                                : ""
-
-                        text: _servicePrefix +
-                              ((remotePerson) ? _callGroupPhoneNumberForDisplay : "Unknown") // (needs geolocalization of number)
-
-                        Component.onCompleted: {
-                            if(!remotePerson && !callGroupDelegate.isSynergyCall) {
-                                LibPhoneNumber.getNumberGeolocation(contactAddress.addr, contacts.countryCode, setTextFromGeoLocation);
-                            }
-                        }
-
-                        function setTextFromGeoLocation(geoLocation) {
-                            var location = geoLocation.location || "Unknown";
-                            var country = geoLocation.country || {};
-                            var countryShortName = country.sn || "Unknown Country";
-                            detailTextId.text = location + ", " + countryShortName;
-                        }
-                    }
-
-                }
-                // On the middle: type of call and time of call
-                ColumnLayout {
-                    Layout.fillWidth: false
-                    Layout.fillHeight: true
-                    Layout.minimumWidth: Units.gu(3.2)
-                    ClippedImage {
-                        Layout.preferredHeight: Units.gu(3.2)
-                        Layout.alignment: Qt.AlignHCenter
-
-                        source: Qt.resolvedUrl('images/call-log-list-sprite.png')
-
-                        wantedWidth: Units.gu(3.2)
-                        wantedHeight: Units.gu(3.2)
-
-                        imageSize: Qt.size(44, 182)
-                        patchGridSize: Qt.size(1, 4)
-                        patch: (model.recentcall_type==="missed") ? Qt.point(0,0) :
-                               (model.recentcall_type === "incoming") ? Qt.point(0,1) :
-                               (model.recentcall_type === "ignored") ? Qt.point(0,3) : Qt.point(0,2)
-                    }
-                    Text {
-                        id: timeStampText
-                        Layout.fillHeight: true
-
-                        property date timeStamp: new Date(model.timestamp);
-
-                        color:'white'
-                        font.pixelSize: FontUtils.sizeToPixels("15pt")
-                        text: Qt.formatTime(timeStamp, Qt.locale().timeFormat(Locale.ShortFormat));
-                    }
-                }
-                // On the right: image of person with eventual mask with number of calls,
-                // and arrow to show details
-
-                Item {
-                    id: avatarDisclosureItem
-                    Layout.fillWidth: false
-                    Layout.fillHeight: true
-                    Layout.preferredWidth: callGroupRowLayout.height
-
-                    property url personPhotoUrl: callGroupDelegate.remotePerson ?
-                                                     callGroupDelegate.remotePerson.photos.listPhotoPath :
-                                                     Qt.resolvedUrl('images/generic-details-view-avatar.png');
-
-                    Image {
-                        id: avatarPhotoImage
-                        anchors {
-                            top: avatarDisclosureMask.top
-                            topMargin: 5*avatarDisclosureMask.height/90
-                            left: avatarDisclosureMask.left
-                            leftMargin: 6*avatarDisclosureMask.width/108
-                        }
-                        width: 60*avatarDisclosureMask.height/90
-                        height: 75*avatarDisclosureMask.height/90
-                        source: avatarDisclosureItem.personPhotoUrl
-                        fillMode: Image.PreserveAspectCrop
-                        visible: false
-                    }
-                    CornerShader {
-                        id: cornerShader
-                        anchors.fill: avatarPhotoImage
-                        source: avatarPhotoImage
-                        radius: 5*avatarDisclosureMask.height/90
-                    }
-                    ClippedImage {
-                        id: avatarDisclosureMask
-                        source: Qt.resolvedUrl('images/avatar-disclosure.png')
-
-                        anchors.fill: parent
-
-                        wantedWidth: avatarDisclosureItem.width
-                        wantedHeight: avatarDisclosureItem.height
-
-                        imageSize: Qt.size(108, 360)
-                        patchGridSize: Qt.size(1, 4)
-                        patch: callgroupDetail.active ? (avatarDisclosureMouseArea.pressed ? Qt.point(0,3) : Qt.point(0,2) ) :
-                                                        (avatarDisclosureMouseArea.pressed ? Qt.point(0,1) : Qt.point(0,0) )
-                    }
-                    Image {
-                        source: 'images/call-log-count-pill.png'
-                        anchors {
-                            top: avatarDisclosureMask.top
-                            topMargin: -Units.gu(0.5)
-                            left: avatarDisclosureMask.left
-                            leftMargin: -Units.gu(0.5)
-                        }
-                        width: Units.gu(3.2)
-                        height: Units.gu(3.2)
-
-                        Text {
-                            anchors.centerIn: parent
-                            text: model.callcount
-                            color: 'white'
-                            font.pixelSize: FontUtils.sizeToPixels("12pt")
-                            anchors.verticalCenterOffset: -Units.gu(0.2)
-                        }
-                    }
-
-                    MouseArea {
-                        id: avatarDisclosureMouseArea
-                        anchors.fill: parent
-                        onClicked: callgroupDetail.active = !callgroupDetail.active
-                    }
-                }
-            }
         }
     }
 
+    // No divider before a day header: the header brings its own rule.
     Rectangle {
-        anchors {
-            left: parent.left
-            right: parent.right
-        }
-        property bool _isLastGroupOfDay: (index+1)<historyModel.count && historyModel.get(index+1).timestamp_day !== model.timestamp_day
-        height: callgroupDetail.visible ? callgroupDetail.height : _isLastGroupOfDay ? 0 : 1
+        width: parent.width
+        height: callGroupDelegate.lastOfDay ? 0 : 1
         color: appTheme.listDividerColor
+    }
 
-        Loader {
-            id: callgroupDetail
-            anchors {
-                left: parent.left
-                right: parent.right
-                leftMargin: Units.gu(1)
-                rightMargin: Units.gu(3)
+    Loader {
+        id: callgroupDetail
+
+        width: parent.width
+        active: false
+        visible: active
+
+        sourceComponent: Component {
+            CallGroupDetails {
+                callGroupId: callGroupDelegate.callGroupId
+                callGroupRemotePerson: callGroupDelegate.remotePerson
+                callGroupAddress: callGroupDelegate.contactAddress
+                contacts: callGroupDelegate.contacts
+                dialHandler: callGroupDelegate.dialHandler
+                callTransports: callGroupDelegate.callTransports
             }
-            active: false
-            visible: active
-            sourceComponent: Component {
-                            CallGroupDetails {
-                                callGroupId: callGroupDelegate.callGroupId
-                                callGroupRemotePerson: callGroupDelegate.remotePerson
-                                callGroupAddress: callGroupDelegate.contactAddress
-                                contacts: callGroupDelegate.contacts
-                                dialHandler: callGroupDelegate.dialHandler
-                                callTransports: callGroupDelegate.callTransports
-                            }
-                         }
         }
     }
 }

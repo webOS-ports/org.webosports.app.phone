@@ -24,6 +24,8 @@ import LunaNext.Common 0.1
 import LuneOS.Components 1.0
 import LuneOS.Service 1.0
 
+import "../services/PhoneNumberUtils.js" as PhoneNumberUtils
+
 BasePage {
     id: historyPageId
     pageName: "History"
@@ -114,66 +116,89 @@ BasePage {
         }
     }
 
-    ListView {
-        id:historyList
+    // The log sits in a bordered group box, as every list in the original does.
+    Rectangle {
         anchors {
-            top:allOrMissedRect.bottom
-            bottom:parent.bottom
+            top: allOrMissedRect.bottom
+            topMargin: Units.gu(0.4)
+            bottom: parent.bottom
             left: parent.left
             right: parent.right
+            margins: Units.gu(0.8)
         }
-        spacing:4
-        clip:true
-        model: historyListViewModel
+        color: appTheme.listBackgroundColor
+        radius: Units.gu(0.8)
+        border.color: appTheme.listBorderColor
+        border.width: 1
+        clip: true
 
-        section.property: "timestamp_day"
-        section.criteria: ViewSection.FullString
-        section.delegate: Item {
-            width: parent.width
-            height: childrenRect.height
-            Rectangle {
-                width: Units.gu(1) //parent.width
-                color: appTheme.panelBorderColor
-                height: sectionTextId.height/5
-                anchors.left: parent.left
-                anchors.verticalCenter: sectionTextId.verticalCenter
+        ListView {
+            id: historyList
+
+            anchors.fill: parent
+            clip: true
+            model: historyListViewModel
+
+            section.property: "timestamp_day"
+            section.criteria: ViewSection.FullString
+
+            // The day, in grey caps, with a dark rule running to the edge.
+            section.delegate: Item {
+                width: historyList.width
+                height: Units.gu(2.8)
+
+                Text {
+                    id: sectionTextId
+
+                    anchors {
+                        left: parent.left
+                        leftMargin: Units.gu(1.2)
+                        bottom: parent.bottom
+                        bottomMargin: Units.gu(0.3)
+                    }
+                    color: appTheme.listSecondaryTextColor
+                    font.bold: true
+                    font.capitalization: Font.AllUppercase
+                    font.pixelSize: FontUtils.sizeToPixels("small")
+
+                    property date _timestamp: new Date(Number(section) * 86400000)
+                    text: PhoneNumberUtils.formatRelativeDay(_timestamp, Qt.locale())
+                }
+
+                Rectangle {
+                    anchors {
+                        left: sectionTextId.right
+                        leftMargin: Units.gu(1)
+                        right: parent.right
+                        rightMargin: Units.gu(1.2)
+                        verticalCenter: sectionTextId.verticalCenter
+                    }
+                    height: 1
+                    color: appTheme.listBorderColor
+                }
             }
+
+            delegate: CallGroupDelegate {
+                width: historyList.width
+                historyModel: historyPageId.historyModel
+                contacts: historyPageId.contacts
+                dialHandler: historyPageId.dialHandler
+                callTransports: historyPageId.callTransports
+                appTheme: historyPageId.appTheme
+
+                // The row before a day header must not draw a divider too.
+                lastOfDay: (index + 1) >= historyListViewModel.count ||
+                           historyListViewModel.get(index + 1).timestamp_day !== model.timestamp_day
+            }
+
             Text {
-                id: sectionTextId
-                x: Units.gu(2)
-                color: "lightgrey"
-                font.bold: true
-                font.pixelSize: FontUtils.sizeToPixels("18pt")
-                property date _timestamp: new Date(Number(section)*86400000) //  convert timestamp_day to ms
-                text: _timestamp.toLocaleDateString()
+                anchors.centerIn: parent
+                visible: historyList.count === 0
+                color: appTheme.listSecondaryTextColor
+                font.pixelSize: FontUtils.sizeToPixels("medium")
+                text: buttonOnlyMissed.checked ? qsTr("Your missed call history is empty")
+                                               : qsTr("Your call history is empty")
             }
-            Rectangle {
-                width: parent.width - sectionTextId.contentWidth - Units.gu(3) //Units.gu(1) //parent.width
-                color: appTheme.panelBorderColor
-                height: sectionTextId.height/5
-                anchors.right: parent.right
-                anchors.verticalCenter: sectionTextId.verticalCenter
-            }
-
-        }
-
-        delegate: CallGroupDelegate {
-            width: historyList.width
-            historyModel: historyPageId.historyModel
-            contacts: historyPageId.contacts
-            dialHandler: historyPageId.dialHandler
-            callTransports: historyPageId.callTransports
-            appTheme: historyPageId.appTheme
-        }
-
-        Text {
-            anchors.centerIn: parent
-            visible: historyList.count === 0
-            color: "white"
-            font.pixelSize: FontUtils.sizeToPixels("20pt")
-            text: buttonOnlyMissed.checked ? qsTr("Your missed call history is empty")
-                                           : qsTr("Your call history is empty")
         }
     }
 }
-

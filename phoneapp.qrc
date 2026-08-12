@@ -103,12 +103,15 @@
         <file>qml/views/images/dialpad-bg.png</file>
         <file>qml/views/images/disconnect-button.png</file>
         <file>qml/views/images/empty-calllog-phone.png</file>
+        <file>qml/views/images/expand-button.png</file>
+        <file>qml/views/images/favorites-icon-drawer-open.png</file>
         <file>qml/views/images/favorites-star-blue.png</file>
         <file>qml/views/images/flight-mode-icon.png</file>
         <file>qml/views/images/frame-background.png</file>
         <file>qml/views/images/generic-details-view-avatar-small.png</file>
         <file>qml/views/images/generic-details-view-avatar.png</file>
         <file>qml/views/images/icon-m-common-backspace.svg</file>
+        <file>qml/views/images/icon-videocall-list.png</file>
         <file>qml/views/images/list-avatar-default.png</file>
         <file>qml/views/images/menu-icon-addcall.png</file>
         <file>qml/views/images/menu-icon-addcontact.png</file>
@@ -137,6 +140,8 @@
         <file>qml/views/images/popup-icon-dropped.png</file>
         <file>qml/views/images/popup-icon-error.png</file>
         <file>qml/views/images/popup-icon-missed.png</file>
+        <file>qml/views/images/search-button-cancel.png</file>
+        <file>qml/views/images/search-button.png</file>
         <file>qml/views/images/voicemail-icon.png</file>
     </qresource>
 </RCC>

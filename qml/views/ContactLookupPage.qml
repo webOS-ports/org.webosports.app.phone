@@ -102,8 +102,12 @@ BasePage {
                           favorite: match.person.favorite === true });
 
             options.forEach(function(option) {
-                result.push({ header: false, person: match.person, option: option });
+                result.push({ header: false, person: match.person, option: option,
+                              lastOfContact: false });
             });
+
+            // The row before the next contact's name carries no divider.
+            result[result.length - 1].lastOfContact = true;
         });
 
         rows = result;
@@ -344,7 +348,7 @@ BasePage {
 
                     Rectangle {
                         anchors { left: parent.left; right: parent.right; bottom: parent.bottom }
-                        height: 1
+                        height: (row.rowData && row.rowData.lastOfContact) ? 0 : 1
                         color: appTheme.listDividerColor
                     }
 
@@ -386,10 +390,10 @@ BasePage {
                         // A video-capable row offers video, using the original
                         // app's own list icon.
                         Image {
-                            Layout.preferredWidth: Units.gu(2.4)
-                            Layout.preferredHeight: Units.gu(1.5)
+                            Layout.preferredWidth: Units.gu(3.4)
+                            Layout.preferredHeight: Units.gu(3.2)
                             fillMode: Image.PreserveAspectFit
-                            source: Qt.resolvedUrl("images/icon-videocall-list.png")
+                            source: Qt.resolvedUrl("images/Camera-Icon.png")
                             visible: !!row.option && row.option.supportsVideo
                             opacity: videoArea.pressed ? 0.6 : 1.0
 
