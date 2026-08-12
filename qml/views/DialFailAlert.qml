@@ -31,6 +31,9 @@ import "../services/CallMessages.js" as CallMessages
 MessageAlert {
     id: dialFailAlert
 
+    /// DialFail.js puts the error icon after the text, unlike the call popups.
+    iconOnRight: true
+
     property var dialHandler
     property var telephonyManager
 
