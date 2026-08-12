@@ -16,7 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>
  */
 
-import QtQuick 2.0
+import QtQuick 2.15
 import QtQuick.Layouts 1.0
 
 import org.nemomobile.voicecall 1.0
@@ -66,17 +66,47 @@ BasePage {
 
     onVoiceCallChanged: selectedCall = voiceCall
 
+    readonly property string formattedAddress: selectedCall
+        ? PhoneNumberUtils.formatForDisplay(selectedCall.lineId,
+                                            contacts ? contacts.countryCode : "US", false)
+        : ""
+
+    /**
+     * The network a Synergy call is going over, in caps. Blank for a cellular
+     * call, and blank for a provider the transport registry does not know --
+     * otherwise an unrecognised id gets tidied into a label and shown as if it
+     * were the name of a service.
+     */
+    readonly property string serviceLabel: {
+        if (!selectedCall || !callTransports) return "";
+
+        var provider = selectedCall.providerId || "";
+        if (provider.length === 0 || provider === callTransports.cellularTransport) return "";
+        if (!callTransports.transportFor(provider)) return "";
+
+        return callTransports.labelFor(provider).toUpperCase();
+    }
+
     function open() { root.visible = true }
     function close() { root.visible = false }
 
-    color: appTheme.backgroundColor
+    // The page behind the call: #25394a with backdrop-phone.png banded across
+    // the top of it, which is what .single-call-simple is.
+    color: '#25394a'
     gradient: null
+
+    Image {
+        anchors { top: parent.top; left: parent.left; right: parent.right }
+        height: sourceSize.height
+        source: Qt.resolvedUrl("images/backdrop-phone.png")
+        fillMode: Image.TileHorizontally
+    }
 
     /**
      * The call card
      **/
 
-    Rectangle {
+    Item {
         id: card
 
         anchors.horizontalCenter: parent.horizontalCenter
@@ -85,17 +115,88 @@ BasePage {
         width: Math.min(parent.width - Units.gu(4), Units.gu(40))
         height: cardColumn.height
 
-        radius: Units.gu(1)
-        color: appTheme.panelColor
-        border.color: appTheme.panelBorderColor
-        border.width: 1
-        clip: true
+        /*
+         * The glass the call sits behind. One nine-slice covers what the
+         * original splits between .single-call-header, .single-call-glass and
+         * .glass-footer: the top sixty-one rows are the header, the bottom
+         * twenty-two the footer, and the translucent black between them
+         * stretches to however tall the card is.
+         */
+        BorderImage {
+            anchors.fill: parent
+            source: Qt.resolvedUrl("images/glass-panel.png")
+            border { left: 22; right: 22; top: 61; bottom: 22 }
+            horizontalTileMode: BorderImage.Stretch
+            verticalTileMode: BorderImage.Stretch
+        }
 
         Column {
             id: cardColumn
             width: parent.width
 
-            // One line per call. The avatar only appears for a single call --
+            // Who is on the line. Eighteen pixel name over a sixteen pixel
+            // address over a fourteen pixel network label, all centred, as
+            // .single-call-display-name / -address / -label have them.
+            Item {
+                width: parent.width
+                height: visible ? nameColumn.height + Units.gu(1.6) : 0
+                visible: !root.multipleCalls
+
+                Column {
+                    id: nameColumn
+
+                    anchors {
+                        top: parent.top
+                        topMargin: Units.gu(0.8)
+                        left: parent.left
+                        right: parent.right
+                        leftMargin: Units.gu(1.2)
+                        rightMargin: Units.gu(1.2)
+                    }
+                    spacing: 0
+
+                    Text {
+                        id: displayName
+
+                        // The name if the caller is known, else what they
+                        // dialled from. A Contact that has not resolved yet
+                        // reports no name rather than an empty one.
+                        readonly property string contactName:
+                            root.currentContact ? String(root.currentContact.displayLabel || "").trim() : ""
+
+                        width: parent.width
+                        horizontalAlignment: Text.AlignHCenter
+                        elide: Text.ElideRight
+                        color: '#ffffff'
+                        font.pixelSize: Units.gu(1.8)
+                        lineHeight: Units.gu(3.6)
+                        lineHeightMode: Text.FixedHeight
+                        text: contactName.length > 0 ? contactName : root.formattedAddress
+                    }
+
+                    Text {
+                        width: parent.width
+                        horizontalAlignment: Text.AlignHCenter
+                        elide: Text.ElideRight
+                        color: '#ffffff'
+                        font.pixelSize: Units.gu(1.6)
+                        visible: displayName.contactName.length > 0 && text.length > 0
+                        text: root.formattedAddress
+                    }
+
+                    Text {
+                        width: parent.width
+                        horizontalAlignment: Text.AlignHCenter
+                        elide: Text.ElideRight
+                        color: '#999999'
+                        font.pixelSize: Units.gu(1.4)
+                        visible: text.length > 0
+                        text: root.serviceLabel
+                    }
+                }
+            }
+
+            // One line per call. The photo only appears for a single call --
             // with two lines up there is no room, exactly as on the original.
             Repeater {
                 model: root.allCalls
@@ -110,7 +211,7 @@ BasePage {
                     Rectangle {
                         width: parent.width
                         height: index > 0 ? 1 : 0
-                        color: appTheme.panelBorderColor
+                        color: '#00000060'
                     }
 
                     CallLineDelegate {
@@ -123,6 +224,7 @@ BasePage {
                         selected: root.multipleCalls && root.selectedCall === modelData
                         showFooter: root.multipleCalls
                         canJoin: root.multipleCalls && voiceCallMgrWrapper.canMerge
+                        visible: root.multipleCalls
 
                         onClicked: root.selectedCall = modelData
                         onHangupRequested: modelData.hangup()
@@ -132,44 +234,39 @@ BasePage {
                 }
             }
 
-            // The avatar well, shown only for a single call.
+            // The contact's photo in its stamp frame, shown for a single call.
             Item {
                 width: parent.width
-                height: visible ? Units.gu(20) : 0
+                height: visible ? Units.gu(16.6) : 0
                 visible: !root.multipleCalls && !flipable.flipped
 
-                Rectangle {
-                    anchors.fill: parent
-                    gradient: appTheme.panelGradient
-                }
-
-                Image {
-                    id: imageAvatar
+                Item {
                     anchors.centerIn: parent
-                    width: Units.gu(14)
+                    width: Units.gu(17)
                     height: Units.gu(14)
 
-                    asynchronous: true
-                    fillMode: Image.PreserveAspectCrop
-                    smooth: true
-                    source: currentContact.avatarPath
-                    visible: false
-                }
-                CornerShader {
-                    anchors.fill: imageAvatar
-                    source: imageAvatar
-                    radius: Units.gu(1)
-                }
-                Rectangle {
-                    anchors.fill: imageAvatar
-                    color: 'transparent'
-                    radius: Units.gu(1)
-                    border.color: '#4a4a4a'
-                    border.width: 1
+                    Image {
+                        id: imageAvatar
+                        anchors.fill: parent
+
+                        asynchronous: true
+                        fillMode: Image.PreserveAspectCrop
+                        smooth: true
+                        source: root.currentContact ? root.currentContact.avatarPath : Qt.resolvedUrl("images/contacts-unknown-icon-large.png")
+                    }
+
+                    // active-photo-overlay.png is three pixels proud of the
+                    // photo on every side, which is how it frames it.
+                    Image {
+                        anchors.centerIn: parent
+                        width: parent.width + Units.gu(0.6)
+                        height: parent.height + Units.gu(0.6)
+                        source: Qt.resolvedUrl("images/active-photo-overlay.png")
+                    }
                 }
             }
 
-            // The DTMF pad takes the avatar's place when the dialpad is on.
+            // The DTMF pad takes the photo's place when the dialpad is on.
             Item {
                 id: flipable
 
@@ -182,7 +279,7 @@ BasePage {
 
                 Rectangle {
                     anchors.fill: parent
-                    color: appTheme.panelDarkColor
+                    color: '#00000080'
                 }
 
                 Text {
@@ -190,8 +287,8 @@ BasePage {
                     anchors { top: parent.top; horizontalCenter: parent.horizontalCenter }
                     height: Units.gu(3)
                     verticalAlignment: Text.AlignVCenter
-                    color: appTheme.primaryTextColor
-                    font.pixelSize: FontUtils.sizeToPixels("medium")
+                    color: '#ffffff'
+                    font.pixelSize: Units.gu(1.6)
                     text: root.selectedCall ? root.selectedCall.lineId : ""
                 }
 
@@ -217,19 +314,18 @@ BasePage {
             }
 
             // A post-dial string that stopped at a 'wait' needs the user to say go.
-            Rectangle {
+            Item {
                 width: parent.width
                 height: visible ? Units.gu(5) : 0
                 visible: postDialPrompt.remainder.length > 0
-                color: appTheme.panelFooterColor
 
                 Text {
                     id: postDialPrompt
                     property string remainder: ""
 
                     anchors.centerIn: parent
-                    color: appTheme.primaryTextColor
-                    font.pixelSize: FontUtils.sizeToPixels("small")
+                    color: '#ffffff'
+                    font.pixelSize: Units.gu(1.6)
                     text: qsTr("Send %1").arg(remainder)
                 }
 
@@ -249,24 +345,55 @@ BasePage {
                 }
             }
 
-            // With a single call the hangup button lives on the card's footer;
-            // with several, each line carries its own and this ends them all.
+            // How long the call has been up, with MUTE called out in front of
+            // it while the microphone is off -- LineState's prefix label.
             Item {
                 width: parent.width
-                height: Units.gu(6)
+                height: Units.gu(4.5)
 
-                Rectangle {
-                    anchors.fill: parent
-                    color: appTheme.panelFooterColor
+                Row {
+                    anchors.centerIn: parent
+                    spacing: Units.gu(0.5)
+
+                    Text {
+                        color: '#ffffff'
+                        font.bold: true
+                        font.pixelSize: Units.gu(1.6)
+                        visible: voiceCallManager ? voiceCallManager.isMicrophoneMuted : false
+                        text: qsTr("MUTE")
+                    }
+
+                    Text {
+                        color: '#ffffff'
+                        font.pixelSize: Units.gu(1.6)
+                        text: root.selectedCall
+                                  ? PhoneNumberUtils.formatDuration(root.selectedCall.duration / 1000)
+                                  : ""
+                    }
                 }
+            }
 
+            // With a single call this ends it; with several, each line carries
+            // its own hangup and this ends them all.
+            Item {
+                width: parent.width
+                height: Units.gu(6.6)
+
+                // Three states stacked in the one file, in the order the CSS
+                // slices them: up, disabled, down.
                 SpriteIcon {
-                    anchors.fill: parent
-                    source: Qt.resolvedUrl(root.multipleCalls
-                                               ? "images/multicall-disconnect-button-full-all.png"
-                                               : "images/multicall-disconnect-button.png")
+                    anchors {
+                        left: parent.left
+                        right: parent.right
+                        verticalCenter: parent.verticalCenter
+                        leftMargin: Units.gu(0.6)
+                        rightMargin: Units.gu(0.6)
+                    }
+                    height: Units.gu(6.6)
+
+                    source: Qt.resolvedUrl("images/disconnect-button.png")
                     frameCount: 3
-                    frame: hangupAllArea.pressed ? 1 : 0
+                    frame: hangupAllArea.pressed ? 2 : 0
                 }
 
                 MouseArea {

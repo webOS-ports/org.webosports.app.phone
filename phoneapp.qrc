@@ -92,6 +92,9 @@
         <file>qml/views/SimPinWindow.qml</file>
         <file>qml/views/SpeakerButton.qml</file>
         <file>qml/views/images/Camera-Icon.png</file>
+        <file>qml/views/images/active-photo-overlay.png</file>
+        <file>qml/views/images/glass-panel.png</file>
+        <file>qml/views/images/backdrop-phone.png</file>
         <file>qml/views/images/avatar-disclosure.png</file>
         <file>qml/views/images/button-ignore-answer.png</file>
         <file>qml/views/images/button-sprite.png</file>
