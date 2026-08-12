@@ -141,6 +141,16 @@ Item {
             property string _service: callGroupDetailsId._prefixLabelFor(_remotePerson)
             property string _number: LibPhoneNumber.formatPhoneNumberForDisplay(_remotePerson.addr,
                                                                                 contacts.countryCode)
+            /// The account this particular call went over, so tapping it back
+            /// reaches the same place -- a group can hold calls over several.
+            property string _transport: (_remotePerson.service &&
+                                         _remotePerson.service !== "com.palm.telephony")
+                                            ? _remotePerson.service : ""
+
+            Rectangle {
+                anchors.fill: parent
+                color: callArea.pressed ? appTheme.listSelectedColor : 'transparent'
+            }
 
             RowLayout {
                 anchors.fill: parent
@@ -197,6 +207,20 @@ Item {
 
                 // Keeps these columns lined up under the expand button above.
                 Item { Layout.preferredWidth: callGroupDetailsId.trailingColumn }
+            }
+
+            // Calling a past call back places it over the account it used.
+            MouseArea {
+                id: callArea
+
+                anchors.fill: parent
+                enabled: !!callphoneDelegate._remotePerson.addr
+
+                onClicked: {
+                    if (callGroupDetailsId.dialHandler)
+                        callGroupDetailsId.dialHandler.dial(callphoneDelegate._remotePerson.addr,
+                                                            callphoneDelegate._transport, false);
+                }
             }
         }
     }
