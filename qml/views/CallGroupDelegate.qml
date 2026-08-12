@@ -35,8 +35,8 @@ import "../services/PhoneNumberUtils.js" as PhoneNumberUtils
  * service and number underneath, then the type of call, the time, and a button
  * that opens the individual calls.
  *
- * The artwork is the original's: call-log-list-light-sprite for the call type,
- * call-log-count-pill for the count, expand-button for the disclosure.
+ * The artwork is the original's: call-log-list-sprite for the call type,
+ * dashboard-unread for the count pill, expand-button for the disclosure.
  */
 Column {
     id: callGroupDelegate
@@ -77,7 +77,7 @@ Column {
         id: swipeRow
 
         width: parent.width
-        height: Units.gu(7)
+        height: appTheme.callLogRowHeight
 
         Rectangle {
             anchors.fill: parent
@@ -153,12 +153,12 @@ Column {
                         spacing: Units.gu(0.6)
 
                         Text {
-                            // Grow no further than the text needs, but give way
-                            // to the count and star when the row is narrow.
-                            // Measuring against parent.width would feed the
-                            // layout its own result.
-                            Layout.fillWidth: true
-                            Layout.maximumWidth: implicitWidth
+                            // Capped against the row rather than the layout:
+                            // asking the layout how wide it is would feed it
+                            // its own result, and an eliding Text reports the
+                            // elided width as its implicit one, so bounding it
+                            // by that collapses it a word at a time.
+                            Layout.maximumWidth: callGroupDelegate.width * 0.55
                             color: appTheme.listTextColor
                             elide: Text.ElideRight
                             font.pixelSize: FontUtils.sizeToPixels("medium")
@@ -167,21 +167,33 @@ Column {
                                       : callGroupDelegate.numberForDisplay
                         }
 
-                        // How many calls this group stands for.
-                        Item {
-                            Layout.preferredWidth: Units.gu(2.4)
+                        /*
+                         * How many calls this group stands for.
+                         *
+                         * The original's .image-toggle-button-pillCountLbl: a
+                         * pill that grows sideways with the number, drawn from
+                         * dashboard-unread.png with nine pixels held at each
+                         * end and the middle stretched, and set in bold.
+                         */
+                        BorderImage {
+                            Layout.preferredWidth: Math.max(Units.gu(2.5),
+                                                            countText.implicitWidth + Units.gu(1.4))
                             Layout.preferredHeight: Units.gu(2.4)
+                            Layout.leftMargin: Units.gu(0.4)
+
                             visible: model.callcount > 1
 
-                            Image {
-                                anchors.fill: parent
-                                source: Qt.resolvedUrl('images/call-log-count-pill.png')
-                                fillMode: Image.PreserveAspectFit
-                            }
+                            source: Qt.resolvedUrl('images/dashboard-unread.png')
+                            border { left: 9; right: 9; top: 0; bottom: 0 }
+                            horizontalTileMode: BorderImage.Stretch
+                            verticalTileMode: BorderImage.Stretch
+
                             Text {
+                                id: countText
                                 anchors.centerIn: parent
                                 color: 'white'
-                                font.pixelSize: FontUtils.sizeToPixels("x-small")
+                                font.bold: true
+                                font.pixelSize: FontUtils.sizeToPixels("small")
                                 text: model.callcount
                             }
                         }
@@ -205,8 +217,7 @@ Column {
                         spacing: Units.gu(0.5)
 
                         Text {
-                            Layout.fillWidth: true
-                            Layout.maximumWidth: implicitWidth
+                            Layout.maximumWidth: callGroupDelegate.width * 0.62
                             color: appTheme.listSecondaryTextColor
                             elide: Text.ElideRight
                             font.pixelSize: FontUtils.sizeToPixels("small")

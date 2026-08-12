@@ -98,10 +98,10 @@
         <file>qml/views/images/buttons-numpad.png</file>
         <file>qml/views/images/call-log-button-down.png</file>
         <file>qml/views/images/call-log-button-up.png</file>
-        <file>qml/views/images/call-log-count-pill.png</file>
         <file>qml/views/images/call-log-list-light-sprite.png</file>
         <file>qml/views/images/call-log-list-separator.png</file>
         <file>qml/views/images/call-log-list-sprite.png</file>
+        <file>qml/views/images/dashboard-unread.png</file>
         <file>qml/views/images/contacts-icon-frame.png</file>
         <file>qml/views/images/contacts-unknown-icon-large.png</file>
         <file>qml/views/images/dial-button.png</file>
