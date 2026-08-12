@@ -211,18 +211,28 @@ BasePage {
                 radius: height / 2
             }
 
-            // A magnifier while empty, a clear cross once something is typed.
-            Text {
+            // The magnifier and clear cross are the phone app's own artwork.
+            // A Unicode glyph stood in here before, which came out small and
+            // mirrored -- U+2315 is a telephone recorder, not a magnifier.
+            Image {
+                id: searchIcon
+
                 anchors {
                     right: parent.right
-                    rightMargin: Units.gu(1.2)
+                    rightMargin: Units.gu(1)
                     verticalCenter: parent.verticalCenter
                 }
-                color: '#8a8a8a'
-                font.pixelSize: FontUtils.sizeToPixels("medium")
-                text: searchField.text.length > 0 ? "✕" : "\u2315"
+                width: Units.gu(2.4)
+                height: Units.gu(2.4)
+                fillMode: Image.PreserveAspectFit
+                smooth: true
+
+                source: Qt.resolvedUrl(searchField.text.length > 0 ? "images/search-button-cancel.png"
+                                                                   : "images/search-button.png")
+                opacity: clearArea.pressed ? 0.6 : 1.0
 
                 MouseArea {
+                    id: clearArea
                     anchors.fill: parent
                     anchors.margins: -Units.gu(1)
                     enabled: searchField.text.length > 0
