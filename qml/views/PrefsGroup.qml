@@ -101,17 +101,30 @@ Item {
      * none, as the group's own edge closes it off.
      */
     Repeater {
-        model: Math.max(0, rowsColumn.children.length - 1)
+        model: rowsColumn.children.length
 
         delegate: Item {
             required property int index
             readonly property Item row: rowsColumn.children[index]
 
+            /// A Repeater filling the group is itself a child, and one with no
+            /// height; so is a row that is hidden. Neither gets a rule, and
+            /// neither counts when working out which row is the last.
+            readonly property bool drawable: !!row && row.visible && row.height > 0
+            readonly property bool lastDrawable: {
+                for (var i = index + 1; i < rowsColumn.children.length; ++i) {
+                    var other = rowsColumn.children[i];
+                    if (other && other.visible && other.height > 0)
+                        return false;
+                }
+                return true;
+            }
+
             x: rowsColumn.x
             width: rowsColumn.width
             y: rowsColumn.y + (row ? row.y + row.height : 0)
             height: 2
-            visible: !!row && row.visible
+            visible: drawable && !lastDrawable
 
             Rectangle { width: parent.width; height: 1; color: '#acacac' }
             Rectangle { y: 1; width: parent.width; height: 1; color: '#eaeaea' }

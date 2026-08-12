@@ -86,6 +86,7 @@
         <file>qml/views/PrefsDoneBar.qml</file>
         <file>qml/views/PrefsGroup.qml</file>
         <file>qml/views/PrefsInfoRow.qml</file>
+        <file>qml/views/PrefsLightButton.qml</file>
         <file>qml/views/PrefsSwitchRow.qml</file>
         <file>qml/views/PrefsTextRow.qml</file>
         <file>qml/views/SearchField.qml</file>

@@ -116,107 +116,117 @@ BasePage {
                   : qsTr("Add an account that can place calls, or insert a SIM card.")
     }
 
-    ListView {
-        id: accountList
-
+    Flickable {
         anchors {
             top: subheader.bottom
-            bottom: addButton.top
+            bottom: doneButton.top
             left: parent.left
             right: parent.right
-            margins: Units.gu(1)
+            margins: Units.gu(1.5)
         }
+        contentHeight: accountsColumn.height
         clip: true
-        spacing: Units.gu(1)
 
-        model: accountsPage.callTransports ? accountsPage.callTransports.callableTransportIds() : []
+        Column {
+            id: accountsColumn
 
-        delegate: Rectangle {
-            required property var modelData
+            width: parent.width
+            spacing: Units.gu(1.5)
 
-            width: accountList.width
-            height: Units.gu(7)
-            radius: Units.gu(1)
-            color: appTheme.panelColor
+            // The accounts, in a group of their own as the preferences scene
+            // shows them -- not as dark panels floating on a light page.
+            PrefsGroup {
+                width: parent.width
+                appTheme: accountsPage.appTheme
+                title: qsTr("Accounts")
 
-            property var transport: accountsPage.callTransports.transportFor(modelData)
+                Repeater {
+                    model: accountsPage.callTransports
+                               ? accountsPage.callTransports.callableTransportIds() : []
 
-            RowLayout {
-                anchors.fill: parent
-                anchors.margins: Units.gu(1)
-                spacing: Units.gu(1)
+                    delegate: Item {
+                        required property var modelData
+                        readonly property var transport:
+                            accountsPage.callTransports.transportFor(modelData)
 
-                Image {
-                    Layout.preferredWidth: Units.gu(4)
-                    Layout.preferredHeight: Units.gu(4)
-                    fillMode: Image.PreserveAspectFit
-                    source: (parent.parent.transport && parent.parent.transport.icon)
-                                ? parent.parent.transport.icon
-                                : Qt.resolvedUrl("images/menu-icon-dial.png")
-                }
+                        width: accountsColumn.width - Units.gu(1.6)
+                        height: Units.gu(5.5)
 
-                ColumnLayout {
-                    Layout.fillWidth: true
-                    spacing: 0
+                        RowLayout {
+                            anchors.fill: parent
+                            anchors.leftMargin: Units.gu(0.4)
+                            anchors.rightMargin: Units.gu(0.4)
+                            spacing: Units.gu(1)
 
-                    Text {
-                        Layout.fillWidth: true
-                        color: accountsPage.appTheme.prefsTextColor
-                        elide: Text.ElideRight
-                        font.pixelSize: FontUtils.sizeToPixels("medium")
-                        text: accountsPage.callTransports.labelFor(modelData)
-                    }
-                    Text {
-                        Layout.fillWidth: true
-                        color: accountsPage.appTheme.prefsSecondaryTextColor
-                        elide: Text.ElideRight
-                        font.pixelSize: FontUtils.sizeToPixels("small")
-                        text: {
-                            var transport = accountsPage.callTransports.transportFor(modelData);
-                            if (transport && transport.alias && transport.alias.length > 0)
-                                return transport.alias;
+                            Image {
+                                Layout.preferredWidth: Units.gu(3.4)
+                                Layout.preferredHeight: Units.gu(3.4)
+                                fillMode: Image.PreserveAspectFit
+                                visible: !!source && String(source).length > 0
+                                source: (transport && transport.icon) ? transport.icon : ""
+                            }
 
-                            return accountsPage.callTransports.isAvailable(modelData)
-                                       ? qsTr("Ready") : qsTr("Not available");
+                            ColumnLayout {
+                                Layout.fillWidth: true
+                                spacing: 0
+
+                                Text {
+                                    Layout.fillWidth: true
+                                    color: accountsPage.appTheme.prefsTextColor
+                                    elide: Text.ElideRight
+                                    font.pixelSize: FontUtils.sizeToPixels("medium")
+                                    text: accountsPage.callTransports.labelFor(modelData)
+                                }
+                                Text {
+                                    Layout.fillWidth: true
+                                    color: accountsPage.appTheme.prefsSecondaryTextColor
+                                    elide: Text.ElideRight
+                                    font.pixelSize: FontUtils.sizeToPixels("small")
+                                    text: {
+                                        if (transport && transport.alias && transport.alias.length > 0)
+                                            return transport.alias;
+
+                                        return accountsPage.callTransports.isAvailable(modelData)
+                                                   ? qsTr("Ready") : qsTr("Not available");
+                                    }
+                                }
+                            }
+
+                            Text {
+                                color: accountsPage.appTheme.prefsSecondaryTextColor
+                                font.pixelSize: FontUtils.sizeToPixels("small")
+                                visible: accountsPage.callTransports.supportsVideo(modelData)
+                                text: qsTr("Video")
+                            }
                         }
                     }
                 }
 
-                Text {
-                    color: accountsPage.callTransports.supportsVideo(modelData) ? 'white' : 'transparent'
-                    font.pixelSize: FontUtils.sizeToPixels("x-small")
-                    text: qsTr("Video")
+                Item {
+                    width: accountsColumn.width - Units.gu(1.6)
+                    height: Units.gu(5.5)
+                    visible: !accountsPage.callTransports ||
+                             accountsPage.callTransports.callableTransportIds().length === 0
+
+                    Text {
+                        anchors.centerIn: parent
+                        color: accountsPage.appTheme.prefsSecondaryTextColor
+                        font.pixelSize: FontUtils.sizeToPixels("medium")
+                        text: qsTr("No calling accounts yet")
+                    }
                 }
             }
+
+            PrefsLightButton {
+                width: parent.width
+                appTheme: accountsPage.appTheme
+                text: qsTr("Add an account")
+
+                onClicked: lunaService.call("luna://com.webos.applicationManager/launch",
+                                            JSON.stringify({ id: "com.palm.app.accounts" }), undefined,
+                                            function(error) { console.log("Could not open Accounts: " + error); })
+            }
         }
-
-        Text {
-            anchors.centerIn: parent
-            visible: accountList.count === 0
-            color: accountsPage.appTheme.prefsTextColor
-            wrapMode: Text.Wrap
-            width: parent.width - Units.gu(4)
-            horizontalAlignment: Text.AlignHCenter
-            font.pixelSize: FontUtils.sizeToPixels("medium")
-            text: qsTr("No calling accounts yet")
-        }
-    }
-
-    Button {
-        id: addButton
-
-        anchors {
-            bottom: doneButton.top
-            left: parent.left
-            right: parent.right
-            margins: Units.gu(1)
-        }
-        height: Units.gu(5)
-        text: qsTr("Add an account")
-
-        onClicked: lunaService.call("luna://com.webos.applicationManager/launch",
-                                    JSON.stringify({ id: "com.palm.app.accounts" }), undefined,
-                                    function(error) { console.log("Could not open Accounts: " + error); })
     }
 
     PrefsDoneBar {
