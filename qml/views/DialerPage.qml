@@ -36,8 +36,57 @@ BasePage {
     /// Emitted when the user wants to pick a contact instead of typing.
     signal contactLookupRequested(string prefix);
 
+    // Hardware numeric keypad -> dialer. The page itself holds key focus -- not
+    // numEntry's TextField, which is activeFocusOnPress:false -- so physical keys
+    // reach us without raising the on-screen keyboard or activating the maliit
+    // input context. The tab/stack machinery briefly hands focus elsewhere just
+    // after load, so reclaim it whenever the dialer is the visible page.
+    focus: true
+    onVisibleChanged: if (visible) pDialPage.forceActiveFocus();
+    onActiveFocusChanged: if (!activeFocus && visible) refocusTimer.restart();
+    Component.onCompleted: pDialPage.forceActiveFocus();
+
+    Keys.onPressed: (event) => {
+        var k = event.key;
+        if ((k >= Qt.Key_0 && k <= Qt.Key_9) ||
+            k === Qt.Key_Asterisk || k === Qt.Key_NumberSign || k === Qt.Key_Plus) {
+            // Route through the on-screen pad's signal so hardware keys get the
+            // same feedback, in-call DTMF and insert handling as tapped keys.
+            numPad.sendKey(k);
+        } else if (k === Qt.Key_Backspace || k === Qt.Key_Delete) {
+            numEntry.backspace();
+        } else if (k === Qt.Key_Call || k === Qt.Key_Yes ||
+                   k === Qt.Key_Return || k === Qt.Key_Enter) {
+            pDialPage.dial();
+        } else {
+            event.accepted = false;
+            return;
+        }
+        event.accepted = true;
+    }
+
+    Timer {
+        id: refocusTimer
+        interval: 0
+        onTriggered: if (pDialPage.visible && !pDialPage.activeFocus) pDialPage.forceActiveFocus();
+    }
+
     function reset() {
         numEntry.clear();
+    }
+
+    // Shared by the dial button and the hardware Call/Enter keys.
+    function dial() {
+        if (numEntry.text.length === 0) {
+            // Dial on an empty field brings back the last number dialled.
+            var last = pDialPage.dialHandler ? pDialPage.dialHandler.lastDialedNumber : "";
+            if (last.length > 0)
+                numEntry.text = last;
+            else
+                pDialPage.contactLookupRequested("");
+            return;
+        }
+        pDialPage.dialHandler.dial(numEntry.getPhoneNumber());
     }
 
     /// Fills the dialpad from contact lookup without dialling yet.
@@ -141,6 +190,10 @@ BasePage {
             console.log("Unable to vibrate");
         }
 
+        function dtmfFailure(message) {
+            console.log("Unable to play DTMF tone");
+        }
+
         onSendKey: (keycode) => {
             var feedback = AppTweaks.dialpadFeedbackTweakValue;
 
@@ -165,8 +218,15 @@ BasePage {
                 return;
             }
 
-            if ((feedback === "vibrateSound" || feedback === "soundOnly") && voiceCallMgrWrapper)
-                voiceCallMgrWrapper.manager.startDtmfTone(character);
+            // Local dialpad feedback tone via audiod's DTMF generator
+            // (com.palm.audio/dtmf/playDTMF). Nemo's manager.startDtmfTone()
+            // routes through ngfd, which LuneOS does not run, so it is silent
+            // here. audiod plays a self-stopping one-shot; only 0-9, * and #
+            // have tones.
+            if ((feedback === "vibrateSound" || feedback === "soundOnly") &&
+                ((character >= "0" && character <= "9") || character === "*" || character === "#"))
+                service.call("luna://com.palm.audio/dtmf/playDTMF",
+                             JSON.stringify({name: character}), undefined, dtmfFailure);
 
             numEntry.insert(character);
         }
@@ -181,22 +241,10 @@ BasePage {
             right: parent.right
         }
 
-        onClicked: {
-            if (numEntry.text.length === 0) {
-                // Dial on an empty field brings back the last number dialled,
-                // ready to be sent again, as the original dialer did.
-                var last = pDialPage.dialHandler ? pDialPage.dialHandler.lastDialedNumber : "";
-                if (last.length > 0)
-                    numEntry.text = last;
-                else
-                    pDialPage.contactLookupRequested("");
-                return;
-            }
-
-            // Every dial string -- number, MMI code, USSD, in-call digit --
-            // goes through the dial handler so the GSM rules apply uniformly.
-            pDialPage.dialHandler.dial(numEntry.getPhoneNumber());
-        }
+        // Every dial string -- number, MMI code, USSD, in-call digit -- goes
+        // through the dial handler (via pDialPage.dial()) so the GSM rules apply
+        // uniformly, whether triggered by this button or the hardware Call key.
+        onClicked: pDialPage.dial()
     }
     }
 }
