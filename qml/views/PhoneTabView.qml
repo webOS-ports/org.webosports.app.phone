@@ -102,6 +102,32 @@ Item {
         currentIndex = _stackIndexOf("phone");
         dialpadOverlay.open();
     }
+    /*
+     * The app menu, owned by the view rather than by the button that opens it
+     * -- on a device there is no button, and the status bar asks for it by
+     * relaunching the app.
+     */
+    PhoneAppMenu {
+        id: phoneAppMenu
+
+        dialHandler: tabView.dialHandler
+
+        onPreferencesRequested: prefsLoader.active = true
+        onAccountsRequested: accountsLoader.active = true
+        onClearHistoryRequested: clearHistoryDialog.open()
+    }
+
+    function openAppMenu() {
+        if (phoneAppMenu.visible) {
+            phoneAppMenu.close();
+            return;
+        }
+
+        // Out of the top left corner, where webOS drops it, whichever end of
+        // the screen this layout keeps its tabs.
+        phoneAppMenu.popup(tabView, 0, tabView.phoneUi ? 0 : header.height);
+    }
+
     Component.onCompleted: if (tabView.phoneUi) tabView.showDialer()
 
     /// Contacts live on the Phone tab, as they do on the reference.
@@ -152,13 +178,7 @@ Item {
             pressedColor: appTheme.buttonPressedColor
             borderColor: appTheme.buttonBorderColor
 
-            menu: PhoneAppMenu {
-                dialHandler: tabView.dialHandler
-
-                onPreferencesRequested: prefsLoader.active = true
-                onAccountsRequested: accountsLoader.active = true
-                onClearHistoryRequested: clearHistoryDialog.open()
-            }
+            menu: phoneAppMenu
         }
 
         // The platform TabBar can stack an icon over a caption since this

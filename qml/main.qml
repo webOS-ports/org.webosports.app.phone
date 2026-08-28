@@ -73,6 +73,17 @@ WebOSWindow {
         if (!params)
             return;
 
+        /*
+         * The status bar's menu does not draw anything itself: it relaunches
+         * the app with this command and leaves the app to put its own menu up.
+         * On a device that is the only way in, since the app draws no menu
+         * button of its own there.
+         */
+        if (params["palm-command"] === "open-app-menu") {
+            phoneWindow.openAppMenu();
+            return;
+        }
+
         if (params.mode && params.mode === "first-use") {
             // PIN window will now open automatically when the PIN is required
             return;
@@ -127,7 +138,7 @@ WebOSWindow {
                 console.log("Could not parse relaunch parameters: " + error);
             }
 
-            if (params.action || params.address) {
+            if (params.action || params.address || params["palm-command"]) {
                 root.handleLaunchParams(params);
                 return;
             }

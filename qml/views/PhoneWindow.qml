@@ -206,6 +206,12 @@ WebOSWindow {
 
             tabView.resetDialer();
             stackView.pop(null);
+
+            // A handset's Phone tab is the keypad, so that is what finishing a
+            // call goes back to. A tablet keeps the keypad behind a button and
+            // returns to whatever tab was showing.
+            if (tabView.phoneUi)
+                tabView.showDialer();
             // Guarded: this handler still has work to do after it, and a
             // throw here would skip the rest of the cleanup.
             if (incomingCallAlertWindow && incomingCallAlertWindow.visible) {
@@ -295,6 +301,12 @@ WebOSWindow {
         if (!phoneWindowId.visible) {
             phoneWindowId.show();
         }
+    }
+
+    /// Asked for by the status bar, which has no menu of its own to show.
+    function openAppMenu() {
+        if (tabView && tabView.openAppMenu)
+            tabView.openAppMenu();
     }
 
     function incomingCall(voiceCall) {
