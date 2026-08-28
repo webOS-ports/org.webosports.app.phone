@@ -1,0 +1,62 @@
+{
+  "comment": [
+    "Mock com.palm.account:1 records for desktop runs. Each one is a Synergy",
+    "account with a PHONE capability, so the phone app offers it as a way to",
+    "place a call. Remove entries here to see the app fall back to cellular",
+    "only; the templates that describe them are in the LunaService mock's",
+    "listAccountTemplates handler."
+  ],
+  "data": [
+    {
+      "_id": "++MockWhatsAppAccount",
+      "_kind": "com.palm.account:1",
+      "templateId": "com.palm.whatsapp",
+      "alias": "+31 6 2148 9831",
+      "username": "+31621489831",
+      "beingDeleted": false,
+      "capabilityProviders": [
+        {
+          "id": "whatsapp-phone",
+          "capability": "PHONE",
+          "implementation": "luna://com.palm.whatsapp",
+          "serviceName": "type_whatsapp",
+          "videoFormat": "both"
+        }
+      ]
+    },
+    {
+      "_id": "++MockTelegramAccount",
+      "_kind": "com.palm.account:1",
+      "templateId": "com.palm.telegram",
+      "alias": "herrie",
+      "username": "herrie",
+      "beingDeleted": false,
+      "capabilityProviders": [
+        {
+          "id": "telegram-phone",
+          "capability": "PHONE",
+          "implementation": "luna://com.palm.telegram",
+          "serviceName": "type_telegram",
+          "videoFormat": "both"
+        }
+      ]
+    },
+    {
+      "_id": "++MockSignalAccount",
+      "_kind": "com.palm.account:1",
+      "templateId": "com.palm.signal",
+      "alias": "+31 6 2148 9831",
+      "username": "+31621489831",
+      "beingDeleted": false,
+      "capabilityProviders": [
+        {
+          "id": "signal-phone",
+          "capability": "PHONE",
+          "implementation": "luna://com.palm.signal",
+          "serviceName": "type_signal",
+          "videoFormat": "none"
+        }
+      ]
+    }
+  ]
+}

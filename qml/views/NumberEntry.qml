@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2014 Roshan Gunasekara <roshan@mobileteck.com>
+ * Copyright (C) 2026 WebOS Ports
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,8 +19,22 @@
 import QtQuick 2.0
 import QtQuick.Controls 2.0
 
+// The menus, switches and fields here are the platform's, so they have to
+// be drawn by the platform's style rather than whatever Controls defaults to.
+import QtQuick.Controls.LuneOS 2.0
+
 import LunaNext.Common 0.1
 
+import "../services/PhoneNumberUtils.js" as PhoneNumberUtils
+
+/**
+ * The dial string field.
+ *
+ * `text` is always the raw string to dial; what the user sees is the same
+ * string formatted for their region, or the name of the matching contact once
+ * one has been picked. Ported from the legacy Dialer.DialStringWidget, which
+ * did the same split between rawString and dialString.
+ */
 Item {
     id: numberEntry
 
@@ -33,11 +48,32 @@ Item {
 
     property bool isPhoneNumber: true
 
+    /// Region used to format the number, e.g. "NL".
+    property string countryCode: "US"
+
+    /// When set, the field shows this name instead of the number. Cleared as
+    /// soon as the user types again, as in the legacy dialer.
+    property string contactName: ""
+
+    /// Emitted when the (empty) field is tapped, to open contact lookup.
+    signal emptyFieldClicked();
+
     property string __previousCharacter
+
+    readonly property string displayText: {
+        if (contactName.length > 0)
+            return contactName;
+        if (!isPhoneNumber || textEdit.text.length === 0)
+            return textEdit.text;
+
+        return PhoneNumberUtils.formatForDisplay(textEdit.text, countryCode, true);
+    }
 
     function insert(character) {
         var text = textEdit.text
         var cpos = textEdit.cursorPosition;
+
+        contactName = "";
 
         if(text.length == 0) {
             textEdit.text = character
@@ -53,6 +89,13 @@ Item {
     }
 
     function backspace() {
+        // Backspacing out of a contact name clears the whole entry, rather than
+        // leaving the number the name stood for behind.
+        if (contactName.length > 0) {
+            clear();
+            return;
+        }
+
         var cpos = textEdit.cursorPosition == 0 ? 1 : textEdit.cursorPosition;
         var text = textEdit.text
 
@@ -72,16 +115,20 @@ Item {
     }
 
     function clear() {
+        contactName = "";
         resetCursor();
         textEdit.text = '';
     }
 
+    /// Fills the field from a contact the user picked in contact lookup.
+    function setContact(name, number) {
+        textEdit.text = number;
+        contactName = name;
+        resetCursor();
+    }
+
     function getPhoneNumber(){
-        if(numEntry.text.length > 0) {
-            return numEntry.text.replace(/\D/g, '');
-        } else {
-            return ''
-        }
+        return textEdit.text;
     }
 
     Timer {
@@ -109,6 +156,7 @@ Item {
         width: Units.gu(5)
         height: Units.gu(3)
         fillMode: Image.PreserveAspectFit
+        visible: textEdit.text.length > 0
 
         anchors {
             verticalCenter: parent.verticalCenter
@@ -138,28 +186,55 @@ Item {
 
         activeFocusOnPress: false
         inputMethodHints: Qt.ImhDialableCharactersOnly
-        font.pixelSize: FontUtils.sizeToPixels("large")
-        color: "white"
+        color: "transparent"
         horizontalAlignment: TextInput.AlignLeft
-        placeholderText: isPhoneNumber ? "Enter phone number" : ""
+        placeholderText: isPhoneNumber ? qsTr("Enter phone number") : ""
 
         Component.onCompleted: {
             // On desktop we don't have this field
             if (textEdit.passwordCharacter)
-                textEdit.passwordCharacter = "\u2022";
+                textEdit.passwordCharacter = "•";
         }
 
-        placeholderTextColor: "white"
+        placeholderTextColor: numberEntry.textColor
         background: Rectangle {
             color: 'transparent'
+        }
+
+        // The field itself holds the raw string but is drawn transparent; what
+        // the user sees is the formatted version painted on top, so that
+        // formatting never changes what gets dialled.
+        Text {
+            id: displayLabel
+
+            anchors.fill: parent
+            verticalAlignment: Text.AlignVCenter
+            horizontalAlignment: textEdit.horizontalAlignment
+            elide: Text.ElideLeft
+
+            color: numberEntry.textColor
+            font.pixelSize: {
+                // Shrink long dial strings so they stay on one line, following
+                // the steps the legacy dialer used.
+                var length = numberEntry.displayText.length;
+                if (length <= 12) return FontUtils.sizeToPixels("large");
+                if (length <= 16) return FontUtils.sizeToPixels("medium");
+                return FontUtils.sizeToPixels("small");
+            }
+
+            text: (textEdit.echoMode === TextInput.Password)
+                      ? Array(textEdit.text.length + 1).join("•")
+                      : numberEntry.displayText
         }
     }
 
     MouseArea {
         anchors.fill:textEdit
 
-        onPressed: {
+        onPressed: (mouse) => {
             interactionTimeout.restart();
+            if (numberEntry.isPhoneNumber && textEdit.text.length === 0)
+                numberEntry.emptyFieldClicked();
             mouse.accepted = false;
         }
     }

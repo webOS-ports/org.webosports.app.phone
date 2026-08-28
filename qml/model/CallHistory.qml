@@ -154,6 +154,13 @@ Db8Model {
 
         callGroupID += Qt.formatDate(startTime, "d/M/yyyy") + "_";
 
+        // A call over a Synergy account is a different entry from a cellular
+        // call to the same person on the same day, so the service is part of
+        // the identity. Cellular keeps the legacy id so existing logs still match.
+        var service = endedVoiceCall.providerId || "com.palm.telephony";
+        if (service !== "com.palm.telephony")
+            callGroupID += service + "_";
+
         return callGroupID;
     }
 
@@ -170,12 +177,18 @@ Db8Model {
         var foundPhoneNumber = personMatchingNumber ? personMatchingNumber.foundPhoneNumber: null;
 
         var startTime = new Date();
-        startTime.setSeconds(startTime.getSeconds() - endedVoiceCall.duration);
+        startTime.setTime(startTime.getTime() - endedVoiceCall.duration);
 
         // get the group ID of that call
         var callGroupID = _buildCallGroupID(endedVoiceCall, foundPerson, startTime);
 
-        var actionForCall = IncomingCallsService.getActionForCall(endedVoiceCall.handlerId);
+        // Only an incoming call has an action recorded against it. Asking for
+        // one on an outgoing call answers "missed", because that is what the
+        // register says about a call it has never heard of -- and a call the
+        // user placed and then cancelled would be filed as one they missed.
+        var actionForCall = endedVoiceCall.isIncoming
+                                ? IncomingCallsService.getActionForCall(endedVoiceCall.handlerId)
+                                : IncomingCallsService.Accepted;
 
         var newCallItem = {
             _kind: "com.palm.phonecall:1",
@@ -185,14 +198,17 @@ Db8Model {
             timestampInSecs: Math.floor(startTime.getTime()/1000),
             to: []
         };
-        if( actionForCall===IncomingCallsService.Missed ) newCallItem.groups.push(callGroupID+"missed");
-
         var normalizedLineId = LibPhoneNumber.normalizePhoneNumber(endedVoiceCall.lineId, personListModel.countryCode);
+
+        // With Synergy a call can go over any calling account, so the log has
+        // to record which one -- "service" is what the call log reads back to
+        // show the network a call was placed on.
+        var callService = endedVoiceCall.providerId || "com.palm.telephony";
 
         var personDetails = {
             addr: endedVoiceCall.lineId,
             normalizedAddr: normalizedLineId,
-            service: "com.palm.telephony"
+            service: callService
         };
         if( foundPerson ) {
             personDetails.name = (foundPerson.nickname === "") ? (foundPerson.name.givenName + " " + foundPerson.name.familyName) : foundPerson.nickname;
@@ -206,7 +222,7 @@ Db8Model {
 
         if( endedVoiceCall.isIncoming ) {
             newCallItem.from = personDetails;
-            newCallItem.to.push({ addr: "", service: "com.palm.telephony" });
+            newCallItem.to.push({ addr: "", service: callService });
 
             if(actionForCall===IncomingCallsService.Missed) {
                 newCallItem.type = "missed";
@@ -219,10 +235,14 @@ Db8Model {
             }
         }
         else {
-            newCallItem.from = { addr: "", service: "com.palm.telephony" };
+            newCallItem.from = { addr: "", service: callService };
             newCallItem.to.push(personDetails);
             newCallItem.type = "outgoing";
         }
+
+        // Now the type is settled, file the call under the missed group too if
+        // that is what it was.
+        if( newCallItem.type === "missed" ) newCallItem.groups.push(callGroupID+"missed");
 
         // In all cases, a call item must be added
         __queryDB('put', { objects: [ newCallItem ] }, function(result) {});
@@ -249,7 +269,7 @@ Db8Model {
                 existingCallGroup = result.results[0];
                 action = "merge";
             }
-            __addOrUpdate(action, existingCallGroup, "merge");
+            __addOrUpdate(action, existingCallGroup, "missed");
         }
 
         // Also, the callgroup must be either created or updated
@@ -281,6 +301,45 @@ Db8Model {
         }
     }
 
+
+    /**
+     * Removes one call group and every call in it. The legacy call log offered
+     * this as a swipe-to-delete on each row; the QML app had no way to remove
+     * anything from the history at all.
+     */
+    function deleteCallGroup(groupId)
+    {
+        if (!groupId || groupId.length === 0) return;
+
+        console.log("Call History: deleting group " + groupId);
+
+        // The individual calls reference their groups by id, so they have to go
+        // first -- otherwise they would be orphaned and still counted.
+        __queryDB('del', { query: { from: "com.palm.phonecall:1",
+                                    where: [ { prop: "groups", op: "=", val: groupId } ] } },
+                  function(result) {});
+
+        __queryDB('del', { query: { from: "com.palm.phonecallgroup:1",
+                                    where: [ { prop: "groupId", op: "=", val: groupId } ] } },
+                  function(result) {});
+    }
+
+    /// Empties the whole call log, as the legacy app menu's "Clear Call History".
+    function clearHistory()
+    {
+        console.log("Call History: clearing everything");
+
+        __queryDB('del', { query: { from: "com.palm.phonecall:1" } }, function(result) {});
+        __queryDB('del', { query: { from: "com.palm.phonecallgroup:1" } }, function(result) {});
+    }
+
+    /// Removes every missed-call group, leaving the rest of the log alone.
+    function clearMissedCalls()
+    {
+        __queryDB('del', { query: { from: "com.palm.phonecallgroup:1",
+                                    where: [ { prop: "type", op: "=", val: "missed" } ] } },
+                  function(result) {});
+    }
 
     property QtObject __ls2service: LunaService {
         id: __lunaNextLS2Service

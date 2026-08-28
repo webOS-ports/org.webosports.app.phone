@@ -1,5 +1,6 @@
 /*
- * Copyright (C) 2014 Roshan Gunasekara <roshan@mobileteck.com>
+ * Copyright (C) 2015 Simon Busch <morphis@gravedo.de>
+ * Copyright (C) 2026 WebOS Ports
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -27,9 +28,13 @@ import LuneOS.Service 1.0
 import QOfono 0.2
 import "../services"
 import "../services/PinTypes.js" as PinTypes
+import "../services/CallMessages.js" as CallMessages
 
 WebOSWindow {
     id: simPinWindow
+
+    property TelephonyManager telephonyManager
+    property VoiceCallMgrWrapper voiceCallMgrWrapper
 
     width: Settings.displayWidth
     height: Settings.displayHeight
@@ -46,38 +51,51 @@ WebOSWindow {
     property bool _showNeeded: false
 
     function _finished(success) {
-        if (success)
+        if (success) {
+            _enteredPuk = "";
+            pinInput.clear();
+            pinInput.retrying = false;
             simPinWindow.close();
+        }
     }
 
     function _handlePinComplete(error, message) {
         switch (error) {
         case OfonoSimManager.NotImplementedError:
         case OfonoSimManager.UnknownError:
+            console.log("PIN operation failed: " + message);
+            _statusMessage = CallMessages.pinFailureDefault;
             _finished(false);
             break;
         case OfonoSimManager.InProgressError:
             break;
         case OfonoSimManager.InvalidArgumentsError:
         case OfonoSimManager.InvalidFormatError:
-        case OfonoSimManager.FailedError:
+            _statusMessage = CallMessages.pinFailure["badformat"];
             pinInput.clear();
             break;
+        case OfonoSimManager.FailedError:
+            // A wrong PUK must not silently take the first half of a PUK+PIN
+            // pair with it -- start the pair over so the user is not left
+            // entering a new PIN against a PUK the SIM already rejected.
+            _statusMessage = simManager.isPukType(_confirmedPinType)
+                                 ? CallMessages.pukFailure["incorrect"]
+                                 : CallMessages.pinFailure["incorrect"];
+            _enteredPuk = "";
+            pinInput.retrying = true;
+            pinInput.resetEntry();
+            break;
         case OfonoSimManager.NoError:
-            if (simManager.isPukType(_confirmedPinType)) {
-
-            }
-            else {
-                // PIN was correct
-            }
-
+            _statusMessage = "";
             _finished(true);
-
             break;
         }
     }
 
+    property string _statusMessage: ""
+
     function _handleSimPermBlocked() {
+        _statusMessage = qsTr("This SIM card is permanently blocked. Contact your network operator.");
     }
 
     PhoneUiTheme { id: phoneUiAppTheme }
@@ -91,8 +109,8 @@ WebOSWindow {
 
         modemPath: modemManager.defaultModem
 
-        onEnterPinComplete: _handlePinComplete(error, errorString)
-        onResetPinComplete: _handlePinComplete(error, errorString)
+        onEnterPinComplete: (error, errorString) => _handlePinComplete(error, errorString)
+        onResetPinComplete: (error, errorString) => _handlePinComplete(error, errorString)
 
         onPinRetriesChanged: {
             for (var type in pinRetries) {
@@ -102,6 +120,11 @@ WebOSWindow {
         }
 
         onPinRequiredChanged: {
+            // Whatever half-finished PUK sequence was in flight no longer
+            // applies once the SIM asks for something else.
+            _enteredPuk = "";
+            pinInput.resetEntry();
+
             if (simPinWindow.visible)
                 return;
 
@@ -116,21 +139,25 @@ WebOSWindow {
         id: pinInput
 
         anchors.fill: parent
+        visible: !emergencyDialer.visible
 
         simManager: simManager
         requestedPinType: simManager.pinRequired
+        statusMessage: simPinWindow._statusMessage
 
         onPinEntered: {
             _confirmedPinType = simManager.pinRequired
+            simPinWindow._statusMessage = "";
 
             if (simManager.isPukType(simManager.pinRequired)) {
                 if (_enteredPuk.length === 0) {
+                    // First half of the PUK sequence: remember the PUK, then
+                    // ask for the new PIN the SIM will be reset to.
                     _enteredPuk = pinInput.pin;
                     pinInput.requestNewPin();
                 }
                 else {
                     simManager.resetPin(simManager.pinRequired, _enteredPuk, pinInput.pin);
-                    _enteredPuk = "";
                 }
             }
             else {
@@ -138,8 +165,25 @@ WebOSWindow {
             }
         }
 
+        onEmergencyCallRequested: emergencyDialer.visible = true
+
         onCanceled: {
             simPinWindow.close();
         }
+    }
+
+    // A locked SIM must still be able to reach the emergency services; the
+    // legacy app had a whole phoneEmergency card for exactly this.
+    EmergencyDialerPage {
+        id: emergencyDialer
+
+        anchors.fill: parent
+        visible: false
+
+        appTheme: phoneUiAppTheme
+        telephonyManager: simPinWindow.telephonyManager
+        voiceCallMgrWrapper: simPinWindow.voiceCallMgrWrapper
+
+        onClosed: emergencyDialer.visible = false
     }
 }

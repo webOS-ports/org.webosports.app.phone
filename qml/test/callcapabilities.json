@@ -1,0 +1,39 @@
+{
+  "comment": [
+    "Mock com.palm.callcapabilities:1 records: what each transport reports at",
+    "runtime. networkStatus is what makes a service selectable in the",
+    "'which service?' chooser -- set one to 'none' to see it greyed out."
+  ],
+  "data": [
+    {
+      "_id": "++MockCapWhatsApp",
+      "_kind": "com.palm.callcapabilities:1",
+      "transport": "com.palm.whatsapp",
+      "serviceName": "type_whatsapp",
+      "networkName": "WhatsApp",
+      "networkStatus": "service",
+      "videoFormat": "both",
+      "implementation": "luna://com.palm.whatsapp"
+    },
+    {
+      "_id": "++MockCapTelegram",
+      "_kind": "com.palm.callcapabilities:1",
+      "transport": "com.palm.telegram",
+      "serviceName": "type_telegram",
+      "networkName": "Telegram",
+      "networkStatus": "service",
+      "videoFormat": "both",
+      "implementation": "luna://com.palm.telegram"
+    },
+    {
+      "_id": "++MockCapSignal",
+      "_kind": "com.palm.callcapabilities:1",
+      "transport": "com.palm.signal",
+      "serviceName": "type_signal",
+      "networkName": "Signal",
+      "networkStatus": "service",
+      "videoFormat": "none",
+      "implementation": "luna://com.palm.signal"
+    }
+  ]
+}

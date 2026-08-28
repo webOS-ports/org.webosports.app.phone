@@ -1,0 +1,245 @@
+/*
+ * Copyright (C) 2026 WebOS Ports
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>
+ */
+
+import QtQuick 2.0
+import QtQuick.Controls 2.5
+
+// The menus, switches and fields here are the platform's, so they have to
+// be drawn by the platform's style rather than whatever Controls defaults to.
+import QtQuick.Controls.LuneOS 2.0
+import QtQuick.Layouts 1.2
+
+import LunaNext.Common 0.1
+import LuneOS.Service 1.0
+
+/**
+ * "Your phone accounts": which services this device can place calls over.
+ *
+ * Ports the legacy firstLaunch/ConnectPhone scene, generalised. It is shown on
+ * its own when no calling account exists at all -- with no SIM and no connector
+ * there is nothing the dialpad could do -- and is reachable from the
+ * preferences the rest of the time.
+ */
+BasePage {
+    id: accountsPage
+
+    pageName: "PhoneAccounts"
+
+    // A preference scene is light, and belongs to the settings world rather
+    // than to the call -- so it does not take the call card's gradient.
+    gradient: null
+    color: appTheme.prefsBackgroundColor
+
+    Rectangle {
+        id: prefsHeader
+
+        anchors { top: parent.top; left: parent.left; right: parent.right }
+        height: Units.gu(5)
+        color: appTheme.prefsHeaderColor
+
+        Row {
+            anchors.centerIn: parent
+            spacing: Units.gu(0.8)
+
+            Image {
+                anchors.verticalCenter: parent.verticalCenter
+                width: Units.gu(2.8)
+                height: Units.gu(2.8)
+                fillMode: Image.PreserveAspectFit
+                source: Qt.resolvedUrl("../../icon.png")
+            }
+
+            Text {
+                anchors.verticalCenter: parent.verticalCenter
+                color: appTheme.prefsTextColor
+                font.pixelSize: FontUtils.sizeToPixels("large")
+                text: qsTr("Phone Accounts")
+            }
+        }
+
+        Rectangle {
+            anchors { left: parent.left; right: parent.right; bottom: parent.bottom }
+            height: 1
+            color: appTheme.prefsRowDividerColor
+        }
+    }
+
+
+    signal closed();
+
+    Text {
+        id: header
+
+        anchors {
+            top: prefsHeader.bottom
+            left: parent.left
+            right: parent.right
+            margins: Units.gu(1.5)
+        }
+        horizontalAlignment: Text.AlignHCenter
+        wrapMode: Text.Wrap
+        color: accountsPage.appTheme.prefsTextColor
+        font.bold: true
+        font.pixelSize: FontUtils.sizeToPixels("large")
+        text: qsTr("Your phone accounts")
+    }
+
+    Text {
+        id: subheader
+
+        anchors {
+            top: header.bottom
+            left: parent.left
+            right: parent.right
+            margins: Units.gu(1.5)
+        }
+        horizontalAlignment: Text.AlignHCenter
+        wrapMode: Text.Wrap
+        color: accountsPage.appTheme.prefsSecondaryTextColor
+        font.pixelSize: FontUtils.sizeToPixels("small")
+        text: accountsPage.callTransports && accountsPage.callTransports.callableTransportIds().length > 0
+                  ? qsTr("Calls can be placed over any of these.")
+                  : qsTr("Add an account that can place calls, or insert a SIM card.")
+    }
+
+    Flickable {
+        anchors {
+            top: subheader.bottom
+            bottom: doneButton.top
+            left: parent.left
+            right: parent.right
+            margins: Units.gu(1.5)
+        }
+        contentHeight: accountsColumn.height
+        clip: true
+
+        Column {
+            id: accountsColumn
+
+            width: parent.width
+            spacing: Units.gu(1.5)
+
+            // The accounts, in a group of their own as the preferences scene
+            // shows them -- not as dark panels floating on a light page.
+            PrefsGroup {
+                width: parent.width
+                appTheme: accountsPage.appTheme
+                title: qsTr("Accounts")
+
+                Repeater {
+                    model: accountsPage.callTransports
+                               ? accountsPage.callTransports.callableTransportIds() : []
+
+                    delegate: Item {
+                        required property var modelData
+                        readonly property var transport:
+                            accountsPage.callTransports.transportFor(modelData)
+
+                        width: accountsColumn.width - Units.gu(1.6)
+                        height: Units.gu(5.5)
+
+                        RowLayout {
+                            anchors.fill: parent
+                            anchors.leftMargin: Units.gu(0.4)
+                            anchors.rightMargin: Units.gu(0.4)
+                            spacing: Units.gu(1)
+
+                            Image {
+                                Layout.preferredWidth: Units.gu(3.4)
+                                Layout.preferredHeight: Units.gu(3.4)
+                                fillMode: Image.PreserveAspectFit
+                                visible: !!source && String(source).length > 0
+                                source: (transport && transport.icon) ? transport.icon : ""
+                            }
+
+                            ColumnLayout {
+                                Layout.fillWidth: true
+                                spacing: 0
+
+                                Text {
+                                    Layout.fillWidth: true
+                                    color: accountsPage.appTheme.prefsTextColor
+                                    elide: Text.ElideRight
+                                    font.pixelSize: FontUtils.sizeToPixels("medium")
+                                    text: accountsPage.callTransports.labelFor(modelData)
+                                }
+                                Text {
+                                    Layout.fillWidth: true
+                                    color: accountsPage.appTheme.prefsSecondaryTextColor
+                                    elide: Text.ElideRight
+                                    font.pixelSize: FontUtils.sizeToPixels("small")
+                                    text: {
+                                        if (transport && transport.alias && transport.alias.length > 0)
+                                            return transport.alias;
+
+                                        return accountsPage.callTransports.isAvailable(modelData)
+                                                   ? qsTr("Ready") : qsTr("Not available");
+                                    }
+                                }
+                            }
+
+                            Text {
+                                color: accountsPage.appTheme.prefsSecondaryTextColor
+                                font.pixelSize: FontUtils.sizeToPixels("small")
+                                visible: accountsPage.callTransports.supportsVideo(modelData)
+                                text: qsTr("Video")
+                            }
+                        }
+                    }
+                }
+
+                Item {
+                    width: accountsColumn.width - Units.gu(1.6)
+                    height: Units.gu(5.5)
+                    visible: !accountsPage.callTransports ||
+                             accountsPage.callTransports.callableTransportIds().length === 0
+
+                    Text {
+                        anchors.centerIn: parent
+                        color: accountsPage.appTheme.prefsSecondaryTextColor
+                        font.pixelSize: FontUtils.sizeToPixels("medium")
+                        text: qsTr("No calling accounts yet")
+                    }
+                }
+            }
+
+            PrefsLightButton {
+                width: parent.width
+                appTheme: accountsPage.appTheme
+                text: qsTr("Add an account")
+
+                onClicked: lunaService.call("luna://com.webos.applicationManager/launch",
+                                            JSON.stringify({ id: "com.palm.app.accounts" }), undefined,
+                                            function(error) { console.log("Could not open Accounts: " + error); })
+            }
+        }
+    }
+
+    PrefsDoneBar {
+        id: doneButton
+
+        anchors { bottom: parent.bottom; left: parent.left; right: parent.right }
+        appTheme: accountsPage.appTheme
+
+        onClicked: accountsPage.closed()
+    }
+
+    LunaService {
+        id: lunaService
+        name: "org.webosports.app.phone"
+    }
+}

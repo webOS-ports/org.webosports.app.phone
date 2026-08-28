@@ -1,0 +1,24 @@
+{
+  "comment": [
+    "Mock com.palm.imbuddystatus:1 presence. availability 0 means offline, so",
+    "the Telegram row for that contact shows dimmed in the contact list."
+  ],
+  "data": [
+    {
+      "_id": "++MockBuddy1",
+      "_kind": "com.palm.imbuddystatus.libpurple:1",
+      "serviceName": "type_whatsapp",
+      "username": "+31621489831",
+      "availability": 1,
+      "status": "Available"
+    },
+    {
+      "_id": "++MockBuddy2",
+      "_kind": "com.palm.imbuddystatus.libpurple:1",
+      "serviceName": "type_telegram",
+      "username": "id8864003499",
+      "availability": 0,
+      "status": "Offline"
+    }
+  ]
+}

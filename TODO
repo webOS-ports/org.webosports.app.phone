@@ -1,10 +1,92 @@
-Unsorted and unpriorized list of things we are missing:
+Feature parity with the legacy Enyo phone app (com.palm.app.phone)
+=================================================================
 
-* phone number formatting depending on current localization settings
+The legacy app's own source was never open sourced; what is ported here was
+reconstructed from the copy in core-apps/com.palm.app.phone. Ported code carries
+a comment naming the legacy file it came from.
+
+
+Ported
+------
+
+* Dial string handling (source/telephonydialhandler/)
+    * emergency numbers, from oFono with the standard fallback list
+    * emergency dialling with the radio off: power up, wait for registration, redial
+    * MMI codes -- call forwarding, call waiting, call barring, CLIR/CLIP/CNAP,
+      IMEI, PIN/PUK change -- carried out over the matching oFono interfaces
+    * USSD, including interactive sessions the user can reply to
+    * CLIR prefixes (*31# / #31#)
+    * in-call control digits (3GPP 22.030: 0, 1, 2, 3, 1X, 2X)
+    * post-dial strings: ',' pauses and sends, ';' waits for the user
+    * launch codes (#*NNN#) that hand off to another application
 * Call management
-    * popupalert window for incoming calls
-    * overall call handling
-* extracting person:1 data for favorites
-* SIM PUK handling
-* call history (needs proper support in webos-telephonyd)
-* ...
+    * several calls at once: hold, swap, merge into a conference, split back out
+    * add a second call from the in-call screen
+    * call waiting, announced with the short tone instead of the ringtone
+    * popupalert window for incoming calls (was already there)
+    * missed-call notification and alert with "Call back"
+    * "unable to connect" alert, with a "Turn radio on" action in airplane mode
+    * audio routing: earpiece, speaker, wired headset, bluetooth; speaker while
+      docked on a Touchstone; proximity sensor while held to the ear
+* Phone number formatting against the current region, on the dialpad as you type
+  and everywhere a number is displayed
+* Contact lookup: search by name or number, pick which number to call
+* Type-ahead contact match on the dialpad
+* Favourites: display name, photo, and one row per number
+* Call history: swipe to delete, clear all from the app menu, call back, text,
+  add to / view in Contacts, filter by name or number
+* Voicemail: mailbox number from the SIM, long press on 1, app menu entry,
+  new-message notification
+* Dialing shortcuts (a prefix per number length)
+* SIM PIN and PUK, with the full PUK -> new PIN -> confirm sequence
+* Emergency dialpad over a locked SIM
+* Preferences: call forwarding, call waiting, caller ID, call barring, voicemail
+  number, dialing shortcuts, SIM PIN
+* Launch actions from other applications (dial, answer, reject, swap, merge,
+  extract, dtmf, activecall, voicemail, calllog, favorites, dialpad)
+* App menu
+* Synergy: calling over any account, not just the modem
+    * transport registry built from PHONE-capable accounts + com.palm.callcapabilities:1
+    * connector calls driven over the account's own luna service and adapted to
+      look like ordinary voice calls, so hold/swap/merge/DTMF/history all apply
+    * dial proxy: preferred service per domestic/international call, and a
+      dial-time chooser when the user has expressed no preference
+    * per-contact call options -- their numbers and their IM addresses, each
+      labelled with the service it goes over
+    * Video tab, shown only when a signed-in account supports video
+    * buddy presence from com.palm.imbuddystatus:1
+    * call log records and reuses the account each call went over
+    * "Your phone accounts" screen
+  SERVICE-AGNOSTIC throughout: no connector is named anywhere in the app, so a
+  new one needs an account template and no code.
+* Visuals matched to the webOS 3.x phone app as it runs on the TouchPad:
+  charcoal chrome, top tab bar with icon + label, light contact lists with the
+  service in grey caps on the right, and the black call card with one line per
+  call
+
+
+Deliberately not ported
+-----------------------
+
+* CDMA-era features: OTASP, MSL, PRL, provisioning, world phone / multimode.
+  oFono has no equivalent and the hardware is gone.
+* Skype specifically: its backend is gone. Any other connector that declares a
+  PHONE capability is supported without naming it.
+* Visual voicemail: carrier-specific, needs a VVM service that LuneOS lacks.
+* Voice dialing: needs a speech recognition engine.
+* First-launch / account setup screens.
+
+
+Still missing
+-------------
+
+* Call history needs proper support in webos-telephonyd for calls placed while
+  the app is not running.
+* Extracting person:1 data for favourites still reads the raw db8 record rather
+  than going through a contacts service.
+* Bluetooth handsfree: the audio route is detected, but AT command handling
+  (answering from the headset) relies on the launch-action path rather than a
+  direct oFono Handsfree binding.
+* Fixed dialing (FDN) is reported by oFono but there is no UI for editing the
+  FDN list.
+* Network operator selection has no UI.
