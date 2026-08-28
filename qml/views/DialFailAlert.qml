@@ -17,6 +17,7 @@
 
 import QtQuick 2.0
 
+import "../services"
 import "../services/CallMessages.js" as CallMessages
 
 /**
@@ -34,8 +35,8 @@ MessageAlert {
     /// DialFail.js puts the error icon after the text, unlike the call popups.
     iconOnRight: true
 
-    property var dialHandler
-    property var telephonyManager
+    property DialHandler dialHandler
+    property TelephonyManager telephonyManager
 
     property string _pendingNumber: ""
 

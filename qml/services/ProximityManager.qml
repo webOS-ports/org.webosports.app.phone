@@ -29,8 +29,8 @@ import LuneOS.Service 1.0
 Item {
     id: proximityManager
 
-    property var voiceCallManager
-    property var audioRouteManager
+    property VoiceCallMgrWrapper voiceCallManager
+    property AudioRouteManager audioRouteManager
 
     readonly property bool shouldEnable: !!voiceCallManager &&
                                          (!!voiceCallManager.activeVoiceCall ||
@@ -72,7 +72,6 @@ Item {
     LunaService {
         id: proximitySubscription
         name: "org.webosports.app.phone"
-        usePrivateBus: true
         service: "luna://com.palm.display"
         method: "control/setProperty"
 

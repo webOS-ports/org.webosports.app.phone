@@ -19,6 +19,7 @@ import QtQuick 2.0
 
 import LuneOS.Service 1.0
 
+import "../model"
 import "IncomingCallsService.js" as IncomingCallsService
 import "CallMessages.js" as CallMessages
 
@@ -33,9 +34,9 @@ import "CallMessages.js" as CallMessages
 Item {
     id: notificationManager
 
-    property var voiceCallManager
-    property var telephonyManager
-    property var contacts
+    property VoiceCallMgrWrapper voiceCallManager
+    property TelephonyManager telephonyManager
+    property ContactsModel contacts
 
     readonly property string appId: "org.webosports.app.phone"
 
@@ -112,6 +113,5 @@ Item {
     LunaService {
         id: lunaService
         name: "org.webosports.app.phone"
-        usePrivateBus: true
     }
 }

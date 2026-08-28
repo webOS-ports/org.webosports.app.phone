@@ -35,12 +35,12 @@ import "CallMessages.js" as CallMessages
 Item {
     id: dialHandler
 
-    property var voiceCallMgrWrapper
-    property var telephonyManager
-    property var supplementaryServices
-    property var dialingShortcuts
-    property var dialProxy
-    property var callTransports
+    property VoiceCallMgrWrapper voiceCallMgrWrapper
+    property TelephonyManager telephonyManager
+    property SupplementaryServices supplementaryServices
+    property DialingShortcuts dialingShortcuts
+    property DialProxy dialProxy
+    property CallTransports callTransports
 
     /// Set from the North American dialling tweak; makes *NN / 0 / 00 dial
     /// instead of going out as USSD.
@@ -341,6 +341,5 @@ Item {
     LunaService {
         id: lunaService
         name: "org.webosports.app.phone"
-        usePrivateBus: true
     }
 }

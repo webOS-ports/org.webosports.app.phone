@@ -26,6 +26,7 @@ import LuneOS.Service 1.0
 import LuneOS.Telephony 1.0
 
 import "../model"
+import "../services"
 import "../services/PhoneNumberUtils.js" as PhoneNumberUtils
 
 /**
@@ -50,8 +51,8 @@ Item {
     property var callGroupRemotePerson;
     property var callGroupAddress;
     property string callGroupId;
-    property var dialHandler;
-    property var callTransports;
+    property DialHandler dialHandler;
+    property CallTransports callTransports;
     property PhoneUiTheme appTheme: PhoneUiTheme {}
 
     readonly property string callService: (callGroupAddress && callGroupAddress.service)
@@ -389,6 +390,5 @@ Item {
     LunaService {
         id: lunaService
         name: "org.webosports.app.phone"
-        usePrivateBus: true
     }
 }

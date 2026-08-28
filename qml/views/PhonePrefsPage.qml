@@ -25,6 +25,8 @@ import QtQuick.Layouts 1.2
 
 import LunaNext.Common 0.1
 
+import "../services"
+
 /**
  * Phone preferences.
  *
@@ -78,7 +80,7 @@ BasePage {
         }
     }
 
-    property var dialingShortcuts
+    property DialingShortcuts dialingShortcuts
 
     signal closed();
 

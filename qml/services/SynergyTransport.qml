@@ -223,7 +223,6 @@ Item {
     LunaService {
         id: lunaService
         name: "org.webosports.app.phone"
-        usePrivateBus: true
     }
 
     // Subscribe as soon as we know which service to talk to. The connector may

@@ -38,7 +38,6 @@ Item {
     id: callTransports
 
     readonly property string cellularTransport: ServiceLabels.TIL
-    readonly property string palmProfile: ServiceLabels.PALM_PROFILE
 
     /**
      * Every known transport, keyed by account templateId. Each entry carries:
@@ -71,18 +70,16 @@ Item {
         return Object.keys(transports);
     }
 
-    /// Every transport except cellular and the palm profile: the Synergy ones.
+    /// Every transport except cellular: the Synergy ones.
     function voipTransportIds() {
         return transportIds().filter(function(id) {
-            return id !== cellularTransport && id !== palmProfile;
+            return id !== cellularTransport;
         });
     }
 
     /// Transports the user can actually place a call over right now.
     function callableTransportIds() {
-        return transportIds().filter(function(id) {
-            return id !== palmProfile;
-        });
+        return transportIds();
     }
 
     readonly property bool hasCellular: !!transports[cellularTransport]
@@ -287,7 +284,6 @@ Item {
     LunaService {
         id: lunaService
         name: "org.webosports.app.phone"
-        usePrivateBus: true
     }
 
     // Runtime call capabilities, watched so a connector coming online updates

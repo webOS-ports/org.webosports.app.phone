@@ -71,7 +71,6 @@ Item {
     LunaService {
         id: lunaService
         name: "org.webosports.app.phone"
-        usePrivateBus: true
     }
 
     Component.onCompleted: {

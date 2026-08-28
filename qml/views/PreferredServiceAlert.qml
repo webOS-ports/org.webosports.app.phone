@@ -20,6 +20,9 @@ import QtQuick 2.0
 import LunaNext.Common 0.1
 import LuneOS.Components 1.0 as LuneComponents
 
+import "../services"
+import "../model"
+
 /**
  * "Which service would you like to use?"
  *
@@ -32,10 +35,10 @@ Item {
     id: preferredServiceAlert
 
     property PhoneUiTheme appTheme;
-    property var callTransports
-    property var dialProxy
-    property var dialHandler
-    property var contacts
+    property CallTransports callTransports
+    property DialProxy dialProxy
+    property DialHandler dialHandler
+    property ContactsModel contacts
 
     property var callData: ({})
     property bool remember: false

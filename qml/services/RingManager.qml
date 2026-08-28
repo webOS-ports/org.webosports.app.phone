@@ -122,7 +122,6 @@ Item {
     LunaService {
         id: __lunaNextLS2Service
         name: "org.webosports.app.phone"
-        usePrivateBus: true
     }
     function _getPreferencesSuccess(message) {
         var response = JSON.parse(message.payload)

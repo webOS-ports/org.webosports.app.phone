@@ -47,11 +47,11 @@ Item {
     property ContactsModel contacts;
     property CallHistory historyModel;
     property FavoritesModel favoritesModel;
-    property var dialHandler;
-    property var supplementaryServices;
-    property var dialingShortcuts;
-    property var callTransports;
-    property var imBuddyStatus;
+    property DialHandler dialHandler;
+    property SupplementaryServices supplementaryServices;
+    property DialingShortcuts dialingShortcuts;
+    property CallTransports callTransports;
+    property ImBuddyStatus imBuddyStatus;
 
     /// True only under the desktop host, which has no system app menu to use.
     property bool runningOnDesktop: false

@@ -24,6 +24,8 @@ import QtQuick.Controls.LuneOS 2.0
 
 import LuneOS.Service 1.0
 
+import "../services"
+
 /**
  * The application menu, ported from the legacy phoneAppMenu: clear call
  * history, call voicemail, and shortcuts into the sounds and preferences apps.
@@ -41,7 +43,7 @@ Menu {
     // one that drops out of the corner of the screen.
     LuneOSMenu.appMenuStyle: true
 
-    property var dialHandler
+    property DialHandler dialHandler
 
     /// Asked to empty the call log; the owner confirms before it happens.
     signal clearHistoryRequested();
@@ -90,6 +92,5 @@ Menu {
     LunaService {
         id: lunaService
         name: "org.webosports.app.phone"
-        usePrivateBus: true
     }
 }

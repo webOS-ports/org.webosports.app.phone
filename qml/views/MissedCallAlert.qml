@@ -20,6 +20,7 @@ import QtQml
 
 import LuneOS.Service 1.0
 
+import "../services"
 import "../services/CallMessages.js" as CallMessages
 
 /**
@@ -30,7 +31,7 @@ import "../services/CallMessages.js" as CallMessages
 MessageAlert {
     id: missedCallAlert
 
-    property var dialHandler
+    property DialHandler dialHandler
 
     property string _missedNumber: ""
 
@@ -61,6 +62,5 @@ MessageAlert {
     LunaService {
         id: lunaService
         name: "org.webosports.app.phone"
-        usePrivateBus: true
     }
 }

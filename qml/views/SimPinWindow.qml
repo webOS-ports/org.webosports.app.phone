@@ -33,8 +33,8 @@ import "../services/CallMessages.js" as CallMessages
 WebOSWindow {
     id: simPinWindow
 
-    property var telephonyManager
-    property var voiceCallMgrWrapper
+    property TelephonyManager telephonyManager
+    property VoiceCallMgrWrapper voiceCallMgrWrapper
 
     width: Settings.displayWidth
     height: Settings.displayHeight

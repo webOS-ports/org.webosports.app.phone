@@ -23,6 +23,7 @@ import LuneOS.Components 1.0
 import org.nemomobile.voicecall 1.0
 
 import "../model"
+import "../services"
 import "../services/PhoneNumberUtils.js" as PhoneNumberUtils
 import "../services/CallMessages.js" as CallMessages
 
@@ -41,7 +42,7 @@ Item {
     property var voiceCall
     property ContactsModel contacts
     property PhoneUiTheme appTheme
-    property var callTransports
+    property CallTransports callTransports
     property bool selected: false
     /// Shows the merge/swap arrow; the card decides when that is meaningful.
     property bool canJoin: false

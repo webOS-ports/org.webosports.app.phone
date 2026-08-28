@@ -42,7 +42,6 @@ Item {
     LunaService {
         id: __lunaNextLS2Service
         name: "org.webosports.app.phone"
-        usePrivateBus: true
     }
 
     property VoiceCallManager manager: VoiceCallManager {
@@ -56,7 +55,7 @@ Item {
 
     /// The Synergy transport registry. Calls placed over a messaging connector
     /// go through the matching SynergyTransport instead of the modem.
-    property var callTransports
+    property CallTransports callTransports
 
     /// One driver per non-cellular transport, keyed by templateId.
     property var synergyTransports: ({})

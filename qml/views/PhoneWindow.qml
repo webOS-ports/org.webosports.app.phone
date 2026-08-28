@@ -41,12 +41,12 @@ WebOSWindow {
     property SimPinWindow simPinWindow
     property PhoneUiTheme phoneUiAppTheme;
 
-    property var dialHandler;
-    property var supplementaryServices;
-    property var audioRouteManager;
-    property var dialingShortcuts;
-    property var callTransports;
-    property var imBuddyStatus;
+    property DialHandler dialHandler;
+    property SupplementaryServices supplementaryServices;
+    property AudioRouteManager audioRouteManager;
+    property DialingShortcuts dialingShortcuts;
+    property CallTransports callTransports;
+    property ImBuddyStatus imBuddyStatus;
 
     /// True only under the desktop host; see main-desktop.qml.
     property bool runningOnDesktop: false

@@ -25,6 +25,7 @@ import LuneOS.Components 1.0
 import LuneOS.Telephony 1.0
 
 import "../model"
+import "../services"
 import "../services/PhoneNumberUtils.js" as PhoneNumberUtils
 
 /**
@@ -43,8 +44,8 @@ Column {
 
     property var historyModel;
     property ContactsModel contacts;
-    property var dialHandler;
-    property var callTransports;
+    property DialHandler dialHandler;
+    property CallTransports callTransports;
     property PhoneUiTheme appTheme: PhoneUiTheme {}
 
     /// True for the last group of its day, so the row above a day header does

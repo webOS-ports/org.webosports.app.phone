@@ -20,8 +20,8 @@ Rectangle {
 
     // Services every page may need. Declared here so PhoneWindow can hand them
     // to any page it pushes without each page repeating the plumbing.
-    property var dialHandler
-    property var audioRouteManager
-    property var supplementaryServices
-    property var callTransports
+    property DialHandler dialHandler
+    property AudioRouteManager audioRouteManager
+    property SupplementaryServices supplementaryServices
+    property CallTransports callTransports
 }

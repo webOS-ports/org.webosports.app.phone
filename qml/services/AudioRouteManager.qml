@@ -32,7 +32,7 @@ import "CallMessages.js" as CallMessages
 Item {
     id: audioRouteManager
 
-    property var voiceCallManager
+    property VoiceCallMgrWrapper voiceCallManager
 
     readonly property string routeEarpiece: "earpiece"
     readonly property string routeSpeaker: "ihf"
@@ -118,7 +118,6 @@ Item {
     LunaService {
         id: lunaService
         name: "org.webosports.app.phone"
-        usePrivateBus: true
     }
 
     Component.onCompleted: {

@@ -35,8 +35,8 @@ import "DialStringParser.js" as DialStringParser
 Item {
     id: dialProxy
 
-    property var callTransports
-    property var telephonyManager
+    property CallTransports callTransports
+    property TelephonyManager telephonyManager
 
     /// The user has to pick a transport before this call can be placed.
     /// `callData` is { address, video, audio, personId, isInternational }.
@@ -149,7 +149,6 @@ Item {
     LunaService {
         id: lunaService
         name: "org.webosports.app.phone"
-        usePrivateBus: true
     }
 
     Component.onCompleted: {

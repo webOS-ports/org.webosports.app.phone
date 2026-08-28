@@ -26,23 +26,14 @@
 .pragma library
 
 var TIL = "com.palm.telephony";
-var PALM_PROFILE = "com.palm.palmprofile";
 
 var imServiceLabels = {
-    "type_aim": qsTr("AIM"),
-    "type_yahoo": qsTr("Yahoo!"),
-    "type_gtalk": qsTr("GTalk"),
-    "type_msn": qsTr("Messenger"),
-    "type_icq": qsTr("ICQ"),
+    "type_whatsapp": qsTr("WhatsApp"),
+    "type_googlechat": qsTr("Google Chat"),
     "type_irc": qsTr("IRC"),
     "type_qq": qsTr("QQ"),
-    "type_whatsapp": qsTr("WhatsApp"),
-    "type_yjp": qsTr("Y! Japan"),
-    "type_lcs": qsTr("LCS"),
-    "type_dotmac": qsTr(".Mac"),
-    "type_myspace": qsTr("MySpace"),
-    "type_gadugadu": qsTr("GaduGadu"),
-    "type_googlechat": qsTr("Google Chat"),
+    "type_sip": qsTr("SIP"),
+    "type_xmpp": qsTr("XMPP"),
     "type_default": qsTr("IM")
 };
 

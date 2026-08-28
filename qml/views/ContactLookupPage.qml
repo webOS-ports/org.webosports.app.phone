@@ -24,6 +24,7 @@ import QtQuick.Controls.LuneOS 2.0
 import LunaNext.Common 0.1
 import LuneOS.Components 1.0
 
+import "../services"
 import "../services/PhoneNumberUtils.js" as PhoneNumberUtils
 import "../services/ContactCallOptions.js" as ContactCallOptions
 
@@ -48,7 +49,7 @@ BasePage {
     gradient: null
     color: appTheme.backgroundColor
 
-    property var imBuddyStatus
+    property ImBuddyStatus imBuddyStatus
 
     /// The Video tab lists only contacts reachable by a video-capable account.
     property bool videoOnly: false

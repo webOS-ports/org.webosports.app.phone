@@ -26,27 +26,12 @@
 
 .import "MmiCodes.js" as MmiCodes
 
-// Launch codes that hand off to another application. Kept from the legacy app;
-// entries whose app no longer exists on LuneOS simply never match anything.
-var LaunchCodesExternalApps = {
-    '8011183': 'com.palm.app.collectlogs', // based on QWERTY: c011ect
-    '5647': 'com.palm.app.collectlogs',    // LOGS
-    '8727277': 'com.palm.app.usbpassthrough', // USBPASS
-    '43574357': 'com.palm.app.deviceinfo', // HELPHELP
-    '387': 'com.palm.app.ftp',             // FTP
-    '66338': 'com.palm.app.ondevlog',      // ONDEV
-    '66623': 'com.palm.app.monad',         // MONAD
-    '8463': 'com.palm.app.timedetails',    // TIME
-    '3386633': 'com.palm.app.devmodeswitcher', // DEVMODE
-    '8378': 'com.palm.app.crotest',        // CROTEST
-    '2833766': 'com.palm.app.phonediag',   // AUDEQON
-    '28337633': 'com.palm.app.phonediag',  // AUDEQOFF
-    '477': 'com.palm.app.phonediag',       // GPS
-    '889': 'com.palm.app.phonediag',       // TTY
-    '3366': 'com.palm.app.phonediag',      // DEMO
-    '72346': 'com.palm.app.phonediag',     // RADIO
-    '633': 'com.palm.app.phonediag'        // OFF
-};
+// Launch codes that hand off to another application, dialled as "#*<code>#".
+// The legacy table pointed at Palm diagnostic apps (com.palm.app.phonediag,
+// com.palm.app.ftp, ...) that no longer exist; the table is empty until
+// LuneOS has an app worth a launch code. A code that matches nothing here is
+// sent out as USSD, like any other "#..." string.
+var LaunchCodesExternalApps = {};
 
 // Prefixes that introduce a launch code on GSM.
 var LaunchCodePrefixes = ["#*"];

@@ -42,7 +42,6 @@ Item {
 
     LunaService {
         id: simStatusQuery
-        usePrivateBus: true
         service: "luna://com.palm.telephony"
         method: "simStatusQuery"
 

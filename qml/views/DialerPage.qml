@@ -108,7 +108,6 @@ BasePage {
     LunaService {
         id: service
         name: "org.webosports.app.phone"
-        usePrivateBus: true
     }
 
     /**
