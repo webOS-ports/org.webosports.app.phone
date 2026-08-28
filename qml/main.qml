@@ -79,7 +79,13 @@ WebOSWindow {
          * On a device that is the only way in, since the app draws no menu
          * button of its own there.
          */
-        if (params["palm-command"] === "open-app-menu") {
+        // The command may arrive on its own or still wrapped in the launch
+        // request the shell sent, depending on what the runner hands over.
+        var command = params["palm-command"] ||
+                      (params.params ? params.params["palm-command"] : undefined);
+
+        if (command === "open-app-menu") {
+            console.log("Opening the app menu for the status bar");
             phoneWindow.openAppMenu();
             return;
         }
@@ -138,7 +144,10 @@ WebOSWindow {
                 console.log("Could not parse relaunch parameters: " + error);
             }
 
-            if (params.action || params.address || params["palm-command"]) {
+            var hasCommand = params["palm-command"] ||
+                             (params.params && params.params["palm-command"]);
+
+            if (params.action || params.address || hasCommand) {
                 root.handleLaunchParams(params);
                 return;
             }

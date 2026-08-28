@@ -128,7 +128,31 @@ Item {
         phoneAppMenu.popup(tabView, 0, tabView.phoneUi ? 0 : header.height);
     }
 
-    Component.onCompleted: if (tabView.phoneUi) tabView.showDialer()
+    /**
+     * On a handset the keypad is the face of the Phone tab, so its being up is
+     * not an event to be fired at the right moment but a fact about which tab
+     * is showing. Worked out from that rather than opened and closed by hand:
+     * a missed call to open() left the phone sitting on the contact list with
+     * no way back to the keys but the tab itself.
+     */
+    function syncDialpad() {
+        if (!tabView.phoneUi)
+            return;
+
+        if (contentStack.currentIndex === _stackIndexOf("phone"))
+            dialpadOverlay.open();
+        else
+            dialpadOverlay.close();
+    }
+
+    onVisibleChanged: if (visible) syncDialpad()
+
+    Connections {
+        target: contentStack
+        function onCurrentIndexChanged() { tabView.syncDialpad(); }
+    }
+
+    Component.onCompleted: syncDialpad()
 
     /// Contacts live on the Phone tab, as they do on the reference.
     function showContacts() { currentIndex = _stackIndexOf("phone"); }
@@ -208,17 +232,7 @@ Item {
                 return 0;
             }
 
-            onTabSelected: (index) => {
-                contentStack.currentIndex = tabView.tabs[index].stackIndex;
-
-                if (!tabView.phoneUi)
-                    return;
-
-                if (tabView.tabs[index].key === "phone")
-                    dialpadOverlay.open();
-                else
-                    dialpadOverlay.close();
-            }
+            onTabSelected: (index) => contentStack.currentIndex = tabView.tabs[index].stackIndex
         }
 
         Rectangle {

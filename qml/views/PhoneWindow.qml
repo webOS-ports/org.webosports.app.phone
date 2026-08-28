@@ -207,11 +207,11 @@ WebOSWindow {
             tabView.resetDialer();
             stackView.pop(null);
 
-            // A handset's Phone tab is the keypad, so that is what finishing a
-            // call goes back to. A tablet keeps the keypad behind a button and
-            // returns to whatever tab was showing.
+            // A handset's Phone tab is the keypad, so finishing a call goes
+            // back to it; the tab view puts the keys up itself once that tab
+            // is the one showing.
             if (tabView.phoneUi)
-                tabView.showDialer();
+                tabView.showContacts();
             // Guarded: this handler still has work to do after it, and a
             // throw here would skip the rest of the cleanup.
             if (incomingCallAlertWindow && incomingCallAlertWindow.visible) {
