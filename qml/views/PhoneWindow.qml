@@ -209,9 +209,11 @@ WebOSWindow {
 
             // A handset's Phone tab is the keypad, so finishing a call goes
             // back to it; the tab view puts the keys up itself once that tab
-            // is the one showing.
-            if (tabView.phoneUi)
-                tabView.showContacts();
+            // is the one showing. Through the loader's item: the loader
+            // carries none of this itself, and asking it silently answers
+            // undefined rather than failing.
+            if (tabView.item && tabView.item.phoneUi)
+                tabView.item.showContacts();
             // Guarded: this handler still has work to do after it, and a
             // throw here would skip the rest of the cleanup.
             if (incomingCallAlertWindow && incomingCallAlertWindow.visible) {
@@ -305,8 +307,8 @@ WebOSWindow {
 
     /// Asked for by the status bar, which has no menu of its own to show.
     function openAppMenu() {
-        if (tabView && tabView.openAppMenu)
-            tabView.openAppMenu();
+        if (tabView.item && tabView.item.openAppMenu)
+            tabView.item.openAppMenu();
     }
 
     function incomingCall(voiceCall) {
