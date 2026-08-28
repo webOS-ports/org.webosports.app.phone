@@ -40,6 +40,10 @@ WebOSWindow {
         }
     }
 
+    /// Set by the desktop host. A device has a system app menu of its own and
+    /// wants none of ours.
+    property bool runningOnDesktop: false
+
     width: Settings.displayWidth
     height: Settings.displayHeight
     windowType: "_WEBOS_WINDOW_TYPE_NONE" // make sure this window will never appear in the card shell
@@ -250,6 +254,7 @@ WebOSWindow {
 
     PhoneWindow {
         id: phoneWindow
+        runningOnDesktop: root.runningOnDesktop
         simPinWindow: simPinWindowId
         incomingCallAlertWindow: incomingCallAlertWindowId
         contacts: personListModelId

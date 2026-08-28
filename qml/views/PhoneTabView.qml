@@ -53,6 +53,19 @@ Item {
     property var callTransports;
     property var imBuddyStatus;
 
+    /// True only under the desktop host, which has no system app menu to use.
+    property bool runningOnDesktop: false
+
+    /**
+     * A phone is not a small tablet.
+     *
+     * Its tabs run along the foot of the screen rather than the top, and it
+     * opens on the keypad filling everything above them -- a phone is for
+     * dialling first. Settings.tabletUi is what the shell itself reads to
+     * tell the two apart.
+     */
+    readonly property bool phoneUi: !Settings.tabletUi
+
     readonly property bool hasVideoService: callTransports &&
                                             callTransports.videoCallableImTypes().length > 0
 
@@ -89,6 +102,8 @@ Item {
         currentIndex = _stackIndexOf("phone");
         dialpadOverlay.open();
     }
+    Component.onCompleted: if (tabView.phoneUi) tabView.showDialer()
+
     /// Contacts live on the Phone tab, as they do on the reference.
     function showContacts() { currentIndex = _stackIndexOf("phone"); }
     function showFavorites() { currentIndex = _stackIndexOf("favorites"); }
@@ -107,7 +122,12 @@ Item {
     Rectangle {
         id: header
 
-        anchors { top: parent.top; left: parent.left; right: parent.right }
+        anchors {
+            left: parent.left
+            right: parent.right
+            top: tabView.phoneUi ? undefined : parent.top
+            bottom: tabView.phoneUi ? parent.bottom : undefined
+        }
         height: Units.gu(6)
         color: appTheme.tabBarColor
 
@@ -116,10 +136,15 @@ Item {
 
             anchors {
                 left: parent.left
-                leftMargin: Units.gu(0.8)
+                leftMargin: visible ? Units.gu(0.8) : 0
                 verticalCenter: parent.verticalCenter
             }
+            width: visible ? implicitWidth : 0
             height: Units.gu(3.6)
+
+            // A device puts the app menu in the system bar; only the desktop
+            // host, which has no system bar, needs one drawn here.
+            visible: tabView.runningOnDesktop
 
             text: qsTr("Phone")
             textColor: appTheme.primaryTextColor
@@ -145,7 +170,7 @@ Item {
 
             anchors {
                 left: appMenuButton.right
-                leftMargin: Units.gu(0.8)
+                leftMargin: appMenuButton.visible ? Units.gu(0.8) : 0
                 right: parent.right
                 top: parent.top
                 bottom: parent.bottom
@@ -163,11 +188,26 @@ Item {
                 return 0;
             }
 
-            onTabSelected: (index) => contentStack.currentIndex = tabView.tabs[index].stackIndex
+            onTabSelected: (index) => {
+                contentStack.currentIndex = tabView.tabs[index].stackIndex;
+
+                if (!tabView.phoneUi)
+                    return;
+
+                if (tabView.tabs[index].key === "phone")
+                    dialpadOverlay.open();
+                else
+                    dialpadOverlay.close();
+            }
         }
 
         Rectangle {
-            anchors { left: parent.left; right: parent.right; bottom: parent.bottom }
+            anchors {
+                left: parent.left
+                right: parent.right
+                top: tabView.phoneUi ? parent.top : undefined
+                bottom: tabView.phoneUi ? undefined : parent.bottom
+            }
             height: 1
             color: appTheme.tabBarBorderColor
         }
@@ -183,8 +223,8 @@ Item {
         id: contentStack
 
         anchors {
-            top: header.bottom
-            bottom: parent.bottom
+            top: tabView.phoneUi ? parent.top : header.bottom
+            bottom: tabView.phoneUi ? header.top : parent.bottom
             left: parent.left
             right: parent.right
         }
@@ -240,24 +280,41 @@ Item {
 
     // The dialpad sits over the page it was opened from, as on the reference,
     // rather than taking a column of its own.
+    /*
+     * The keypad.
+     *
+     * On a tablet it is a panel over the middle of the screen, dimming what is
+     * behind it. On a phone it is the face of the Phone tab: it fills
+     * everything above the tabs, and leaves them alone so the user can still
+     * move between tabs while it is up.
+     */
     Popup {
         id: dialpadOverlay
 
         parent: Overlay.overlay
-        modal: true
-        dim: true
+        modal: !tabView.phoneUi
+        dim: !tabView.phoneUi
+        closePolicy: tabView.phoneUi ? Popup.NoAutoClose
+                                     : (Popup.CloseOnEscape | Popup.CloseOnPressOutside)
         padding: 0
 
-        width: Math.min(tabView.width - Units.gu(4), Units.gu(34))
-        height: Math.min(tabView.height - Units.gu(8), Units.gu(52))
-        // Popup positions itself with x/y rather than anchors.
-        x: parent ? Math.round((parent.width - width) / 2) : 0
-        y: parent ? Math.round((parent.height - height) / 2) : 0
+        // Popup positions itself with x/y rather than anchors. On a handset it
+        // takes everything above the tab bar; on a tablet it is a panel in the
+        // middle of the screen.
+        width: tabView.phoneUi ? tabView.width
+                               : Math.min(tabView.width - Units.gu(4), Units.gu(34))
+        height: tabView.phoneUi ? tabView.height - header.height
+                                : Math.min(tabView.height - Units.gu(8), Units.gu(52))
+        x: tabView.phoneUi ? 0
+                           : (parent ? Math.round((parent.width - width) / 2) : 0)
+        y: tabView.phoneUi ? 0
+                           : (parent ? Math.round((parent.height - height) / 2) : 0)
 
         background: Item {}
 
         contentItem: DialerPage {
             appTheme: tabView.appTheme
+            fillsScreen: tabView.phoneUi
             voiceCallMgrWrapper: tabView.voiceCallManager
             telephonyManager: tabView.telephonyManager
             contacts: tabView.contacts
@@ -268,6 +325,10 @@ Item {
                 tabView.showContacts();
                 if (tabPhone.item) tabPhone.item.initialFilter = prefix;
             }
+
+            // Once the call is placed the keypad has done its job; leaving it
+            // up hides the call it just started.
+            onDialled: dialpadOverlay.close()
         }
 
         onClosed: if (contentItem && contentItem.reset) contentItem.reset()

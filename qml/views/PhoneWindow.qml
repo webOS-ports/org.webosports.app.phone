@@ -48,6 +48,9 @@ WebOSWindow {
     property var callTransports;
     property var imBuddyStatus;
 
+    /// True only under the desktop host; see main-desktop.qml.
+    property bool runningOnDesktop: false
+
     property Contact currentContact: Contact { contactsModel: contacts }
 
     visible: false
@@ -286,6 +289,7 @@ WebOSWindow {
         id: tabViewComp
         PhoneTabView {
             appTheme: phoneUiAppTheme
+            runningOnDesktop: phoneWindowId.runningOnDesktop
             historyModel: phoneWindowId.historyModel
             favoritesModel: phoneWindowId.favoritesModel
             voiceCallManager: phoneWindowId.voiceCallMgrWrapper

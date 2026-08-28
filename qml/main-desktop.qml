@@ -88,7 +88,9 @@ Window {
             console.error("Error loading main.qml: ", main.errorString());
         }
         else {
-            main.createObject(mainDesktop);
+            // On a device the system draws the app menu; here nothing does,
+            // so the app has to put one up itself.
+            main.createObject(mainDesktop, { runningOnDesktop: true });
         }
 
         relaunchMainAppTimer.start();

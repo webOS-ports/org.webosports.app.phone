@@ -35,6 +35,9 @@ BasePage {
 
     /// Emitted when the user wants to pick a contact instead of typing.
     signal contactLookupRequested(string prefix);
+    /// A call has been placed from here, so whatever is showing the keypad can
+    /// put it away.
+    signal dialled();
 
     // Hardware numeric keypad -> dialer. The page itself holds key focus -- not
     // numEntry's TextField, which is activeFocusOnPress:false -- so physical keys
@@ -87,6 +90,7 @@ BasePage {
             return;
         }
         pDialPage.dialHandler.dial(numEntry.getPhoneNumber());
+        pDialPage.dialled();
     }
 
     /// Fills the dialpad from contact lookup without dialling yet.
@@ -107,12 +111,21 @@ BasePage {
         usePrivateBus: true
     }
 
-    // The dialpad keeps a fixed, phone-sized footprint and is centred, rather
-    // than stretching to whatever the window happens to be. A key is about
-    // 4:3, so the pad's height follows from its width.
-    readonly property real padWidth: Math.min(width - Units.gu(2), Units.gu(32))
-    // Keys are roughly 4:3, so four rows come to about the pad's own width.
-    readonly property real padKeysHeight: padWidth * 0.95
+    /**
+     * On a handset the keypad is the screen, so it takes all of it. On a
+     * tablet it keeps a fixed, phone-sized footprint in the middle, rather
+     * than stretching keys across a screen far wider than a thumb.
+     */
+    property bool fillsScreen: false
+
+    // A key is about 4:3, so the pad's height follows from its width -- except
+    // where it fills the screen, and the height it is given comes first.
+    readonly property real padWidth: fillsScreen ? width - Units.gu(1)
+                                                 : Math.min(width - Units.gu(2), Units.gu(32))
+    readonly property real padKeysHeight: fillsScreen
+                                              ? Math.max(0, height - numEntry.height
+                                                            - matchStrip.height - dialButton.height)
+                                              : padWidth * 0.95
 
     Item {
         id: dialpadPanel
