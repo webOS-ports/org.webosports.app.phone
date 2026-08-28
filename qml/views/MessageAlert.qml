@@ -74,6 +74,7 @@ WebOSWindow {
 
     /// Shows an alert the user can only acknowledge.
     function showMessage(alertTitle, alertMessage, icon) {
+        console.log("MESSAGE popup: '" + alertTitle + "' / '" + alertMessage + "'");
         title = alertTitle || "";
         message = alertMessage || "";
         iconSource = icon || "";

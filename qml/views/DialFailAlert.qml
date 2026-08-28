@@ -41,6 +41,7 @@ MessageAlert {
 
     /// Shows the failure for `number`, keyed by a CallMessages.dialFailure reason.
     function showDialFailure(number, reason) {
+        console.log("DIALFAIL popup: number='" + number + "' reason='" + reason + "'");
         _pendingNumber = number || "";
 
         var text = CallMessages.lookup(CallMessages.dialFailure, reason,

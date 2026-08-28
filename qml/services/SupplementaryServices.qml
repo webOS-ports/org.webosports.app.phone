@@ -151,6 +151,24 @@ Item {
         _done(false, message || CallMessages.mmiFailed);
     }
 
+    /*
+     * oFono could not read the supplementary-service properties.
+     *
+     * That happens by itself -- every time the radio moves between
+     * technologies, of which there can be several a second -- and says
+     * nothing about anything the user asked for. It is only a failure worth
+     * announcing if somebody is waiting on an answer; otherwise reporting it
+     * puts "No service" in front of someone who is not doing anything.
+     */
+    function _propertiesUnavailable() {
+        if (_pendingCommand.length === 0) {
+            console.log("Supplementary service properties unavailable while idle -- not reporting");
+            return;
+        }
+
+        _fail(CallMessages.noServiceError);
+    }
+
     // Call forwarding. The MMI tables use 'condition' names that do not line up
     // one-to-one with oFono's per-condition properties, so translate here.
     function _forwardSetter(condition, value) {
@@ -355,7 +373,7 @@ Item {
         onVoiceBusyComplete: (success) => _onSetComplete(success)
         onVoiceNoReplyComplete: (success) => _onSetComplete(success)
         onVoiceNotReachableComplete: (success) => _onSetComplete(success)
-        onGetPropertiesFailed: _fail(CallMessages.noServiceError)
+        onGetPropertiesFailed: _propertiesUnavailable()
     }
 
     OfonoCallSettings {
@@ -364,7 +382,7 @@ Item {
 
         onVoiceCallWaitingComplete: (success) => _onSetComplete(success)
         onHideCallerIdComplete: (success) => _onSetComplete(success)
-        onGetPropertiesFailed: _fail(CallMessages.noServiceError)
+        onGetPropertiesFailed: _propertiesUnavailable()
     }
 
     OfonoCallBarring {
@@ -377,7 +395,7 @@ Item {
             _done(success, success ? qsTr("Call barring password changed.")
                                    : qsTr("Could not change the call barring password."))
         onDisableAllComplete: (success) => _onSetComplete(success)
-        onGetPropertiesFailed: _fail(CallMessages.noServiceError)
+        onGetPropertiesFailed: _propertiesUnavailable()
     }
 
     OfonoSimManager {

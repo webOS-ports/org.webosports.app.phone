@@ -236,11 +236,24 @@ Item {
 
         _pendingPostDial = postDial || "";
         _pendingDialNumber = displayNumber || number;
+        _dialAttemptedAt = Date.now();
         _dial(number, transport);
     }
 
     property string _pendingPostDial: ""
     property string _pendingDialNumber: ""
+
+    /*
+     * When that dial was asked for. A dial is only in flight for a moment --
+     * either a call appears or the attempt has failed -- and after that the
+     * errors the call manager reports are nothing to do with it. Without this
+     * a dial that never became a call leaves the next unrelated error, and on
+     * a phone whose radio keeps changing technology there are plenty, showing
+     * "No service" to someone who is not dialling.
+     */
+    property double _dialAttemptedAt: 0
+    readonly property int _dialInFlightMs: 15000
+
     property string _pendingTransport: ""
     property bool _pendingVideo: false
     property string _dialTransportAfterHold: ""
@@ -431,6 +444,7 @@ Item {
         _dialNumberAfterHold = "";
         _dialTransportAfterHold = "";
         _pendingDialNumber = number;
+        _dialAttemptedAt = Date.now();
         _dial(number, transport);
     }
 
@@ -639,8 +653,14 @@ Item {
         function onError(message) {
             console.log("VoiceCallManager error: " + message);
 
-            if (root._pendingDialNumber.length === 0)
+            if (root._pendingDialNumber.length === 0 ||
+                Date.now() - root._dialAttemptedAt > root._dialInFlightMs) {
+                console.log("  ... not ours: pending='" + root._pendingDialNumber +
+                            "' age=" + (Date.now() - root._dialAttemptedAt) + "ms");
                 return;
+            }
+
+            console.log("DIALFAIL from the call manager while dialling " + root._pendingDialNumber);
 
             root.dialFailed(root._pendingDialNumber, _reasonFromError(message));
             root._pendingDialNumber = "";

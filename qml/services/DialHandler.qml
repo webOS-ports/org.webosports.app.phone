@@ -165,6 +165,7 @@ Item {
 
         case "ussd":
             if (!telephonyManager || !telephonyManager.radioOnline) {
+                console.log("DIALFAIL from ussd (radio offline)");
                 dialFailed(action.command, "noservice");
                 return;
             }
@@ -200,6 +201,7 @@ Item {
         // over whatever data connection the device has.
         if ((transport.length === 0 || transport === cellular) &&
             telephonyManager && !telephonyManager.radioOnline) {
+            console.log("DIALFAIL from airplane-mode check");
             dialFailed(action.number, "airplanemodeon");
             return;
         }
@@ -222,6 +224,7 @@ Item {
         message(CallMessages.dialOnPowerPending);
 
         if (!telephonyManager || !telephonyManager.setRadioOnline(true)) {
+            console.log("DIALFAIL from emergency dial, radio would not come up");
             dialFailed(number, "noservice");
             return;
         }
@@ -294,6 +297,7 @@ Item {
                 return;
 
             console.log("Radio did not come up in time for the emergency call");
+            console.log("DIALFAIL from emergency redial timeout");
             dialFailed(_emergencyRedialNumber, "noservice");
             message(CallMessages.dialOnPowerFail);
             _emergencyRedialNumber = "";
