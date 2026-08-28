@@ -38,7 +38,7 @@ Item {
         owner: appTweaks.owner
         serviceName: appTweaks.serviceName
         key: "dialPadFeedback"
-        defaultValue: "noFeedback"
+        defaultValue: "vibrateSound"
     }
 
 }
