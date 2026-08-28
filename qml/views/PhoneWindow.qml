@@ -193,13 +193,22 @@ WebOSWindow {
                 return;
             }
 
-            if(phoneWindowId.visible) {
-                if(hideWindowWhenCallEnds) phoneWindowId.hide();
+            /*
+             * Tear the call screen down whether or not the window has come up
+             * yet. show() is asynchronous, so a call that ends as fast as it
+             * started gets here while the window is still on its way -- and
+             * gating this on being visible left the dead call screen on the
+             * stack, to be put on screen a moment later with no call behind
+             * it and no way back to the tabs.
+             */
+            if (hideWindowWhenCallEnds)
+                phoneWindowId.hide();
 
-                tabView.resetDialer();
-                stackView.pop(null)
-            }
-            if(incomingCallAlertWindow.visible) {
+            tabView.resetDialer();
+            stackView.pop(null);
+            // Guarded: this handler still has work to do after it, and a
+            // throw here would skip the rest of the cleanup.
+            if (incomingCallAlertWindow && incomingCallAlertWindow.visible) {
                 incomingCallAlertWindow.hide();
                 incomingCallAlertWindow.voiceCall = null;
             }
@@ -270,6 +279,14 @@ WebOSWindow {
 
     function activeCallDialog(voiceCall) {
         console.log("Showing Active Call Dialog")
+
+        // The call can be gone already: a dial that fails at once reports
+        // itself placed and ended in the same turn. Opening the call screen
+        // for a call that has ended leaves it up with nothing to show it.
+        if (!voiceCall || !voiceCallMgrWrapper || voiceCallMgrWrapper.callCount === 0) {
+            console.log("  ... but the call has already ended");
+            return;
+        }
 
         hideWindowWhenCallEnds = (phoneWindowId.visible === false);
 
