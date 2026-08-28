@@ -628,8 +628,20 @@ Item {
 
     Connections {
         target: manager
+
+        /*
+         * The call manager reports every error it meets, most of them nothing
+         * to do with us -- the modem losing service, a provider complaining
+         * while the phone sits idle. Only an error arriving while we are
+         * actually placing a call means that call failed; announcing the rest
+         * puts "No service" in front of someone who is not even dialling.
+         */
         function onError(message) {
             console.log("VoiceCallManager error: " + message);
+
+            if (root._pendingDialNumber.length === 0)
+                return;
+
             root.dialFailed(root._pendingDialNumber, _reasonFromError(message));
             root._pendingDialNumber = "";
             root._pendingPostDial = "";

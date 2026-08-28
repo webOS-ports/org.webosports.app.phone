@@ -310,7 +310,19 @@ Item {
         y: tabView.phoneUi ? 0
                            : (parent ? Math.round((parent.height - height) / 2) : 0)
 
-        background: Item {}
+        /*
+         * A handset's keypad is not modal, so the tabs stay reachable -- but
+         * that also means a press it does not use carries on down to whatever
+         * is behind it. Behind it is the contact list, where a stray tap
+         * places a call. This catches those.
+         */
+        background: Item {
+            MouseArea {
+                anchors.fill: parent
+                enabled: tabView.phoneUi
+                onPressed: (mouse) => mouse.accepted = true
+            }
+        }
 
         contentItem: DialerPage {
             appTheme: tabView.appTheme
