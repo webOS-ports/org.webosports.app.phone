@@ -192,9 +192,17 @@ Item {
             width: visible ? implicitWidth : 0
             height: Units.gu(3.6)
 
-            // A device puts the app menu in the system bar; only the desktop
-            // host, which has no system bar, needs one drawn here.
-            visible: tabView.runningOnDesktop
+            /*
+             * Drawn on a device too, for now.
+             *
+             * The status bar's menu is supposed to cover this: it relaunches
+             * the app with palm-command open-app-menu and leaves the app to
+             * put its own menu up, which the app now answers. On the device
+             * that command never arrives, so hiding this button left no way
+             * into the menu at all. Better a button that works than a tidier
+             * bar with nothing behind it.
+             */
+            visible: true
 
             text: qsTr("Phone")
             textColor: appTheme.primaryTextColor
