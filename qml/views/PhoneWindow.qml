@@ -51,6 +51,14 @@ WebOSWindow {
 
     property bool hideWindowWhenCallEnds: false
 
+    function openVideoCall(params) {
+        videoCallOverlay.open(params);
+    }
+
+    function closeVideoCall() {
+        videoCallOverlay.close();
+    }
+
     /**
      * When PhoneApp is closed, hang up any active calls.
      */
@@ -131,6 +139,8 @@ WebOSWindow {
         function onEndingCall(voiceCall) {
             console.log("VoiceCall " + voiceCall.lineId + " ended")
 
+            videoCallOverlay.close();
+
             if(phoneWindowId.visible) {
                 if(hideWindowWhenCallEnds) phoneWindowId.hide();
 
@@ -187,6 +197,12 @@ WebOSWindow {
             telephonyManager: phoneWindowId.telephonyManager
             contacts: phoneWindowId.contacts
         }
+    }
+
+    VideoCallOverlay {
+        id: videoCallOverlay
+        anchors.fill: parent
+        z: 100
     }
 
     Loader {

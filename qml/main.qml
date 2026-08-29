@@ -56,6 +56,12 @@ WebOSWindow {
                 return;
             }
 
+            if (params.videoCallDemo) {
+                phoneWindow.show();
+                phoneWindow.openVideoCall(params);
+                return;
+            }
+
             if (!params.launchedAtBoot)
                 phoneWindow.show();
         }
@@ -66,6 +72,12 @@ WebOSWindow {
 
         if (params.mode && params.mode === "first-use") {
             // PIN window will now open automatically when the PIN is required
+            return;
+        }
+
+        if (params.videoCallDemo) {
+            phoneWindow.show();
+            phoneWindow.openVideoCall(params);
             return;
         }
 

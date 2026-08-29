@@ -271,6 +271,27 @@ BasePage {
             }
         }
 
+        // Video call area driven by luneos-rtc-engine; self-view demo
+        // until the messaging call engines are wired up.
+        Rectangle {
+            visible: root.voiceCallIsActive
+            width: Units.gu(5)
+            height: parent.height
+            color: "transparent"
+
+            Text {
+                anchors.centerIn: parent
+                color: "white"
+                font.pixelSize: Units.gu(2.5)
+                text: "▶" // play triangle as video glyph placeholder
+            }
+
+            MouseArea {
+                anchors.fill: parent
+                onClicked: phoneWindowId.openVideoCall({})
+            }
+        }
+
         AddCallButton {
             visible:root.voiceCallIsActive
             onClicked: {
