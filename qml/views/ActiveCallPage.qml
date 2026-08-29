@@ -272,9 +272,10 @@ BasePage {
         }
 
         // Video call area driven by luneos-rtc-engine; self-view demo
-        // until the messaging call engines are wired up.
+        // until the messaging call engines are wired up. Only offered
+        // when a physical camera is actually present.
         Rectangle {
-            visible: root.voiceCallIsActive
+            visible: root.voiceCallIsActive && phoneWindowId.videoCallAvailable
             width: Units.gu(5)
             height: parent.height
             color: "transparent"

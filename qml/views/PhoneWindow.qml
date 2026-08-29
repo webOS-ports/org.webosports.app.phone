@@ -27,6 +27,7 @@ import QtQuick.Window 2.3
 import Eos.Window 0.1
 
 import LunaNext.Common 0.1
+import LuneOS.Service 1.0
 
 WebOSWindow {
     id: phoneWindowId
@@ -51,7 +52,56 @@ WebOSWindow {
 
     property bool hideWindowWhenCallEnds: false
 
+    // Video calling needs an actual camera, not just the platform
+    // capability: gate on the rtc engine's capabilities, which probe the
+    // real camera count. (Queried over LS2 rather than QtMultimedia's
+    // device enumeration, which probes kernel video nodes and can corrupt
+    // the vendor camera HAL session on droid devices.)
+    property bool videoCallAvailable: false
+    property bool videoCallProbeDone: false
+    property var __pendingVideoCallParams: null
+
+    Component.onCompleted: {
+        cameraProbeService.call("luna://org.webosports.rtcengine/capabilities",
+            JSON.stringify({}),
+            function(message) {
+                var response = JSON.parse(message.payload);
+                videoCallAvailable = !!(response.returnValue &&
+                                        response.videoCallCapable);
+                videoCallProbeDone = true;
+                console.warn("Video call availability: " + videoCallAvailable);
+                __openPendingVideoCall();
+            },
+            function(message) {
+                console.warn("Video capability probe failed: " + message.payload);
+                videoCallProbeDone = true;
+                __openPendingVideoCall();
+            });
+    }
+
+    LunaService {
+        id: cameraProbeService
+        name: "org.webosports.app.phone"
+        usePrivateBus: true
+    }
+
+    function __openPendingVideoCall() {
+        var params = __pendingVideoCallParams;
+        __pendingVideoCallParams = null;
+        if (params && videoCallAvailable)
+            videoCallOverlay.open(params);
+    }
+
     function openVideoCall(params) {
+        if (!videoCallProbeDone) {
+            // camera probe still in flight; open when it answers
+            __pendingVideoCallParams = params || {};
+            return;
+        }
+        if (!videoCallAvailable) {
+            console.warn("Video call requested but no camera present");
+            return;
+        }
         videoCallOverlay.open(params);
     }
 

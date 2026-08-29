@@ -16,16 +16,19 @@
  */
 
 import QtQuick 2.6
+import QtMultimedia
 
 import LunaNext.Common 0.1
 import LuneOS.Service 1.0
 import LuneOS.Foreign 1.0
 
 /**
- * Video area for a call, driven by luneos-rtc-engine. The remote video
- * region of this item is exported through wl_webos_foreign; the engine
- * decodes the incoming stream straight into it (compositor punch-through)
- * while it streams the local camera out as hardware-encoded H.264.
+ * Video area for a call, driven by luneos-rtc-engine. The engine
+ * decodes the incoming stream, publishes the frames over gst-shm, and
+ * this overlay renders them as a regular QML VideoOutput - composited
+ * like any other item, so the card behaves normally in the shell.
+ * Meanwhile the engine streams the local camera out as
+ * hardware-encoded H.264.
  *
  * Until the messaging call engines feed the engine's sockets, loopback
  * mode shows the local camera as a self-view demo.
@@ -38,6 +41,14 @@ Rectangle {
     property int videoRotation: 90
     property bool loopbackDemo: true
     property string engineStatus: "idle"
+
+    readonly property string shmPath: "/tmp/rtc-video"
+    readonly property int streamWidth: 1280
+    readonly property int streamHeight: 720
+    // frame dimensions after the engine's render rotation
+    readonly property bool dimensionsSwapped: videoRotation === 90 || videoRotation === 270
+    readonly property int frameWidth: dimensionsSwapped ? streamHeight : streamWidth
+    readonly property int frameHeight: dimensionsSwapped ? streamWidth : streamHeight
 
     visible: active
     color: "black"
@@ -60,29 +71,47 @@ Rectangle {
     }
 
     function startEngine() {
-        if (!active || !remoteVideo.exported) {
-            engineStatus = remoteVideo.exported ? "idle" : "waiting for window";
-            return;
-        }
         engineStatus = "starting";
         rtcService.call("luna://org.webosports.rtcengine/start",
             JSON.stringify({
                 camera: cameraNumber,
                 rotation: videoRotation,
-                windowId: remoteVideo.windowId,
+                shmPath: shmPath,
+                width: streamWidth,
+                height: streamHeight,
                 loopback: loopbackDemo
             }),
             function(message) {
                 var response = JSON.parse(message.payload);
-                engineStatus = response.returnValue ? "running"
-                                                    : ("error: " + response.errorText);
+                if (response.returnValue) {
+                    engineStatus = "running";
+                    attachVideoSource();
+                } else {
+                    engineStatus = "error: " + response.errorText;
+                }
             },
             function(message) {
                 engineStatus = "error: " + message.payload;
             });
     }
 
+    function attachVideoSource() {
+        if (captureSession.nativeVideoSource)
+            captureSession.nativeVideoSource.stop();
+        var source = RtcVideoFactory.createShmSource(shmPath, frameWidth, frameHeight);
+        if (source) {
+            captureSession.nativeVideoSource = source;
+            source.start();
+        } else {
+            engineStatus = "error: no video source";
+        }
+    }
+
     function stopEngine() {
+        if (captureSession.nativeVideoSource) {
+            captureSession.nativeVideoSource.stop();
+            captureSession.nativeVideoSource = null;
+        }
         rtcService.call("luna://org.webosports.rtcengine/stop", "{}",
                         undefined, undefined);
         engineStatus = "idle";
@@ -94,14 +123,15 @@ Rectangle {
         usePrivateBus: true
     }
 
-    ForeignExportedRegion {
-        id: remoteVideo
+    CaptureSession {
+        id: captureSession
+        videoOutput: videoOut
+    }
+
+    VideoOutput {
+        id: videoOut
         anchors.fill: parent
-        onWindowIdChanged: {
-            if (videoCallOverlay.active && exported &&
-                    videoCallOverlay.engineStatus !== "running")
-                videoCallOverlay.startEngine();
-        }
+        fillMode: VideoOutput.PreserveAspectFit
     }
 
     Text {
