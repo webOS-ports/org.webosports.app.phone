@@ -173,7 +173,9 @@ Item {
             top: pinEntry.bottom
             left: parent.left
             right: parent.right
-            bottom: cancelButton.top
+            // stop above the emergency button rather than at the window edge,
+            // so the two buttons that sit on the blank keys are not covered
+            bottom: emergencyButton.top
         }
 
         mode:'sim'
@@ -185,19 +187,21 @@ Item {
         }
     }
 
+    // Cancel and Enter fill the two cells the keypad leaves blank in 'sim'
+    // mode, so the bottom row reads Cancel / 0 / Enter. They used to be
+    // anchored to the bottom of the window while the keypad was stretched to
+    // their bottom edge as well, which drew both of them across the last row
+    // of keys.
     PinInputButton {
         id: cancelButton
 
-        width: parent.width / 3
-        height: Units.gu(5)
+        width: keyboard.keysWidth
+        height: keyboard.keysHeight
 
         text: qsTr("Cancel")
 
-        anchors.left: parent.left
-        anchors.leftMargin: Units.gu(2)
-        anchors.bottom: parent.bottom
-        anchors.bottomMargin: height / 3
-        anchors.topMargin: height / 4
+        x: keyboard.x + keyboard.gridX
+        y: keyboard.y + keyboard.gridY + keyboard.keysHeight * 3
 
         onClicked: {
             simPinInput.canceled();
@@ -223,16 +227,13 @@ Item {
     PinInputButton {
         id: okButton
 
-        width: parent.width / 3
-        height: Units.gu(5)
+        width: keyboard.keysWidth
+        height: keyboard.keysHeight
 
         text: qsTr("Enter")
 
-        anchors.right: parent.right
-        anchors.rightMargin: Units.gu(2)
-        anchors.bottom: parent.bottom
-        anchors.bottomMargin: height / 3
-        anchors.topMargin: height / 4
+        x: keyboard.x + keyboard.gridX + keyboard.keysWidth * 2
+        y: keyboard.y + keyboard.gridY + keyboard.keysHeight * 3
 
         onClicked: {
             // The original test rejected nothing: a length could never be both
