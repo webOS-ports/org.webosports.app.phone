@@ -28,6 +28,14 @@ Item {
     property int keysWidth: ((numPad.width-Units.gu(2)) / keys.columns)
     property int keysHeight: ((numPad.height-Units.gu(2)) / keys.rows)
 
+    // In 'sim' mode the two outer keys of the bottom row are drawn blank so a
+    // caller can put its own buttons there. The grid is centred rather than
+    // filling the item, so expose where it starts: without this a caller can
+    // only guess, and Cancel/Enter end up floating over the keys instead of
+    // landing in the cells left free for them.
+    property alias gridX: keys.x
+    property alias gridY: keys.y
+
     Image {
         source: "images/dialpad-bg.png"
         anchors.fill: parent
