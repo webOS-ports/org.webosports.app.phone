@@ -17,6 +17,7 @@
  */
 
 import QtQuick 2.0
+import QtQml
 import QtQuick.Controls 2.0
 import QtQuick.Layouts 1.0
 
@@ -48,6 +49,7 @@ WebOSWindow {
     }
 
     property string _enteredPuk: ""
+    property string _pinModemPath: ""
     property int _confirmedPinType
     property bool _showNeeded: false
 
@@ -99,14 +101,55 @@ WebOSWindow {
         _statusMessage = qsTr("This SIM card is permanently blocked. Contact your network operator.");
     }
 
+    // On a dual-SIM device ofono exposes one modem per slot and only the first
+    // one is OfonoManager's default. A PIN on any other slot would never be
+    // asked for, so watch every modem and point the prompt at whichever one is
+    // waiting: an unlocked default modem must not hide a locked second SIM.
+    function _updatePinModem() {
+        for (var i = 0; i < simWatchers.count; i++) {
+            var watcher = simWatchers.objectAt(i);
+            if (watcher && watcher.valid && watcher.pinRequired !== OfonoSimManager.NoPin) {
+                simPinWindow._pinModemPath = watcher.modemPath;
+                return;
+            }
+        }
+
+        simPinWindow._pinModemPath = "";
+    }
+
+    function _maybeShow() {
+        if (simPinWindow.visible)
+            return;
+
+        if (simManager.pinRequired === OfonoSimManager.NoPin)
+            return;
+
+        simPinWindow.show();
+    }
+
     OfonoManager {
         id: modemManager
+
+        onModemsChanged: simPinWindow._updatePinModem()
+    }
+
+    Instantiator {
+        id: simWatchers
+
+        model: modemManager.modems
+
+        delegate: OfonoSimManager {
+            modemPath: modelData
+
+            onValidChanged: simPinWindow._updatePinModem()
+            onPinRequiredChanged: simPinWindow._updatePinModem()
+        }
     }
 
     OfonoSimManager {
         id: simManager
 
-        modemPath: modemManager.defaultModem
+        modemPath: _pinModemPath !== "" ? _pinModemPath : modemManager.defaultModem
 
         onEnterPinComplete: (error, errorString) => _handlePinComplete(error, errorString)
         onResetPinComplete: (error, errorString) => _handlePinComplete(error, errorString)
@@ -124,13 +167,7 @@ WebOSWindow {
             _enteredPuk = "";
             pinInput.resetEntry();
 
-            if (simPinWindow.visible)
-                return;
-
-            if (simManager.pinRequired === OfonoSimManager.NoPin)
-                return;
-
-            simPinWindow.show();
+            _maybeShow();
         }
     }
 
