@@ -168,7 +168,13 @@ Item {
         source: appTheme.image("icon-m-common-backspace.svg")
 
         MouseArea {
-            anchors.fill: parent
+            // The icon is a small thing to hit with a thumb, so the target is
+            // not the icon: it takes the full height of the entry bar and
+            // reaches well past the icon on either side.
+            anchors.verticalCenter: parent.verticalCenter
+            anchors.horizontalCenter: parent.horizontalCenter
+            width: parent.width + Units.gu(6)
+            height: bgImage.height
 
             onClicked: numberEntry.backspace();
             onPressAndHold: numberEntry.clear();

@@ -69,7 +69,13 @@ Item {
         id: sublabel
         visible: !disableSubLabel
         anchors.horizontalCenter: parent.horizontalCenter
-        anchors.top:label.bottom
+        // Held clear of the key's bottom edge rather than hung off the label's
+        // line box. The bottom row of the pad is drawn with the patch that
+        // carries the pad's outer frame - in both artwork sets the face stops
+        // at 92% of the cell - so hanging from the label printed the "+" under
+        // the 0 on the frame instead of on the key.
+        anchors.bottom: parent.bottom
+        anchors.bottomMargin: root.height * 0.12
         color:appTheme.subForegroundColor
         font.pixelSize: fontSize/2.5
     }
