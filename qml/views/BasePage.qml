@@ -10,7 +10,7 @@ Rectangle {
 
     property string pageName: "Base"
 
-    property PhoneUiTheme appTheme;
+    property UiTheme appTheme;
     property QtObject voiceCall;
 
     property ContactsModel contacts

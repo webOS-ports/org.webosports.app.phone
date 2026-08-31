@@ -69,6 +69,7 @@ BasePage {
         // The same white pill the Phone tab is searched with, rather than a
         // bare field with a Unicode magnifier in its placeholder.
         SearchField {
+            appTheme: historyPageId.appTheme
             id: searchFieldInput
 
             anchors.verticalCenter: parent.verticalCenter

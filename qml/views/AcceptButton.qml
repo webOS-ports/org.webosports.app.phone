@@ -21,6 +21,8 @@ import QtQuick.Controls 2.0
 Button {
     id: acceptButtonRoot
 
+    property UiTheme appTheme: PhoneUiTheme {}
+
     width:630
     height:99
 
@@ -33,7 +35,7 @@ Button {
         Image{
             x: 0
             y: acceptButtonRoot.pressed ? -198: 0
-            source: Qt.resolvedUrl("images/dial-button.png")
+            source: appTheme.image("dial-button.png")
         }
     }
 }

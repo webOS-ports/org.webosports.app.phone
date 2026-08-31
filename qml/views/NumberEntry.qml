@@ -38,6 +38,8 @@ import "../services/PhoneNumberUtils.js" as PhoneNumberUtils
 Item {
     id: numberEntry
 
+    property UiTheme appTheme: PhoneUiTheme {}
+
     height: bgImage.height
 
     property alias text: textEdit.text
@@ -147,7 +149,7 @@ Item {
             right: parent.right
         }
         height: Units.gu(7);
-        source: "images/dialer-entry-bg.png"
+        source: appTheme.image("dialer-entry-bg.png")
     }
 
     Image {
@@ -163,7 +165,7 @@ Item {
             right: parent.right
             margins: Units.gu(3)
         }
-        source: 'images/icon-m-common-backspace.svg'
+        source: appTheme.image("icon-m-common-backspace.svg")
 
         MouseArea {
             anchors.fill: parent

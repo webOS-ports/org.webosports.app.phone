@@ -23,13 +23,16 @@ import LuneOS.Components 1.0
 Button {
     id: dialButtonRoot
 
+    property UiTheme appTheme: PhoneUiTheme {}
+
     background: ClippedImage {
         id: bgClippedImage
 
-        source: Qt.resolvedUrl("images/dial-button.png")
+        source: appTheme.image("dial-button.png")
 
         wantedWidth: dialButtonRoot.width
-        imageSize: Qt.size(612, 297)
+        // No imageSize: dial-button.png is 612 wide in the tablet set and
+        // 480 in the handset's, so ClippedImage takes it from the image.
         patchGridSize: Qt.size(1, 3)
         patch: dialButtonRoot.pressed ? Qt.point(0,2): Qt.point(0,0)
 

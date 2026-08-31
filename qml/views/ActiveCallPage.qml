@@ -98,7 +98,7 @@ BasePage {
     Image {
         anchors { top: parent.top; left: parent.left; right: parent.right }
         height: sourceSize.height
-        source: Qt.resolvedUrl("images/backdrop-phone.png")
+        source: appTheme.image("backdrop-phone.png")
         fillMode: Image.TileHorizontally
     }
 
@@ -124,7 +124,7 @@ BasePage {
          */
         BorderImage {
             anchors.fill: parent
-            source: Qt.resolvedUrl("images/glass-panel.png")
+            source: appTheme.image("glass-panel.png")
             border { left: 22; right: 22; top: 61; bottom: 22 }
             horizontalTileMode: BorderImage.Stretch
             verticalTileMode: BorderImage.Stretch
@@ -252,7 +252,7 @@ BasePage {
                         asynchronous: true
                         fillMode: Image.PreserveAspectCrop
                         smooth: true
-                        source: root.currentContact ? root.currentContact.avatarPath : Qt.resolvedUrl("images/contacts-unknown-icon-large.png")
+                        source: root.currentContact ? root.currentContact.avatarPath : appTheme.image("contacts-unknown-icon-large.png")
                     }
 
                     // active-photo-overlay.png is three pixels proud of the
@@ -261,7 +261,7 @@ BasePage {
                         anchors.centerIn: parent
                         width: parent.width + Units.gu(0.6)
                         height: parent.height + Units.gu(0.6)
-                        source: Qt.resolvedUrl("images/active-photo-overlay.png")
+                        source: appTheme.image("active-photo-overlay.png")
                     }
                 }
             }
@@ -293,6 +293,7 @@ BasePage {
                 }
 
                 NumPad {
+                    appTheme: root.appTheme
                     anchors {
                         top: tLineId.bottom
                         bottom: parent.bottom
@@ -391,7 +392,7 @@ BasePage {
                     }
                     height: Units.gu(6.6)
 
-                    source: Qt.resolvedUrl("images/disconnect-button.png")
+                    source: appTheme.image("disconnect-button.png")
                     frameCount: 3
                     frame: hangupAllArea.pressed ? 2 : 0
                 }
@@ -433,15 +434,15 @@ BasePage {
             visible: root.voiceCallIsActive
             iconSource: {
                 if (!root.audioRouteManager)
-                    return Qt.resolvedUrl("images/menu-icon-speaker.png");
+                    return appTheme.image("menu-icon-speaker.png");
 
                 switch (root.audioRouteManager.currentRoute) {
                 case root.audioRouteManager.routeBluetooth:
-                    return Qt.resolvedUrl("images/menu-popup-bluetooth.png");
+                    return appTheme.image("menu-popup-bluetooth.png");
                 case root.audioRouteManager.routeWiredHeadset:
-                    return Qt.resolvedUrl("images/menu-icon-headset.png");
+                    return appTheme.image("menu-icon-headset.png");
                 default:
-                    return Qt.resolvedUrl("images/menu-icon-speaker.png");
+                    return appTheme.image("menu-icon-speaker.png");
                 }
             }
             label: qsTr("Speaker")
@@ -455,7 +456,7 @@ BasePage {
         CallActionButton {
             appTheme: root.appTheme
             visible: root.voiceCallIsActive
-            iconSource: Qt.resolvedUrl("images/menu-icon-mute.png")
+            iconSource: appTheme.image("menu-icon-mute.png")
             label: qsTr("Mute")
             active: voiceCallManager ? voiceCallManager.isMicrophoneMuted : false
             onClicked: voiceCallManager.setMuteMicrophone(!voiceCallManager.isMicrophoneMuted)
@@ -464,7 +465,7 @@ BasePage {
         CallActionButton {
             appTheme: root.appTheme
             visible: root.voiceCallIsActive
-            iconSource: Qt.resolvedUrl("images/menu-icon-dtmfpad.png")
+            iconSource: appTheme.image("menu-icon-dtmfpad.png")
             label: qsTr("Dialpad")
             active: flipable.flipped
             onClicked: flipable.flipped = !flipable.flipped
@@ -476,7 +477,7 @@ BasePage {
         CallActionButton {
             appTheme: root.appTheme
             visible: voiceCallMgrWrapper.canSwap
-            iconSource: Qt.resolvedUrl("images/multicall-switch-button.png")
+            iconSource: appTheme.image("multicall-switch-button.png")
             label: qsTr("Swap")
             onClicked: voiceCallMgrWrapper.swap()
         }
@@ -484,7 +485,7 @@ BasePage {
         CallActionButton {
             appTheme: root.appTheme
             visible: voiceCallMgrWrapper.canSplit
-            iconSource: Qt.resolvedUrl("images/multicall-resume-button.png")
+            iconSource: appTheme.image("multicall-resume-button.png")
             label: qsTr("Split")
             onClicked: voiceCallMgrWrapper.split(root.selectedCall)
         }
@@ -492,7 +493,7 @@ BasePage {
         CallActionButton {
             appTheme: root.appTheme
             visible: voiceCallMgrWrapper.canAddCall
-            iconSource: Qt.resolvedUrl("images/menu-icon-addcall.png")
+            iconSource: appTheme.image("menu-icon-addcall.png")
             label: qsTr("Add Call")
             onClicked: root.addCallRequested()
         }

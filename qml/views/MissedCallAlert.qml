@@ -31,6 +31,8 @@ import "../services/CallMessages.js" as CallMessages
 MessageAlert {
     id: missedCallAlert
 
+    property UiTheme appTheme: PhoneUiTheme {}
+
     property DialHandler dialHandler
 
     property string _missedNumber: ""
@@ -48,7 +50,7 @@ MessageAlert {
 
         showQuestion(CallMessages.missedCallTitle,
                      qsTr("%1 at %2").arg(name).arg(when),
-                     Qt.resolvedUrl("images/popup-icon-missed.png"),
+                     appTheme.image("popup-icon-missed.png"),
                      qsTr("Call back"),
                      missedCallAlert._callBack);
     }

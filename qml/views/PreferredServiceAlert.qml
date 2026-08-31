@@ -34,7 +34,7 @@ import "../model"
 Item {
     id: preferredServiceAlert
 
-    property PhoneUiTheme appTheme;
+    property UiTheme appTheme;
     property CallTransports callTransports
     property DialProxy dialProxy
     property DialHandler dialHandler

@@ -2,3 +2,4 @@
 *.qmlc
 *.jsc
 *.swp
+.desktop-profile

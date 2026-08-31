@@ -30,7 +30,7 @@ BasePage {
     BorderImage {
         id: avatarBackground
 
-        source: "images/frame-background.png"
+        source: appTheme.image("frame-background.png")
         border.left: 70; border.top: 70
         border.right: 70; border.bottom: 70
 
@@ -72,7 +72,7 @@ BasePage {
 
         width: imageAvatar.width + Units.gu(2)
         height: width
-        source: "images/contacts-icon-frame.png"
+        source: appTheme.image("contacts-icon-frame.png")
         fillMode:Image.Stretch
         asynchronous:true
         smooth:true
@@ -113,6 +113,7 @@ BasePage {
         }
 
         IncomingAcceptButton {
+            appTheme: incommingCallDialog.appTheme
             height: answerRejectBtns.height
             width: answerRejectBtns.height
             anchors.left: parent.left
@@ -124,6 +125,7 @@ BasePage {
         }
 
         IncomingRejectButton {
+            appTheme: incommingCallDialog.appTheme
             height: answerRejectBtns.height
             width: answerRejectBtns.height
             anchors.right: parent.right

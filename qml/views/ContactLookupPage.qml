@@ -187,6 +187,7 @@ BasePage {
         clip: true
 
         SearchField {
+            appTheme: contactLookupPage.appTheme
             id: searchField
 
             anchors {
@@ -283,7 +284,7 @@ BasePage {
                         height: Units.gu(0.4)
 
                         visible: matched.text.length > 0
-                        source: Qt.resolvedUrl("images/filter-highlight.png")
+                        source: appTheme.image("filter-highlight.png")
                         fillMode: Image.TileHorizontally
                     }
 
@@ -335,6 +336,7 @@ BasePage {
                     }
 
                     ListSeparator {
+                        appTheme: contactLookupPage.appTheme
                         anchors { left: parent.left; right: parent.right; bottom: parent.bottom }
                         drawn: !(row.rowData && row.rowData.lastOfContact)
                     }
@@ -380,7 +382,7 @@ BasePage {
                             Layout.preferredWidth: Units.gu(3.4)
                             Layout.preferredHeight: Units.gu(3.2)
                             fillMode: Image.PreserveAspectFit
-                            source: Qt.resolvedUrl("images/Camera-Icon.png")
+                            source: appTheme.image("Camera-Icon.png")
                             visible: !!row.option && row.option.supportsVideo
                             opacity: videoArea.pressed ? 0.6 : 1.0
 

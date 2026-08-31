@@ -34,6 +34,8 @@ import "../services/PhoneNumberUtils.js" as PhoneNumberUtils
 BasePage {
     id: videoCallPage
 
+    property UiTheme appTheme: PhoneUiTheme {}
+
     pageName: "VideoCall"
 
     /// Where a decoded stream would be shown, once there is one to show.
@@ -47,7 +49,7 @@ BasePage {
 
     Image {
         anchors.fill: parent
-        source: Qt.resolvedUrl("images/scenetall.png")
+        source: appTheme.image("scenetall.png")
         fillMode: Image.TileHorizontally
     }
 
@@ -84,7 +86,7 @@ BasePage {
             x: Units.gu(0.6)
             y: Units.gu(1.6)
 
-            source: Qt.resolvedUrl("images/dropshadowboarder_PIP.png")
+            source: appTheme.image("dropshadowboarder_PIP.png")
             border { left: 7; right: 7; top: 7; bottom: 7 }
 
             function keepInside() {
@@ -133,7 +135,7 @@ BasePage {
 
         Image {
             anchors.fill: parent
-            source: Qt.resolvedUrl("images/vidHeader.png")
+            source: appTheme.image("vidHeader.png")
             fillMode: Image.Tile
         }
 
@@ -168,11 +170,12 @@ BasePage {
 
         // Turning the camera off leaves the call up as a voice one.
         VideoCallHeaderButton {
+            appTheme: videoCallPage.appTheme
             id: videoButton
 
             anchors { left: parent.left; top: parent.top; bottom: parent.bottom }
 
-            iconSource: Qt.resolvedUrl("images/video_on_off.png")
+            iconSource: appTheme.image("video_on_off.png")
             label: qsTr("Video")
             dividerOnLeft: false
             on: videoCallPage.voiceCall ? videoCallPage.voiceCall.isVideo === true : false
@@ -184,11 +187,12 @@ BasePage {
         }
 
         VideoCallHeaderButton {
+            appTheme: videoCallPage.appTheme
             id: audioButton
 
             anchors { right: parent.right; top: parent.top; bottom: parent.bottom }
 
-            iconSource: Qt.resolvedUrl("images/mute_on_off.png")
+            iconSource: appTheme.image("mute_on_off.png")
             label: qsTr("Audio")
             dividerOnLeft: true
             on: videoCallPage.voiceCallMgrWrapper
@@ -235,7 +239,7 @@ BasePage {
         height: Units.gu(3.7)
 
         // Up, down and disabled, stacked in the one file.
-        source: Qt.resolvedUrl("images/hangup_dartfish.png")
+        source: appTheme.image("hangup_dartfish.png")
         frameCount: 3
         frame: hangupArea.pressed ? 1 : 0
 

@@ -245,10 +245,21 @@ WebOSWindow {
         id: favoritesModelId
     }
 
-    /* views */
-    PhoneUiTheme {
-        id: phoneUiTheme
-    }
+    /*
+     * views
+     *
+     * The app has two looks, one for each shape of device, and this is the
+     * only place that chooses between them. Settings.tabletUi is what the
+     * shell itself reads to tell a tablet from a handset, so the app follows
+     * that rather than measuring its own window -- a phone app on a big
+     * screen is still a phone app. Everything below takes a UiTheme and never
+     * names either of the two.
+     */
+    readonly property UiTheme phoneUiTheme: Settings.tabletUi ? tabletUiThemeId
+                                                              : phoneUiThemeId
+
+    PhoneUiTheme  { id: phoneUiThemeId }
+    TabletUiTheme { id: tabletUiThemeId }
 
     IncomingCallAlert {
         id: incomingCallAlertWindowId
@@ -267,6 +278,7 @@ WebOSWindow {
 
     SimPinWindow {
         id: simPinWindowId
+        appTheme: root.phoneUiTheme
         telephonyManager: telephonyManagerId
         voiceCallMgrWrapper: voiceCallMgrWrapperId
         visible: false

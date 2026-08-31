@@ -34,7 +34,7 @@ import LuneOS.Components 1.0
 Item {
     id: phoneTabBar
 
-    property PhoneUiTheme appTheme: PhoneUiTheme {}
+    property UiTheme appTheme: PhoneUiTheme {}
 
     /// [{ icon: url, label: string }]
     property var tabs: []

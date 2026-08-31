@@ -135,6 +135,7 @@ BasePage {
         height: numEntry.height + matchStrip.height + pDialPage.padKeysHeight + dialButton.height
 
         NumberEntry {
+            appTheme: pDialPage.appTheme
             id: numEntry
 
             anchors {
@@ -190,6 +191,7 @@ BasePage {
     }
 
     NumPad {
+        appTheme: pDialPage.appTheme
         id: numPad
         anchors {
             top: matchStrip.bottom
@@ -245,6 +247,7 @@ BasePage {
     }
 
     DialButton {
+        appTheme: pDialPage.appTheme
         id: dialButton
 
         anchors {

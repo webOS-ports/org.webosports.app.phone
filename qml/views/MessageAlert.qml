@@ -38,7 +38,7 @@ import LuneOS.Components 1.0 as LuneComponents
 WebOSWindow {
     id: messageAlert
 
-    property PhoneUiTheme appTheme;
+    property UiTheme appTheme;
 
     property string title: ""
     property string message: ""

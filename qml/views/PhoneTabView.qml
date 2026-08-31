@@ -40,7 +40,7 @@ import "../model"
 Item {
     id: tabView
 
-    property PhoneUiTheme appTheme;
+    property UiTheme appTheme;
 
     property VoiceCallMgrWrapper voiceCallManager;
     property TelephonyManager telephonyManager;
@@ -73,10 +73,10 @@ Item {
     // shows the ones that apply, so each tab carries the stack index it opens.
     // On a wide screen the dialpad is always on screen, so it loses its tab.
     readonly property var allTabs: [
-        { key: "phone",     stackIndex: 0, icon: Qt.resolvedUrl("images/menu-icon-Phone.png"),     label: qsTr("Phone") },
-        { key: "video",     stackIndex: 1, icon: Qt.resolvedUrl("images/menu-icon-video.png"),     label: qsTr("Video") },
-        { key: "favorites", stackIndex: 2, icon: Qt.resolvedUrl("images/menu-icon-favorites.png"), label: qsTr("Favorites") },
-        { key: "calllog",   stackIndex: 3, icon: Qt.resolvedUrl("images/menu-icon-call-log.png"),  label: qsTr("Call Log") }
+        { key: "phone",     stackIndex: 0, icon: appTheme.image("menu-icon-Phone.png"),     label: qsTr("Phone") },
+        { key: "video",     stackIndex: 1, icon: appTheme.image("menu-icon-video.png"),     label: qsTr("Video") },
+        { key: "favorites", stackIndex: 2, icon: appTheme.image("menu-icon-favorites.png"), label: qsTr("Favorites") },
+        { key: "calllog",   stackIndex: 3, icon: appTheme.image("menu-icon-call-log.png"),  label: qsTr("Call Log") }
     ]
 
     readonly property var tabs: allTabs.filter(function(tab) {
@@ -112,8 +112,8 @@ Item {
 
         dialHandler: tabView.dialHandler
 
-        onPreferencesRequested: prefsLoader.active = true
-        onAccountsRequested: accountsLoader.active = true
+        onPreferencesRequested: tabView.showOverlayPage(prefsLoader)
+        onAccountsRequested: tabView.showOverlayPage(accountsLoader)
         onClearHistoryRequested: clearHistoryDialog.open()
     }
 
@@ -136,6 +136,18 @@ Item {
      * no way back to the keys but the tab itself.
      */
     function syncDialpad() {
+        /*
+         * A page laid over the whole view -- preferences, accounts -- is not
+         * the Phone tab, whatever the tabs say. It has to be closed for rather
+         * than merely stacked over: the keypad is a Popup and so lives in the
+         * window's overlay layer, which is drawn above every child of the view
+         * no matter what z they are given, so leaving it up buries them.
+         */
+        if (prefsLoader.active || accountsLoader.active) {
+            dialpadOverlay.close();
+            return;
+        }
+
         if (!tabView.phoneUi)
             return;
 
@@ -143,6 +155,18 @@ Item {
             dialpadOverlay.open();
         else
             dialpadOverlay.close();
+    }
+
+    /// Opening or closing a page that covers the view changes whether the
+    /// keypad may be up, so both go through here.
+    function showOverlayPage(loader) {
+        loader.active = true;
+        syncDialpad();
+    }
+
+    function hideOverlayPage(loader) {
+        loader.active = false;
+        syncDialpad();
     }
 
     onVisibleChanged: if (visible) syncDialpad()
@@ -154,11 +178,21 @@ Item {
 
     Component.onCompleted: syncDialpad()
 
-    /// Contacts live on the Phone tab, as they do on the reference.
-    function showContacts() { currentIndex = _stackIndexOf("phone"); }
-    function showFavorites() { currentIndex = _stackIndexOf("favorites"); }
-    function showCallLog() { currentIndex = _stackIndexOf("calllog"); }
-    function showVideo() { currentIndex = _stackIndexOf("video"); }
+    /*
+     * Contacts live on the Phone tab, as they do on the reference.
+     *
+     * Each of these syncs the keypad rather than leaving that to
+     * onCurrentIndexChanged: asking for the tab that is already showing sets
+     * currentIndex to what it already holds, which emits nothing, and the
+     * keypad never comes back. That is what a call placed from the keypad
+     * did -- it ended on a bare contact list with no way back to the keys but
+     * another tab. syncDialpad() decides afresh either way, so calling it
+     * when the index did change costs nothing.
+     */
+    function showContacts() { currentIndex = _stackIndexOf("phone"); syncDialpad(); }
+    function showFavorites() { currentIndex = _stackIndexOf("favorites"); syncDialpad(); }
+    function showCallLog() { currentIndex = _stackIndexOf("calllog"); syncDialpad(); }
+    function showVideo() { currentIndex = _stackIndexOf("video"); syncDialpad(); }
 
     Rectangle {
         anchors.fill: parent
@@ -416,10 +450,13 @@ Item {
         sourceComponent: PhonePrefsPage {
             appTheme: tabView.appTheme
             telephonyManager: tabView.telephonyManager
+            // The SIM PIN card offers an emergency dialpad, which needs to be
+            // able to place the call.
+            voiceCallMgrWrapper: tabView.voiceCallManager
             supplementaryServices: tabView.supplementaryServices
             dialingShortcuts: tabView.dialingShortcuts
 
-            onClosed: prefsLoader.active = false
+            onClosed: tabView.hideOverlayPage(prefsLoader)
         }
     }
 
@@ -433,7 +470,7 @@ Item {
             appTheme: tabView.appTheme
             callTransports: tabView.callTransports
 
-            onClosed: accountsLoader.active = false
+            onClosed: tabView.hideOverlayPage(accountsLoader)
         }
     }
 }

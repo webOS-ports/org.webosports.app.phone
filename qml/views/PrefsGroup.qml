@@ -33,7 +33,7 @@ Item {
 
     default property alias content: rowsColumn.data
 
-    property PhoneUiTheme appTheme: PhoneUiTheme {}
+    property UiTheme appTheme: PhoneUiTheme {}
     property string title: ""
 
     readonly property bool labelled: title.length > 0
@@ -54,8 +54,8 @@ Item {
     BorderImage {
         anchors.fill: parent
 
-        source: Qt.resolvedUrl(prefsGroup.labelled ? "images/group-labeled.png"
-                                                   : "images/group-unlabeled.png")
+        source: Qt.resolvedUrl(prefsGroup.labelled ? appTheme.image("group-labeled.png")
+                                                   : appTheme.image("group-unlabeled.png"))
         border {
             left: prefsGroup.sideInset; right: prefsGroup.sideInset; bottom: prefsGroup.sideInset
             top: prefsGroup.topInset

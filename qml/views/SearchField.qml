@@ -35,6 +35,8 @@ import LunaNext.Common 0.1
 TextField {
     id: searchField
 
+    property UiTheme appTheme: PhoneUiTheme {}
+
     height: Units.gu(4)
 
     color: '#2a2929'
@@ -61,8 +63,8 @@ TextField {
         fillMode: Image.PreserveAspectFit
         smooth: true
 
-        source: Qt.resolvedUrl(searchField.text.length > 0 ? "images/search-button-cancel.png"
-                                                           : "images/search-button.png")
+        source: Qt.resolvedUrl(searchField.text.length > 0 ? appTheme.image("search-button-cancel.png")
+                                                           : appTheme.image("search-button.png"))
         opacity: clearArea.pressed ? 0.6 : 1.0
 
         MouseArea {

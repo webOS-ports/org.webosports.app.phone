@@ -33,12 +33,13 @@ import "../services/CallMessages.js" as CallMessages
 WebOSWindow {
     id: simPinWindow
 
+    property UiTheme appTheme
     property TelephonyManager telephonyManager
     property VoiceCallMgrWrapper voiceCallMgrWrapper
 
     width: Settings.displayWidth
     height: Settings.displayHeight
-    color: phoneUiAppTheme.backgroundColor
+    color: simPinWindow.appTheme.backgroundColor
     windowType: "_WEBOS_WINDOW_TYPE_SYSTEM_UI"
     keepAlive: true
 
@@ -97,8 +98,6 @@ WebOSWindow {
     function _handleSimPermBlocked() {
         _statusMessage = qsTr("This SIM card is permanently blocked. Contact your network operator.");
     }
-
-    PhoneUiTheme { id: phoneUiAppTheme }
 
     OfonoManager {
         id: modemManager
@@ -180,7 +179,7 @@ WebOSWindow {
         anchors.fill: parent
         visible: false
 
-        appTheme: phoneUiAppTheme
+        appTheme: simPinWindow.appTheme
         telephonyManager: simPinWindow.telephonyManager
         voiceCallMgrWrapper: simPinWindow.voiceCallMgrWrapper
 

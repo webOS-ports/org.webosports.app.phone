@@ -22,7 +22,7 @@ import LuneOS.Components 1.0
 Item {
    id:root
 
-   property PhoneUiTheme appTheme: PhoneUiTheme{}
+   property UiTheme appTheme: PhoneUiTheme {}
 
    property alias label: label.text
    property alias sublabel: sublabel.text
@@ -31,6 +31,10 @@ Item {
    property bool disableSubLabel: false
    property string alt: ""
    property point posInPadGrid
+
+   /// A key that carries artwork instead of a digit, e.g. the PIN pad's
+   /// backspace. The source is a two-state sprite, at rest above pressed.
+   property url icon
 
    property int fontSize: height/2.5
 
@@ -42,6 +46,23 @@ Item {
         color: appTheme.foregroundColor
         font.pixelSize: fontSize
         font.bold: true
+    }
+
+    ClippedImage {
+        id: iconImage
+
+        visible: root.icon.toString() !== ""
+        anchors.centerIn: parent
+
+        source: root.icon
+        // Sized from the sprite itself: it differs between the artwork sets.
+        patchGridSize: Qt.size(1, 2)
+        patch: Qt.point(0, mouseArea.pressed ? 1 : 0)
+
+        // Both dimensions are given: ClippedImage only keeps a patch's own
+        // proportions when the grid is square, and this sprite's is not.
+        wantedWidth: Units.gu(3.6)
+        wantedHeight: Units.gu(5)
     }
 
     Text {
@@ -56,7 +77,7 @@ Item {
     ClippedImage {
         id: box
 
-        source: mouseArea.pressed ? Qt.resolvedUrl("images/buttons-numpad-pressed.png") : Qt.resolvedUrl("images/buttons-numpad.png")
+        source: mouseArea.pressed ? appTheme.image("buttons-numpad-pressed.png") : appTheme.image("buttons-numpad.png")
 
         wantedWidth: parent.width
         wantedHeight: parent.height

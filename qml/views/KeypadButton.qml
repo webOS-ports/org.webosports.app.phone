@@ -27,7 +27,7 @@ Button {
 
     checkable: true
 
-    property PhoneUiTheme appTheme: PhoneUiTheme{}
+    property UiTheme appTheme: PhoneUiTheme {}
 
     background: Rectangle{
         color: buttonRoot.checked ? appTheme.callActionBtnFgColorActive : appTheme.callActionBtnFgColor
@@ -45,7 +45,7 @@ Button {
             Image{
                 x: 0
                 y: buttonRoot.pressed ? -48: 0
-                source: "images/menu-icon-dtmfpad.png"
+                source: appTheme.image("menu-icon-dtmfpad.png")
             }
         }
     }

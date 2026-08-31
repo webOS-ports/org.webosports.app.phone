@@ -24,7 +24,7 @@ import LuneOS.Components 1.0
 Button {
     id: buttonRoot
 
-    property PhoneUiTheme appTheme: PhoneUiTheme{}
+    property UiTheme appTheme: PhoneUiTheme {}
 
     checkable: true
 
@@ -36,7 +36,7 @@ Button {
         radius: buttonRoot.width*0.2
 
         ClippedImage {
-            source: Qt.resolvedUrl('images/button-sprite.png')
+            source: appTheme.image("button-sprite.png")
 
             wantedWidth: buttonRoot.width
             wantedHeight: buttonRoot.height

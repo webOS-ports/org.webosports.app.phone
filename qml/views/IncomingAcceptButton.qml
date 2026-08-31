@@ -22,11 +22,13 @@ import LuneOS.Components 1.0
 
 Button {
     id: buttonRoot
+
+    property UiTheme appTheme: PhoneUiTheme {}
     width:210
     height:210
 
    background: ClippedImage {
-      source: Qt.resolvedUrl("images/button-ignore-answer.png")
+      source: appTheme.image("button-ignore-answer.png")
 
       wantedHeight: buttonRoot.height
       wantedWidth: buttonRoot.width

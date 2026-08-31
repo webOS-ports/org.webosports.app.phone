@@ -118,12 +118,25 @@ Item {
         callBarring.changePassword(oldPassword, newPassword);
     }
 
-    function changeSimPin(oldPin, newPin) {
-        return _pinChange(PinTypes.SimPin, oldPin, newPin, newPin);
+    /*
+     * The confirmation is the caller's to supply: the PIN card asks for the
+     * new PIN twice and wants the two compared, where a caller with only one
+     * copy of it can leave the argument out.
+     *
+     * Both of these set _pendingCommand, which they used not to. Without it
+     * `busy` stayed false for the whole operation and _onPinComplete read a
+     * stale command to decide whether it was reporting on a PIN or a PUK.
+     */
+    function changeSimPin(oldPin, newPin, confirmPin) {
+        _pendingCommand = "pin1Change";
+        return _pinChange(PinTypes.SimPin, oldPin, newPin,
+                          confirmPin === undefined ? newPin : confirmPin);
     }
 
-    function unblockSimPin(puk, newPin) {
-        return _pinUnblock(PinTypes.SimPuk, puk, newPin, newPin);
+    function unblockSimPin(puk, newPin, confirmPin) {
+        _pendingCommand = "pin1Unblock";
+        return _pinUnblock(PinTypes.SimPuk, puk, newPin,
+                           confirmPin === undefined ? newPin : confirmPin);
     }
 
     function lockSimPin(pin) {

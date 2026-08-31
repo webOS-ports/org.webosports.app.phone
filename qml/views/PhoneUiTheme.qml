@@ -1,5 +1,4 @@
 /*
- * Copyright (C) 2014 Roshan Gunasekara <roshan@mobileteck.com>
  * Copyright (C) 2026 WebOS Ports
  *
  * This program is free software: you can redistribute it and/or modify
@@ -21,194 +20,111 @@ import QtQuick 2.0
 import LunaNext.Common 0.1
 
 /**
- * The phone app's palette, matched to the webOS 3.x phone app as it runs on the
- * TouchPad.
+ * The handset look.
  *
- * The QML app had drifted to a blue gradient of its own; every value here was
- * instead sampled from the real thing, so the two look like the same
- * application. The charcoal chrome, the black call card, the blue active
- * button and the green/red call buttons are all measured, not guessed.
+ * Sampled from the phone app as it ships on the Pre3 -- webOS 2.2.4,
+ * `nova-cust-image-mantaray`. The two looks agree on the chrome: #25394a,
+ * #132232 and #071116 are the same in both stylesheets, which is why they sit
+ * in UiTheme. Where the handset differs is in how it greys a list, how it
+ * fills an opened drawer, and -- most visibly -- in the artwork, which it
+ * draws from the 1.5x set the Pre3 ships rather than the tablet's 1x.
+ *
+ * Values not set here are ones no difference has been found for. That is a
+ * statement about the evidence, not a guarantee they are identical: the
+ * sampling covered base.css, dialer.css, activecall.css, dialpad.css and the
+ * phoneApp and phoneprefs stylesheets, not every rule in the app.
  */
-QtObject {
-    /**
-     * Chrome
-     **/
-
-    /// The page behind everything. The same grey the list rows sit on -- the
-    /// group box is told apart by its border alone, not by a fill of its own.
-    property color backgroundColor: '#57595c'
-    property color foregroundColor: '#ffffff'
-
-    /// Panels that sit on the page: the call card, the dialpad, popups.
-    property color panelColor: '#2d2c2c'
-    /// The dark well inside a panel, behind an avatar or a call line.
-    property color panelDarkColor: '#030303'
-    /// The strip a panel's buttons sit on.
-    property color panelFooterColor: '#242627'
-    property color panelBorderColor: '#4a4a4a'
-
-    /// Tab bar. The tab in use is the darker one: it reads as pressed in.
-    property color tabBarColor: '#5a5d61'
-    property color tabBarSelectedColor: '#424446'
-    property color tabBarBorderColor: '#2c2e30'
+UiTheme {
+    imageDir: Qt.resolvedUrl("images/phone/")
 
     /**
-     * Text
-     **/
+     * The page behind everything.
+     *
+     * The handset is blue where the tablet is grey. shared/base.css gives
+     * .phone-background as `#25394a url(backdrop-phone.png) left top repeat-x`
+     * -- a flat blue with a vertical gradient laid over it -- and the stops
+     * below are read off that backdrop at 1.5x, which is the artwork the Pre3
+     * draws. It matters more than it sounds: the dialpad is a translucent
+     * black scrim over translucent keys, so what shows through the pad is this
+     * and nothing else.
+     */
+    backgroundColor: '#25394a'
 
-    property color primaryTextColor: '#ffffff'
-    /// Secondary information: numbers under a name, timestamps, hints.
-    property color secondaryTextColor: '#9a9a9a'
-    /// The service a contact point or call belongs to, shown in caps.
-    /// #6f7070 is the original's own .call-history-subitem colour.
-    property color serviceTextColor: '#6f7070'
-    property color disabledTextColor: '#5a5a5a'
-
-    /**
-     * Buttons
-     **/
-
-    property color buttonColor: '#2c2c2c'
-    property color buttonPressedColor: '#3a3a3a'
-    property color buttonBorderColor: '#151515'
-    /// A toggled-on call control, e.g. speaker or mute.
-    property color buttonActiveColor: '#3871a1'
-
-    /// Place a call.
-    property color callColor: '#60ab27'
-    /// End or decline a call.
-    property color hangupColor: '#d0341f'
-
-    /// Destructive backdrop, revealed behind a swiped call log row.
-    property color deleteColor: '#8b2020'
+    mainGradient: Gradient {
+        GradientStop { position: 0.00; color: '#4e7495' }
+        GradientStop { position: 0.15; color: '#466885' }
+        GradientStop { position: 0.50; color: '#38546b' }
+        GradientStop { position: 0.75; color: '#2f465a' }
+        GradientStop { position: 1.00; color: '#233443' }
+    }
 
     /**
      * Lists
-     **/
-
-    /**
-     * Lists sit in a bordered group box, a mid grey with light text.
      *
-     * These were read off the device twice and got it wrong both times: first
-     * from a capture taken behind a dimming scrim, which made the list look
-     * light-on-white, and then from the same capture again, which made it far
-     * darker than it is. The values here are from an undimmed capture and are
-     * corroborated -- the row separator's own alpha resolves to exactly the
-     * pixels the device shows over this background, and the selection blue
-     * matches to the digit.
+     * One grey does for every secondary line here, where the tablet gives
+     * each list its own: .call-history-subitem is #AAAAAA on the Pre3 against
+     * the TouchPad's #6f7070, and neither the favourites nor the call log
+     * label overrides it.
      */
-    property color listBackgroundColor: '#57595c'
-    property color listAlternateColor: '#525457'
-    property color listTextColor: '#ffffff'
-
     /**
-     * Each list names its own second line, and the original gives each a
-     * different grey: the call log's is the dimmest of them, the contact list
-     * sits between, and favourites is nearly as bright as the name above it.
-     * They are .call-log .clv-drawerItem-displayLbl, .contact-list .enyo-item
-     * and .drawerItem-favorites-displayLbl respectively.
-     */
-    property color listSecondaryTextColor: '#cccccc'
-    property color callLogDetailColor: '#9d9e9f'
-    property color favoritesDetailColor: '#c5c5c6'
-    /// A number inside an opened call group: .drawer-subItem-itemTextLbl.
-    property color drawerNumberColor: '#cbcbcb'
-    /// The name above a run of rows: .enyo-divider-caption.
-    property color listSectionTextColor: '#8b8c8e'
-
-    /**
-     * The drawer a row opens. Favourites fills it flat; the call log lays a
-     * nine-slice over it that darkens the top and bottom edges, so an open
-     * drawer looks sunk into the row that opened it.
-     */
-    property color listSectionColor: '#3b3d3f'
-    property url drawerBackgroundSource: Qt.resolvedUrl('images/call-log-drawer-sub-item-bg.png')
-
-    /// A row the user is acting on: .enyo-addressing-item-selected.
-    property color listSelectedColor: '#4a7298'
-
-    /// The rule around a list: `2px solid #1f2121` with a six-pixel radius,
-    /// set thirty pixels in from the edge of the page.
-    property color listBorderColor: '#1f2121'
-    property real listBorderWidth: 2
-    property real listBorderRadius: Units.gu(0.6)
-    property real listMargin: Units.gu(3)
-
-    /**
-     * The drawer a list row opens.
+     * Lists are not filled on the handset.
      *
-     * A row of its own -- another number to call, "View Contact" -- is fifty
-     * pixels tall. A past call is only thirty-six, because it is a record
-     * rather than something to act on; com.palm.app.phone sets that height
-     * outright in .call-history-subitem. Both indent past the photo so their
-     * text lines up with the name of the row that opened them, which is what
-     * the original's `padding-left: 60px` on .drawer-subitem does.
+     * .call-log and .enyo-item carry no background rule at all in 2.2.4, so
+     * the blue page shows through them the way it shows through the dialpad;
+     * the TouchPad fills both (#323232), which is where the greys in UiTheme
+     * come from. Leaving those greys in place put opaque slabs over the blue.
      */
-    property real drawerRowHeight: Units.gu(5)
-    property real drawerCallRowHeight: Units.gu(3.6)
-    property real drawerIndent: Units.gu(6)
+    listBackgroundColor: 'transparent'
+    listAlternateColor: 'transparent'
 
-    /// A list row carrying a photo and two lines of text. The call log's is a
-    /// little taller than the favourites', as it is on the device.
-    property real listRowHeight: Units.gu(7.4)
-    property real callLogRowHeight: Units.gu(7.9)
+    serviceTextColor: '#aaaaaa'
+    /*
+     * #aaaaaa is .call-history-subitem, which is the service line and only
+     * that. The call log's own second line, .call-log .clv-drawerItem-displayLbl,
+     * sets no colour on the handset and inherits .enyo-item's #ccc -- it was
+     * given the subitem grey here by mistake.
+     */
+    callLogDetailColor: '#cccccc'
+    favoritesDetailColor: '#cccccc'
+    drawerNumberColor: '#cccccc'
+    /// .enyo-divider-caption keeps the framework's own #ccc.
+    listSectionTextColor: '#cccccc'
 
     /**
-     * Preferences
+     * An opened drawer is blue on the handset. .drawer-subitem fills with
+     * #25394a -- the same blue the rest of webOS uses behind a selection --
+     * where the TouchPad had gone flat grey.
+     */
+    listSectionColor: '#25394a'
+
+    /*
+     * listSelectedColor is deliberately not overridden.
      *
-     * The preference scenes are light where the rest of the app is dark, as
-     * they are in webOS -- they belong to the settings world rather than to
-     * the call. Groups are drawn with the framework's own nine-slices, whose
-     * caption band is black at a quarter opacity: over this background that
-     * resolves to exactly the grey the device shows.
+     * It was, to 'transparent', on the strength of the Pre3's
+     * `.contact-list .enyo-addressing-item-selected { background: none }`.
+     * That reading was wrong twice over: the same rule carries a
+     * focus-gradient border-image, so the row is still marked, just with
+     * artwork rather than a fill; and the unscoped framework rule is
+     * `background: lightblue` in both eras, so this was never a difference
+     * between them. Meanwhile the QML uses this for press feedback on every
+     * list, so blanking it left a tap showing nothing at all.
      */
-    property color prefsBackgroundColor: '#d8d8d8'
-    property color prefsHeaderColor: '#e0e0e0'
-    property color prefsFooterColor: '#b1b1b1'
-    property color prefsTextColor: '#2a2a2a'
-    property color prefsSecondaryTextColor: '#5a5a5a'
-    property color prefsGroupLabelColor: '#ffffff'
-    property color prefsRowDividerColor: '#00000040'
-    /// The button that closes a preference scene.
-    property color prefsDoneColor: '#62b246'
 
     /**
-     * Gradients
-     **/
-
-    property Gradient mainGradient: Gradient {
-        GradientStop { position: 0.0; color: '#2f3032' }
-        GradientStop { position: 1.0; color: '#252628' }
-    }
-
-    /// The call card: charcoal at the top fading into black behind the avatar.
-    property Gradient panelGradient: Gradient {
-        GradientStop { position: 0.0; color: '#333233' }
-        GradientStop { position: 0.55; color: '#151515' }
-        GradientStop { position: 1.0; color: '#030303' }
-    }
-
-    property Gradient selectedGradient: Gradient {
-        GradientStop { position: 0.0; color: '#2a2a2a' }
-        GradientStop { position: 1.0; color: '#1b1b1b' }
-    }
-    property Gradient unSelectedGradient: Gradient {
-        GradientStop { position: 0.0; color: '#3a3c3e' }
-        GradientStop { position: 1.0; color: '#2b2d2f' }
-    }
-
-    /**
-     * Retained for compatibility with the existing views.
-     **/
-
-    property color headerColor: '#4a4a4a'
-    property color headerTitle: '#ffffff'
-    property color headerTip: '#000000'
-    property color subForegroundColor: '#8d8d8d'
-    property color selectedTabColor: '#222324'
-    property color selectedTabForground: '#ffffff'
-    property color unselectedTabColor: '#333537'
-    property color unselectedTabForground: '#9a9a9a'
-    property color callActionBtnFgColor: '#2c2c2c'
-    property color callActionBtnFgColorActive: '#3871a1'
+     * The SIM PIN card.
+     *
+     * Fills the card, sky backdrop and all, with the entry drawn large and
+     * white and a pair of matching pills along the foot. Kept from PinCode as
+     * it runs on the Pre3, whose stylesheet gives the heading twenty-six
+     * pixels, the step line seventeen, the dots thirty-two and bold, and the
+     * buttons sixty.
+     */
+    pinCardIsPanel: false
+    pinCardEntryColor: '#ffffff'
+    pinCardEntrySize: Units.gu(3.2)
+    pinCardEntryBold: true
+    pinCardTitleSize: Units.gu(2.6)
+    pinCardSubTextSize: Units.gu(1.7)
+    pinCardButtonHeight: Units.gu(6)
+    pinCardAffirmativeDone: false
 }

@@ -32,7 +32,7 @@ WebOSWindow {
     property ContactsModel contacts;
     property VoiceCallMgrWrapper voiceCallManager
     property QtObject voiceCall;
-    property PhoneUiTheme appTheme;
+    property UiTheme appTheme;
 
     property Contact currentContact: Contact { contactsModel: contacts; lineId: voiceCall ? voiceCall.lineId : "" }
 
@@ -81,6 +81,7 @@ WebOSWindow {
         spacing: Units.gu(1)
 
         IncomingAcceptButton {
+            appTheme: incomingCallAlert.appTheme
             anchors.verticalCenter: buttons.verticalCenter
             height: parent.height
             width: parent.height
@@ -115,6 +116,7 @@ WebOSWindow {
         }
 
         IncomingRejectButton {
+            appTheme: incomingCallAlert.appTheme
             anchors.verticalCenter: buttons.verticalCenter
             height: parent.height
             width: parent.height

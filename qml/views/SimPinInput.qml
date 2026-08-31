@@ -32,7 +32,7 @@ import LunaNext.Common 0.1
 Item {
     id: simPinInput
 
-    property PhoneUiTheme appTheme: PhoneUiTheme{}
+    property UiTheme appTheme: PhoneUiTheme {}
 
     property OfonoSimManager simManager
     property int requestedPinType: 0
@@ -153,6 +153,7 @@ Item {
     }
 
     NumberEntry {
+        appTheme: simPinInput.appTheme
         id: pinEntry
 
         anchors {
@@ -167,6 +168,7 @@ Item {
     }
 
     NumPad {
+        appTheme: simPinInput.appTheme
         id: keyboard
 
         anchors {
