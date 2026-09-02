@@ -69,14 +69,24 @@ Item {
     readonly property bool hasVideoService: callTransports &&
                                             callTransports.videoCallableImTypes().length > 0
 
+    /**
+     * The theme is loaded rather than built alongside us, so it arrives a pass
+     * after the bindings below first run. Asking it for artwork through here
+     * keeps that first pass from throwing; the list rebuilds itself, icons and
+     * all, the moment the theme lands.
+     */
+    function tabIcon(name) {
+        return appTheme ? appTheme.image(name) : "";
+    }
+
     // The stack always holds the same pages in the same order; the bar only
     // shows the ones that apply, so each tab carries the stack index it opens.
     // On a wide screen the dialpad is always on screen, so it loses its tab.
     readonly property var allTabs: [
-        { key: "phone",     stackIndex: 0, icon: appTheme.image("menu-icon-Phone.png"),     label: qsTr("Phone") },
-        { key: "video",     stackIndex: 1, icon: appTheme.image("menu-icon-video.png"),     label: qsTr("Video") },
-        { key: "favorites", stackIndex: 2, icon: appTheme.image("menu-icon-favorites.png"), label: qsTr("Favorites") },
-        { key: "calllog",   stackIndex: 3, icon: appTheme.image("menu-icon-call-log.png"),  label: qsTr("Call Log") }
+        { key: "phone",     stackIndex: 0, icon: tabView.tabIcon("menu-icon-Phone.png"),     label: qsTr("Phone") },
+        { key: "video",     stackIndex: 1, icon: tabView.tabIcon("menu-icon-video.png"),     label: qsTr("Video") },
+        { key: "favorites", stackIndex: 2, icon: tabView.tabIcon("menu-icon-favorites.png"), label: qsTr("Favorites") },
+        { key: "calllog",   stackIndex: 3, icon: tabView.tabIcon("menu-icon-call-log.png"),  label: qsTr("Call Log") }
     ]
 
     readonly property var tabs: allTabs.filter(function(tab) {
