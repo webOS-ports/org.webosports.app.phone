@@ -104,6 +104,30 @@ QtObject {
     property color deleteColor: '#8b2020'
 
     /**
+     * The native size of the full-width buttons along the foot of a panel --
+     * the dial button and the disconnect button. Both are drawn as three
+     * patches stacked, both artwork sets draw them 297 tall, and only the
+     * width differs: the tablet's are 612 wide, the handset's 480.
+     *
+     * ClippedImage cannot read this off the image, and a button gives it only
+     * a width, so without this it has no proportion to work the height out
+     * from: an unset imageSize is -1x-1, which reads as square and stretches
+     * the artwork to a third of the button's width.
+     */
+    property size footerButtonImageSize: Qt.size(612, 297)
+
+    /**
+     * The rounded cap at either end of a SIM PIN card button, in pixels of
+     * that look's own artwork. Only what lies between the two caps stretches
+     * to the width the button ends up with, so a cap narrower than the real
+     * one drags part of the curve across the middle of the pill.
+     *
+     * dialpad.css gives `border-width: 0 25px` against the 1x pill, which is
+     * 51 wide -- caps of twenty-five with a single pixel between them.
+     */
+    property int pinMenuButtonCapWidth: 25
+
+    /**
      * Lists
      *
      * Lists sit in a bordered group box, a mid grey with light text.

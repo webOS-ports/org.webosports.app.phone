@@ -37,6 +37,14 @@ import LunaNext.Common 0.1
 UiTheme {
     imageDir: Qt.resolvedUrl("images/phone/")
 
+    /// The handset's dial and disconnect buttons are drawn 480 wide, the
+    /// width of the Pre3 screen, where the tablet draws them 612.
+    footerButtonImageSize: Qt.size(480, 297)
+
+    /// The handset draws the 1.5x pill, 76 wide, so its caps are 37 and not
+    /// the 25 the stylesheet names for the 1x one.
+    pinMenuButtonCapWidth: 37
+
     /**
      * The page behind everything.
      *

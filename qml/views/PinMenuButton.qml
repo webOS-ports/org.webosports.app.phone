@@ -24,9 +24,10 @@ import LunaNext.Common 0.1
  *
  * The legacy .pin-menu-button: a sixty pixel high pill drawn from
  * pin-menu-button-tall.png, whose two bands are the button at rest and the
- * same pill lit while it is held. Twenty-five pixels at either end are the
- * rounded caps, so only the middle stretches to whatever width the button
- * ends up with.
+ * same pill lit while it is held. Either end is a rounded cap and only what
+ * lies between them stretches to whatever width the button ends up with, so
+ * the cap comes from the theme -- it is a measurement of the artwork, and the
+ * two looks are drawn at different densities.
  */
 Item {
     id: pinMenuButton
@@ -44,7 +45,15 @@ Item {
 
         source: Qt.resolvedUrl(mouseArea.pressed ? appTheme.image("pin-menu-button-pressed.png")
                                                  : appTheme.image("pin-menu-button.png"))
-        border { left: 25; right: 25; top: 0; bottom: 0 }
+        // The caps are named by the theme: the two looks draw this pill at
+        // different densities, and the stylesheet's twenty-five is the width
+        // of the cap on the tablet's 1x artwork alone.
+        border {
+            left: appTheme.pinMenuButtonCapWidth
+            right: appTheme.pinMenuButtonCapWidth
+            top: 0
+            bottom: 0
+        }
         horizontalTileMode: BorderImage.Stretch
         verticalTileMode: BorderImage.Stretch
     }

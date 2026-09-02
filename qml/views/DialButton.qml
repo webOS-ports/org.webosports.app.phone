@@ -31,8 +31,11 @@ Button {
         source: appTheme.image("dial-button.png")
 
         wantedWidth: dialButtonRoot.width
-        // No imageSize: dial-button.png is 612 wide in the tablet set and
-        // 480 in the handset's, so ClippedImage takes it from the image.
+        // Only a width is given, so ClippedImage works the height out from the
+        // artwork's own proportions -- and it cannot read those off the image,
+        // so the theme names them. Left unset they default to -1x-1, which
+        // reads as square and stretched the handset upright.
+        imageSize: appTheme.footerButtonImageSize
         patchGridSize: Qt.size(1, 3)
         patch: dialButtonRoot.pressed ? Qt.point(0,2): Qt.point(0,0)
 
