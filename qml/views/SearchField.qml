@@ -35,7 +35,7 @@ import LunaNext.Common 0.1
 TextField {
     id: searchField
 
-    property UiTheme appTheme: PhoneUiTheme {}
+    property UiTheme appTheme
 
     height: Units.gu(4)
 

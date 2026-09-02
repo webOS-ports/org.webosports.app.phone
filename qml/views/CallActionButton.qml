@@ -30,7 +30,7 @@ import LuneOS.Components 1.0
 Item {
     id: callActionButton
 
-    property UiTheme appTheme: PhoneUiTheme {}
+    property UiTheme appTheme
 
     property url iconSource
     property string label: ""

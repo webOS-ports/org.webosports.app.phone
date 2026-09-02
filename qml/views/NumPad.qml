@@ -21,7 +21,7 @@ import LunaNext.Common 0.1
 Item {
     id: numPad
 
-    property UiTheme appTheme: PhoneUiTheme {}
+    property UiTheme appTheme
 
     // dial: the full pad. sim: digits only. pin: the legacy PinDialpad, which
     // blanks the bottom left key and puts a backspace where # would be.
@@ -56,6 +56,7 @@ Item {
         anchors.centerIn: parent
 
         NumPadButton {
+            appTheme: numPad.appTheme
             width: keysWidth
             height: keysHeight
             label:'1'
@@ -68,6 +69,7 @@ Item {
         }
 
         NumPadButton {
+            appTheme: numPad.appTheme
             width: keysWidth
             height: keysHeight
             label:'2'
@@ -79,6 +81,7 @@ Item {
         }
 
         NumPadButton {
+            appTheme: numPad.appTheme
             width: keysWidth
             height: keysHeight
             label:'3'
@@ -90,6 +93,7 @@ Item {
         }
 
         NumPadButton {
+            appTheme: numPad.appTheme
             width: keysWidth
             height: keysHeight
             label:'4'
@@ -101,6 +105,7 @@ Item {
         }
 
         NumPadButton {
+            appTheme: numPad.appTheme
             width: keysWidth
             height: keysHeight
             label:'5'
@@ -112,6 +117,7 @@ Item {
         }
 
         NumPadButton {
+            appTheme: numPad.appTheme
             width: keysWidth
             height: keysHeight
             label:'6'
@@ -123,6 +129,7 @@ Item {
         }
 
         NumPadButton {
+            appTheme: numPad.appTheme
             width: keysWidth
             height: keysHeight
             label:'7'
@@ -134,6 +141,7 @@ Item {
         }
 
         NumPadButton {
+            appTheme: numPad.appTheme
             width: keysWidth
             height: keysHeight
             label:'8'
@@ -145,6 +153,7 @@ Item {
         }
 
         NumPadButton {
+            appTheme: numPad.appTheme
             width: keysWidth
             height: keysHeight
             label:'9'
@@ -156,6 +165,7 @@ Item {
         }
 
         NumPadButton {
+            appTheme: numPad.appTheme
             width: keysWidth
             height: keysHeight
             label: numPad._digitsOnly ? '' : '*'
@@ -168,6 +178,7 @@ Item {
         }
 
         NumPadButton {
+            appTheme: numPad.appTheme
             width: keysWidth
             height: keysHeight
             label: '0'
@@ -180,6 +191,7 @@ Item {
         }
 
         NumPadButton {
+            appTheme: numPad.appTheme
             width: keysWidth
             height: keysHeight
             label: numPad._digitsOnly ? '' : '#'

@@ -32,7 +32,7 @@ import LunaNext.Common 0.1
 Item {
     id: pinMenuButton
 
-    property UiTheme appTheme: PhoneUiTheme {}
+    property UiTheme appTheme
 
     property string text: ""
 

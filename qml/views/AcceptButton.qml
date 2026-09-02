@@ -21,7 +21,7 @@ import QtQuick.Controls 2.0
 Button {
     id: acceptButtonRoot
 
-    property UiTheme appTheme: PhoneUiTheme {}
+    property UiTheme appTheme
 
     width:630
     height:99

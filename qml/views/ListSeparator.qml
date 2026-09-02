@@ -29,7 +29,7 @@ import LunaNext.Common 0.1
  */
 Image {
 
-    property UiTheme appTheme: PhoneUiTheme {}
+    property UiTheme appTheme
     /// Set false on the last row before a section header, which brings its own
     /// rule; two together read as a gap in the list.
     property bool drawn: true

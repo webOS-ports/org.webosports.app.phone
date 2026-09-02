@@ -326,6 +326,7 @@ WebOSWindow {
 
     IncomingUSSDAlert {
         id: incomingUSSDAlertId
+        appTheme: root.phoneUiTheme
         telephonyManager: telephonyManagerId
         visible: false
     }

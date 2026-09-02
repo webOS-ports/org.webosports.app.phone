@@ -33,7 +33,7 @@ Item {
 
     default property alias content: rowsColumn.data
 
-    property UiTheme appTheme: PhoneUiTheme {}
+    property UiTheme appTheme
     property string title: ""
 
     readonly property bool labelled: title.length > 0

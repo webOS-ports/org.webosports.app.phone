@@ -34,8 +34,6 @@ import "../services/PhoneNumberUtils.js" as PhoneNumberUtils
 BasePage {
     id: videoCallPage
 
-    property UiTheme appTheme: PhoneUiTheme {}
-
     pageName: "VideoCall"
 
     /// Where a decoded stream would be shown, once there is one to show.
