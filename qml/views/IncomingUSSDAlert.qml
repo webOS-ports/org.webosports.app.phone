@@ -41,7 +41,7 @@ WebOSWindow {
     id: incomingUSSDAlert
 
     property TelephonyManager telephonyManager;
-    property UiTheme appTheme: PhoneUiTheme {}
+    property UiTheme appTheme
 
     width: Settings.displayWidth
     height: Units.gu(32)

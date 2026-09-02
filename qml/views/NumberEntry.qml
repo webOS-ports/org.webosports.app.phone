@@ -38,7 +38,7 @@ import "../services/PhoneNumberUtils.js" as PhoneNumberUtils
 Item {
     id: numberEntry
 
-    property UiTheme appTheme: PhoneUiTheme {}
+    property UiTheme appTheme
 
     height: bgImage.height
 

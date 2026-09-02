@@ -32,7 +32,7 @@ import LunaNext.Common 0.1
 Item {
     id: simPinInput
 
-    property UiTheme appTheme: PhoneUiTheme {}
+    property UiTheme appTheme
 
     property OfonoSimManager simManager
     property int requestedPinType: 0

@@ -27,7 +27,7 @@ import LunaNext.Common 0.1
 Rectangle {
     id: lightButton
 
-    property UiTheme appTheme: PhoneUiTheme {}
+    property UiTheme appTheme
     property alias text: label.text
 
     signal clicked();

@@ -198,7 +198,7 @@ BasePage {
 
                         width: favouriteEntry.width
 
-                        ListSeparator { width: parent.width }
+                        ListSeparator { appTheme: favouritePage.appTheme; width: parent.width }
 
                     Item {
                         width: parent.width

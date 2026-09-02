@@ -20,7 +20,7 @@ import LuneOS.Components 1.0
 Item {
     id: headerButton
 
-    property UiTheme appTheme: PhoneUiTheme {}
+    property UiTheme appTheme
 
     property url iconSource
     property string label: ""

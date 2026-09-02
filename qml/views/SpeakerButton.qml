@@ -24,7 +24,7 @@ import LuneOS.Components 1.0
 Button {
     id: buttonRoot
 
-    property UiTheme appTheme: PhoneUiTheme {}
+    property UiTheme appTheme
 
     checkable: true
 

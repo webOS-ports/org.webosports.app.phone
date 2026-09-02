@@ -25,7 +25,7 @@ Button {
     width: Units.gu(5)
     height:Units.gu(5)
 
-    property UiTheme appTheme: PhoneUiTheme {}
+    property UiTheme appTheme
 
     background: Rectangle{
         color: addCallButton.pressed ? appTheme.callActionBtnFgColorActive : appTheme.callActionBtnFgColor

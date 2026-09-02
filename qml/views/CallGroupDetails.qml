@@ -53,7 +53,7 @@ Item {
     property string callGroupId;
     property DialHandler dialHandler;
     property CallTransports callTransports;
-    property UiTheme appTheme: PhoneUiTheme {}
+    property UiTheme appTheme
 
     readonly property string callService: (callGroupAddress && callGroupAddress.service)
                                               ? callGroupAddress.service : ""
@@ -245,7 +245,7 @@ Item {
                         property string _phoneNumberValue: model.value ? model.value : modelData.value
                         property string _phoneNumberType: model.type ? model.type : modelData.type
 
-                        ListSeparator { width: parent.width }
+                        ListSeparator { appTheme: callGroupDetailsId.appTheme; width: parent.width }
 
                     Item {
                         width: parent.width

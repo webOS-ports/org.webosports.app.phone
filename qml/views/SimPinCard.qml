@@ -38,7 +38,7 @@ import LunaNext.Common 0.1
 Item {
     id: pinCard
 
-    property UiTheme appTheme: PhoneUiTheme {}
+    property UiTheme appTheme
 
     /// The heading, e.g. "Enter PIN".
     property string title: ""

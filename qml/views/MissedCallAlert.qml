@@ -31,8 +31,6 @@ import "../services/CallMessages.js" as CallMessages
 MessageAlert {
     id: missedCallAlert
 
-    property UiTheme appTheme: PhoneUiTheme {}
-
     property DialHandler dialHandler
 
     property string _missedNumber: ""

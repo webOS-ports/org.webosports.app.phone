@@ -254,12 +254,33 @@ WebOSWindow {
      * that rather than measuring its own window -- a phone app on a big
      * screen is still a phone app. Everything below takes a UiTheme and never
      * names either of the two.
+     *
+     * Only the look in force is ever built. The two are components rather
+     * than objects, and the loader turns one of them into the single theme
+     * the app then wears for its lifetime; the other stays a recipe.
+     *
+     * A loaded object arrives one pass later than a declared one: the loader
+     * builds its item when it completes, which is after the bindings below
+     * have run once. Anything that reads the theme that early has to tolerate
+     * finding nothing there yet -- it is asked again as soon as it lands.
      */
-    readonly property UiTheme phoneUiTheme: Settings.tabletUi ? tabletUiThemeId
-                                                              : phoneUiThemeId
+    readonly property UiTheme phoneUiTheme: uiThemeLoaderId.item
 
-    PhoneUiTheme  { id: phoneUiThemeId }
-    TabletUiTheme { id: tabletUiThemeId }
+    Loader {
+        id: uiThemeLoaderId
+        sourceComponent: Settings.tabletUi ? tabletUiThemeComponent
+                                           : phoneUiThemeComponent
+    }
+
+    Component {
+        id: phoneUiThemeComponent
+        PhoneUiTheme {}
+    }
+
+    Component {
+        id: tabletUiThemeComponent
+        TabletUiTheme {}
+    }
 
     IncomingCallAlert {
         id: incomingCallAlertWindowId
@@ -305,6 +326,7 @@ WebOSWindow {
 
     IncomingUSSDAlert {
         id: incomingUSSDAlertId
+        appTheme: root.phoneUiTheme
         telephonyManager: telephonyManagerId
         visible: false
     }

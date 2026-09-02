@@ -22,7 +22,7 @@ import LuneOS.Components 1.0
 Item {
    id:root
 
-   property UiTheme appTheme: PhoneUiTheme {}
+   property UiTheme appTheme
 
    property alias label: label.text
    property alias sublabel: sublabel.text

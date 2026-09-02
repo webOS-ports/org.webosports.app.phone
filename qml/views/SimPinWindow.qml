@@ -174,6 +174,8 @@ WebOSWindow {
     SimPinInput {
         id: pinInput
 
+        appTheme: simPinWindow.appTheme
+
         anchors.fill: parent
         visible: !emergencyDialer.visible
 

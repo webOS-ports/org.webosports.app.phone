@@ -46,7 +46,7 @@ Column {
     property ContactsModel contacts;
     property DialHandler dialHandler;
     property CallTransports callTransports;
-    property UiTheme appTheme: PhoneUiTheme {}
+    property UiTheme appTheme
 
     /// True for the last group of its day, so the row above a day header does
     /// not also draw a divider.
@@ -328,6 +328,7 @@ Column {
 
         sourceComponent: Component {
             CallGroupDetails {
+                appTheme: callGroupDelegate.appTheme
                 callGroupId: callGroupDelegate.callGroupId
                 callGroupRemotePerson: callGroupDelegate.remotePerson
                 callGroupAddress: callGroupDelegate.contactAddress

@@ -23,7 +23,7 @@ import LuneOS.Components 1.0
 Button {
     id: buttonRoot
 
-    property UiTheme appTheme: PhoneUiTheme {}
+    property UiTheme appTheme
     width:210
     height:210
 

@@ -27,7 +27,7 @@ import LunaNext.Common 0.1
 Rectangle {
     id: doneBar
 
-    property UiTheme appTheme: PhoneUiTheme {}
+    property UiTheme appTheme
     property string text: qsTr("Done")
 
     signal clicked();

@@ -27,7 +27,7 @@ Button {
 
     checkable: true
 
-    property UiTheme appTheme: PhoneUiTheme {}
+    property UiTheme appTheme
 
     background: Rectangle{
         color: buttonRoot.checked ? appTheme.callActionBtnFgColorActive : appTheme.callActionBtnFgColor

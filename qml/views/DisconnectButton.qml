@@ -23,7 +23,7 @@ import LuneOS.Components 1.0
 Button {
     id: disconnectButtonRoot
 
-    property UiTheme appTheme: PhoneUiTheme {}
+    property UiTheme appTheme
 
     background: ClippedImage {
         id: bgClippedImage
