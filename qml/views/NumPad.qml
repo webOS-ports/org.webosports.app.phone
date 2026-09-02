@@ -21,7 +21,13 @@ import LunaNext.Common 0.1
 Item {
     id: numPad
 
-    property string mode: 'dial' // dial, sim
+    property UiTheme appTheme: PhoneUiTheme {}
+
+    // dial: the full pad. sim: digits only. pin: the legacy PinDialpad, which
+    // blanks the bottom left key and puts a backspace where # would be.
+    property string mode: 'dial' // dial, sim, pin
+
+    readonly property bool _digitsOnly: (mode === 'sim' || mode === 'pin')
 
     signal sendKey(int keycode)
 
@@ -37,7 +43,7 @@ Item {
     property alias gridY: keys.y
 
     Image {
-        source: "images/dialpad-bg.png"
+        source: appTheme.image("dialpad-bg.png")
         anchors.fill: parent
         fillMode: Image.TileVertically
     }
@@ -56,7 +62,7 @@ Item {
             sublabel: 'voicemail'
             keycode: Qt.Key_1
             longpresskeycode: Qt.Key_LaunchMail
-            disableSubLabel: (mode === "sim")
+            disableSubLabel: numPad._digitsOnly
             posInPadGrid: Qt.point(0,0)
             onSendKey: (keycode) => { numPad.sendKey(keycode) }
         }
@@ -66,7 +72,7 @@ Item {
             height: keysHeight
             label:'2'
             sublabel: 'ABC'
-            disableSubLabel: (mode === "sim")
+            disableSubLabel: numPad._digitsOnly
             keycode: Qt.Key_2
             posInPadGrid: Qt.point(1,0)
             onSendKey: (keycode) => { numPad.sendKey(keycode) }
@@ -77,7 +83,7 @@ Item {
             height: keysHeight
             label:'3'
             sublabel: 'DEF'
-            disableSubLabel: (mode === "sim")
+            disableSubLabel: numPad._digitsOnly
             keycode: Qt.Key_3
             posInPadGrid: Qt.point(2,0)
             onSendKey: (keycode) => { numPad.sendKey(keycode) }
@@ -88,7 +94,7 @@ Item {
             height: keysHeight
             label:'4'
             sublabel: 'GHI'
-            disableSubLabel: (mode === "sim")
+            disableSubLabel: numPad._digitsOnly
             keycode: Qt.Key_4
             posInPadGrid: Qt.point(0,1)
             onSendKey: (keycode) => { numPad.sendKey(keycode) }
@@ -99,7 +105,7 @@ Item {
             height: keysHeight
             label:'5'
             sublabel: 'JKL'
-            disableSubLabel: (mode === "sim")
+            disableSubLabel: numPad._digitsOnly
             keycode: Qt.Key_5
             posInPadGrid: Qt.point(1,1)
             onSendKey: (keycode) => { numPad.sendKey(keycode) }
@@ -110,7 +116,7 @@ Item {
             height: keysHeight
             label:'6'
             sublabel: 'MNO'
-            disableSubLabel: (mode === "sim")
+            disableSubLabel: numPad._digitsOnly
             keycode: Qt.Key_6
             posInPadGrid: Qt.point(2,1)
             onSendKey: (keycode) => { numPad.sendKey(keycode) }
@@ -121,7 +127,7 @@ Item {
             height: keysHeight
             label:'7'
             sublabel: 'PQRS'
-            disableSubLabel: (mode === "sim")
+            disableSubLabel: numPad._digitsOnly
             keycode: Qt.Key_7
             posInPadGrid: Qt.point(0,1)
             onSendKey: (keycode) => { numPad.sendKey(keycode) }
@@ -132,7 +138,7 @@ Item {
             height: keysHeight
             label:'8'
             sublabel: 'TUV'
-            disableSubLabel: (mode === "sim")
+            disableSubLabel: numPad._digitsOnly
             keycode: Qt.Key_8
             posInPadGrid: Qt.point(1,1)
             onSendKey: (keycode) => { numPad.sendKey(keycode) }
@@ -143,7 +149,7 @@ Item {
             height: keysHeight
             label:'9'
             sublabel: 'WXYZ'
-            disableSubLabel: (mode === "sim")
+            disableSubLabel: numPad._digitsOnly
             keycode: Qt.Key_9
             posInPadGrid: Qt.point(2,1)
             onSendKey: (keycode) => { numPad.sendKey(keycode) }
@@ -152,8 +158,10 @@ Item {
         NumPadButton {
             width: keysWidth
             height: keysHeight
-            label: (mode === "sim") ? '' : '*'
+            label: numPad._digitsOnly ? '' : '*'
             disableSubLabel: true
+            // A blank key still sent an asterisk, which landed in the PIN.
+            enabled: !numPad._digitsOnly
             keycode: Qt.Key_Asterisk
             posInPadGrid: Qt.point(0,2)
             onSendKey: (keycode) => { numPad.sendKey(keycode) }
@@ -164,7 +172,7 @@ Item {
             height: keysHeight
             label: '0'
             sublabel: '+'
-            disableSubLabel: (mode === "sim")
+            disableSubLabel: numPad._digitsOnly
             keycode: Qt.Key_0
             longpresskeycode: Qt.Key_Plus
             posInPadGrid: Qt.point(1,2)
@@ -174,9 +182,16 @@ Item {
         NumPadButton {
             width: keysWidth
             height: keysHeight
-            label: (mode === "sim") ? '' : '#'
+            label: numPad._digitsOnly ? '' : '#'
             disableSubLabel: true
-            keycode: Qt.Key_NumberSign
+            enabled: numPad.mode !== 'sim'
+
+            // The PIN pad spends this key on a backspace: a tap rubs out the
+            // last digit, holding it clears the whole entry.
+            icon: (numPad.mode === 'pin') ? numPad.appTheme.image("dialpad-backspace.png") : ""
+            keycode: (numPad.mode === 'pin') ? Qt.Key_Backspace : Qt.Key_NumberSign
+            longpresskeycode: (numPad.mode === 'pin') ? Qt.Key_Clear : keycode
+
             posInPadGrid: Qt.point(2,2)
             onSendKey: (keycode) => { numPad.sendKey(keycode) }
         }

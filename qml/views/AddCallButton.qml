@@ -25,7 +25,7 @@ Button {
     width: Units.gu(5)
     height:Units.gu(5)
 
-    property PhoneUiTheme appTheme: PhoneUiTheme{}
+    property UiTheme appTheme: PhoneUiTheme {}
 
     background: Rectangle{
         color: addCallButton.pressed ? appTheme.callActionBtnFgColorActive : appTheme.callActionBtnFgColor
@@ -44,7 +44,7 @@ Button {
             Image{
                 x: 0
                 y: addCallButton.pressed ? -48: 0
-                source: "images/menu-icon-addcall.png"
+                source: appTheme.image("menu-icon-addcall.png")
             }
         }
     }

@@ -105,7 +105,7 @@ BasePage {
                                 anchors.fill: parent
                                 source: (model.photos && model.photos.listPhotoPath)
                                             ? model.photos.listPhotoPath
-                                            : Qt.resolvedUrl("images/list-avatar-default.png")
+                                            : appTheme.image("list-avatar-default.png")
                                 fillMode: Image.PreserveAspectCrop
                                 asynchronous: true
                                 visible: false
@@ -159,8 +159,8 @@ BasePage {
                             ClippedImage {
                                 anchors.centerIn: parent
                                 source: Qt.resolvedUrl(favouriteEntry.expanded
-                                                           ? "images/favorites-icon-drawer-open.png"
-                                                           : "images/expand-button.png")
+                                                           ? appTheme.image("favorites-icon-drawer-open.png")
+                                                           : appTheme.image("expand-button.png"))
                                 wantedWidth: Units.gu(3.4)
                                 wantedHeight: Units.gu(3.4)
                                 imageSize: favouriteEntry.expanded ? Qt.size(36, 72) : Qt.size(50, 100)
@@ -239,7 +239,7 @@ BasePage {
                                 Layout.preferredWidth: Units.gu(3.4)
                                 Layout.preferredHeight: Units.gu(3.2)
                                 fillMode: Image.PreserveAspectFit
-                                source: Qt.resolvedUrl("images/Camera-Icon.png")
+                                source: appTheme.image("Camera-Icon.png")
                                 visible: modelData.supportsVideo
 
                                 MouseArea {
@@ -260,7 +260,7 @@ BasePage {
 
                                 ClippedImage {
                                     anchors.centerIn: parent
-                                    source: Qt.resolvedUrl("images/button-sprite.png")
+                                    source: appTheme.image("button-sprite.png")
                                     wantedWidth: Units.gu(3.4)
                                     wantedHeight: Units.gu(3.4)
                                     imageSize: Qt.size(184, 246)
@@ -291,6 +291,7 @@ BasePage {
 
                 // Opening a favourite also offers their contact card.
                 ListSeparator {
+                    appTheme: favouritePage.appTheme
                     width: parent.width
                     drawn: favouriteEntry.expanded
                 }
@@ -326,6 +327,7 @@ BasePage {
 
                 // Closes the entry off, drawer and all.
                 ListSeparator {
+                    appTheme: favouritePage.appTheme
                     width: parent.width
                 }
             }

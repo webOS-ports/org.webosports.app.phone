@@ -22,7 +22,7 @@ import LuneOS.Components 1.0
 Item {
    id:root
 
-   property PhoneUiTheme appTheme: PhoneUiTheme{}
+   property UiTheme appTheme: PhoneUiTheme {}
 
    property alias label: label.text
    property alias sublabel: sublabel.text
@@ -31,6 +31,10 @@ Item {
    property bool disableSubLabel: false
    property string alt: ""
    property point posInPadGrid
+
+   /// A key that carries artwork instead of a digit, e.g. the PIN pad's
+   /// backspace. The source is a two-state sprite, at rest above pressed.
+   property url icon
 
    property int fontSize: height/2.5
 
@@ -44,11 +48,34 @@ Item {
         font.bold: true
     }
 
+    ClippedImage {
+        id: iconImage
+
+        visible: root.icon.toString() !== ""
+        anchors.centerIn: parent
+
+        source: root.icon
+        // Sized from the sprite itself: it differs between the artwork sets.
+        patchGridSize: Qt.size(1, 2)
+        patch: Qt.point(0, mouseArea.pressed ? 1 : 0)
+
+        // Both dimensions are given: ClippedImage only keeps a patch's own
+        // proportions when the grid is square, and this sprite's is not.
+        wantedWidth: Units.gu(3.6)
+        wantedHeight: Units.gu(5)
+    }
+
     Text {
         id: sublabel
         visible: !disableSubLabel
         anchors.horizontalCenter: parent.horizontalCenter
-        anchors.top:label.bottom
+        // Held clear of the key's bottom edge rather than hung off the label's
+        // line box. The bottom row of the pad is drawn with the patch that
+        // carries the pad's outer frame - in both artwork sets the face stops
+        // at 92% of the cell - so hanging from the label printed the "+" under
+        // the 0 on the frame instead of on the key.
+        anchors.bottom: parent.bottom
+        anchors.bottomMargin: root.height * 0.12
         color:appTheme.subForegroundColor
         font.pixelSize: fontSize/2.5
     }
@@ -56,7 +83,7 @@ Item {
     ClippedImage {
         id: box
 
-        source: mouseArea.pressed ? Qt.resolvedUrl("images/buttons-numpad-pressed.png") : Qt.resolvedUrl("images/buttons-numpad.png")
+        source: mouseArea.pressed ? appTheme.image("buttons-numpad-pressed.png") : appTheme.image("buttons-numpad.png")
 
         wantedWidth: parent.width
         wantedHeight: parent.height

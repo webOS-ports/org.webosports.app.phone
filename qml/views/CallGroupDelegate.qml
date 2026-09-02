@@ -46,7 +46,7 @@ Column {
     property ContactsModel contacts;
     property DialHandler dialHandler;
     property CallTransports callTransports;
-    property PhoneUiTheme appTheme: PhoneUiTheme {}
+    property UiTheme appTheme: PhoneUiTheme {}
 
     /// True for the last group of its day, so the row above a day header does
     /// not also draw a divider.
@@ -133,7 +133,7 @@ Column {
                         anchors.fill: parent
                         source: callGroupDelegate.remotePerson
                                     ? callGroupDelegate.remotePerson.photos.listPhotoPath
-                                    : Qt.resolvedUrl('images/list-avatar-default.png')
+                                    : appTheme.image("list-avatar-default.png")
                         fillMode: Image.PreserveAspectCrop
                         asynchronous: true
                         visible: false
@@ -184,7 +184,7 @@ Column {
 
                             visible: model.callcount > 1
 
-                            source: Qt.resolvedUrl('images/dashboard-unread.png')
+                            source: appTheme.image("dashboard-unread.png")
                             border { left: 9; right: 9; top: 0; bottom: 0 }
                             horizontalTileMode: BorderImage.Stretch
                             verticalTileMode: BorderImage.Stretch
@@ -203,7 +203,7 @@ Column {
                             Layout.preferredWidth: Units.gu(1.6)
                             Layout.preferredHeight: Units.gu(1.6)
                             fillMode: Image.PreserveAspectFit
-                            source: Qt.resolvedUrl('images/favorites-star-blue.png')
+                            source: appTheme.image("favorites-star-blue.png")
                             visible: !!callGroupDelegate.remotePerson &&
                                      callGroupDelegate.remotePerson.favorite === true
                         }
@@ -231,7 +231,7 @@ Column {
                             Layout.preferredWidth: Units.gu(2)
                             Layout.preferredHeight: Units.gu(1.2)
                             fillMode: Image.PreserveAspectFit
-                            source: Qt.resolvedUrl('images/icon-videocall-list.png')
+                            source: appTheme.image("icon-videocall-list.png")
                             visible: callGroupDelegate.isSynergyCall &&
                                      !!callGroupDelegate.callTransports &&
                                      callGroupDelegate.callTransports.supportsVideo(callGroupDelegate.callService)
@@ -247,10 +247,10 @@ Column {
                     Layout.preferredWidth: Units.gu(2.2)
                     Layout.preferredHeight: Units.gu(2.2)
 
-                    source: Qt.resolvedUrl('images/call-log-list-sprite.png')
+                    source: appTheme.image("call-log-list-sprite.png")
                     wantedWidth: Units.gu(2.2)
                     wantedHeight: Units.gu(2.2)
-                    imageSize: Qt.size(44, 182)
+                    // Sized from the image; the two artwork sets differ.
                     patchGridSize: Qt.size(1, 4)
                     patch: (model.recentcall_type === "missed") ? Qt.point(0,0) :
                            (model.recentcall_type === "incoming") ? Qt.point(0,1) :
@@ -274,7 +274,7 @@ Column {
 
                     ClippedImage {
                         anchors.centerIn: parent
-                        source: Qt.resolvedUrl('images/expand-button.png')
+                        source: appTheme.image("expand-button.png")
                         wantedWidth: Units.gu(3.4)
                         wantedHeight: Units.gu(3.4)
                         imageSize: Qt.size(50, 100)
@@ -342,6 +342,7 @@ Column {
     // drawer belongs to the row above it. Left out before a day header, which
     // brings its own rule.
     ListSeparator {
+        appTheme: callGroupDelegate.appTheme
         width: parent.width
         drawn: !callGroupDelegate.lastOfDay
     }

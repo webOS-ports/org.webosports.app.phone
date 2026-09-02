@@ -16,16 +16,12 @@
  */
 
 import QtQuick 2.0
-import QtQuick.Controls 2.5
-
-// The menus, switches and fields here are the platform's, so they have to
-// be drawn by the platform's style rather than whatever Controls defaults to.
-import QtQuick.Controls.LuneOS 2.0
 import QtQuick.Layouts 1.2
 
 import LunaNext.Common 0.1
 
 import "../services"
+import "../services/CallMessages.js" as CallMessages
 
 /**
  * Phone preferences.
@@ -181,7 +177,7 @@ BasePage {
                 }
                 PrefsButtonRow {
                     label: qsTr("Turn all barring off")
-                    onClicked: barringPasswordDialog.open()
+                    onClicked: prefsPage._startBarring()
                 }
             }
 
@@ -222,8 +218,8 @@ BasePage {
                     value: telephonyManager ? (telephonyManager.signalStrength + "%") : ""
                 }
                 PrefsButtonRow {
-                    label: qsTr("Change SIM PIN")
-                    onClicked: pinDialog.open()
+                    label: qsTr("Change SIM Card PIN")
+                    onClicked: prefsPage._startPinChange()
                 }
             }
 
@@ -238,55 +234,249 @@ BasePage {
         onClicked: prefsPage.closed()
     }
 
-    Dialog {
-        id: barringPasswordDialog
+    /*
+     * The call barring password.
+     *
+     * There is no legacy scene to follow here: the Enyo app never offered
+     * barring in its preferences at all, and reached it only through the MMI
+     * strings, which carry the password in the dial string itself. So it is
+     * asked for on the card the SIM PIN uses -- a barring password is another
+     * four digits the network wants back, and a keypad the app already draws
+     * beats a text field the platform has no style for.
+     */
+    Loader {
+        id: barringCardLoader
 
-        parent: Overlay.overlay
-        anchors.centerIn: parent
-        modal: true
-        title: qsTr("Call barring password")
-        standardButtons: Dialog.Ok | Dialog.Cancel
+        anchors.fill: parent
+        active: false
+        z: 1
 
-        TextField {
-            id: barringPasswordField
-            echoMode: TextInput.Password
-            placeholderText: qsTr("Password")
-        }
+        sourceComponent: SimPinCard {
+            appTheme: prefsPage.appTheme
 
-        onAccepted: {
-            supplementaryServices.disableAllBarring(barringPasswordField.text);
-            barringPasswordField.text = "";
+            title: prefsPage._barringTitle
+            subText: prefsPage._barringSubText
+            /// GSM barring passwords are four digits, always.
+            maximumLength: 4
+            emergencyCallEnabled: false
+
+            onAccepted: prefsPage._barringAccepted(pin)
+            onCanceled: prefsPage._endBarring()
+            onKeyed: prefsPage._clearBarringError()
         }
     }
 
-    Dialog {
-        id: pinDialog
+    property string _barringTitle: ""
+    property string _barringSubText: ""
+    property bool _barringInError: false
 
-        parent: Overlay.overlay
-        anchors.centerIn: parent
-        modal: true
-        title: qsTr("Change SIM PIN")
-        standardButtons: Dialog.Ok | Dialog.Cancel
+    function _resetBarring() {
+        _barringTitle = qsTr("Enter barring password");
+        _barringSubText = qsTr("Enter 4 numbers for the barring password");
+        _barringInError = false;
 
-        ColumnLayout {
-            TextField {
-                id: oldPinField
-                echoMode: TextInput.Password
-                inputMethodHints: Qt.ImhDigitsOnly
-                placeholderText: qsTr("Current PIN")
-            }
-            TextField {
-                id: newPinField
-                echoMode: TextInput.Password
-                inputMethodHints: Qt.ImhDigitsOnly
-                placeholderText: qsTr("New PIN")
-            }
+        if (barringCardLoader.item)
+            barringCardLoader.item.clear();
+    }
+
+    function _startBarring() {
+        _resetBarring();
+        barringCardLoader.active = true;
+    }
+
+    function _endBarring() {
+        barringCardLoader.active = false;
+    }
+
+    function _clearBarringError() {
+        if (_barringInError)
+            _resetBarring();
+    }
+
+    function _barringAccepted(entered) {
+        if (entered.length === 0) {
+            _endBarring();
+            return;
         }
 
-        onAccepted: {
-            supplementaryServices.changeSimPin(oldPinField.text, newPinField.text);
-            oldPinField.text = "";
-            newPinField.text = "";
+        supplementaryServices.disableAllBarring(entered);
+    }
+
+    Connections {
+        /*
+         * Switched by the target rather than by `enabled`: the Qt the device
+         * runs has no such property on Connections, so setting it bound
+         * nothing and left this listening the whole time -- which meant the
+         * other card's handler ran on every completion too.
+         */
+        target: barringCardLoader.active ? prefsPage.supplementaryServices : null
+
+        function onCompleted(success, message) {
+            if (success) {
+                prefsPage._endBarring();
+                return;
+            }
+
+            // Not necessarily a wrong password: oFono reports one failure for
+            // the lot, so the heading says what did not happen rather than
+            // guessing why.
+            prefsPage._resetBarring();
+            prefsPage._barringTitle = qsTr("Could not turn barring off");
+            prefsPage._barringSubText = message;
+            prefsPage._barringInError = true;
+        }
+    }
+
+    /*
+     * Changing the SIM PIN.
+     *
+     * Not a popup: SecurityScene's "Change SIM Card PIN" swapped the whole
+     * preferences card for PinCode, which asked for the old PIN, the new one
+     * and the new one again in turn, each on the same dialpad. This is that
+     * card, and it walks the same three steps under the same headings.
+     */
+    Loader {
+        id: pinCardLoader
+
+        anchors.fill: parent
+        active: false
+        z: 1
+
+        sourceComponent: SimPinCard {
+            appTheme: prefsPage.appTheme
+
+            title: prefsPage._pinTitle
+            subText: prefsPage._pinSubText
+            maximumLength: 8
+
+            onAccepted: prefsPage._pinAccepted(pin)
+            onEmergencyCallRequested: emergencyLoader.active = true
+            onKeyed: prefsPage._clearPinError()
+        }
+    }
+
+    /// A SIM the user is locked out of still has to reach the emergency
+    /// services, which is what the legacy card's left button was for.
+    Loader {
+        id: emergencyLoader
+
+        anchors.fill: parent
+        active: false
+        z: 2
+
+        sourceComponent: EmergencyDialerPage {
+            appTheme: prefsPage.appTheme
+            telephonyManager: prefsPage.telephonyManager
+            voiceCallMgrWrapper: prefsPage.voiceCallMgrWrapper
+
+            onClosed: emergencyLoader.active = false
+        }
+    }
+
+    /// The three things the card asks for, with the headings the original
+    /// gave each of them.
+    readonly property var _pinSteps: ({
+        "old":     { title: qsTr("Enter PIN"),
+                     sub:   qsTr("Enter old PIN") },
+        "new":     { title: qsTr("Enter new PIN"),
+                     sub:   qsTr("Enter 4-8 numbers for new PIN") },
+        "confirm": { title: qsTr("Confirm new PIN"),
+                     sub:   qsTr("Enter 4-8 numbers for new PIN") }
+    })
+
+    property string _pinStep: "old"
+    property string _pinTitle: ""
+    property string _pinSubText: ""
+    /// Set while the card is showing why the last attempt was turned down, so
+    /// the next digit typed can put the step's own wording back.
+    property bool _pinInError: false
+    property string _pinOld: ""
+    property string _pinNew: ""
+
+    function _setPinStep(step) {
+        _pinStep = step;
+        _pinTitle = _pinSteps[step].title;
+        _pinSubText = _pinSteps[step].sub;
+        _pinInError = false;
+
+        if (pinCardLoader.item)
+            pinCardLoader.item.clear();
+    }
+
+    function _startPinChange() {
+        _pinOld = "";
+        _pinNew = "";
+        _setPinStep("old");
+        pinCardLoader.active = true;
+    }
+
+    function _endPinChange() {
+        _pinOld = "";
+        _pinNew = "";
+        pinCardLoader.active = false;
+    }
+
+    function _clearPinError() {
+        if (_pinInError)
+            _setPinStep(_pinStep);
+    }
+
+    function _pinAccepted(entered) {
+        // Done on an empty first step leaves the card. The original relied on
+        // the back gesture for this, which a page inside our own card has no
+        // way of receiving.
+        if (entered.length === 0) {
+            if (_pinStep === "old")
+                _endPinChange();
+            return;
+        }
+
+        switch (_pinStep) {
+        case "old":
+            _pinOld = entered;
+            _setPinStep("new");
+            break;
+        case "new":
+            _pinNew = entered;
+            _setPinStep("confirm");
+            break;
+        case "confirm":
+            supplementaryServices.changeSimPin(_pinOld, _pinNew, entered);
+            break;
+        }
+    }
+
+    Connections {
+        /*
+         * Switched by the target rather than by `enabled`: the Qt the device
+         * runs has no such property on Connections, so setting it bound
+         * nothing and left this listening the whole time -- which meant the
+         * other card's handler ran on every completion too.
+         */
+        target: pinCardLoader.active ? prefsPage.supplementaryServices : null
+
+        function onCompleted(success, message) {
+            if (success) {
+                prefsPage._endPinChange();
+                return;
+            }
+
+            // Two PINs that did not match send the user back to the new PIN;
+            // anything the SIM itself turned down starts the whole thing over.
+            if (message === CallMessages.pinFailure["mismatch"]) {
+                prefsPage._pinNew = "";
+                prefsPage._setPinStep("new");
+                prefsPage._pinSubText = qsTr("PIN doesn't match");
+            }
+            else {
+                prefsPage._pinOld = "";
+                prefsPage._pinNew = "";
+                prefsPage._setPinStep("old");
+                prefsPage._pinTitle = qsTr("PIN incorrect");
+                prefsPage._pinSubText = message;
+            }
+
+            prefsPage._pinInError = true;
         }
     }
 }

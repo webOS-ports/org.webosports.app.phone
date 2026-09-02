@@ -53,7 +53,7 @@ Item {
     property string callGroupId;
     property DialHandler dialHandler;
     property CallTransports callTransports;
-    property PhoneUiTheme appTheme: PhoneUiTheme {}
+    property UiTheme appTheme: PhoneUiTheme {}
 
     readonly property string callService: (callGroupAddress && callGroupAddress.service)
                                               ? callGroupAddress.service : ""
@@ -187,7 +187,7 @@ Item {
                     Layout.preferredWidth: callGroupDetailsId.iconColumn
                     Layout.preferredHeight: callGroupDetailsId.iconColumn
 
-                    source: Qt.resolvedUrl('images/call-log-list-light-sprite.png')
+                    source: appTheme.image("call-log-list-light-sprite.png")
                     wantedWidth: callGroupDetailsId.iconColumn
                     wantedHeight: callGroupDetailsId.iconColumn
                     imageSize: Qt.size(22, 91)
@@ -286,7 +286,7 @@ Item {
 
                                 ClippedImage {
                                     anchors.centerIn: parent
-                                    source: Qt.resolvedUrl('images/button-sprite.png')
+                                    source: appTheme.image("button-sprite.png")
                                     wantedWidth: Units.gu(3.4)
                                     wantedHeight: Units.gu(3.4)
                                     imageSize: Qt.size(184, 246)
@@ -320,6 +320,7 @@ Item {
 
     // 3. The contact card, last.
     ListSeparator {
+        appTheme: callGroupDetailsId.appTheme
         width: parent.width
         drawn: callGroupDetailsId.groupPhoneNumber.length > 0
     }

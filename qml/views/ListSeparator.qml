@@ -28,6 +28,8 @@ import LunaNext.Common 0.1
  * gives the lists their engraved look. A flat one-pixel rectangle does not.
  */
 Image {
+
+    property UiTheme appTheme: PhoneUiTheme {}
     /// Set false on the last row before a section header, which brings its own
     /// rule; two together read as a gap in the list.
     property bool drawn: true
@@ -35,7 +37,7 @@ Image {
     height: drawn ? 2 : 0
     visible: drawn
 
-    source: Qt.resolvedUrl("images/call-log-list-separator.png")
+    source: appTheme.image("call-log-list-separator.png")
     fillMode: Image.Tile
     horizontalAlignment: Image.AlignLeft
     verticalAlignment: Image.AlignTop

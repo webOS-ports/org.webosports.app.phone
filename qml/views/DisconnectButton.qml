@@ -23,13 +23,17 @@ import LuneOS.Components 1.0
 Button {
     id: disconnectButtonRoot
 
+    property UiTheme appTheme: PhoneUiTheme {}
+
     background: ClippedImage {
         id: bgClippedImage
 
-        source: Qt.resolvedUrl("images/disconnect-button.png")
+        source: appTheme.image("disconnect-button.png")
 
         wantedWidth: disconnectButtonRoot.width
-        imageSize: Qt.size(612, 297)
+        // As on the dial button: with only a width given, the height comes
+        // from the artwork's proportions, which the theme has to name.
+        imageSize: appTheme.footerButtonImageSize
         patchGridSize: Qt.size(1, 3)
         patch: disconnectButtonRoot.pressed ? Qt.point(0,2): Qt.point(0,0)
 

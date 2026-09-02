@@ -20,6 +20,8 @@ import LuneOS.Components 1.0
 Item {
     id: headerButton
 
+    property UiTheme appTheme: PhoneUiTheme {}
+
     property url iconSource
     property string label: ""
     property bool dividerOnLeft: false
@@ -49,7 +51,7 @@ Item {
     Image {
         anchors.fill: parent
         visible: buttonArea.pressed
-        source: Qt.resolvedUrl("images/selected_button_bg.png")
+        source: appTheme.image("selected_button_bg.png")
         fillMode: Image.TileHorizontally
     }
 
@@ -61,7 +63,7 @@ Item {
             right: headerButton.dividerOnLeft ? undefined : parent.right
         }
         width: 2
-        source: Qt.resolvedUrl("images/button_divider.png")
+        source: appTheme.image("button_divider.png")
         fillMode: Image.TileVertically
     }
 

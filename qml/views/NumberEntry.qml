@@ -38,6 +38,8 @@ import "../services/PhoneNumberUtils.js" as PhoneNumberUtils
 Item {
     id: numberEntry
 
+    property UiTheme appTheme: PhoneUiTheme {}
+
     height: bgImage.height
 
     property alias text: textEdit.text
@@ -147,7 +149,7 @@ Item {
             right: parent.right
         }
         height: Units.gu(7);
-        source: "images/dialer-entry-bg.png"
+        source: appTheme.image("dialer-entry-bg.png")
     }
 
     Image {
@@ -163,10 +165,16 @@ Item {
             right: parent.right
             margins: Units.gu(3)
         }
-        source: 'images/icon-m-common-backspace.svg'
+        source: appTheme.image("icon-m-common-backspace.svg")
 
         MouseArea {
-            anchors.fill: parent
+            // The icon is a small thing to hit with a thumb, so the target is
+            // not the icon: it takes the full height of the entry bar and
+            // reaches well past the icon on either side.
+            anchors.verticalCenter: parent.verticalCenter
+            anchors.horizontalCenter: parent.horizontalCenter
+            width: parent.width + Units.gu(6)
+            height: bgImage.height
 
             onClicked: numberEntry.backspace();
             onPressAndHold: numberEntry.clear();

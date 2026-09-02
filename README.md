@@ -17,6 +17,35 @@ Running on the desktop
 The app can be run on a development machine, against mock services, without a
 device. Open `phoneapp.qmlproject` in Qt Creator and press Run.
 
+The app wears one of two looks depending on the shape of the device -- the
+handset one or the tablet one -- and there is an entry point for each:
+
+* `qml/main-desktop.qml`        the handset look
+* `qml/main-desktop-tablet.qml` the tablet look
+
+Qt Creator always runs the project's `mainFile`, and greys out **Projects >
+Run > Main QML file** because the .qmlproject names one -- so neither picking
+the entry point in the editor nor changing that setting will switch looks.
+Its QML run configuration has nowhere to pass an argument either.
+
+So put the profile in `.desktop-profile` at the top of the checkout instead,
+and press Run as usual:
+
+    echo tp > .desktop-profile     # the tablet look
+    rm .desktop-profile            # back to the handset
+
+The file is gitignored, holds one word, and is read before the app is built.
+Anything unrecognised is reported and ignored. Running one of the entry points
+directly still works too, as does `--profile=` on the command line, which
+outranks the file:
+
+    qml -I ../luneos-components/modules -I ../luneos-components/test/imports \
+        qml/main-desktop.qml -- --profile=tp
+
+Every run says which look it came up in:
+
+    qml: Running as a tablet, 1024x768
+
 It expects `luneos-components` checked out next to this repository:
 
     <parent>/org.webosports.app.phone
@@ -55,6 +84,32 @@ the qmlproject sets it, but if you run `qml` by hand you need it too:
 
     qml -I ../luneos-components/modules -I ../luneos-components/test/imports \
         qml/main-desktop.qml
+
+The app wears one of two looks depending on the shape of the device -- the
+handset one or the tablet one -- and the mock can pretend to be either. Pass
+`--profile` after a `--` to pick which; the names are the keys of `profiles` in
+`luneos-components/test/imports/LunaNext/Common/SettingsStub.js` (`desktop`,
+`tp`, `n5`, `n7`, `a500`, `gnex`, `n4`), and anything unrecognised falls back to
+`desktop`:
+
+    qml -I ../luneos-components/modules -I ../luneos-components/test/imports \
+        qml/main-desktop.qml -- --profile=tp
+
+
+Tests
+=====
+
+The QML test cases live in `tests/` and run against the same mocks:
+
+    ./run-tests.sh
+
+`QMLTESTRUNNER` picks a particular Qt's runner and `COMPONENTS` points
+elsewhere for the mocks; anything else on the command line is passed through to
+qmltestrunner, so `./run-tests.sh -functions` lists what there is.
+
+The cases that care about the shape of the device switch profile themselves
+through `Settings.setProfile()`, so a single run covers both looks -- there is
+no profile to pass in here.
 
 
 How to Build on Linux

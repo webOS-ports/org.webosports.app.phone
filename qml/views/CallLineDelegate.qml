@@ -41,7 +41,7 @@ Item {
 
     property var voiceCall
     property ContactsModel contacts
-    property PhoneUiTheme appTheme
+    property UiTheme appTheme
     property CallTransports callTransports
     property bool selected: false
     /// Shows the merge/swap arrow; the card decides when that is meaningful.
@@ -175,7 +175,7 @@ Item {
             }
             width: Units.gu(2.6)
             height: Units.gu(2.6)
-            source: Qt.resolvedUrl("images/menu-icon-addcontact.png")
+            source: appTheme.image("menu-icon-addcontact.png")
             frame: addContactArea.pressed ? 1 : 0
             visible: !callLine.isKnownContact && callLine.voiceCall &&
                      callLine.voiceCall.lineId.length > 0
@@ -216,7 +216,7 @@ Item {
 
                 SpriteIcon {
                     anchors.fill: parent
-                    source: Qt.resolvedUrl("images/multicall-disconnect-button.png")
+                    source: appTheme.image("multicall-disconnect-button.png")
                     frameCount: 3
                     frame: hangupArea.pressed ? 1 : 0
                 }
@@ -241,7 +241,7 @@ Item {
 
                 SpriteIcon {
                     anchors.fill: parent
-                    source: Qt.resolvedUrl("images/multicall-merge-button.png")
+                    source: appTheme.image("multicall-merge-button.png")
                     frameCount: 3
                     frame: joinArea.pressed ? 1 : 0
                 }

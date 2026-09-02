@@ -26,7 +26,7 @@ Button {
 
     checkable: true
 
-    property PhoneUiTheme appTheme: PhoneUiTheme{}
+    property UiTheme appTheme: PhoneUiTheme {}
 
     background: Rectangle{
         color: buttonRoot.checked ? appTheme.callActionBtnFgColorActive : appTheme.callActionBtnFgColor
@@ -44,7 +44,7 @@ Button {
             Image{
                 x: 0
                 y: buttonRoot.pressed ? -132: 10
-                source: "images/mute_on_off.png"
+                source: appTheme.image("mute_on_off.png")
             }
         }
     }

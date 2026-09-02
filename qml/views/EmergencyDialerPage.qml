@@ -68,6 +68,7 @@ BasePage {
     }
 
     NumberEntry {
+        appTheme: emergencyPage.appTheme
         id: numEntry
 
         anchors {
@@ -96,6 +97,7 @@ BasePage {
     }
 
     NumPad {
+        appTheme: emergencyPage.appTheme
         anchors {
             top: hint.bottom
             bottom: dialButton.top
@@ -108,6 +110,7 @@ BasePage {
     }
 
     DialButton {
+        appTheme: emergencyPage.appTheme
         id: dialButton
 
         anchors {

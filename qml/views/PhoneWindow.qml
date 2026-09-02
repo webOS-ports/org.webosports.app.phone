@@ -39,7 +39,7 @@ WebOSWindow {
     property TelephonyManager telephonyManager;
     property IncomingCallAlert incomingCallAlertWindow;
     property SimPinWindow simPinWindow
-    property PhoneUiTheme phoneUiAppTheme;
+    property UiTheme phoneUiAppTheme;
 
     property DialHandler dialHandler;
     property SupplementaryServices supplementaryServices;

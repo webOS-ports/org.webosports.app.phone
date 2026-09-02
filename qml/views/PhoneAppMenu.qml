@@ -75,7 +75,10 @@ Menu {
 
     MenuItem {
         text: qsTr("Sounds & Ringtones")
-        onTriggered: phoneAppMenu._launch("com.palm.app.soundsandalerts")
+        // Not com.palm.app.soundsandalerts: that is the Enyo app off the Pre,
+        // and LuneOS does not ship it. Sounds is one of the panels of the QML
+        // settings app, installed under its own id.
+        onTriggered: phoneAppMenu._launch("org.webosports.app.settings.soundsandalerts")
     }
 
     MenuItem {

@@ -32,6 +32,8 @@ import "../services/CallMessages.js" as CallMessages
 MessageAlert {
     id: dialFailAlert
 
+    property UiTheme appTheme: PhoneUiTheme {}
+
     /// DialFail.js puts the error icon after the text, unlike the call popups.
     iconOnRight: true
 
@@ -52,13 +54,13 @@ MessageAlert {
         // gets a button instead of just an explanation.
         if (reason === "airplanemodeon") {
             showQuestion(CallMessages.dialFailureTitle, text,
-                         Qt.resolvedUrl("images/flight-mode-icon.png"),
+                         appTheme.image("flight-mode-icon.png"),
                          qsTr("Turn radio on"), dialFailAlert._enableRadioAndRedial);
             return;
         }
 
         showMessage(CallMessages.dialFailureTitle, text,
-                    Qt.resolvedUrl("images/popup-icon-error.png"));
+                    appTheme.image("popup-icon-error.png"));
     }
 
     function _enableRadioAndRedial() {

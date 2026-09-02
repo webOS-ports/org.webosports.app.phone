@@ -18,6 +18,8 @@
 
 import QtQuick 2.0
 
+import LunaNext.Common 0.1
+
 import LuneOS.Telephony 1.0
 
 QtObject {
@@ -39,7 +41,16 @@ QtObject {
 
     property string geoLocation: "Unknown"
 
-    readonly property string _genericAvatarPath: Qt.resolvedUrl('../views/images/contacts-unknown-icon-large.png')
+    /*
+     * The stand-in for a contact with no photo.
+     *
+     * A model has no theme to ask, so this is the one place outside the views
+     * that has to work out which artwork set is in force for itself. The rule
+     * is the same one main.qml picks the theme with.
+     */
+    readonly property string _genericAvatarPath:
+        Qt.resolvedUrl(Settings.tabletUi ? '../views/images/tablet/contacts-unknown-icon-large.png'
+                                         : '../views/images/phone/contacts-unknown-icon-large.png')
 
     onLineIdChanged: buildFromLineId()
     function buildFromLineId()
