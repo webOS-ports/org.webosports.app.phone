@@ -424,11 +424,43 @@ Item {
         console.log("Problem when calling luna://org.webosports.service.audio/setCallMode : " + message);
     }
 
-    onActiveVoiceCallChanged: {
-        console.log("Active VoiceCall changed -> setting audio to " + !!activeVoiceCall);
-        __lunaNextLS2Service.call("luna://org.webosports.service.audio/setCallMode", JSON.stringify({ inCall: (!!activeVoiceCall) }),
-                                  undefined, root.__setCallModeError);
+    /**
+     * audiod's inCall flag, and whether we have already told it so.
+     *
+     * This is global, latched state in another process: audiod keeps whatever
+     * it was last told, and luna-displaymanager reads it back as
+     * DisplayManager::isOnCall(). While it is set, every display-off lands in
+     * DisplayStateOffOnCall, which reports itself to sleepd as "on" so a phone
+     * held to the ear does not suspend mid-call. So a stale true is not a
+     * cosmetic bug: the device can never suspend again, and nothing outside
+     * audiod can clear it (the display API's "off" is a no-op in that state).
+     * Measured on a PinePhone Pro 2026-09-22 - the flag had been set with no
+     * call ever placed, and the phone had been 94% awake for 27 hours.
+     *
+     * Hence: send it only when it actually changes, and make sure it is
+     * cleared on the way out.
+     */
+    property bool __callModeSet: false
 
+    function __setCallMode(inCall, force) {
+        if (inCall === __callModeSet && !force)
+            return;
+        __callModeSet = inCall;
+        console.log("phone: telling audiod inCall=" + inCall);
+        __lunaNextLS2Service.call("luna://org.webosports.service.audio/setCallMode", JSON.stringify({ inCall: inCall }),
+                                  undefined, root.__setCallModeError);
+    }
+
+    /**
+     * Drive it from hasActiveCall rather than activeVoiceCall alone. The
+     * manager unsets activeVoiceCall during a conference and briefly while
+     * calls are swapped - the same reason currentCall() exists - and each of
+     * those transitions used to send a spurious inCall:false, and on the way
+     * back a true that no later event was guaranteed to undo.
+     */
+    onHasActiveCallChanged: __setCallMode(hasActiveCall)
+
+    onActiveVoiceCallChanged: {
         // A queued post-dial string is sent as soon as its call goes active.
         if (activeVoiceCall)
             _flushPostDial(activeVoiceCall);
@@ -683,6 +715,30 @@ Item {
 
     Component.onCompleted: {
         __lunaNextLS2Service.call("luna://com.webos.service.systemservice/getPreferences", JSON.stringify({ keys: ["region"], subscribe: false }), _getPreferencesSuccess, _getPreferencesFailure)
+
+        // Sync audiod to reality on every launch, whatever it currently holds.
+        // onDestruction below cannot run if we were killed rather than closed,
+        // so a previous instance may have left the flag set with no call in
+        // progress - and once set, nothing else in the system can clear it.
+        // Forced, because our own __callModeSet starts false and would
+        // otherwise suppress the very call that repairs a stale true.
+        // If a call really is up (we were restarted mid-call) this sends true,
+        // and if calls have not been enumerated yet the hasActiveCall handler
+        // sends it as soon as they are.
+        __setCallMode(hasActiveCall, true);
+    }
+
+    /**
+     * Closing the app ends our ability to correct the flag, so hand it back
+     * first. Without this the app could be closed during a call - or with the
+     * flag set by any transition we did not see the other half of - and audiod
+     * would keep the device awake for ever.
+     */
+    Component.onDestruction: {
+        if (__callModeSet) {
+            console.log("phone: app going away with inCall set, clearing it");
+            __setCallMode(false);
+        }
     }
     function _getPreferencesSuccess(message) {
         var response = JSON.parse(message.payload)
