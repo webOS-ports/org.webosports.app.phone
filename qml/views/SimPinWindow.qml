@@ -101,6 +101,54 @@ WebOSWindow {
         _statusMessage = qsTr("This SIM card is permanently blocked. Contact your network operator.");
     }
 
+    /**
+     * Which SIM is being asked about.
+     *
+     * One slot and the question answers itself. Two, and a card that says
+     * "Enter PIN code" and nothing else is a card you cannot answer: both SIMs
+     * have a PIN and only one of them is being asked for, and getting it wrong
+     * spends an attempt off a SIM that was not even asking.
+     *
+     * The slot is the modem's place in ofono's list, which is the order the
+     * hardware presents them in and so the order the slots are labelled in.
+     * One-based, because the label on the phone is.
+     */
+    readonly property int _simSlot: {
+        var modems = modemManager.modems;
+        var path = _pinModemPath !== "" ? _pinModemPath : modemManager.defaultModem;
+
+        for (var i = 0; i < modems.length; ++i) {
+            if (modems[i] === path)
+                return i + 1;
+        }
+
+        return 0;
+    }
+
+    /**
+     * And who it belongs to, when that can be had.
+     *
+     * Most of what identifies a SIM is behind the very PIN being asked for:
+     * the service provider name and the subscriber identity are both read out
+     * of files the card will not open until it is unlocked, and a modem with a
+     * locked SIM has not registered anywhere, so there is no network name
+     * either. Either can turn up all the same -- on a PIN2 or a PUK prompt the
+     * card is already open, and ofono may have kept what it read before -- so
+     * both are asked, and the card simply leaves the line out when neither
+     * answers.
+     */
+    readonly property string _simOperator: {
+        if (simManager.serviceProviderName.length > 0)
+            return simManager.serviceProviderName;
+
+        return pinNetwork.name;
+    }
+
+    OfonoNetworkRegistration {
+        id: pinNetwork
+        modemPath: simManager.modemPath
+    }
+
     // On a dual-SIM device ofono exposes one modem per slot and only the first
     // one is OfonoManager's default. A PIN on any other slot would never be
     // asked for, so watch every modem and point the prompt at whichever one is
@@ -137,6 +185,19 @@ WebOSWindow {
         id: simWatchers
 
         model: modemManager.modems
+
+        /*
+         * Asked on creation as well as on every change.
+         *
+         * The two handlers below only fire when something moves, and nothing
+         * has to: a modem whose properties ofono had already settled before
+         * this window was built arrives valid and locked, with no change to
+         * report. Then no slot is ever scanned, _pinModemPath stays empty, and
+         * the prompt points at the default modem -- which is exactly the case
+         * this Instantiator exists to catch, a locked second SIM behind an
+         * unlocked first one.
+         */
+        onObjectAdded: simPinWindow._updatePinModem()
 
         delegate: OfonoSimManager {
             modemPath: modelData
@@ -182,6 +243,10 @@ WebOSWindow {
         simManager: simManager
         requestedPinType: simManager.pinRequired
         statusMessage: simPinWindow._statusMessage
+
+        simSlot: simPinWindow._simSlot
+        simCount: modemManager.modems.length
+        operatorName: simPinWindow._simOperator
 
         onPinEntered: {
             _confirmedPinType = simManager.pinRequired
