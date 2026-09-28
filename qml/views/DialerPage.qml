@@ -40,59 +40,105 @@ BasePage {
     signal dialled();
 
     /**
-     * Key focus stays on the page, and no text field is focused anywhere.
+     * What the input method thinks has focus.
      *
-     * That is what keeps the on-screen keyboard down: a focused field is the
-     * only thing that raises it, and a dialpad that brings a numeric keyboard
-     * up over itself is worse than useless.
+     * An item with no size and nothing drawn, whose only job is to tell the
+     * input method that a dial string is being typed. The field the user sees
+     * is still numEntry, still activeFocusOnPress:false, and still the only
+     * thing that holds the number.
      *
-     * It also costs the dialer everything that depends on the input method
-     * knowing what kind of field is in front of the user -- on a phone QWERTY,
-     * the digits printed on the letter keys, which are unreachable without
-     * holding Alt. That was wired up here and had to come back out: a hidden
-     * proxy took input-method focus, which made the plugin see a phone-number
-     * field on a Q25 exactly as intended, and put a numeric keyboard over the
-     * dialpad on a FLX1s, which has no hardware keyboard and so nothing to
-     * suppress it.
+     * Something has to be focused or the plugin is never told to redirect keys
+     * (setRedirectKeys is called from handleFocusChange), never learns the
+     * content type, and so never offers a phone QWERTY's printed digits
+     * without Alt. The page holding key focus, which is where this started,
+     * gets the keys and none of that.
      *
-     * Qt's own way to say "focused, but do not bring up a keyboard" is
-     * ImhNoOnScreenKeyboard, and it does not survive the trip: maliit's plugin
-     * API carries contentType, correction, prediction and capitalization and
-     * has no hint for this one, so the plugin never learns the field asked to
-     * be left alone. Until that is plumbed through the framework there is no
-     * way to have both, and a keypad nobody can see past is the worse of the
-     * two failures.
+     * ImhNoOnScreenKeyboard is what keeps the panel down, and it is worth
+     * knowing that it did not always: focus alone put a numeric keyboard over
+     * the dialpad on a FLX1s, because this stack raises the panel by
+     * activating the field and had no way to be told otherwise. It has one
+     * now -- the hint is carried on the content hint through qtwayland-webos
+     * and maliit-framework-webos, and webos-keyboard leaves the keys down for
+     * a field that asks. All three have to be built for this to be safe.
      *
-     * The tab/stack machinery briefly hands focus elsewhere just after load,
-     * so reclaim it whenever the dialer is the visible page.
+     * The split between proxy and field is the other half of the point. A
+     * character the plugin resolves off a key face is committed as text rather
+     * than delivered as a key press, so it would otherwise land in the field
+     * behind the app's back: no vibration, no tone, and a digit appended to
+     * the dial string in the middle of a call where it should have gone out as
+     * DTMF. Coming through here it takes the path a tapped key takes.
      */
-    focus: true
+    TextInput {
+        id: imProxy
 
-    /// Puts key focus where the dialer needs it. Anything that brings the
-    /// keypad up calls this rather than reaching in itself.
-    function takeKeyFocus() {
-        pDialPage.forceActiveFocus();
+        width: 1
+        height: 1
+        opacity: 0
+        // visible:false would make it unfocusable, which is the one thing it
+        // is for.
+        activeFocusOnTab: false
+
+        inputMethodHints: Qt.ImhDialableCharactersOnly | Qt.ImhNoPredictiveText
+                          | Qt.ImhNoOnScreenKeyboard
+
+        // The tab/stack machinery briefly hands focus elsewhere just after
+        // load, so reclaim it whenever the dialer is the visible page.
+        onActiveFocusChanged: if (!activeFocus && pDialPage.visible) refocusTimer.restart();
+
+        /*
+         * Keys first, before TextInput's own handling gets them -- which is
+         * what a Keys handler on an item does. So a digit, a backspace or the
+         * Call key is dealt with exactly as it was before any of this, and
+         * never reaches the proxy's own text.
+         */
+        Keys.onPressed: (event) => {
+            var k = event.key;
+            if ((k >= Qt.Key_0 && k <= Qt.Key_9) ||
+                k === Qt.Key_Asterisk || k === Qt.Key_NumberSign || k === Qt.Key_Plus) {
+                // Route through the on-screen pad's signal so hardware keys get
+                // the same feedback, in-call DTMF and insert handling as tapped
+                // keys.
+                numPad.sendKey(k);
+            } else if (k === Qt.Key_Backspace || k === Qt.Key_Delete) {
+                numEntry.backspace();
+            } else if (k === Qt.Key_Call || k === Qt.Key_Yes ||
+                       k === Qt.Key_Return || k === Qt.Key_Enter) {
+                pDialPage.dial();
+            } else {
+                event.accepted = false;
+                return;
+            }
+            event.accepted = true;
+        }
+
+        /// And text, for the keys that do not arrive as keys.
+        onTextChanged: {
+            if (text.length === 0)
+                return;
+
+            var typed = text;
+            text = "";
+
+            for (var i = 0; i < typed.length; ++i) {
+                var character = typed.charAt(i);
+                // Only what belongs in a dial string. A letter reaching here
+                // means no profile resolved it, and a letter in a phone number
+                // is noise -- the same nothing the key handler above makes of
+                // one.
+                if ("0123456789*#+".indexOf(character) < 0)
+                    continue;
+
+                pDialPage.keyFeedback();
+                pDialPage.handleDialCharacter(character);
+            }
+        }
     }
 
-    onActiveFocusChanged: if (!activeFocus && visible) refocusTimer.restart();
-
-    Keys.onPressed: (event) => {
-        var k = event.key;
-        if ((k >= Qt.Key_0 && k <= Qt.Key_9) ||
-            k === Qt.Key_Asterisk || k === Qt.Key_NumberSign || k === Qt.Key_Plus) {
-            // Route through the on-screen pad's signal so hardware keys get the
-            // same feedback, in-call DTMF and insert handling as tapped keys.
-            numPad.sendKey(k);
-        } else if (k === Qt.Key_Backspace || k === Qt.Key_Delete) {
-            numEntry.backspace();
-        } else if (k === Qt.Key_Call || k === Qt.Key_Yes ||
-                   k === Qt.Key_Return || k === Qt.Key_Enter) {
-            pDialPage.dial();
-        } else {
-            event.accepted = false;
-            return;
-        }
-        event.accepted = true;
+    /// Puts key focus where the dialer needs it. Anything that brings the
+    /// keypad up calls this rather than focusing the page: focus on the page
+    /// itself is focus taken off the proxy, and the keys stop arriving.
+    function takeKeyFocus() {
+        imProxy.forceActiveFocus();
     }
 
     onVisibleChanged: if (visible) pDialPage.takeKeyFocus();
@@ -101,7 +147,7 @@ BasePage {
     Timer {
         id: refocusTimer
         interval: 0
-        onTriggered: if (pDialPage.visible && !pDialPage.activeFocus) pDialPage.takeKeyFocus();
+        onTriggered: if (pDialPage.visible && !imProxy.activeFocus) pDialPage.takeKeyFocus();
     }
 
     function reset() {
