@@ -44,6 +44,20 @@ Item {
 
     height: Units.gu(6)
 
+    /**
+     * The icon over the caption.
+     *
+     * The caption's size is fixed -- it is a label and shrinking it makes it
+     * unreadable long before it saves anything worth having -- so where the
+     * bar has been given less height than the reference one, the icon is what
+     * gives way. On a bar of the full six grid units this is simply the 2.6
+     * the reference draws.
+     */
+    readonly property real iconSize: Math.min(Units.gu(2.6),
+                                              height - captionHeight - Units.gu(0.3)
+                                                     - Units.gu(0.6))
+    readonly property real captionHeight: FontUtils.sizeToPixels("x-small") * 1.3
+
     Rectangle {
         anchors.fill: parent
         color: appTheme.tabBarColor
@@ -85,8 +99,8 @@ Item {
 
                     SpriteIcon {
                         anchors.horizontalCenter: parent.horizontalCenter
-                        width: Units.gu(2.6)
-                        height: Units.gu(2.6)
+                        width: phoneTabBar.iconSize
+                        height: phoneTabBar.iconSize
                         source: modelData.icon
                         // These carry their own lit state as a second frame,
                         // rather than needing the dark one faded down.

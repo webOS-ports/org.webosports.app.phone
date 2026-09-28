@@ -121,9 +121,55 @@ BasePage {
     // where it fills the screen, and the height it is given comes first.
     readonly property real padWidth: fillsScreen ? width - Units.gu(1)
                                                  : Math.min(width - Units.gu(2), Units.gu(32))
+
+    /**
+     * How the page is divided between the keys and everything else.
+     *
+     * The field and the dial button each have a natural size. The field is
+     * seven grid units tall; the button keeps its artwork's proportions, so
+     * drawn the full width of the page it is about a fifth of that width
+     * tall. On a handset shaped like a Pre3 the two together come to roughly
+     * a quarter of the page and the keys take the rest, which is the layout
+     * these numbers were drawn for.
+     *
+     * A square screen breaks that. The Q25's page is no taller than it is
+     * wide, so the same two naturals eat close to half of it and leave each
+     * key four times wider than it is tall -- a row of letterboxes, and the
+     * first thing anyone complains about.
+     *
+     * So the keys are budgeted first: they keep at least this share of the
+     * page, and the chrome gets the remainder. What it cannot have comes off
+     * both pieces in proportion rather than out of one of them, so on a short
+     * screen the dialer still looks like itself, only tighter.
+     */
+    readonly property real keysMinimumShare: 0.7
+
+    readonly property real naturalEntryHeight: Units.gu(7)
+    readonly property real naturalMatchHeight: matchingContacts.length > 0 ? Units.gu(3.5) : 0
+    /// heightPerWidth is the button's own: only it knows how its sprite is cut.
+    readonly property real naturalDialHeight: padWidth * dialButton.heightPerWidth
+    readonly property real naturalChromeHeight: naturalEntryHeight + naturalMatchHeight
+                                                + naturalDialHeight
+
+    /**
+     * One below on a page too short for the chrome's natural size, one
+     * otherwise. Nothing here reads a child's actual height, so none of it
+     * can chase the sizes it is deciding.
+     */
+    readonly property real chromeScale: {
+        if (!fillsScreen || naturalChromeHeight <= 0)
+            return 1;
+        var allowed = height * (1 - keysMinimumShare);
+        return allowed < naturalChromeHeight ? allowed / naturalChromeHeight : 1;
+    }
+
+    readonly property real entryHeight: naturalEntryHeight * chromeScale
+    readonly property real matchHeight: naturalMatchHeight * chromeScale
+    readonly property real dialHeight: naturalDialHeight * chromeScale
+
     readonly property real padKeysHeight: fillsScreen
-                                              ? Math.max(0, height - numEntry.height
-                                                            - matchStrip.height - dialButton.height)
+                                              ? Math.max(0, height - entryHeight
+                                                            - matchHeight - dialHeight)
                                               : padWidth * 0.95
 
     Item {
@@ -132,7 +178,8 @@ BasePage {
         anchors.horizontalCenter: parent.horizontalCenter
         anchors.verticalCenter: parent.verticalCenter
         width: pDialPage.padWidth
-        height: numEntry.height + matchStrip.height + pDialPage.padKeysHeight + dialButton.height
+        height: pDialPage.entryHeight + pDialPage.matchHeight
+                + pDialPage.padKeysHeight + pDialPage.dialHeight
 
         NumberEntry {
             appTheme: pDialPage.appTheme
@@ -144,6 +191,7 @@ BasePage {
                 right: parent.right
             }
 
+            fieldHeight: pDialPage.entryHeight
             textColor: '#ffffff'
             countryCode: contacts ? contacts.countryCode : "US"
 
@@ -159,7 +207,7 @@ BasePage {
             left: parent.left
             right: parent.right
         }
-        height: visible ? Units.gu(3.5) : 0
+        height: pDialPage.matchHeight
         visible: pDialPage.matchingContacts.length > 0
 
         color: appTheme.panelFooterColor
@@ -252,9 +300,14 @@ BasePage {
 
         anchors {
             bottom: parent.bottom
-            left: parent.left
-            right: parent.right
+            horizontalCenter: parent.horizontalCenter
         }
+
+        // The page decides how tall the button may be; the button keeps its
+        // artwork's proportions, so it is narrowed to that height rather than
+        // drawn the full width of the panel and squashed onto it.
+        preferredWidth: pDialPage.padWidth
+        maximumHeight: pDialPage.dialHeight
 
         // Every dial string -- number, MMI code, USSD, in-call digit -- goes
         // through the dial handler (via pDialPage.dial()) so the GSM rules apply

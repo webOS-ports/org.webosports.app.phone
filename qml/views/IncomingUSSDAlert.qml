@@ -130,6 +130,10 @@ WebOSWindow {
         color: "white"
         placeholderTextColor: "grey"
 
+        // A USSD reply is a menu choice or a short code. The word ribbon has
+        // nothing to suggest and would sit over this alert's own buttons.
+        inputMethodHints: Qt.ImhNoPredictiveText
+
         background: Rectangle {
             color: appTheme.panelFooterColor
             radius: Units.gu(0.5)

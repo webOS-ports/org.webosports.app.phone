@@ -222,7 +222,14 @@ Item {
             top: tabView.phoneUi ? undefined : parent.top
             bottom: tabView.phoneUi ? parent.bottom : undefined
         }
-        height: Units.gu(6)
+
+        // Six grid units is the bar the reference draws, and on a screen the
+        // shape of a Pre3 that is a twelfth of it. On the Q25's square one the
+        // same six units are an eighth of the app and the keypad below is
+        // already short of height, so the bar is held to that eighth: it is
+        // chrome, and chrome does not get to grow into the thing it frames.
+        // The bar shrinks its icons to suit; see PhoneTabBar.
+        height: Math.min(Units.gu(6), tabView.height / 8)
         color: appTheme.tabBarColor
 
         LuneComponents.AppMenuButton {

@@ -42,6 +42,16 @@ Item {
 
     height: bgImage.height
 
+    /**
+     * How tall to draw the field.
+     *
+     * Seven grid units is what the background artwork is drawn for and what
+     * every caller but one wants. The dialer overrides it on a screen with no
+     * height to spare, where the field giving a little back is what buys the
+     * keys a row worth pressing.
+     */
+    property real fieldHeight: Units.gu(7)
+
     property alias text: textEdit.text
     property string textColor: "white"
     property alias alignment: textEdit.horizontalAlignment
@@ -148,15 +158,17 @@ Item {
             left: parent.left
             right: parent.right
         }
-        height: Units.gu(7);
+        height: numberEntry.fieldHeight
         source: appTheme.image("dialer-entry-bg.png")
     }
 
     Image {
         id:backspace
 
+        // Kept inside the field: where that has been squeezed, an icon drawn
+        // for the full-height one would crowd the number beside it.
         width: Units.gu(5)
-        height: Units.gu(3)
+        height: Math.min(Units.gu(3), numberEntry.fieldHeight * 0.45)
         fillMode: Image.PreserveAspectFit
         visible: textEdit.text.length > 0
 
@@ -193,7 +205,15 @@ Item {
         }
 
         activeFocusOnPress: false
-        inputMethodHints: Qt.ImhDialableCharactersOnly
+        /*
+         * Nothing typed in the phone app is prose, so the keyboard's word
+         * ribbon has nothing to offer here -- and on a device with a hardware
+         * keyboard it is up whenever a field has focus, a strip of guesses
+         * laid over the bottom of the app. On the Q25 that is exactly where
+         * the tab bar is. ImhNoPredictiveText is what maliit reads to turn
+         * its word engine off (see InputMethod::update).
+         */
+        inputMethodHints: Qt.ImhDialableCharactersOnly | Qt.ImhNoPredictiveText
         color: "transparent"
         horizontalAlignment: TextInput.AlignLeft
         placeholderText: isPhoneNumber ? qsTr("Enter phone number") : ""
@@ -225,9 +245,15 @@ Item {
                 // Shrink long dial strings so they stay on one line, following
                 // the steps the legacy dialer used.
                 var length = numberEntry.displayText.length;
-                if (length <= 12) return FontUtils.sizeToPixels("large");
-                if (length <= 16) return FontUtils.sizeToPixels("medium");
-                return FontUtils.sizeToPixels("small");
+                var size;
+                if (length <= 12) size = FontUtils.sizeToPixels("large");
+                else if (length <= 16) size = FontUtils.sizeToPixels("medium");
+                else size = FontUtils.sizeToPixels("small");
+
+                // Those steps assume the field is as tall as the artwork wants.
+                // Where it is not, the number comes down with it rather than
+                // filling the bar top to bottom.
+                return Math.min(size, numberEntry.fieldHeight * 0.5);
             }
 
             text: (textEdit.echoMode === TextInput.Password)
