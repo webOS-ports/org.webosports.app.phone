@@ -39,43 +39,175 @@ BasePage {
     /// put it away.
     signal dialled();
 
-    // Hardware numeric keypad -> dialer. The page itself holds key focus -- not
-    // numEntry's TextField, which is activeFocusOnPress:false -- so physical keys
-    // reach us without raising the on-screen keyboard or activating the maliit
-    // input context. The tab/stack machinery briefly hands focus elsewhere just
-    // after load, so reclaim it whenever the dialer is the visible page.
-    focus: true
-    onVisibleChanged: if (visible) pDialPage.forceActiveFocus();
-    onActiveFocusChanged: if (!activeFocus && visible) refocusTimer.restart();
-    Component.onCompleted: pDialPage.forceActiveFocus();
+    /**
+     * What the input method thinks has focus.
+     *
+     * An item with no size and nothing drawn, whose only job is to tell the
+     * input method that a dial string is being typed. The field the user sees
+     * is still numEntry, still activeFocusOnPress:false, and still the only
+     * thing that holds the number.
+     *
+     * Something has to be focused or the plugin is never told to redirect keys
+     * (setRedirectKeys is called from handleFocusChange), never learns the
+     * content type, and so never offers a phone QWERTY's printed digits
+     * without Alt. The page holding key focus, which is where this started,
+     * gets the keys and none of that.
+     *
+     * imhNoOnScreenKeyboard below is what keeps the panel down, and it is worth
+     * knowing that it did not always: focus alone put a numeric keyboard over
+     * the dialpad on a FLX1s, because this stack raises the panel by
+     * activating the field and had no way to be told otherwise. It has one
+     * now -- the bit is carried on the content hint through qtwayland-webos
+     * and maliit-framework-webos, and webos-keyboard leaves the keys down for
+     * a field that asks. All three have to be built for this to be safe.
+     *
+     * The split between proxy and field is the other half of the point. A
+     * character the plugin resolves off a key face is committed as text rather
+     * than delivered as a key press, so it would otherwise land in the field
+     * behind the app's back: no vibration, no tone, and a digit appended to
+     * the dial string in the middle of a call where it should have gone out as
+     * DTMF. Coming through here it takes the path a tapped key takes.
+     */
+    TextInput {
+        id: imProxy
 
-    Keys.onPressed: (event) => {
-        var k = event.key;
-        if ((k >= Qt.Key_0 && k <= Qt.Key_9) ||
-            k === Qt.Key_Asterisk || k === Qt.Key_NumberSign || k === Qt.Key_Plus) {
-            // Route through the on-screen pad's signal so hardware keys get the
-            // same feedback, in-call DTMF and insert handling as tapped keys.
-            numPad.sendKey(k);
-        } else if (k === Qt.Key_Backspace || k === Qt.Key_Delete) {
-            numEntry.backspace();
-        } else if (k === Qt.Key_Call || k === Qt.Key_Yes ||
-                   k === Qt.Key_Return || k === Qt.Key_Enter) {
-            pDialPage.dial();
-        } else {
-            event.accepted = false;
-            return;
+        width: 1
+        height: 1
+        opacity: 0
+        // visible:false would make it unfocusable, which is the one thing it
+        // is for.
+        activeFocusOnTab: false
+
+        /**
+         * "This field has a keypad of its own; do not draw one over it."
+         *
+         * Not a Qt hint -- Qt has none for this. Its enum stops at
+         * ImhNoTextHandles (0x1000) and the next three bits are free before
+         * ImhExclusiveInputMask claims the top half, so webOS takes the last
+         * of them: the furthest from whatever Qt allocates next, and outside
+         * the exclusive mask so it can never be read as an input filter.
+         * QFlags keeps a bit it does not recognise, so it reaches
+         * qtwayland-webos, which is where it is read; the two have to agree on
+         * the value and each says so.
+         */
+        readonly property int imhNoOnScreenKeyboard: 0x8000
+
+        inputMethodHints: Qt.ImhDialableCharactersOnly | Qt.ImhNoPredictiveText
+                          | imProxy.imhNoOnScreenKeyboard
+
+        // The tab/stack machinery briefly hands focus elsewhere just after
+        // load, so reclaim it whenever the dialer is the visible page.
+        onActiveFocusChanged: if (!activeFocus && pDialPage.visible) refocusTimer.restart();
+
+        /*
+         * Keys first, before TextInput's own handling gets them -- which is
+         * what a Keys handler on an item does. So a digit, a backspace or the
+         * Call key is dealt with exactly as it was before any of this, and
+         * never reaches the proxy's own text.
+         */
+        Keys.onPressed: (event) => {
+            var k = event.key;
+            if ((k >= Qt.Key_0 && k <= Qt.Key_9) ||
+                k === Qt.Key_Asterisk || k === Qt.Key_NumberSign || k === Qt.Key_Plus) {
+                // Route through the on-screen pad's signal so hardware keys get
+                // the same feedback, in-call DTMF and insert handling as tapped
+                // keys.
+                numPad.sendKey(k);
+            } else if (k === Qt.Key_Backspace || k === Qt.Key_Delete) {
+                numEntry.backspace();
+            } else if (k === Qt.Key_Call || k === Qt.Key_Yes ||
+                       k === Qt.Key_Return || k === Qt.Key_Enter) {
+                pDialPage.dial();
+            } else {
+                event.accepted = false;
+                return;
+            }
+            event.accepted = true;
         }
-        event.accepted = true;
+
+        /// And text, for the keys that do not arrive as keys.
+        onTextChanged: {
+            if (text.length === 0)
+                return;
+
+            var typed = text;
+            text = "";
+
+            for (var i = 0; i < typed.length; ++i) {
+                var character = typed.charAt(i);
+                // Only what belongs in a dial string. A letter reaching here
+                // means no profile resolved it, and a letter in a phone number
+                // is noise -- the same nothing the key handler above makes of
+                // one.
+                if ("0123456789*#+".indexOf(character) < 0)
+                    continue;
+
+                pDialPage.keyFeedback();
+                pDialPage.handleDialCharacter(character);
+            }
+        }
     }
+
+    /// Puts key focus where the dialer needs it. Anything that brings the
+    /// keypad up calls this rather than focusing the page: focus on the page
+    /// itself is focus taken off the proxy, and the keys stop arriving.
+    function takeKeyFocus() {
+        imProxy.forceActiveFocus();
+    }
+
+    onVisibleChanged: if (visible) pDialPage.takeKeyFocus();
+    Component.onCompleted: pDialPage.takeKeyFocus();
 
     Timer {
         id: refocusTimer
         interval: 0
-        onTriggered: if (pDialPage.visible && !pDialPage.activeFocus) pDialPage.forceActiveFocus();
+        onTriggered: if (pDialPage.visible && !imProxy.activeFocus) pDialPage.takeKeyFocus();
     }
 
     function reset() {
         numEntry.clear();
+    }
+
+    /**
+     * What a key does, whichever way it arrived.
+     *
+     * Three things reach the dial string now -- a tapped key, a hardware key
+     * delivered as a key press, and a character the keyboard plugin resolved
+     * off a key face and committed as text -- and all three are the user
+     * pressing a key on a dialpad. They share this so that they cannot drift
+     * apart: it would be very easy for one of them to quietly stop sending
+     * DTMF mid-call, or to stop buzzing, and hard to notice which.
+     */
+    function keyFeedback() {
+        var feedback = AppTweaks.dialpadFeedbackTweakValue;
+
+        if (feedback === "vibrateSound" || feedback === "vibrateOnly") {
+            service.call("luna://com.palm.vibrate/vibrate", JSON.stringify({
+                                                          period: 100, duration: 10
+                                                      }), undefined,
+                                       numPad.vibrateFailure)
+        }
+    }
+
+    function handleDialCharacter(character) {
+        // With a call up, the dialpad doubles as a DTMF pad.
+        if (voiceCallMgrWrapper && voiceCallMgrWrapper.activeVoiceCall) {
+            voiceCallMgrWrapper.sendDtmf(character);
+            return;
+        }
+
+        // Local dialpad feedback tone via audiod's DTMF generator
+        // (com.palm.audio/dtmf/playDTMF). Nemo's manager.startDtmfTone()
+        // routes through ngfd, which LuneOS does not run, so it is silent
+        // here. audiod plays a self-stopping one-shot; only 0-9, * and #
+        // have tones.
+        var feedback = AppTweaks.dialpadFeedbackTweakValue;
+        if ((feedback === "vibrateSound" || feedback === "soundOnly") &&
+            ((character >= "0" && character <= "9") || character === "*" || character === "#"))
+            service.call("luna://com.palm.audio/dtmf/playDTMF",
+                         JSON.stringify({name: character}), undefined, numPad.dtmfFailure);
+
+        numEntry.insert(character);
     }
 
     // Shared by the dial button and the hardware Call/Enter keys.
@@ -121,9 +253,85 @@ BasePage {
     // where it fills the screen, and the height it is given comes first.
     readonly property real padWidth: fillsScreen ? width - Units.gu(1)
                                                  : Math.min(width - Units.gu(2), Units.gu(32))
+
+    /**
+     * How the page is divided between the keys and everything else.
+     *
+     * The field and the dial button each have a natural size. The field is
+     * seven grid units tall; the button keeps its artwork's proportions, so
+     * drawn the full width of the page it is about a fifth of that width
+     * tall. On a handset shaped like a Pre3 the two together come to roughly
+     * a quarter of the page and the keys take the rest, which is the layout
+     * these numbers were drawn for.
+     *
+     * A square screen breaks that. The Q25's page is no taller than it is
+     * wide, so the same two naturals eat close to half of it and leave each
+     * key four times wider than it is tall -- a row of letterboxes, and the
+     * first thing anyone complains about.
+     *
+     * So the keys are budgeted first: they keep at least this share of the
+     * page, and the chrome gets the remainder. What it cannot have comes off
+     * both pieces in proportion rather than out of one of them, so on a short
+     * screen the dialer still looks like itself, only tighter.
+     */
+    readonly property real keysMinimumShare: 0.7
+
+    /**
+     * The keys and the dial button are drawn the same width, always.
+     *
+     * They are the two things on the page a thumb aims at, sitting one above
+     * the other, and a button that stops short of the keys above it reads as a
+     * mistake -- which is what the first pass at this produced.
+     *
+     * Which of them gives way is settled by the artwork. buttons-numpad.png is
+     * a nine-slice and stretches to any size at all; dial-button.png is a
+     * fixed plate with the handset glyph painted into the middle of it, so its
+     * proportions are the one thing on this page that cannot bend. The keys
+     * come to the button's width, then, and not the other way about.
+     *
+     * The pad's backdrop still fills the page either side of them, so this
+     * narrows the block of keys rather than leaving a column of page down both
+     * edges.
+     */
+    readonly property real naturalKeypadWidth: padWidth - Units.gu(2)
+
+    readonly property real naturalEntryHeight: Units.gu(7)
+    readonly property real naturalMatchHeight: matchingContacts.length > 0 ? Units.gu(3.5) : 0
+    /// heightPerWidth is the button's own: only it knows how its sprite is cut.
+    readonly property real naturalDialHeight: naturalKeypadWidth * dialButton.heightPerWidth
+    readonly property real naturalChromeHeight: naturalEntryHeight + naturalMatchHeight
+                                                + naturalDialHeight
+
+    /**
+     * One below on a page too short for the chrome's natural size, one
+     * otherwise. Nothing here reads a child's actual height, so none of it
+     * can chase the sizes it is deciding.
+     */
+    readonly property real chromeScale: {
+        if (!fillsScreen || naturalChromeHeight <= 0)
+            return 1;
+        var allowed = height * (1 - keysMinimumShare);
+        return allowed < naturalChromeHeight ? allowed / naturalChromeHeight : 1;
+    }
+
+    readonly property real entryHeight: naturalEntryHeight * chromeScale
+    readonly property real matchHeight: naturalMatchHeight * chromeScale
+    readonly property real dialHeight: naturalDialHeight * chromeScale
+
+    /**
+     * What the button comes out at once its height has been capped, and so
+     * what the keys above it are drawn at too.
+     *
+     * Rounded down to a whole number of columns. NumPad's key width is an int,
+     * so three of them fall short of any width that is not a multiple of
+     * three, and the button would overhang the keys by a pixel or two -- which
+     * is precisely the misalignment this is here to remove.
+     */
+    readonly property real keypadWidth: 3 * Math.floor(naturalKeypadWidth * chromeScale / 3)
+
     readonly property real padKeysHeight: fillsScreen
-                                              ? Math.max(0, height - numEntry.height
-                                                            - matchStrip.height - dialButton.height)
+                                              ? Math.max(0, height - entryHeight
+                                                            - matchHeight - dialHeight)
                                               : padWidth * 0.95
 
     Item {
@@ -131,12 +339,27 @@ BasePage {
 
         anchors.horizontalCenter: parent.horizontalCenter
         anchors.verticalCenter: parent.verticalCenter
-        width: pDialPage.padWidth
-        height: numEntry.height + matchStrip.height + pDialPage.padKeysHeight + dialButton.height
+
+        /*
+         * The column is one width all the way down.
+         *
+         * padWidth is what the page has to give; keypadWidth is what the dial
+         * button's artwork can actually be drawn at, and so what the keys and
+         * the backdrop take. The panel takes it too, which is what puts the
+         * number field on the same two edges as everything under it -- it had
+         * been left at the full width, and a field wider than the pad it
+         * belongs to reads as a mistake in the same way an oversized backdrop
+         * did.
+         */
+        width: pDialPage.keypadWidth
+        height: pDialPage.entryHeight + pDialPage.matchHeight
+                + pDialPage.padKeysHeight + pDialPage.dialHeight
 
         NumberEntry {
             appTheme: pDialPage.appTheme
             id: numEntry
+            // Named so the layout tests can measure it.
+            objectName: "numberEntry"
 
             anchors {
                 top: parent.top
@@ -144,6 +367,7 @@ BasePage {
                 right: parent.right
             }
 
+            fieldHeight: pDialPage.entryHeight
             textColor: '#ffffff'
             countryCode: contacts ? contacts.countryCode : "US"
 
@@ -159,7 +383,7 @@ BasePage {
             left: parent.left
             right: parent.right
         }
-        height: visible ? Units.gu(3.5) : 0
+        height: pDialPage.matchHeight
         visible: pDialPage.matchingContacts.length > 0
 
         color: appTheme.panelFooterColor
@@ -193,12 +417,30 @@ BasePage {
     NumPad {
         appTheme: pDialPage.appTheme
         id: numPad
+        // Named so the layout tests can measure it.
+        objectName: "numPad"
         anchors {
             top: matchStrip.bottom
             bottom: dialButton.top
             left: parent.left
             right: parent.right
         }
+
+        /*
+         * The keys fill the panel, backdrop and all.
+         *
+         * The panel is already keypadWidth -- the width the dial button's
+         * artwork can be drawn at -- so the grid takes all of it rather than
+         * leaving an inset of its own. That inset is what went wrong last
+         * time: it put 451 pixels of backdrop around 416 of keys and 416 of
+         * button, sticking out past both. Any one of the things stacked here a
+         * different width from the others is the thing that catches the eye.
+         *
+         * Vertically the keys keep the margin they always had, which is where
+         * they get their breathing room from the field above and the button
+         * below; see NumPad.keysHeight.
+         */
+        gridWidth: pDialPage.keypadWidth
 
         function vibrateFailure(message) {
             console.log("Unable to vibrate");
@@ -209,14 +451,7 @@ BasePage {
         }
 
         onSendKey: (keycode) => {
-            var feedback = AppTweaks.dialpadFeedbackTweakValue;
-
-            if (feedback === "vibrateSound" || feedback === "vibrateOnly") {
-                service.call("luna://com.palm.vibrate/vibrate", JSON.stringify({
-                                                              period: 100, duration: 10
-                                                          }), undefined,
-                                           vibrateFailure)
-            }
+            pDialPage.keyFeedback();
 
             if (keycode === Qt.Key_LaunchMail) {
                 // Long press on 1 calls voicemail, as on the original dialpad.
@@ -224,37 +459,26 @@ BasePage {
                 return;
             }
 
-            var character = String.fromCharCode(keycode);
-
-            // With a call up, the dialpad doubles as a DTMF pad.
-            if (voiceCallMgrWrapper && voiceCallMgrWrapper.activeVoiceCall) {
-                voiceCallMgrWrapper.sendDtmf(character);
-                return;
-            }
-
-            // Local dialpad feedback tone via audiod's DTMF generator
-            // (com.palm.audio/dtmf/playDTMF). Nemo's manager.startDtmfTone()
-            // routes through ngfd, which LuneOS does not run, so it is silent
-            // here. audiod plays a self-stopping one-shot; only 0-9, * and #
-            // have tones.
-            if ((feedback === "vibrateSound" || feedback === "soundOnly") &&
-                ((character >= "0" && character <= "9") || character === "*" || character === "#"))
-                service.call("luna://com.palm.audio/dtmf/playDTMF",
-                             JSON.stringify({name: character}), undefined, dtmfFailure);
-
-            numEntry.insert(character);
+            pDialPage.handleDialCharacter(String.fromCharCode(keycode));
         }
     }
 
     DialButton {
         appTheme: pDialPage.appTheme
         id: dialButton
+        // Named so the layout tests can measure it.
+        objectName: "dialButton"
 
         anchors {
             bottom: parent.bottom
-            left: parent.left
-            right: parent.right
+            horizontalCenter: parent.horizontalCenter
         }
+
+        // The button keeps its artwork's proportions, so it is narrowed to the
+        // height it is allowed rather than drawn the full width of the panel
+        // and squashed onto it. The keys above are drawn to match.
+        preferredWidth: pDialPage.keypadWidth
+        maximumHeight: pDialPage.dialHeight
 
         // Every dial string -- number, MMI code, USSD, in-call digit -- goes
         // through the dial handler (via pDialPage.dial()) so the GSM rules apply

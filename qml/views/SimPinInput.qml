@@ -42,6 +42,35 @@ Item {
     /// Set by the window when an attempt failed, e.g. "Incorrect PUK code".
     property string statusMessage: ""
 
+    /**
+     * Which SIM is being asked about, and who it belongs to.
+     *
+     * `simSlot` is one-based and zero when it is not known; `simCount` is how
+     * many slots the device has; `operatorName` is empty far more often than
+     * not, because nearly everything that names a SIM is behind the PIN being
+     * asked for.
+     */
+    property int simSlot: 0
+    property int simCount: 0
+    property string operatorName: ""
+
+    /**
+     * What to head the card with.
+     *
+     * The slot only earns a line when there is more than one to choose
+     * between: on a single-SIM phone "SIM 1" says nothing the user did not
+     * know. The operator earns one whenever it is known, on any device, since
+     * it is the name they think of the card by.
+     */
+    readonly property string _simLabel: {
+        var slot = (simCount > 1 && simSlot > 0) ? qsTr("SIM %1").arg(simSlot) : "";
+
+        if (slot.length > 0 && operatorName.length > 0)
+            return qsTr("%1 - %2").arg(slot).arg(operatorName);
+
+        return slot.length > 0 ? slot : operatorName;
+    }
+
     signal pinEntered
     signal canceled
     /// The user wants the emergency dialpad instead of unlocking.
@@ -80,8 +109,46 @@ Item {
 
         anchors.left: parent.left
         anchors.right: parent.right
-        anchors.topMargin: Units.gu(2)
-        height: Units.gu(10)
+        anchors.top: parent.top
+        // Two grid units above the heading, unless two grid units is a
+        // noticeable share of the whole card, which on a square screen it is.
+        anchors.topMargin: Math.min(Units.gu(2), simPinInput.height * 0.03)
+
+        /*
+         * Ten grid units is what the card was drawn to, and enough for a
+         * heading and a line under it. It is not enough once the SIM is named
+         * above them as well -- and on a screen no taller than it is wide, ten
+         * grid units of heading is a sixth of the card taken from the keys,
+         * which are already the thing there is least room for.
+         *
+         * So: never smaller than its own content, and otherwise the smaller of
+         * the block it was drawn to and a share of the card. On a handset the
+         * drawn block wins and nothing moves.
+         */
+        height: Math.max(implicitHeight,
+                         Math.min(Units.gu(10), simPinInput.height * 0.18))
+
+        /*
+         * Above the heading rather than below it, because it is the thing that
+         * decides whether the rest of the card applies to you: which card the
+         * digits are going to matters before what they are called.
+         */
+        Label {
+            id: simLabel
+
+            visible: simPinInput._simLabel.length > 0
+            Layout.alignment: Qt.AlignHCenter
+            Layout.fillWidth: true
+            horizontalAlignment: Text.AlignHCenter
+            elide: Text.ElideRight
+
+            font.pixelSize: FontUtils.sizeToPixels("medium")
+            font.capitalization: Font.AllUppercase
+            font.letterSpacing: 1
+            color: appTheme.subForegroundColor
+
+            text: simPinInput._simLabel
+        }
 
         Label {
             id: title
@@ -162,6 +229,11 @@ Item {
             right:parent.right
         }
 
+        // The dots need a fraction of what the artwork's bar is drawn for, and
+        // on a short card that bar is a row of keys' worth of nothing. Same
+        // bargain the dialer makes: the keys are what the card is for.
+        fieldHeight: Math.min(Units.gu(7), simPinInput.height * 0.1)
+
         textColor: appTheme.foregroundColor
         echoMode: TextInput.Password
         isPhoneNumber: false
@@ -215,7 +287,10 @@ Item {
         id: emergencyButton
 
         width: parent.width / 3
-        height: Units.gu(5)
+        // A tenth of the card at most. It is the one button here nobody is
+        // aiming for in the ordinary case, and every pixel it gives up goes to
+        // the keys, which on three attempts had better be hittable.
+        height: Math.min(Units.gu(5), simPinInput.height * 0.1)
 
         text: qsTr("Emergency")
 

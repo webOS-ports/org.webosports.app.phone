@@ -42,6 +42,16 @@ Item {
 
     height: bgImage.height
 
+    /**
+     * How tall to draw the field.
+     *
+     * Seven grid units is what the background artwork is drawn for and what
+     * every caller but one wants. The dialer overrides it on a screen with no
+     * height to spare, where the field giving a little back is what buys the
+     * keys a row worth pressing.
+     */
+    property real fieldHeight: Units.gu(7)
+
     property alias text: textEdit.text
     property string textColor: "white"
     property alias alignment: textEdit.horizontalAlignment
@@ -148,22 +158,42 @@ Item {
             left: parent.left
             right: parent.right
         }
-        height: Units.gu(7);
+        height: numberEntry.fieldHeight
         source: appTheme.image("dialer-entry-bg.png")
     }
 
     Image {
         id:backspace
 
-        width: Units.gu(5)
-        height: Units.gu(3)
+        /*
+         * Hugs the glyph instead of reserving a box for it.
+         *
+         * The artwork is 49x27, drawn to fit whatever height the field has, so
+         * a fixed width only pads it with emptiness -- and that padding came
+         * straight off the number. Five grid units of icon and three of margin
+         * is 128 pixels, better than a third of a Q25's field, which left a
+         * ten-digit number needing 206 pixels of the 207 there were. It fitted
+         * by one pixel, and anything longer did not fit at all.
+         *
+         * Kept inside the field as well: where the field has been squeezed, an
+         * icon drawn for a full-height one would crowd the number beside it.
+         *
+         * The target does not shrink with the glyph; see the MouseArea.
+         */
+        height: Math.min(Units.gu(3), numberEntry.fieldHeight * 0.45)
+        // Guarded because the theme is loaded rather than built alongside this,
+        // so it arrives a pass after the bindings first run; square until it
+        // lands, and the icon is invisible until there is text anyway.
+        width: height * (appTheme ? appTheme.backspaceIconImageSize.width
+                                    / appTheme.backspaceIconImageSize.height
+                                  : 1)
         fillMode: Image.PreserveAspectFit
         visible: textEdit.text.length > 0
 
         anchors {
             verticalCenter: parent.verticalCenter
             right: parent.right
-            margins: Units.gu(3)
+            margins: Units.gu(2)
         }
         source: appTheme.image("icon-m-common-backspace.svg")
 
@@ -173,7 +203,9 @@ Item {
             // reaches well past the icon on either side.
             anchors.verticalCenter: parent.verticalCenter
             anchors.horizontalCenter: parent.horizontalCenter
-            width: parent.width + Units.gu(6)
+            // Measured from the field, not from the glyph, so hugging the
+            // artwork above did not quietly shrink what a thumb has to hit.
+            width: parent.width + Units.gu(8)
             height: bgImage.height
 
             onClicked: numberEntry.backspace();
@@ -184,16 +216,38 @@ Item {
     TextField {
         id: textEdit
 
+        /*
+         * The indents are the artwork's, and the artwork is a bar the width of
+         * a Pre3. Held to a tenth of the field on anything narrower, or the
+         * placeholder loses its last word to an indent drawn for a bar half as
+         * wide again: "Enter pho...".
+         *
+         * And the backspace is only in the way when it is there to be in the
+         * way. It keeps its geometry while hidden -- it is anchored, not laid
+         * out -- so reaching past it to the edge of the field is what gives an
+         * empty field the room the icon would otherwise reserve from it.
+         */
         anchors {
             verticalCenter: backspace.verticalCenter
-            right: backspace.left
+            right: backspace.visible ? backspace.left : parent.right
             left: parent.left
-            leftMargin: Units.gu(4)
-            rightMargin: Units.gu(3)
+            leftMargin: Math.min(Units.gu(4), numberEntry.width * 0.1)
+            // The gap to the backspace icon. Three grid units of it was
+            // another forty-eight pixels of the number's, for a space that
+            // only has to read as a gap.
+            rightMargin: Units.gu(1.5)
         }
 
         activeFocusOnPress: false
-        inputMethodHints: Qt.ImhDialableCharactersOnly
+        /*
+         * Nothing typed in the phone app is prose, so the keyboard's word
+         * ribbon has nothing to offer here -- and on a device with a hardware
+         * keyboard it is up whenever a field has focus, a strip of guesses
+         * laid over the bottom of the app. On the Q25 that is exactly where
+         * the tab bar is. ImhNoPredictiveText is what maliit reads to turn
+         * its word engine off (see InputMethod::update).
+         */
+        inputMethodHints: Qt.ImhDialableCharactersOnly | Qt.ImhNoPredictiveText
         color: "transparent"
         horizontalAlignment: TextInput.AlignLeft
         placeholderText: isPhoneNumber ? qsTr("Enter phone number") : ""
@@ -225,9 +279,15 @@ Item {
                 // Shrink long dial strings so they stay on one line, following
                 // the steps the legacy dialer used.
                 var length = numberEntry.displayText.length;
-                if (length <= 12) return FontUtils.sizeToPixels("large");
-                if (length <= 16) return FontUtils.sizeToPixels("medium");
-                return FontUtils.sizeToPixels("small");
+                var size;
+                if (length <= 12) size = FontUtils.sizeToPixels("large");
+                else if (length <= 16) size = FontUtils.sizeToPixels("medium");
+                else size = FontUtils.sizeToPixels("small");
+
+                // Those steps assume the field is as tall as the artwork wants.
+                // Where it is not, the number comes down with it rather than
+                // filling the bar top to bottom.
+                return Math.min(size, numberEntry.fieldHeight * 0.5);
             }
 
             text: (textEdit.echoMode === TextInput.Password)

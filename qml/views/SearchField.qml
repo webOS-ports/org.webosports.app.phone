@@ -39,6 +39,9 @@ TextField {
 
     height: Units.gu(4)
 
+    // A name or a number, never a sentence: no word ribbon over the app.
+    inputMethodHints: Qt.ImhNoPredictiveText
+
     color: '#2a2929'
     placeholderTextColor: '#8a8a8a'
     font.pixelSize: FontUtils.sizeToPixels("medium")

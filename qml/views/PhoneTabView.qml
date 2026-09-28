@@ -222,7 +222,14 @@ Item {
             top: tabView.phoneUi ? undefined : parent.top
             bottom: tabView.phoneUi ? parent.bottom : undefined
         }
-        height: Units.gu(6)
+
+        // Six grid units is the bar the reference draws, and on a screen the
+        // shape of a Pre3 that is a twelfth of it. On the Q25's square one the
+        // same six units are an eighth of the app and the keypad below is
+        // already short of height, so the bar is held to that eighth: it is
+        // chrome, and chrome does not get to grow into the thing it frames.
+        // The bar shrinks its icons to suit; see PhoneTabBar.
+        height: Math.min(Units.gu(6), tabView.height / 8)
         color: appTheme.tabBarColor
 
         LuneComponents.AppMenuButton {
@@ -414,13 +421,26 @@ Item {
             onContactLookupRequested: (prefix) => {
                 dialpadOverlay.close();
                 tabView.showContacts();
-                if (tabPhone.item) tabPhone.item.initialFilter = prefix;
+                if (tabPhone.item) {
+                    tabPhone.item.initialFilter = prefix;
+                    // Asked for by name, so the cursor goes in the field: the
+                    // user came here to carry on typing. Nothing else focuses
+                    // it, which is what keeps the keyboard down elsewhere.
+                    tabPhone.item.focusSearch();
+                }
             }
 
             // Once the call is placed the keypad has done its job; leaving it
             // up hides the call it just started.
             onDialled: dialpadOverlay.close()
         }
+
+        // Whatever had focus before the keypad opened -- a search field on the
+        // page behind, most often -- has to give it up now. Through the page's
+        // own function, because where the focus belongs inside it is the
+        // keypad's business: focusing the page itself would take it off the
+        // item that is actually listening.
+        onOpened: if (contentItem && contentItem.takeKeyFocus) contentItem.takeKeyFocus()
 
         onClosed: if (contentItem && contentItem.reset) contentItem.reset()
     }

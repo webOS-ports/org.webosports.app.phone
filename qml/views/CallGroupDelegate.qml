@@ -73,6 +73,36 @@ Column {
     /// True while the row is swiped aside to show its delete button.
     property bool pendingDelete: false
 
+    /**
+     * What the name and the service line have left to share.
+     *
+     * The row is a photo, two lines of text, the call type, the time and the
+     * disclosure button. Everything but the text has a size of its own, so
+     * what the text may take is the row less all of them -- and a long enough
+     * line has to elide rather than push a neighbour off the end.
+     *
+     * The two lines used to be capped at a share of the row instead, 55% and
+     * 62%, which is right on a screen where 62% of the row is smaller than
+     * what is left over and wrong on one where it is not. On a Q25 it was not:
+     * "WHATSAPP +31 6 2148 9831" took its 62% and shoved the disclosure button
+     * out through the side of the list, and the row below lost half of one.
+     *
+     * Measured off callGroupDelegate.width, which is the row's own and settled
+     * before any of this is laid out. Asking the layout would feed it its own
+     * answer, and an eliding Text reports the elided width as its implicit
+     * one, so bounding it that way collapses it a word at a time.
+     */
+    readonly property real detailsWidth: {
+        var fixed = Units.gu(4.4)          // the photo
+                  + Units.gu(2.2)          // what kind of call it was
+                  + Units.gu(5)            // the time
+                  + Units.gu(3.4)          // the disclosure button
+                  + Units.gu(1) * 4        // the gaps between those and the text
+                  + Units.gu(0.8) * 2;     // the row's own margins
+
+        return Math.max(Units.gu(6), callGroupDelegate.width - fixed);
+    }
+
     // Swipe-to-delete, as on the legacy call log's SwipeableItem rows.
     Item {
         id: swipeRow
@@ -147,6 +177,10 @@ Column {
 
                 ColumnLayout {
                     Layout.fillWidth: true
+                    // The ceiling the two lines are elided against, so a long
+                    // one cannot push the time and the disclosure button off
+                    // the end of the row.
+                    Layout.maximumWidth: callGroupDelegate.detailsWidth
                     spacing: Units.gu(0.2)
 
                     RowLayout {
@@ -154,12 +188,11 @@ Column {
                         spacing: Units.gu(0.6)
 
                         Text {
-                            // Capped against the row rather than the layout:
-                            // asking the layout how wide it is would feed it
-                            // its own result, and an eliding Text reports the
-                            // elided width as its implicit one, so bounding it
-                            // by that collapses it a word at a time.
-                            Layout.maximumWidth: callGroupDelegate.width * 0.55
+                            // Capped against what the row has left for text,
+                            // and shrunk further by the layout when the count
+                            // pill and the star are there to be fitted beside
+                            // it. See detailsWidth.
+                            Layout.maximumWidth: callGroupDelegate.detailsWidth
                             color: appTheme.listTextColor
                             elide: Text.ElideRight
                             font.pixelSize: FontUtils.sizeToPixels("medium")
@@ -218,7 +251,7 @@ Column {
                         spacing: Units.gu(0.5)
 
                         Text {
-                            Layout.maximumWidth: callGroupDelegate.width * 0.62
+                            Layout.maximumWidth: callGroupDelegate.detailsWidth
                             color: appTheme.callLogDetailColor
                             elide: Text.ElideRight
                             font.pixelSize: FontUtils.sizeToPixels("small")

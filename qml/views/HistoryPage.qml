@@ -25,6 +25,7 @@ import LuneOS.Components 1.0
 import LuneOS.Service 1.0
 
 import "../services/PhoneNumberUtils.js" as PhoneNumberUtils
+import "../services/TypeAhead.js" as TypeAhead
 
 BasePage {
     id: historyPageId
@@ -36,28 +37,71 @@ BasePage {
 
     property alias historyModel: historyListViewModel.sourceModel
 
-    // All / Missed button chooser
-    Row {
+    /*
+     * Typing filters the log, without putting the cursor in the field first.
+     *
+     * The page holds key focus, not the field: focus on a text field is what
+     * raises the on-screen keyboard, and on a phone with keys of its own that
+     * would cover the very list being filtered. Tapping the field still works
+     * the ordinary way. See TypeAhead.js.
+     */
+    focus: true
+    onVisibleChanged: if (visible) historyPageId.forceActiveFocus();
+    Component.onCompleted: if (visible) historyPageId.forceActiveFocus();
+
+    Keys.onPressed: (event) => {
+        event.accepted = TypeAhead.handleKey(event, searchFieldInput);
+    }
+
+    /*
+     * All / Missed, and the filter.
+     *
+     * Laid out against the edges of the page rather than centred at three
+     * fixed widths. Those widths came to more than a Q25 is wide, and a
+     * centred row that does not fit overflows at both ends at once: the
+     * chooser ran off the left of the screen while the filter ran off the
+     * right, with the rounded end of the pill somewhere past the bezel.
+     *
+     * The chooser keeps its size, because a radio button has to hold its
+     * caption; the filter takes what is left, because a field is as useful
+     * short as it is long.
+     */
+    Item {
         id: allOrMissedRect
-        anchors.horizontalCenter: parent.horizontalCenter
+
+        anchors {
+            top: parent.top
+            left: parent.left
+            right: parent.right
+            leftMargin: Units.gu(0.8)
+            rightMargin: Units.gu(0.8)
+        }
         height: Units.gu(4)
-        spacing: Units.gu(3)
 
         Row {
+            id: allOrMissedChooser
+
+            anchors.left: parent.left
             anchors.verticalCenter: parent.verticalCenter
             height: parent.height
+
+            /// Enough for "Missed" and its dot, and no more than a third of
+            /// the page each, so two captions cannot crowd out the filter.
+            readonly property real buttonWidth:
+                Math.min(Units.gu(14), (allOrMissedRect.width - Units.gu(8)) / 2)
+
             RadioButton {
                 text: "All"
                 LuneOSRadioButton.useCollapsedLayout: true
                 checked: true
-                width: Units.gu(14)
+                width: allOrMissedChooser.buttonWidth
                 height: parent.height
             }
             RadioButton {
                 id: buttonOnlyMissed
                 text: "Missed"
                 LuneOSRadioButton.useCollapsedLayout: true
-                width: Units.gu(14)
+                width: allOrMissedChooser.buttonWidth
                 height: parent.height
             }
         }
@@ -72,8 +116,12 @@ BasePage {
             appTheme: historyPageId.appTheme
             id: searchFieldInput
 
-            anchors.verticalCenter: parent.verticalCenter
-            width: Units.gu(20)
+            anchors {
+                left: allOrMissedChooser.right
+                leftMargin: Units.gu(1.5)
+                right: parent.right
+                verticalCenter: parent.verticalCenter
+            }
 
             placeholderText: qsTr("Filter")
         }

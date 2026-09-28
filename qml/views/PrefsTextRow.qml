@@ -56,7 +56,7 @@ Item {
         anchors.verticalCenter: parent.verticalCenter
 
         horizontalAlignment: TextInput.AlignRight
-        inputMethodHints: Qt.ImhDialableCharactersOnly
+        inputMethodHints: Qt.ImhDialableCharactersOnly | Qt.ImhNoPredictiveText
         placeholderText: prefsTextRow.placeholder
         color: appTheme.prefsTextColor
         placeholderTextColor: 'grey'
