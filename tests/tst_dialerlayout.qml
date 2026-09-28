@@ -151,9 +151,18 @@ TestCase {
             var page = _dialer(names[i], Settings.displayHeight - Units.gu(6));
             var pad = findChild(page, "numPad");
             var button = findChild(page, "dialButton");
+            var entry = findChild(page, "numberEntry");
 
             verify(pad !== null, names[i] + ": no keypad to measure");
             verify(button !== null, names[i] + ": no dial button to measure");
+            verify(entry !== null, names[i] + ": no number field to measure");
+
+            // The field too: the column is one width from the top of it to the
+            // bottom of the button, and a field wider than the pad it belongs
+            // to reads as a mistake in exactly the way an oversized backdrop
+            // did.
+            compare(entry.width, page.keypadWidth,
+                    names[i] + ": the number field is not the width of the keys");
 
             compare(pad.keysWidth * 3, page.keypadWidth,
                     names[i] + ": the grid does not fill the width it was given");

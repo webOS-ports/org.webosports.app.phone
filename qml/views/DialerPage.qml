@@ -207,13 +207,27 @@ BasePage {
 
         anchors.horizontalCenter: parent.horizontalCenter
         anchors.verticalCenter: parent.verticalCenter
-        width: pDialPage.padWidth
+
+        /*
+         * The column is one width all the way down.
+         *
+         * padWidth is what the page has to give; keypadWidth is what the dial
+         * button's artwork can actually be drawn at, and so what the keys and
+         * the backdrop take. The panel takes it too, which is what puts the
+         * number field on the same two edges as everything under it -- it had
+         * been left at the full width, and a field wider than the pad it
+         * belongs to reads as a mistake in the same way an oversized backdrop
+         * did.
+         */
+        width: pDialPage.keypadWidth
         height: pDialPage.entryHeight + pDialPage.matchHeight
                 + pDialPage.padKeysHeight + pDialPage.dialHeight
 
         NumberEntry {
             appTheme: pDialPage.appTheme
             id: numEntry
+            // Named so the layout tests can measure it.
+            objectName: "numberEntry"
 
             anchors {
                 top: parent.top
@@ -276,31 +290,25 @@ BasePage {
         anchors {
             top: matchStrip.bottom
             bottom: dialButton.top
-            horizontalCenter: parent.horizontalCenter
+            left: parent.left
+            right: parent.right
         }
 
-        // Same width as the dial button below, which is the width the button's
-        // artwork can be drawn at without stretching the handset on it.
-        gridWidth: pDialPage.keypadWidth
-
         /*
-         * The backdrop is exactly the keys, and so exactly the dial button.
+         * The keys fill the panel, backdrop and all.
          *
-         * Three things are stacked here -- the backdrop, the keys drawn on it,
-         * and the button below -- and any one of them a different width from
-         * the other two is the thing that catches the eye. It has now been
-         * wrong in both directions: first the backdrop filled the page while
-         * the keys came in to meet the button, which left a black field with a
-         * keypad adrift in it; then it was given an inset of its own, which
-         * made it stick out past the keys and the button alike by half a grid
-         * unit each side. There is no width here that is right for the
-         * backdrop except the one the other two have.
+         * The panel is already keypadWidth -- the width the dial button's
+         * artwork can be drawn at -- so the grid takes all of it rather than
+         * leaving an inset of its own. That inset is what went wrong last
+         * time: it put 451 pixels of backdrop around 416 of keys and 416 of
+         * button, sticking out past both. Any one of the things stacked here a
+         * different width from the others is the thing that catches the eye.
          *
-         * Vertically it keeps the margin it always had, which is where the
-         * keys get their breathing room from the field above and the button
+         * Vertically the keys keep the margin they always had, which is where
+         * they get their breathing room from the field above and the button
          * below; see NumPad.keysHeight.
          */
-        width: pDialPage.keypadWidth
+        gridWidth: pDialPage.keypadWidth
 
         function vibrateFailure(message) {
             console.log("Unable to vibrate");

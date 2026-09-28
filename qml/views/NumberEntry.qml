@@ -196,11 +196,22 @@ Item {
     TextField {
         id: textEdit
 
+        /*
+         * The indents are the artwork's, and the artwork is a bar the width of
+         * a Pre3. Held to a tenth of the field on anything narrower, or the
+         * placeholder loses its last word to an indent drawn for a bar half as
+         * wide again: "Enter pho...".
+         *
+         * And the backspace is only in the way when it is there to be in the
+         * way. It keeps its geometry while hidden -- it is anchored, not laid
+         * out -- so reaching past it to the edge of the field is what gives an
+         * empty field the room the icon would otherwise reserve from it.
+         */
         anchors {
             verticalCenter: backspace.verticalCenter
-            right: backspace.left
+            right: backspace.visible ? backspace.left : parent.right
             left: parent.left
-            leftMargin: Units.gu(4)
+            leftMargin: Math.min(Units.gu(4), numberEntry.width * 0.1)
             rightMargin: Units.gu(3)
         }
 
