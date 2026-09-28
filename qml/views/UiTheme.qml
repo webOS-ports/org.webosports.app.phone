@@ -117,6 +117,20 @@ QtObject {
     property size footerButtonImageSize: Qt.size(612, 297)
 
     /**
+     * The backspace glyph in the dial field, at its own proportions.
+     *
+     * icon-m-common-backspace.svg is 49x27 in both artwork sets. Named here
+     * rather than read off the image because an Image reports no implicit size
+     * until it has loaded, and a width derived from that collapses to nothing
+     * in the meantime -- which is a field whose layout depends on how quickly
+     * the disk answered.
+     *
+     * The field draws the glyph to its own height and takes the width from
+     * this, so it reserves the glyph and not a box around it.
+     */
+    property size backspaceIconImageSize: Qt.size(49, 27)
+
+    /**
      * The rounded cap at either end of a SIM PIN card button, in pixels of
      * that look's own artwork. Only what lies between the two caps stretches
      * to the width the button ends up with, so a cap narrower than the real

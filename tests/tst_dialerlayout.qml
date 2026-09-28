@@ -54,29 +54,40 @@ TestCase {
     function cleanupTestCase() { Settings.setProfile(_startingProfile); }
 
     /**
-     * The dialer as the app would build it, at a given page height.
+     * The dialer as the app would build it, on a given device.
      *
      * How much height there is to divide is not the panel's: the status bar
      * and the gesture area are the compositor's, the tab bar is the app's, and
-     * what is left over is what the keypad gets. On the Q25 that came to 512
-     * of the panel's 720. Rather than hard-code the compositor's share, the
-     * cases below walk a range of it, so the arithmetic is pinned for whatever
-     * the shell ends up handing over.
+     * what is left over is what the keypad gets. On the Q25 that came to 512 of
+     * the panel's 720. \a cardShare is that share, 1 being the whole panel, so
+     * the cases below can walk a range of it rather than hard-coding what one
+     * shell happens to hand over.
+     *
+     * A share rather than a height because a height has to be worked out from
+     * Settings, and Settings is what setProfile() changes: a caller computing
+     * one would be reading whichever profile the test before it left behind.
+     * That is an order dependency waiting to bite, and it did -- adding a test
+     * above the others silently moved a later one onto a different screen and
+     * failed it.
+     *
+     * Taken as a fraction rather than a height because a height has to be
+     * worked out from Settings, and Settings is what setProfile() changes: a
+     * caller computing one would be reading the profile that happened to be in
+     * force from the test before, which is an order dependency waiting to bite.
+     * It did -- adding a test above the others silently moved a later one onto
+     * a different screen and failed it.
      */
-    function _dialer(profile, pageHeight) {
+    function _dialer(profile, cardShare) {
         verify(Settings.setProfile(profile), "could not select " + profile);
+
+        var share = (cardShare === undefined) ? 1 : cardShare;
+        var pageHeight = Math.round(Settings.displayHeight * share) - Units.gu(6);
+
         var page = createTemporaryObject(dialerComponent, this,
                                          { width: Settings.displayWidth,
                                            height: pageHeight });
         verify(page !== null, profile + ": the dialer would not load");
         return page;
-    }
-
-    function _pageHeights(fractions) {
-        var heights = [];
-        for (var i = 0; i < fractions.length; ++i)
-            heights.push(Math.round(Settings.displayHeight * fractions[i]) - Units.gu(6));
-        return heights;
     }
 
     /// The point of the whole exercise: on a screen no taller than it is wide,
@@ -86,10 +97,10 @@ TestCase {
 
         // The whole panel, then the card the Q25's shell actually hands over,
         // then tighter still.
-        var heights = _pageHeights([1.0, 0.845, 0.78]);
-        for (var i = 0; i < heights.length; ++i) {
-            var page = _dialer("q25", heights[i]);
-            var where = "q25 at " + heights[i] + "px";
+        var shares = [1.0, 0.845, 0.78];
+        for (var i = 0; i < shares.length; ++i) {
+            var page = _dialer("q25", shares[i]);
+            var where = "q25 at " + page.height + "px";
 
             // Half a pixel of slack: where the chrome is squeezed the keys get
             // exactly the share, and exactly is a hair under it in floating
@@ -111,7 +122,7 @@ TestCase {
     /// And a tall screen is left exactly as it was: the chrome is only ever
     /// squeezed when it would not otherwise fit.
     function test_a_tall_screen_keeps_the_natural_sizes() {
-        var page = _dialer("gnex", Settings.displayHeight - Units.gu(6));
+        var page = _dialer("gnex");
 
         compare(page.chromeScale, 1, "a tall screen should not be scaling anything");
         compare(page.entryHeight, Units.gu(7), "the field lost its natural height");
@@ -125,7 +136,7 @@ TestCase {
     function test_the_dial_button_keeps_its_proportions() {
         var names = ["q25", "gnex"];
         for (var i = 0; i < names.length; ++i) {
-            var page = _dialer(names[i], Settings.displayHeight - Units.gu(6));
+            var page = _dialer(names[i]);
 
             verify(page.dialHeight <= page.naturalDialHeight + 0.5,
                    names[i] + ": the button grew past its natural height");
@@ -148,7 +159,7 @@ TestCase {
     function test_the_keys_and_the_dial_button_are_the_same_width() {
         var names = ["q25", "gnex"];
         for (var i = 0; i < names.length; ++i) {
-            var page = _dialer(names[i], Settings.displayHeight - Units.gu(6));
+            var page = _dialer(names[i]);
             var pad = findChild(page, "numPad");
             var button = findChild(page, "dialButton");
             var entry = findChild(page, "numberEntry");

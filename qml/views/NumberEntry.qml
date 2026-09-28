@@ -165,17 +165,35 @@ Item {
     Image {
         id:backspace
 
-        // Kept inside the field: where that has been squeezed, an icon drawn
-        // for the full-height one would crowd the number beside it.
-        width: Units.gu(5)
+        /*
+         * Hugs the glyph instead of reserving a box for it.
+         *
+         * The artwork is 49x27, drawn to fit whatever height the field has, so
+         * a fixed width only pads it with emptiness -- and that padding came
+         * straight off the number. Five grid units of icon and three of margin
+         * is 128 pixels, better than a third of a Q25's field, which left a
+         * ten-digit number needing 206 pixels of the 207 there were. It fitted
+         * by one pixel, and anything longer did not fit at all.
+         *
+         * Kept inside the field as well: where the field has been squeezed, an
+         * icon drawn for a full-height one would crowd the number beside it.
+         *
+         * The target does not shrink with the glyph; see the MouseArea.
+         */
         height: Math.min(Units.gu(3), numberEntry.fieldHeight * 0.45)
+        // Guarded because the theme is loaded rather than built alongside this,
+        // so it arrives a pass after the bindings first run; square until it
+        // lands, and the icon is invisible until there is text anyway.
+        width: height * (appTheme ? appTheme.backspaceIconImageSize.width
+                                    / appTheme.backspaceIconImageSize.height
+                                  : 1)
         fillMode: Image.PreserveAspectFit
         visible: textEdit.text.length > 0
 
         anchors {
             verticalCenter: parent.verticalCenter
             right: parent.right
-            margins: Units.gu(3)
+            margins: Units.gu(2)
         }
         source: appTheme.image("icon-m-common-backspace.svg")
 
@@ -185,7 +203,9 @@ Item {
             // reaches well past the icon on either side.
             anchors.verticalCenter: parent.verticalCenter
             anchors.horizontalCenter: parent.horizontalCenter
-            width: parent.width + Units.gu(6)
+            // Measured from the field, not from the glyph, so hugging the
+            // artwork above did not quietly shrink what a thumb has to hit.
+            width: parent.width + Units.gu(8)
             height: bgImage.height
 
             onClicked: numberEntry.backspace();
@@ -212,7 +232,10 @@ Item {
             right: backspace.visible ? backspace.left : parent.right
             left: parent.left
             leftMargin: Math.min(Units.gu(4), numberEntry.width * 0.1)
-            rightMargin: Units.gu(3)
+            // The gap to the backspace icon. Three grid units of it was
+            // another forty-eight pixels of the number's, for a space that
+            // only has to read as a gap.
+            rightMargin: Units.gu(1.5)
         }
 
         activeFocusOnPress: false
