@@ -284,19 +284,23 @@ BasePage {
         gridWidth: pDialPage.keypadWidth
 
         /*
-         * The backdrop comes in with the keys rather than filling the page.
+         * The backdrop is exactly the keys, and so exactly the dial button.
          *
-         * It used to be anchored across the panel, which was right while the
-         * keys were too: both were the full width and the backdrop was simply
-         * what lay behind them. Once the keys came in to meet the dial button
-         * the backdrop stayed where it was, and what had been a pad became a
-         * black field with a keypad adrift in the middle of it.
+         * Three things are stacked here -- the backdrop, the keys drawn on it,
+         * and the button below -- and any one of them a different width from
+         * the other two is the thing that catches the eye. It has now been
+         * wrong in both directions: first the backdrop filled the page while
+         * the keys came in to meet the button, which left a black field with a
+         * keypad adrift in it; then it was given an inset of its own, which
+         * made it stick out past the keys and the button alike by half a grid
+         * unit each side. There is no width here that is right for the
+         * backdrop except the one the other two have.
          *
-         * One inset of a couple of grid units all round, which is the margin
-         * the keys already had from the top and bottom of it -- so the frame
-         * reads the same on all four sides.
+         * Vertically it keeps the margin it always had, which is where the
+         * keys get their breathing room from the field above and the button
+         * below; see NumPad.keysHeight.
          */
-        width: pDialPage.keypadWidth + Units.gu(2)
+        width: pDialPage.keypadWidth
 
         function vibrateFailure(message) {
             console.log("Unable to vibrate");

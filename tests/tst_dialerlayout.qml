@@ -159,6 +159,13 @@ TestCase {
                     names[i] + ": the grid does not fill the width it was given");
             compare(button.width, page.keypadWidth,
                     names[i] + ": the button is not the width of the keys");
+            // And the backdrop they are drawn on. Three things stacked one
+            // above another, and any one of them a different width from the
+            // other two is the thing that catches the eye -- this has been
+            // wrong in both directions already, once too wide and once too
+            // narrow.
+            compare(pad.width, page.keypadWidth,
+                    names[i] + ": the pad's backdrop is not the width of its keys");
             verify(page.keypadWidth <= page.naturalKeypadWidth,
                    names[i] + ": the keys grew past the pad");
         }
