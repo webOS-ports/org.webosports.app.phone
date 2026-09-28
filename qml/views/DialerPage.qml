@@ -53,11 +53,11 @@ BasePage {
      * without Alt. The page holding key focus, which is where this started,
      * gets the keys and none of that.
      *
-     * ImhNoOnScreenKeyboard is what keeps the panel down, and it is worth
+     * imhNoOnScreenKeyboard below is what keeps the panel down, and it is worth
      * knowing that it did not always: focus alone put a numeric keyboard over
      * the dialpad on a FLX1s, because this stack raises the panel by
      * activating the field and had no way to be told otherwise. It has one
-     * now -- the hint is carried on the content hint through qtwayland-webos
+     * now -- the bit is carried on the content hint through qtwayland-webos
      * and maliit-framework-webos, and webos-keyboard leaves the keys down for
      * a field that asks. All three have to be built for this to be safe.
      *
@@ -78,8 +78,22 @@ BasePage {
         // is for.
         activeFocusOnTab: false
 
+        /**
+         * "This field has a keypad of its own; do not draw one over it."
+         *
+         * Not a Qt hint -- Qt has none for this. Its enum stops at
+         * ImhNoTextHandles (0x1000) and the next three bits are free before
+         * ImhExclusiveInputMask claims the top half, so webOS takes the last
+         * of them: the furthest from whatever Qt allocates next, and outside
+         * the exclusive mask so it can never be read as an input filter.
+         * QFlags keeps a bit it does not recognise, so it reaches
+         * qtwayland-webos, which is where it is read; the two have to agree on
+         * the value and each says so.
+         */
+        readonly property int imhNoOnScreenKeyboard: 0x8000
+
         inputMethodHints: Qt.ImhDialableCharactersOnly | Qt.ImhNoPredictiveText
-                          | Qt.ImhNoOnScreenKeyboard
+                          | imProxy.imhNoOnScreenKeyboard
 
         // The tab/stack machinery briefly hands focus elsewhere just after
         // load, so reclaim it whenever the dialer is the visible page.
