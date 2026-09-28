@@ -435,11 +435,12 @@ Item {
             onDialled: dialpadOverlay.close()
         }
 
-        // The keypad holds key focus itself rather than letting its field have
-        // it, which is how the hardware keys reach it without raising the
-        // on-screen keyboard. Whatever had focus before it opened -- a search
-        // field on the page behind, most often -- has to give it up now.
-        onOpened: if (contentItem) contentItem.forceActiveFocus()
+        // Whatever had focus before the keypad opened -- a search field on the
+        // page behind, most often -- has to give it up now. Through the page's
+        // own function, because where the focus belongs inside it is the
+        // keypad's business: focusing the page itself would take it off the
+        // item that is actually listening.
+        onOpened: if (contentItem && contentItem.takeKeyFocus) contentItem.takeKeyFocus()
 
         onClosed: if (contentItem && contentItem.reset) contentItem.reset()
     }

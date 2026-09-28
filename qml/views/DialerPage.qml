@@ -39,43 +39,168 @@ BasePage {
     /// put it away.
     signal dialled();
 
-    // Hardware numeric keypad -> dialer. The page itself holds key focus -- not
-    // numEntry's TextField, which is activeFocusOnPress:false -- so physical keys
-    // reach us without raising the on-screen keyboard or activating the maliit
-    // input context. The tab/stack machinery briefly hands focus elsewhere just
-    // after load, so reclaim it whenever the dialer is the visible page.
-    focus: true
-    onVisibleChanged: if (visible) pDialPage.forceActiveFocus();
-    onActiveFocusChanged: if (!activeFocus && visible) refocusTimer.restart();
-    Component.onCompleted: pDialPage.forceActiveFocus();
+    /**
+     * What the input method thinks has focus.
+     *
+     * The page used to hold key focus itself, with no text field focused
+     * anywhere, so that physical keys reached it without raising the on-screen
+     * keyboard. That worked for keys that arrive as keys, and it cost the
+     * dialer everything that depends on the input method knowing what sort of
+     * field is in front of the user -- on a phone QWERTY, the digits printed
+     * on the letter keys. With nothing focused the plugin is never told to
+     * redirect keys at all (InputMethodHost::setRedirectKeys is called from
+     * handleFocusChange), never learns the content type, and so never offers
+     * the digits without Alt. /run/maliit-text-focus read 0 with the keypad on
+     * screen, which is the whole of the problem in one byte.
+     *
+     * So something does have focus now, and it is this: an item with no size
+     * and nothing drawn, whose only job is to tell the input method that a
+     * dial string is being typed. The field the user sees is still
+     * numEntry, still activeFocusOnPress:false, and still the only thing that
+     * holds the number -- which is what keeps every character going through
+     * the app's own path, feedback, in-call DTMF and all, rather than being
+     * committed straight into a field behind its back.
+     *
+     * The on-screen keyboard does not come up for it. Focus alone never raises
+     * the panel -- Qt asks for it on a tap, and there is nothing here to tap --
+     * and ImhNoOnScreenKeyboard says so outright for the case where something
+     * else would.
+     */
+    TextInput {
+        id: imProxy
 
-    Keys.onPressed: (event) => {
-        var k = event.key;
-        if ((k >= Qt.Key_0 && k <= Qt.Key_9) ||
-            k === Qt.Key_Asterisk || k === Qt.Key_NumberSign || k === Qt.Key_Plus) {
-            // Route through the on-screen pad's signal so hardware keys get the
-            // same feedback, in-call DTMF and insert handling as tapped keys.
-            numPad.sendKey(k);
-        } else if (k === Qt.Key_Backspace || k === Qt.Key_Delete) {
-            numEntry.backspace();
-        } else if (k === Qt.Key_Call || k === Qt.Key_Yes ||
-                   k === Qt.Key_Return || k === Qt.Key_Enter) {
-            pDialPage.dial();
-        } else {
-            event.accepted = false;
-            return;
+        width: 1
+        height: 1
+        opacity: 0
+        // visible:false would make it unfocusable, which is the one thing it
+        // is for.
+        activeFocusOnTab: false
+
+        inputMethodHints: Qt.ImhDialableCharactersOnly | Qt.ImhNoPredictiveText
+                          | Qt.ImhNoOnScreenKeyboard
+
+        // The tab/stack machinery briefly hands focus elsewhere just after
+        // load, so reclaim it whenever the dialer is the visible page.
+        onActiveFocusChanged: if (!activeFocus && pDialPage.visible) refocusTimer.restart();
+
+        /*
+         * Keys first, before TextInput's own handling gets them -- which is
+         * what a Keys handler on an item does. So a digit, a backspace or the
+         * Call key is dealt with here exactly as it was before any of this,
+         * and never reaches the proxy's own text.
+         */
+        Keys.onPressed: (event) => {
+            var k = event.key;
+            if ((k >= Qt.Key_0 && k <= Qt.Key_9) ||
+                k === Qt.Key_Asterisk || k === Qt.Key_NumberSign || k === Qt.Key_Plus) {
+                // Route through the on-screen pad's signal so hardware keys get
+                // the same feedback, in-call DTMF and insert handling as tapped
+                // keys.
+                numPad.sendKey(k);
+            } else if (k === Qt.Key_Backspace || k === Qt.Key_Delete) {
+                numEntry.backspace();
+            } else if (k === Qt.Key_Call || k === Qt.Key_Yes ||
+                       k === Qt.Key_Return || k === Qt.Key_Enter) {
+                pDialPage.dial();
+            } else {
+                event.accepted = false;
+                return;
+            }
+            event.accepted = true;
         }
-        event.accepted = true;
+
+        /*
+         * And text, for the keys that do not arrive as keys.
+         *
+         * A character the keyboard plugin resolved off a key face -- the 1
+         * printed on the W of a phone QWERTY -- is committed as text through
+         * the input method, not delivered as a key press, so the handler above
+         * never sees it. It lands here instead, and goes through the same path
+         * a tapped key does before being cleared again: the proxy holds
+         * nothing, it only passes things on.
+         */
+        onTextChanged: {
+            if (text.length === 0)
+                return;
+
+            var typed = text;
+            text = "";
+
+            for (var i = 0; i < typed.length; ++i) {
+                var character = typed.charAt(i);
+                // Only what belongs in a dial string. A letter reaching here
+                // means no profile resolved it, and a letter in a phone number
+                // is noise -- the same nothing it was when the key handler
+                // above declined it.
+                if ("0123456789*#+".indexOf(character) < 0)
+                    continue;
+
+                pDialPage.keyFeedback();
+                pDialPage.handleDialCharacter(character);
+            }
+        }
     }
+
+    /// Puts key focus where the dialer needs it. Anything that brings the
+    /// keypad up calls this rather than focusing the page: focus on the page
+    /// itself is focus taken off the proxy, and the keys stop arriving.
+    function takeKeyFocus() {
+        imProxy.forceActiveFocus();
+    }
+
+    onVisibleChanged: if (visible) pDialPage.takeKeyFocus();
+    Component.onCompleted: pDialPage.takeKeyFocus();
 
     Timer {
         id: refocusTimer
         interval: 0
-        onTriggered: if (pDialPage.visible && !pDialPage.activeFocus) pDialPage.forceActiveFocus();
+        onTriggered: if (pDialPage.visible && !imProxy.activeFocus) imProxy.forceActiveFocus();
     }
 
     function reset() {
         numEntry.clear();
+    }
+
+    /**
+     * What a key does, whichever way it arrived.
+     *
+     * Three things reach the dial string now -- a tapped key, a hardware key
+     * delivered as a key press, and a character the keyboard plugin resolved
+     * off a key face and committed as text -- and all three are the user
+     * pressing a key on a dialpad. They share this so that they cannot drift
+     * apart: it would be very easy for one of them to quietly stop sending
+     * DTMF mid-call, or to stop buzzing, and hard to notice which.
+     */
+    function keyFeedback() {
+        var feedback = AppTweaks.dialpadFeedbackTweakValue;
+
+        if (feedback === "vibrateSound" || feedback === "vibrateOnly") {
+            service.call("luna://com.palm.vibrate/vibrate", JSON.stringify({
+                                                          period: 100, duration: 10
+                                                      }), undefined,
+                                       numPad.vibrateFailure)
+        }
+    }
+
+    function handleDialCharacter(character) {
+        // With a call up, the dialpad doubles as a DTMF pad.
+        if (voiceCallMgrWrapper && voiceCallMgrWrapper.activeVoiceCall) {
+            voiceCallMgrWrapper.sendDtmf(character);
+            return;
+        }
+
+        // Local dialpad feedback tone via audiod's DTMF generator
+        // (com.palm.audio/dtmf/playDTMF). Nemo's manager.startDtmfTone()
+        // routes through ngfd, which LuneOS does not run, so it is silent
+        // here. audiod plays a self-stopping one-shot; only 0-9, * and #
+        // have tones.
+        var feedback = AppTweaks.dialpadFeedbackTweakValue;
+        if ((feedback === "vibrateSound" || feedback === "soundOnly") &&
+            ((character >= "0" && character <= "9") || character === "*" || character === "#"))
+            service.call("luna://com.palm.audio/dtmf/playDTMF",
+                         JSON.stringify({name: character}), undefined, numPad.dtmfFailure);
+
+        numEntry.insert(character);
     }
 
     // Shared by the dial button and the hardware Call/Enter keys.
@@ -319,14 +444,7 @@ BasePage {
         }
 
         onSendKey: (keycode) => {
-            var feedback = AppTweaks.dialpadFeedbackTweakValue;
-
-            if (feedback === "vibrateSound" || feedback === "vibrateOnly") {
-                service.call("luna://com.palm.vibrate/vibrate", JSON.stringify({
-                                                              period: 100, duration: 10
-                                                          }), undefined,
-                                           vibrateFailure)
-            }
+            pDialPage.keyFeedback();
 
             if (keycode === Qt.Key_LaunchMail) {
                 // Long press on 1 calls voicemail, as on the original dialpad.
@@ -334,25 +452,7 @@ BasePage {
                 return;
             }
 
-            var character = String.fromCharCode(keycode);
-
-            // With a call up, the dialpad doubles as a DTMF pad.
-            if (voiceCallMgrWrapper && voiceCallMgrWrapper.activeVoiceCall) {
-                voiceCallMgrWrapper.sendDtmf(character);
-                return;
-            }
-
-            // Local dialpad feedback tone via audiod's DTMF generator
-            // (com.palm.audio/dtmf/playDTMF). Nemo's manager.startDtmfTone()
-            // routes through ngfd, which LuneOS does not run, so it is silent
-            // here. audiod plays a self-stopping one-shot; only 0-9, * and #
-            // have tones.
-            if ((feedback === "vibrateSound" || feedback === "soundOnly") &&
-                ((character >= "0" && character <= "9") || character === "*" || character === "#"))
-                service.call("luna://com.palm.audio/dtmf/playDTMF",
-                             JSON.stringify({name: character}), undefined, dtmfFailure);
-
-            numEntry.insert(character);
+            pDialPage.handleDialCharacter(String.fromCharCode(keycode));
         }
     }
 
