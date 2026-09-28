@@ -276,13 +276,27 @@ BasePage {
         anchors {
             top: matchStrip.bottom
             bottom: dialButton.top
-            left: parent.left
-            right: parent.right
+            horizontalCenter: parent.horizontalCenter
         }
 
         // Same width as the dial button below, which is the width the button's
         // artwork can be drawn at without stretching the handset on it.
         gridWidth: pDialPage.keypadWidth
+
+        /*
+         * The backdrop comes in with the keys rather than filling the page.
+         *
+         * It used to be anchored across the panel, which was right while the
+         * keys were too: both were the full width and the backdrop was simply
+         * what lay behind them. Once the keys came in to meet the dial button
+         * the backdrop stayed where it was, and what had been a pad became a
+         * black field with a keypad adrift in the middle of it.
+         *
+         * One inset of a couple of grid units all round, which is the margin
+         * the keys already had from the top and bottom of it -- so the frame
+         * reads the same on all four sides.
+         */
+        width: pDialPage.keypadWidth + Units.gu(2)
 
         function vibrateFailure(message) {
             console.log("Unable to vibrate");
