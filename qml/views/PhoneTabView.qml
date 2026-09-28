@@ -421,13 +421,25 @@ Item {
             onContactLookupRequested: (prefix) => {
                 dialpadOverlay.close();
                 tabView.showContacts();
-                if (tabPhone.item) tabPhone.item.initialFilter = prefix;
+                if (tabPhone.item) {
+                    tabPhone.item.initialFilter = prefix;
+                    // Asked for by name, so the cursor goes in the field: the
+                    // user came here to carry on typing. Nothing else focuses
+                    // it, which is what keeps the keyboard down elsewhere.
+                    tabPhone.item.focusSearch();
+                }
             }
 
             // Once the call is placed the keypad has done its job; leaving it
             // up hides the call it just started.
             onDialled: dialpadOverlay.close()
         }
+
+        // The keypad holds key focus itself rather than letting its field have
+        // it, which is how the hardware keys reach it without raising the
+        // on-screen keyboard. Whatever had focus before it opened -- a search
+        // field on the page behind, most often -- has to give it up now.
+        onOpened: if (contentItem) contentItem.forceActiveFocus()
 
         onClosed: if (contentItem && contentItem.reset) contentItem.reset()
     }

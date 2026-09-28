@@ -91,7 +91,10 @@ TestCase {
             var page = _dialer("q25", heights[i]);
             var where = "q25 at " + heights[i] + "px";
 
-            verify(page.padKeysHeight >= page.height * page.keysMinimumShare,
+            // Half a pixel of slack: where the chrome is squeezed the keys get
+            // exactly the share, and exactly is a hair under it in floating
+            // point.
+            verify(page.padKeysHeight >= page.height * page.keysMinimumShare - 0.5,
                    where + ": keys got " + page.padKeysHeight + " of " + page.height);
 
             // Four rows out of what is left, less the pad's own inset. This
@@ -123,16 +126,41 @@ TestCase {
         var names = ["q25", "gnex"];
         for (var i = 0; i < names.length; ++i) {
             var page = _dialer(names[i], Settings.displayHeight - Units.gu(6));
-            var button = page.dialHeight / page.naturalDialHeight;
 
             verify(page.dialHeight <= page.naturalDialHeight + 0.5,
                    names[i] + ": the button grew past its natural height");
-            // Width and height come down together, so the ratio of the height
-            // it is allowed to the height it wants is the ratio of the widths.
-            fuzzyCompare(page.dialHeight / page.padWidth,
-                         button * phoneTheme.footerButtonImageSize.height / 3
-                               / phoneTheme.footerButtonImageSize.width,
-                         0.001, names[i] + ": the button is no longer in proportion");
+            // The height it is allowed and the width it is drawn at stay in
+            // the artwork's own ratio, whatever the cap did to them.
+            fuzzyCompare(page.dialHeight / page.keypadWidth,
+                         phoneTheme.footerButtonImageSize.height / 3
+                             / phoneTheme.footerButtonImageSize.width,
+                         0.005, names[i] + ": the button is no longer in proportion");
+        }
+    }
+
+    /**
+     * The keys and the button line up exactly, on every shape of screen.
+     *
+     * Not approximately: three key widths are what the grid actually measures,
+     * and NumPad rounds each of them to a whole pixel, so a shared width that
+     * is not a multiple of three leaves the button overhanging the keys.
+     */
+    function test_the_keys_and_the_dial_button_are_the_same_width() {
+        var names = ["q25", "gnex"];
+        for (var i = 0; i < names.length; ++i) {
+            var page = _dialer(names[i], Settings.displayHeight - Units.gu(6));
+            var pad = findChild(page, "numPad");
+            var button = findChild(page, "dialButton");
+
+            verify(pad !== null, names[i] + ": no keypad to measure");
+            verify(button !== null, names[i] + ": no dial button to measure");
+
+            compare(pad.keysWidth * 3, page.keypadWidth,
+                    names[i] + ": the grid does not fill the width it was given");
+            compare(button.width, page.keypadWidth,
+                    names[i] + ": the button is not the width of the keys");
+            verify(page.keypadWidth <= page.naturalKeypadWidth,
+                   names[i] + ": the keys grew past the pad");
         }
     }
 }

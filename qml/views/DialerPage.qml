@@ -144,10 +144,29 @@ BasePage {
      */
     readonly property real keysMinimumShare: 0.7
 
+    /**
+     * The keys and the dial button are drawn the same width, always.
+     *
+     * They are the two things on the page a thumb aims at, sitting one above
+     * the other, and a button that stops short of the keys above it reads as a
+     * mistake -- which is what the first pass at this produced.
+     *
+     * Which of them gives way is settled by the artwork. buttons-numpad.png is
+     * a nine-slice and stretches to any size at all; dial-button.png is a
+     * fixed plate with the handset glyph painted into the middle of it, so its
+     * proportions are the one thing on this page that cannot bend. The keys
+     * come to the button's width, then, and not the other way about.
+     *
+     * The pad's backdrop still fills the page either side of them, so this
+     * narrows the block of keys rather than leaving a column of page down both
+     * edges.
+     */
+    readonly property real naturalKeypadWidth: padWidth - Units.gu(2)
+
     readonly property real naturalEntryHeight: Units.gu(7)
     readonly property real naturalMatchHeight: matchingContacts.length > 0 ? Units.gu(3.5) : 0
     /// heightPerWidth is the button's own: only it knows how its sprite is cut.
-    readonly property real naturalDialHeight: padWidth * dialButton.heightPerWidth
+    readonly property real naturalDialHeight: naturalKeypadWidth * dialButton.heightPerWidth
     readonly property real naturalChromeHeight: naturalEntryHeight + naturalMatchHeight
                                                 + naturalDialHeight
 
@@ -166,6 +185,17 @@ BasePage {
     readonly property real entryHeight: naturalEntryHeight * chromeScale
     readonly property real matchHeight: naturalMatchHeight * chromeScale
     readonly property real dialHeight: naturalDialHeight * chromeScale
+
+    /**
+     * What the button comes out at once its height has been capped, and so
+     * what the keys above it are drawn at too.
+     *
+     * Rounded down to a whole number of columns. NumPad's key width is an int,
+     * so three of them fall short of any width that is not a multiple of
+     * three, and the button would overhang the keys by a pixel or two -- which
+     * is precisely the misalignment this is here to remove.
+     */
+    readonly property real keypadWidth: 3 * Math.floor(naturalKeypadWidth * chromeScale / 3)
 
     readonly property real padKeysHeight: fillsScreen
                                               ? Math.max(0, height - entryHeight
@@ -241,12 +271,18 @@ BasePage {
     NumPad {
         appTheme: pDialPage.appTheme
         id: numPad
+        // Named so the layout tests can measure it.
+        objectName: "numPad"
         anchors {
             top: matchStrip.bottom
             bottom: dialButton.top
             left: parent.left
             right: parent.right
         }
+
+        // Same width as the dial button below, which is the width the button's
+        // artwork can be drawn at without stretching the handset on it.
+        gridWidth: pDialPage.keypadWidth
 
         function vibrateFailure(message) {
             console.log("Unable to vibrate");
@@ -297,16 +333,18 @@ BasePage {
     DialButton {
         appTheme: pDialPage.appTheme
         id: dialButton
+        // Named so the layout tests can measure it.
+        objectName: "dialButton"
 
         anchors {
             bottom: parent.bottom
             horizontalCenter: parent.horizontalCenter
         }
 
-        // The page decides how tall the button may be; the button keeps its
-        // artwork's proportions, so it is narrowed to that height rather than
-        // drawn the full width of the panel and squashed onto it.
-        preferredWidth: pDialPage.padWidth
+        // The button keeps its artwork's proportions, so it is narrowed to the
+        // height it is allowed rather than drawn the full width of the panel
+        // and squashed onto it. The keys above are drawn to match.
+        preferredWidth: pDialPage.keypadWidth
         maximumHeight: pDialPage.dialHeight
 
         // Every dial string -- number, MMI code, USSD, in-call digit -- goes

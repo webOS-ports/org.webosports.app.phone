@@ -61,6 +61,23 @@ BasePage {
     /// Pre-fills the search field, e.g. with what was typed on the dialpad.
     property string initialFilter: ""
 
+    /**
+     * Puts the cursor in the search field.
+     *
+     * Called when the user has navigated here to look a contact up, and only
+     * then. This used to happen on completion instead, which was wrong twice
+     * over: both tabs built on this page load with the app, hidden, so the
+     * search field took the focus before anything was on screen -- the dialer,
+     * which holds key focus itself so that the hardware keypad reaches it,
+     * came up with none, and nothing typed on it registered. And the focus
+     * stayed here afterwards, so the keyboard came up over whichever tab the
+     * user moved to next. Focus is a consequence of navigating somewhere, not
+     * of a page existing.
+     */
+    function focusSearch() {
+        searchField.forceActiveFocus();
+    }
+
     /// The user picked a contact but wants it on the dialpad rather than dialled.
     signal contactPicked(string name, string phoneNumber);
 
@@ -145,7 +162,6 @@ BasePage {
 
     Component.onCompleted: {
         searchField.text = initialFilter;
-        searchField.forceActiveFocus();
         _rebuildRows();
     }
 

@@ -31,7 +31,18 @@ Item {
 
     signal sendKey(int keycode)
 
-    property int keysWidth: ((numPad.width-Units.gu(2)) / keys.columns)
+    /**
+     * How wide the grid of keys is drawn, inside however wide this item is.
+     *
+     * The backdrop fills the item; the keys are a centred block within it, and
+     * by default they take all of it bar the inset that keeps the pad's frame
+     * off the edge. A caller sets this where the keys have to line up with
+     * something else -- the dialer matches them to its dial button, whose
+     * artwork cannot be drawn at an arbitrary width.
+     */
+    property real gridWidth: numPad.width - Units.gu(2)
+
+    property int keysWidth: (numPad.gridWidth / keys.columns)
     property int keysHeight: ((numPad.height-Units.gu(2)) / keys.rows)
 
     // In 'sim' mode the two outer keys of the bottom row are drawn blank so a
