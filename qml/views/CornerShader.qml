@@ -16,17 +16,27 @@
  */
 
 import QtQuick 2.0
-import Qt5Compat.GraphicalEffects
+import QtQuick.Effects
 
-OpacityMask {
+MultiEffect {
     property alias radius: roundedRect.radius
 
+    // The mask has to be a layer for MultiEffect to sample it; hidden, it is
+    // never drawn on its own.
     Rectangle {
         id: roundedRect
         visible: false
+        layer.enabled: true
         anchors.fill: parent
         color: "black"
     }
 
+    maskEnabled: true
     maskSource: roundedRect
+    // MultiEffect's default mask is a hard cut at an alpha of 0.0001, which
+    // loses the antialiased edge of the rounded rectangle. These two values
+    // turn it into a smoothstep over the whole 0..1 alpha range, the closest
+    // it gets to the straight alpha OpacityMask used.
+    maskThresholdMin: 0.5
+    maskSpreadAtMin: 1.0
 }
