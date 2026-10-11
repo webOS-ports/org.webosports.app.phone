@@ -39,18 +39,14 @@ AppPage {
     // narrow screen (the Q25's square)
     readonly property real numberFieldWidth: Math.min(Units.gu(24), width * 0.38)
 
+    // Done sits at the foot, as in every webOS preferences scene
+    footer: DoneBar { onClicked: prefsPage.closed() }
+
     header: AppHeader {
         height: Units.gu(7.5)
         title: qsTr("Phone Preferences")
         icon: Qt.resolvedUrl("../../icon.png")
         compact: width < Units.gu(50)
-        actionComponent: Component {
-            Button {
-                text: qsTr("Done")
-                LuneOSButton.mainColor: LuneOSButton.affirmativeColor
-                onClicked: prefsPage.closed()
-            }
-        }
     }
 
     SettingsPageContent {

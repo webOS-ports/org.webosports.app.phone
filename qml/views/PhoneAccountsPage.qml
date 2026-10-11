@@ -47,18 +47,14 @@ AppPage {
 
     signal closed();
 
+    // Done sits at the foot, as in every webOS preferences scene
+    footer: DoneBar { onClicked: accountsPage.closed() }
+
     header: AppHeader {
         height: Units.gu(7.5)
         title: qsTr("Phone Accounts")
         icon: Qt.resolvedUrl("../../icon.png")
         compact: width < Units.gu(50)
-        actionComponent: Component {
-            Button {
-                text: qsTr("Done")
-                LuneOSButton.mainColor: LuneOSButton.affirmativeColor
-                onClicked: accountsPage.closed()
-            }
-        }
     }
 
     readonly property var _transportIds: callTransports ? callTransports.callableTransportIds() : []
