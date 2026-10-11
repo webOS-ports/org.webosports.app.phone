@@ -21,6 +21,7 @@ import QtQuick 2.0
 import QtQml 2.2
 
 import LuneOS.Service 1.0
+import LuneOS.System 1.0
 import org.nemomobile.voicecall 1.0
 
 import "../model"
@@ -714,8 +715,6 @@ Item {
     }
 
     Component.onCompleted: {
-        __lunaNextLS2Service.call("luna://com.webos.service.systemservice/getPreferences", JSON.stringify({ keys: ["region"], subscribe: false }), _getPreferencesSuccess, _getPreferencesFailure)
-
         // Sync audiod to reality on every launch, whatever it currently holds.
         // onDestruction below cannot run if we were killed rather than closed,
         // so a previous instance may have left the flag set with no call in
@@ -740,8 +739,14 @@ Item {
             __setCallMode(false);
         }
     }
-    function _getPreferencesSuccess(message) {
-        var response = JSON.parse(message.payload)
+    SystemPreferences {
+        clientName: "org.webosports.app.phone"
+        keys: ["region"]
+        onUpdated: (response) => _getPreferencesSuccess(response)
+        onError: (message) => _getPreferencesFailure(message)
+    }
+
+    function _getPreferencesSuccess(response) {
         if (response.region && response.region.countryCode) {
             countryCode = response.region.countryCode;
             console.log("phone: set current country code to: " + response.region.countryCode);

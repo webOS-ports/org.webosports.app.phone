@@ -17,7 +17,7 @@
 
 import QtQuick 2.0
 
-import LuneOS.Service 1.0
+import LuneOS.System 1.0
 
 import "DialStringParser.js" as DialStringParser
 import "CallMessages.js" as CallMessages
@@ -266,10 +266,8 @@ Item {
 
     function _launchApp(appId, launchCode) {
         console.log("Launch code " + launchCode + " -> " + appId);
-        lunaService.call("luna://com.webos.applicationManager/launch",
-                         JSON.stringify({ id: appId, params: { launchCode: launchCode } }),
-                         undefined,
-                         function(error) { console.log("Could not launch " + appId + ": " + error); });
+        launcher.launch(appId, { launchCode: launchCode }, undefined,
+                        function(error) { console.log("Could not launch " + appId + ": " + error); });
     }
 
     // Speed dial: a 4-, 5-, 6- or 7-digit string can be expanded with a stored
@@ -338,8 +336,11 @@ Item {
         }
     }
 
-    LunaService {
-        id: lunaService
-        name: "org.webosports.app.phone"
+    AppLauncher {
+
+        id: launcher
+
+        clientName: "org.webosports.app.phone"
+
     }
 }

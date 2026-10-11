@@ -87,19 +87,14 @@ Window {
     title: "LuneOS phone app (mock host)"
 
     /**
-     * Stands in for the host application object the device provides.
-     *
-     * `launchParameters` is what the app reads on startup, so this is where to
-     * put a launch action to test one -- for example
+     * What the app is launched with, handed over the way qml-runner does on a
+     * device: as the window's launchParams. This is where to put a launch
+     * action to test one -- for example
      * '{"action":"dial","address":"+31612345678"}' to come up dialling, or
      * '{"action":"calllog"}' to open on the call log.
      */
-    property QtObject application: QtObject {
-        property string launchParameters: "{}"
-        property bool launchedAtBoot: false
-
-        signal relaunched(string parameters);
-    }
+    property string launchParameters: "{}"
+    property var phone: null
 
     Timer {
         id: relaunchMainAppTimer
@@ -109,7 +104,8 @@ Window {
         onTriggered: {
             // An empty relaunch is how the app is told to show its window,
             // which is what tapping the launcher icon does on a device.
-            application.relaunched("{}");
+            if (phone)
+                phone.launchParams = "{}";
 
             // Safe to restore now that the phone window is up: closing it ends
             // the session, the way closing the card does.
@@ -160,7 +156,8 @@ Window {
         else {
             // On a device the system draws the app menu; here nothing does,
             // so the app has to put one up itself.
-            main.createObject(desktopHost, { runningOnDesktop: true });
+            phone = main.createObject(desktopHost, { runningOnDesktop: true,
+                                                     launchParams: launchParameters });
         }
 
         relaunchMainAppTimer.start();
