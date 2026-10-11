@@ -43,8 +43,7 @@ TestCase {
         "call-log-list-sprite.png", "contacts-unknown-icon-large.png",
         "dashboard-unread.png", "dial-button.png", "dialer-entry-bg.png",
         "dialpad-backspace.png", "dialpad-bg.png", "disconnect-button.png",
-        "expand-button.png", "favorites-star-blue.png", "group-labeled.png",
-        "group-unlabeled.png", "list-avatar-default.png",
+        "expand-button.png", "favorites-star-blue.png", "list-avatar-default.png",
         "pin-menu-button.png", "pin-menu-button-pressed.png",
         "popup-icon-error.png", "search-button.png"
     ]

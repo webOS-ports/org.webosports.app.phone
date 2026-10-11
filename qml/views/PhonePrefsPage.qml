@@ -1,24 +1,10 @@
-/*
- * Copyright (C) 2026 WebOS Ports
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>
- */
-
 import QtQuick 2.0
-import QtQuick.Layouts 1.2
+import QtQuick.Controls 2.2
 
+// Theme specific properties
+import QtQuick.Controls.LuneOS 2.0
 import LunaNext.Common 0.1
+import LuneOS.Forms 1.0
 
 import "../services"
 import "../services/CallMessages.js" as CallMessages
@@ -31,207 +17,183 @@ import "../services/CallMessages.js" as CallMessages
  * dialing shortcuts and the SIM PIN. The CDMA-only pages (PRL, provisioning,
  * MSL, world phone) are deliberately left out -- oFono has no equivalent and
  * the hardware they targeted is long gone.
+ *
+ * In the look of the settings apps: the light header with Done on the right,
+ * and groups of LuneOS.Forms rows. A preference scene belongs to the settings
+ * world rather than to the call, so it does not take the call card's colours.
  */
-BasePage {
+AppPage {
     id: prefsPage
 
-    pageName: "PhonePrefs"
-
-    // A preference scene is light, and belongs to the settings world rather
-    // than to the call -- so it does not take the call card's gradient.
-    gradient: null
-    color: appTheme.prefsBackgroundColor
-
-    Rectangle {
-        id: prefsHeader
-
-        anchors { top: parent.top; left: parent.left; right: parent.right }
-        height: Units.gu(5)
-        color: appTheme.prefsHeaderColor
-
-        Row {
-            anchors.centerIn: parent
-            spacing: Units.gu(0.8)
-
-            Image {
-                anchors.verticalCenter: parent.verticalCenter
-                width: Units.gu(2.8)
-                height: Units.gu(2.8)
-                fillMode: Image.PreserveAspectFit
-                source: Qt.resolvedUrl("../../icon.png")
-            }
-
-            Text {
-                anchors.verticalCenter: parent.verticalCenter
-                color: appTheme.prefsTextColor
-                font.pixelSize: FontUtils.sizeToPixels("large")
-                text: qsTr("Phone Preferences")
-            }
-        }
-
-        Rectangle {
-            anchors { left: parent.left; right: parent.right; bottom: parent.bottom }
-            height: 1
-            color: appTheme.prefsRowDividerColor
-        }
-    }
-
+    // What PhoneTabView hands the page
+    property UiTheme appTheme
+    property TelephonyManager telephonyManager
+    // The SIM PIN card offers an emergency dialpad, which places the call
+    property VoiceCallMgrWrapper voiceCallMgrWrapper
+    property SupplementaryServices supplementaryServices
     property DialingShortcuts dialingShortcuts
 
     signal closed();
 
-    Flickable {
-        anchors {
-            top: prefsHeader.bottom
-            left: parent.left
-            right: parent.right
-            bottom: doneBar.top
-            margins: Units.gu(1.5)
-        }
-        contentHeight: prefsColumn.height
-        clip: true
+    // A phone number needs less room than the label beside it does on a
+    // narrow screen (the Q25's square)
+    readonly property real numberFieldWidth: Math.min(Units.gu(24), width * 0.38)
 
-        ColumnLayout {
-            id: prefsColumn
-            width: parent.width
-            spacing: Units.gu(1)
-
-            // ---- Call forwarding -------------------------------------------
-
-            PrefsGroup {
-                Layout.fillWidth: true
-                appTheme: prefsPage.appTheme
-                title: qsTr("Call Forwarding")
-
-                PrefsTextRow {
-                    label: qsTr("Always forward to")
-                    placeholder: qsTr("Off")
-                    value: supplementaryServices ? supplementaryServices.callForwardingUnconditional : ""
-                    onCommitted: (text) => supplementaryServices.callForwardingUnconditional = text
-                }
-                PrefsTextRow {
-                    label: qsTr("When busy")
-                    placeholder: qsTr("Off")
-                    value: supplementaryServices ? supplementaryServices.callForwardingBusy : ""
-                    onCommitted: (text) => supplementaryServices.callForwardingBusy = text
-                }
-                PrefsTextRow {
-                    label: qsTr("When unanswered")
-                    placeholder: qsTr("Off")
-                    value: supplementaryServices ? supplementaryServices.callForwardingNoReply : ""
-                    onCommitted: (text) => supplementaryServices.callForwardingNoReply = text
-                }
-                PrefsTextRow {
-                    label: qsTr("When unreachable")
-                    placeholder: qsTr("Off")
-                    value: supplementaryServices ? supplementaryServices.callForwardingNotReachable : ""
-                    onCommitted: (text) => supplementaryServices.callForwardingNotReachable = text
-                }
-                PrefsButtonRow {
-                    label: qsTr("Turn all forwarding off")
-                    onClicked: supplementaryServices.disableAllForwarding()
-                }
+    header: AppHeader {
+        height: Units.gu(7.5)
+        title: qsTr("Phone Preferences")
+        icon: Qt.resolvedUrl("../../icon.png")
+        compact: width < Units.gu(50)
+        actionComponent: Component {
+            Button {
+                text: qsTr("Done")
+                LuneOSButton.mainColor: LuneOSButton.affirmativeColor
+                onClicked: prefsPage.closed()
             }
-
-            // ---- Calls -----------------------------------------------------
-
-            PrefsGroup {
-                Layout.fillWidth: true
-                appTheme: prefsPage.appTheme
-                title: qsTr("Calls")
-
-                PrefsSwitchRow {
-                    label: qsTr("Call waiting")
-                    checked: supplementaryServices && supplementaryServices.callWaiting === "enabled"
-                    onToggled: (on) => supplementaryServices.callWaiting = on ? "enabled" : "disabled"
-                }
-                PrefsSwitchRow {
-                    label: qsTr("Hide my caller ID")
-                    checked: supplementaryServices && supplementaryServices.hideCallerId === "enabled"
-                    onToggled: (on) => supplementaryServices.hideCallerId = on ? "enabled" : "disabled"
-                }
-                PrefsTextRow {
-                    label: qsTr("Voicemail number")
-                    placeholder: qsTr("Not set")
-                    value: telephonyManager ? telephonyManager.voicemailNumber : ""
-                    onCommitted: (text) => telephonyManager.messageWaitingObject.voicemailMailboxNumber = text
-                }
-            }
-
-            // ---- Call barring ----------------------------------------------
-
-            PrefsGroup {
-                Layout.fillWidth: true
-                appTheme: prefsPage.appTheme
-                title: qsTr("Call Barring")
-
-                PrefsInfoRow {
-                    label: qsTr("Outgoing calls")
-                    value: (supplementaryServices && supplementaryServices.barringOutgoing.length > 0)
-                               ? supplementaryServices.barringOutgoing : qsTr("Not barred")
-                }
-                PrefsInfoRow {
-                    label: qsTr("Incoming calls")
-                    value: (supplementaryServices && supplementaryServices.barringIncoming.length > 0)
-                               ? supplementaryServices.barringIncoming : qsTr("Not barred")
-                }
-                PrefsButtonRow {
-                    label: qsTr("Turn all barring off")
-                    onClicked: prefsPage._startBarring()
-                }
-            }
-
-            // ---- Dialing shortcuts -----------------------------------------
-
-            PrefsGroup {
-                Layout.fillWidth: true
-                appTheme: prefsPage.appTheme
-                title: qsTr("Dialing Shortcuts")
-
-                Repeater {
-                    model: prefsPage.dialingShortcuts ? prefsPage.dialingShortcuts.supportedLengths : []
-
-                    delegate: PrefsTextRow {
-                        required property var modelData
-
-                        label: qsTr("Prefix for %1-digit numbers").arg(modelData)
-                        placeholder: qsTr("None")
-                        value: prefsPage.dialingShortcuts.prefixFor(modelData)
-                        onCommitted: (text) => prefsPage.dialingShortcuts.setPrefix(modelData, text)
-                    }
-                }
-            }
-
-            // ---- SIM --------------------------------------------------------
-
-            PrefsGroup {
-                Layout.fillWidth: true
-                appTheme: prefsPage.appTheme
-                title: qsTr("SIM")
-
-                PrefsInfoRow {
-                    label: qsTr("Network")
-                    value: telephonyManager ? (telephonyManager.networkName || qsTr("No service")) : ""
-                }
-                PrefsInfoRow {
-                    label: qsTr("Signal")
-                    value: telephonyManager ? (telephonyManager.signalStrength + "%") : ""
-                }
-                PrefsButtonRow {
-                    label: qsTr("Change SIM Card PIN")
-                    onClicked: prefsPage._startPinChange()
-                }
-            }
-
         }
     }
 
-    PrefsDoneBar {
-        id: doneBar
+    SettingsPageContent {
+        // ---- Call forwarding -----------------------------------------------
 
-        anchors { bottom: parent.bottom; left: parent.left; right: parent.right }
-        appTheme: prefsPage.appTheme
-        onClicked: prefsPage.closed()
+        FormGroup {
+            title: qsTr("Call Forwarding")
+
+            LabelAndTextField {
+                label: qsTr("Always forward to")
+                placeholderText: qsTr("Off")
+                inputMethodHints: Qt.ImhDialableCharactersOnly | Qt.ImhNoPredictiveText
+                fieldWidth: prefsPage.numberFieldWidth
+                text: supplementaryServices ? supplementaryServices.callForwardingUnconditional : ""
+                onCommitted: (text) => supplementaryServices.callForwardingUnconditional = text
+            }
+            LabelAndTextField {
+                label: qsTr("When busy")
+                placeholderText: qsTr("Off")
+                inputMethodHints: Qt.ImhDialableCharactersOnly | Qt.ImhNoPredictiveText
+                fieldWidth: prefsPage.numberFieldWidth
+                text: supplementaryServices ? supplementaryServices.callForwardingBusy : ""
+                onCommitted: (text) => supplementaryServices.callForwardingBusy = text
+            }
+            LabelAndTextField {
+                label: qsTr("When unanswered")
+                placeholderText: qsTr("Off")
+                inputMethodHints: Qt.ImhDialableCharactersOnly | Qt.ImhNoPredictiveText
+                fieldWidth: prefsPage.numberFieldWidth
+                text: supplementaryServices ? supplementaryServices.callForwardingNoReply : ""
+                onCommitted: (text) => supplementaryServices.callForwardingNoReply = text
+            }
+            LabelAndTextField {
+                label: qsTr("When unreachable")
+                placeholderText: qsTr("Off")
+                inputMethodHints: Qt.ImhDialableCharactersOnly | Qt.ImhNoPredictiveText
+                fieldWidth: prefsPage.numberFieldWidth
+                text: supplementaryServices ? supplementaryServices.callForwardingNotReachable : ""
+                onCommitted: (text) => supplementaryServices.callForwardingNotReachable = text
+            }
+        }
+        Button {
+            width: parent.width
+            text: qsTr("Turn all forwarding off")
+            onClicked: supplementaryServices.disableAllForwarding()
+        }
+
+        // ---- Calls ---------------------------------------------------------
+
+        FormGroup {
+            title: qsTr("Calls")
+
+            LabelAndSwitch {
+                label: qsTr("Call waiting")
+                checked: !!supplementaryServices && supplementaryServices.callWaiting === "enabled"
+                // Only changes the user made, never the ones that came back
+                // from the modem, so a setting is not written straight back
+                onToggled: supplementaryServices.callWaiting = checked ? "enabled" : "disabled"
+            }
+            LabelAndSwitch {
+                label: qsTr("Hide my caller ID")
+                checked: !!supplementaryServices && supplementaryServices.hideCallerId === "enabled"
+                onToggled: supplementaryServices.hideCallerId = checked ? "enabled" : "disabled"
+            }
+            LabelAndTextField {
+                label: qsTr("Voicemail number")
+                placeholderText: qsTr("Not set")
+                inputMethodHints: Qt.ImhDialableCharactersOnly | Qt.ImhNoPredictiveText
+                fieldWidth: prefsPage.numberFieldWidth
+                text: telephonyManager ? telephonyManager.voicemailNumber : ""
+                onCommitted: (text) => telephonyManager.messageWaitingObject.voicemailMailboxNumber = text
+            }
+        }
+
+        // ---- Call barring --------------------------------------------------
+
+        FormGroup {
+            title: qsTr("Call Barring")
+
+            LabelAndValue {
+                label: qsTr("Outgoing calls")
+                value: (supplementaryServices && supplementaryServices.barringOutgoing.length > 0)
+                           ? supplementaryServices.barringOutgoing : qsTr("Not barred")
+            }
+            LabelAndValue {
+                label: qsTr("Incoming calls")
+                value: (supplementaryServices && supplementaryServices.barringIncoming.length > 0)
+                           ? supplementaryServices.barringIncoming : qsTr("Not barred")
+            }
+        }
+        Button {
+            width: parent.width
+            text: qsTr("Turn all barring off")
+            onClicked: prefsPage._startBarring()
+        }
+
+        // ---- Dialing shortcuts ---------------------------------------------
+
+        FormGroup {
+            title: qsTr("Dialing Shortcuts")
+            visible: !!prefsPage.dialingShortcuts
+
+            Repeater {
+                model: prefsPage.dialingShortcuts ? prefsPage.dialingShortcuts.supportedLengths : []
+
+                delegate: LabelAndTextField {
+                    required property var modelData
+
+                    label: qsTr("%1-digit numbers").arg(modelData)
+                    placeholderText: qsTr("None")
+                    inputMethodHints: Qt.ImhDialableCharactersOnly | Qt.ImhNoPredictiveText
+                    fieldWidth: prefsPage.numberFieldWidth
+                    text: prefsPage.dialingShortcuts.prefixFor(modelData)
+                    onCommitted: (text) => prefsPage.dialingShortcuts.setPrefix(modelData, text)
+                }
+            }
+        }
+
+        ExplanationText {
+            width: parent.width
+            visible: !!prefsPage.dialingShortcuts
+            text: qsTr("The prefix is put in front of a number dialled with that many digits.")
+        }
+
+        // ---- SIM -----------------------------------------------------------
+
+        FormGroup {
+            title: qsTr("SIM")
+
+            LabelAndValue {
+                label: qsTr("Network")
+                value: telephonyManager ? (telephonyManager.networkName || qsTr("No service")) : ""
+            }
+            LabelAndValue {
+                label: qsTr("Signal")
+                value: telephonyManager ? (telephonyManager.signalStrength + "%") : ""
+            }
+        }
+        Button {
+            width: parent.width
+            text: qsTr("Change SIM Card PIN")
+            onClicked: prefsPage._startPinChange()
+        }
     }
 
     /*
@@ -247,6 +209,8 @@ BasePage {
     Loader {
         id: barringCardLoader
 
+        // Over the header too: a Page puts what it holds below the header
+        parent: prefsPage
         anchors.fill: parent
         active: false
         z: 1
@@ -338,6 +302,7 @@ BasePage {
     Loader {
         id: pinCardLoader
 
+        parent: prefsPage
         anchors.fill: parent
         active: false
         z: 1
@@ -360,6 +325,7 @@ BasePage {
     Loader {
         id: emergencyLoader
 
+        parent: prefsPage
         anchors.fill: parent
         active: false
         z: 2
