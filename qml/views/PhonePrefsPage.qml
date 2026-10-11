@@ -44,25 +44,39 @@ AppPage {
         compact: width < Units.gu(50)
     }
 
-    // "Reading from network" with a spinner, until oFono has the answer
-    component ReadingRow: Item {
+    // Why the network's settings are not there: "Reading from network" with
+    // a spinner while oFono asks, or what stops it from asking at all
+    component StatusRow: Item {
+        property alias text: statusLabel.text
+        property bool busy: false
         width: parent ? parent.width : implicitWidth
         height: Units.gu(6)
         Label {
+            id: statusLabel
             anchors.left: parent.left
+            anchors.right: spinner.left
             anchors.verticalCenter: parent.verticalCenter
-            text: qsTr("Reading from network")
+            elide: Text.ElideRight
             color: Colors.secondaryText
             font.pixelSize: FontUtils.sizeToPixels("16pt")
         }
         BusyIndicator {
+            id: spinner
             anchors.right: parent.right
             anchors.verticalCenter: parent.verticalCenter
             width: Units.gu(3.5)
             height: width
-            running: parent.visible
+            visible: parent.busy
+            running: parent.visible && parent.busy
         }
     }
+
+    // Without a SIM, or with the radio off, oFono never reads these from the
+    // network: say so instead of waiting for ever
+    readonly property bool _noSim: !telephonyManager || !telephonyManager.present
+    readonly property bool _offline: !_noSim && !telephonyManager.radioOnline
+    readonly property string _unavailableText: _noSim ? qsTr("No SIM card")
+                                             : _offline ? qsTr("No network connection") : ""
 
     // A row that does something when tapped ("Lock SIM Card", "+ Add a number")
     component ActionRow: ItemDelegate {
@@ -187,12 +201,20 @@ AppPage {
         FormGroup {
             title: qsTr("Calls")
 
-            ReadingRow {
-                visible: !prefsPage.supplementaryServices || !prefsPage.supplementaryServices.forwardingReady
+            StatusRow {
+                visible: prefsPage._unavailableText.length > 0
+                text: prefsPage._unavailableText
+            }
+            StatusRow {
+                visible: prefsPage._unavailableText.length === 0
+                         && (!prefsPage.supplementaryServices || !prefsPage.supplementaryServices.forwardingReady)
+                text: qsTr("Reading from network")
+                busy: true
             }
             LabelAndSwitch {
                 id: forwardingSwitch
-                visible: !!prefsPage.supplementaryServices && prefsPage.supplementaryServices.forwardingReady
+                visible: prefsPage._unavailableText.length === 0
+                         && !!prefsPage.supplementaryServices && prefsPage.supplementaryServices.forwardingReady
                 label: qsTr("Call Forwarding")
                 checked: prefsPage._forwardOpen || prefsPage._forwarding
                 onToggled: {
@@ -222,12 +244,16 @@ AppPage {
                 }
             }
 
-            ReadingRow {
-                visible: !prefsPage.supplementaryServices || !prefsPage.supplementaryServices.callSettingsReady
+            StatusRow {
+                visible: prefsPage._unavailableText.length === 0
+                         && (!prefsPage.supplementaryServices || !prefsPage.supplementaryServices.callSettingsReady)
+                text: qsTr("Reading from network")
+                busy: true
             }
             LabelAndSwitch {
                 id: callerIdSwitch
-                visible: !!prefsPage.supplementaryServices && prefsPage.supplementaryServices.callSettingsReady
+                visible: prefsPage._unavailableText.length === 0
+                         && !!prefsPage.supplementaryServices && prefsPage.supplementaryServices.callSettingsReady
                 label: qsTr("Show My Caller ID")
                 // "default" leaves it to the network, which shows it
                 checked: !!prefsPage.supplementaryServices && prefsPage.supplementaryServices.hideCallerId !== "enabled"
@@ -277,7 +303,11 @@ AppPage {
             title: qsTr("Voicemail Number")
 
             NumberRow {
-                placeholderText: qsTr("Waiting for network")
+                // The number is the SIM's: with none there is nothing to wait for
+                enabled: prefsPage._unavailableText.length === 0
+                placeholderText: prefsPage._unavailableText.length > 0 ? prefsPage._unavailableText
+                               : (telephonyManager && !telephonyManager.messageWaitingObject.ready)
+                                 ? qsTr("Waiting for network") : qsTr("Enter Number")
                 text: telephonyManager ? telephonyManager.voicemailNumber : ""
                 onCommitted: (number) => telephonyManager.messageWaitingObject.voicemailMailboxNumber = number
             }

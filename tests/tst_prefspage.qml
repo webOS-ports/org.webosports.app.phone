@@ -163,6 +163,36 @@ Item {
             compare(editor.active, false);
         }
 
+        function test_no_sim_says_so_instead_of_waiting() {
+            var wasPresent = telephony.present;
+            telephony.present = false;
+            try {
+                var noSim = findAll(page, function(o) { return o.text === "No SIM card" && o.hasOwnProperty("busy"); })[0];
+                verify(noSim && shown(noSim), "no 'No SIM card' row in Calls");
+                compare(noSim.busy, false);
+                verify(!shown(row("Call Forwarding")));
+                verify(!shown(row("Show My Caller ID")));
+                var reading = findAll(page, function(o) { return o.text === "Reading from network" && shown(o); });
+                compare(reading.length, 0, "still reading from a network there is no SIM for");
+                var voicemail = findAll(page, function(o) { return o.placeholderText === "No SIM card"; })[0];
+                verify(voicemail && shown(voicemail), "the voicemail field still waits for the network");
+                compare(voicemail.enabled, false);
+            } finally {
+                telephony.present = wasPresent;
+            }
+        }
+
+        function test_radio_off_says_so() {
+            var wasOnline = telephony.radioOnline;
+            telephony.radioOnline = false;
+            try {
+                var offline = findAll(page, function(o) { return o.text === "No network connection" && o.hasOwnProperty("busy"); })[0];
+                verify(offline && shown(offline));
+            } finally {
+                telephony.radioOnline = wasOnline;
+            }
+        }
+
         function test_sim_lock_row_follows_the_sim() {
             verify(row("Lock SIM Card") || row("Unlock SIM Card") || row("PUK Required"));
             compare(!!row("Change SIM Card PIN") && shown(row("Change SIM Card PIN")), telephony.simPinLocked);
