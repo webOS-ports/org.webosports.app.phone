@@ -5,22 +5,20 @@ import QtQuick.Controls 2.2
 import QtQuick.Controls.LuneOS 2.0
 import LunaNext.Common 0.1
 import LuneOS.Forms 1.0
+import LuneOS.System 1.0
 
 import "../services"
 import "../services/CallMessages.js" as CallMessages
+import "../services/PhoneNumberUtils.js" as PhoneNumberUtils
 
 /**
- * Phone preferences.
- *
- * Ports the parts of the legacy shared/phoneprefs that still apply on LuneOS:
- * call forwarding, call waiting, caller ID, call barring, the voicemail number,
- * dialing shortcuts and the SIM PIN. The CDMA-only pages (PRL, provisioning,
- * MSL, world phone) are deliberately left out -- oFono has no equivalent and
- * the hardware they targeted is long gone.
- *
- * In the look of the settings apps: the light header with Done on the right,
- * and groups of LuneOS.Forms rows. A preference scene belongs to the settings
- * world rather than to the call, so it does not take the call card's colours.
+ * Phone preferences, laid out as the legacy shared/phoneprefs scene was:
+ * PHONE NUMBER, CALLS, DOMESTIC and INTERNATIONAL CALLS, VOICEMAIL NUMBER,
+ * DIALING SHORTCUTS and SECURITY, in that order, with the same controls.
+ * Left out is what has nothing behind it on LuneOS: contact matches while
+ * typing, International Dialing, DTMF length, PRL, world phone, restricted
+ * dialing, TTY/HAC and the network settings. Call barring, which the legacy
+ * scene reached only through MMI codes, keeps a group at the end.
  */
 AppPage {
     id: prefsPage
@@ -32,12 +30,9 @@ AppPage {
     property VoiceCallMgrWrapper voiceCallMgrWrapper
     property SupplementaryServices supplementaryServices
     property DialingShortcuts dialingShortcuts
+    property CallTransports callTransports
 
     signal closed();
-
-    // A phone number needs less room than the label beside it does on a
-    // narrow screen (the Q25's square)
-    readonly property real numberFieldWidth: Math.min(Units.gu(24), width * 0.38)
 
     // Done sits at the foot, as in every webOS preferences scene
     footer: DoneBar { onClicked: prefsPage.closed() }
@@ -49,49 +44,142 @@ AppPage {
         compact: width < Units.gu(50)
     }
 
-    SettingsPageContent {
-        // ---- Call forwarding -----------------------------------------------
+    // "Reading from network" with a spinner, until oFono has the answer
+    component ReadingRow: Item {
+        width: parent ? parent.width : implicitWidth
+        height: Units.gu(6)
+        Label {
+            anchors.left: parent.left
+            anchors.verticalCenter: parent.verticalCenter
+            text: qsTr("Reading from network")
+            color: Colors.secondaryText
+            font.pixelSize: FontUtils.sizeToPixels("16pt")
+        }
+        BusyIndicator {
+            anchors.right: parent.right
+            anchors.verticalCenter: parent.verticalCenter
+            width: Units.gu(3.5)
+            height: width
+            running: parent.visible
+        }
+    }
 
-        FormGroup {
-            title: qsTr("Call Forwarding")
+    // A row that does something when tapped ("Lock SIM Card", "+ Add a number")
+    component ActionRow: ItemDelegate {
+        width: parent ? parent.width : implicitWidth
+        height: Units.gu(6)
+        leftPadding: 0
+        font.pixelSize: FontUtils.sizeToPixels("16pt")
+    }
 
-            LabelAndTextField {
-                label: qsTr("Always forward to")
-                placeholderText: qsTr("Off")
-                inputMethodHints: Qt.ImhDialableCharactersOnly | Qt.ImhNoPredictiveText
-                fieldWidth: prefsPage.numberFieldWidth
-                text: supplementaryServices ? supplementaryServices.callForwardingUnconditional : ""
-                onCommitted: (text) => supplementaryServices.callForwardingUnconditional = text
-            }
-            LabelAndTextField {
-                label: qsTr("When busy")
-                placeholderText: qsTr("Off")
-                inputMethodHints: Qt.ImhDialableCharactersOnly | Qt.ImhNoPredictiveText
-                fieldWidth: prefsPage.numberFieldWidth
-                text: supplementaryServices ? supplementaryServices.callForwardingBusy : ""
-                onCommitted: (text) => supplementaryServices.callForwardingBusy = text
-            }
-            LabelAndTextField {
-                label: qsTr("When unanswered")
-                placeholderText: qsTr("Off")
-                inputMethodHints: Qt.ImhDialableCharactersOnly | Qt.ImhNoPredictiveText
-                fieldWidth: prefsPage.numberFieldWidth
-                text: supplementaryServices ? supplementaryServices.callForwardingNoReply : ""
-                onCommitted: (text) => supplementaryServices.callForwardingNoReply = text
-            }
-            LabelAndTextField {
-                label: qsTr("When unreachable")
-                placeholderText: qsTr("Off")
-                inputMethodHints: Qt.ImhDialableCharactersOnly | Qt.ImhNoPredictiveText
-                fieldWidth: prefsPage.numberFieldWidth
-                text: supplementaryServices ? supplementaryServices.callForwardingNotReachable : ""
-                onCommitted: (text) => supplementaryServices.callForwardingNotReachable = text
+    // A whole-row number field (the forwarding and voicemail numbers), which
+    // reports a change once the user is done with it
+    component NumberRow: Item {
+        id: numberRow
+        property alias text: numberField.text
+        property alias placeholderText: numberField.placeholderText
+        property bool _changed: false
+        signal committed(string text)
+        function focusField() { numberField.forceActiveFocus(); }
+
+        width: parent ? parent.width : implicitWidth
+        height: Units.gu(6)
+        FormTextField {
+            id: numberField
+            anchors.left: parent.left
+            anchors.right: parent.right
+            anchors.verticalCenter: parent.verticalCenter
+            height: Units.gu(5)
+            font.pixelSize: FontUtils.sizeToPixels("16pt")
+            inputMethodHints: Qt.ImhDialableCharactersOnly | Qt.ImhNoPredictiveText
+            onTextEdited: numberRow._changed = true
+            onEditingFinished: {
+                if (!numberRow._changed)
+                    return;
+                numberRow._changed = false;
+                numberRow.committed(text);
             }
         }
-        Button {
-            width: parent.width
-            text: qsTr("Turn all forwarding off")
-            onClicked: supplementaryServices.disableAllForwarding()
+    }
+
+    // Puts a switch back on the value it shows when the network turned a
+    // change down (the user's tap had moved it off its binding's value)
+    function _revert(row, value) {
+        row.checked = value;
+    }
+
+    property bool _forwardOpen: false
+    readonly property bool _forwarding: !!supplementaryServices
+                                        && supplementaryServices.callForwardingUnconditional.length > 0
+
+    Connections {
+        target: prefsPage.supplementaryServices
+        function onForwardingSet(success) {
+            if (!success) {
+                prefsPage._forwardOpen = false;
+                prefsPage._revert(forwardingSwitch, prefsPage._forwarding);
+                errorDialog.show(qsTr("Call forwarding could not be set. You need a network connection to your wireless service provider to change it."));
+            }
+        }
+        function onCallerIdSet(success) {
+            if (!success) {
+                prefsPage._revert(callerIdSwitch, prefsPage.supplementaryServices.hideCallerId !== "enabled");
+                errorDialog.show(qsTr("Caller ID could not be set."));
+            }
+        }
+        function onCallWaitingSet(success) {
+            if (!success) {
+                prefsPage._revert(callWaitingSwitch, prefsPage.supplementaryServices.callWaiting === "enabled");
+                errorDialog.show(qsTr("Call waiting could not be set."));
+            }
+        }
+    }
+
+    // The preferred service for domestic and international calls, which
+    // DialProxy follows
+    SystemPreferences {
+        id: servicePrefs
+        clientName: "org.webosports.app.phone"
+        keys: ["phonePreferredDomesticPhoneService", "phonePreferredIntlPhoneService"]
+    }
+
+    readonly property var _serviceValues: {
+        var values = [];
+        if (callTransports) {
+            if (callTransports.hasCellular)
+                values.push(callTransports.cellularTransport);
+            values = values.concat(callTransports.voipTransportIds());
+        }
+        values.push("none");
+        return values;
+    }
+    readonly property var _serviceLabels: _serviceValues.map(function(id) {
+        if (id === "none")
+            return qsTr("Always Ask");
+        if (callTransports && id === callTransports.cellularTransport)
+            return (telephonyManager && telephonyManager.networkName) ? telephonyManager.networkName
+                                                                       : qsTr("Carrier Wireless");
+        return callTransports ? callTransports.labelFor(id) : id;
+    })
+
+    readonly property string _phoneNumber: {
+        var numbers = telephonyManager ? telephonyManager.subscriberNumbers : [];
+        if (!numbers || numbers.length === 0)
+            return "";
+        return PhoneNumberUtils.formatForDisplay(numbers[0],
+                                                 voiceCallMgrWrapper ? voiceCallMgrWrapper.countryCode : undefined);
+    }
+
+    SettingsPageContent {
+        // ---- Phone number --------------------------------------------------
+
+        FormGroup {
+            title: qsTr("Phone Number")
+            visible: prefsPage._phoneNumber.length > 0
+
+            LabelAndValue {
+                label: prefsPage._phoneNumber
+            }
         }
 
         // ---- Calls ---------------------------------------------------------
@@ -99,25 +187,174 @@ AppPage {
         FormGroup {
             title: qsTr("Calls")
 
-            LabelAndSwitch {
-                label: qsTr("Call waiting")
-                checked: !!supplementaryServices && supplementaryServices.callWaiting === "enabled"
-                // Only changes the user made, never the ones that came back
-                // from the modem, so a setting is not written straight back
-                onToggled: supplementaryServices.callWaiting = checked ? "enabled" : "disabled"
+            ReadingRow {
+                visible: !prefsPage.supplementaryServices || !prefsPage.supplementaryServices.forwardingReady
             }
             LabelAndSwitch {
-                label: qsTr("Hide my caller ID")
-                checked: !!supplementaryServices && supplementaryServices.hideCallerId === "enabled"
-                onToggled: supplementaryServices.hideCallerId = checked ? "enabled" : "disabled"
+                id: forwardingSwitch
+                visible: !!prefsPage.supplementaryServices && prefsPage.supplementaryServices.forwardingReady
+                label: qsTr("Call Forwarding")
+                checked: prefsPage._forwardOpen || prefsPage._forwarding
+                onToggled: {
+                    if (checked) {
+                        // On shows where the number goes; it is set once
+                        // there is one
+                        prefsPage._forwardOpen = true;
+                        if (forwardNumber.text.length > 0)
+                            prefsPage.supplementaryServices.callForwardingUnconditional = forwardNumber.text;
+                        else
+                            forwardNumber.focusField();
+                    } else {
+                        prefsPage._forwardOpen = false;
+                        if (prefsPage._forwarding)
+                            prefsPage.supplementaryServices.callForwardingUnconditional = "";
+                    }
+                }
             }
-            LabelAndTextField {
-                label: qsTr("Voicemail number")
-                placeholderText: qsTr("Not set")
-                inputMethodHints: Qt.ImhDialableCharactersOnly | Qt.ImhNoPredictiveText
-                fieldWidth: prefsPage.numberFieldWidth
+            NumberRow {
+                id: forwardNumber
+                visible: forwardingSwitch.visible && forwardingSwitch.checked
+                placeholderText: qsTr("Enter Number")
+                text: prefsPage.supplementaryServices ? prefsPage.supplementaryServices.callForwardingUnconditional : ""
+                onCommitted: (number) => {
+                    if (number.length > 0)
+                        prefsPage.supplementaryServices.callForwardingUnconditional = number;
+                }
+            }
+
+            ReadingRow {
+                visible: !prefsPage.supplementaryServices || !prefsPage.supplementaryServices.callSettingsReady
+            }
+            LabelAndSwitch {
+                id: callerIdSwitch
+                visible: !!prefsPage.supplementaryServices && prefsPage.supplementaryServices.callSettingsReady
+                label: qsTr("Show My Caller ID")
+                // "default" leaves it to the network, which shows it
+                checked: !!prefsPage.supplementaryServices && prefsPage.supplementaryServices.hideCallerId !== "enabled"
+                onToggled: prefsPage.supplementaryServices.hideCallerId = checked ? "disabled" : "enabled"
+            }
+            LabelAndSwitch {
+                id: callWaitingSwitch
+                visible: callerIdSwitch.visible
+                label: qsTr("Call Waiting")
+                checked: !!prefsPage.supplementaryServices && prefsPage.supplementaryServices.callWaiting === "enabled"
+                onToggled: prefsPage.supplementaryServices.callWaiting = checked ? "enabled" : "disabled"
+            }
+        }
+
+        // ---- Domestic and international calls ------------------------------
+        // Only once there is a choice: a calling account besides the SIM
+
+        FormGroup {
+            title: qsTr("Domestic Calls")
+            visible: !!prefsPage.callTransports && prefsPage.callTransports.hasVoipAccount
+
+            LabelAndSelector {
+                label: qsTr("Use")
+                values: prefsPage._serviceValues
+                model: prefsPage._serviceLabels
+                value: servicePrefs.value("phonePreferredDomesticPhoneService", "none")
+                onChosen: (v) => servicePrefs.set("phonePreferredDomesticPhoneService", v)
+            }
+        }
+
+        FormGroup {
+            title: qsTr("International Calls")
+            visible: !!prefsPage.callTransports && prefsPage.callTransports.hasVoipAccount
+
+            LabelAndSelector {
+                label: qsTr("Use")
+                values: prefsPage._serviceValues
+                model: prefsPage._serviceLabels
+                value: servicePrefs.value("phonePreferredIntlPhoneService", "none")
+                onChosen: (v) => servicePrefs.set("phonePreferredIntlPhoneService", v)
+            }
+        }
+
+        // ---- Voicemail number ----------------------------------------------
+
+        FormGroup {
+            title: qsTr("Voicemail Number")
+
+            NumberRow {
+                placeholderText: qsTr("Waiting for network")
                 text: telephonyManager ? telephonyManager.voicemailNumber : ""
-                onCommitted: (text) => telephonyManager.messageWaitingObject.voicemailMailboxNumber = text
+                onCommitted: (number) => telephonyManager.messageWaitingObject.voicemailMailboxNumber = number
+            }
+        }
+
+        // ---- Dialing shortcuts ---------------------------------------------
+
+        FormGroup {
+            title: qsTr("Dialing Shortcuts")
+            visible: !!prefsPage.dialingShortcuts
+
+            Repeater {
+                model: prefsPage.dialingShortcuts
+                       ? prefsPage.dialingShortcuts.supportedLengths.filter(function(length) {
+                             return prefsPage.dialingShortcuts.prefixFor(length).length > 0;
+                         })
+                       : []
+
+                // Swipe it aside to delete it, as the legacy list did
+                delegate: SwipeDelegate {
+                    id: shortcutRow
+                    required property var modelData
+
+                    width: parent ? parent.width : implicitWidth
+                    height: Units.gu(6)
+                    leftPadding: 0
+                    rightPadding: 0
+
+                    contentItem: Item {
+                        Label {
+                            anchors.left: parent.left
+                            anchors.verticalCenter: parent.verticalCenter
+                            font.pixelSize: FontUtils.sizeToPixels("16pt")
+                            text: prefsPage.dialingShortcuts.prefixFor(shortcutRow.modelData)
+                                  + "-" + "X".repeat(shortcutRow.modelData)
+                        }
+                        Label {
+                            anchors.right: parent.right
+                            anchors.verticalCenter: parent.verticalCenter
+                            font.pixelSize: FontUtils.sizeToPixels("16pt")
+                            color: "#1f75bf"
+                            text: (shortcutRow.modelData === 1 ? qsTr("1 digit") : qsTr("%1 digits").arg(shortcutRow.modelData))
+                        }
+                    }
+
+                    // The style draws the red confirm behind the row
+                    LuneOSSwipeDelegate.confirmText: qsTr("Delete")
+                    LuneOSSwipeDelegate.onConfirmed: prefsPage.dialingShortcuts.setPrefix(shortcutRow.modelData, "")
+                    background: Item { }
+                }
+            }
+
+            ActionRow {
+                text: qsTr("+ Add a number")
+                onClicked: shortcutEditorLoader.active = true
+            }
+        }
+
+        // ---- Security ------------------------------------------------------
+
+        FormGroup {
+            title: qsTr("Security")
+
+            ActionRow {
+                text: !prefsPage.telephonyManager ? ""
+                      : prefsPage.telephonyManager.pukRequired ? qsTr("PUK Required")
+                      : prefsPage.telephonyManager.simPinLocked ? qsTr("Unlock SIM Card")
+                      : qsTr("Lock SIM Card")
+                enabled: !!prefsPage.telephonyManager && prefsPage.telephonyManager.present
+                         && !prefsPage.telephonyManager.pukRequired
+                onClicked: prefsPage._startSimLock()
+            }
+            ActionRow {
+                visible: !!prefsPage.telephonyManager && prefsPage.telephonyManager.simPinLocked
+                         && !prefsPage.telephonyManager.pukRequired
+                text: qsTr("Change SIM Card PIN")
+                onClicked: prefsPage._startPinChange()
             }
         }
 
@@ -142,53 +379,163 @@ AppPage {
             text: qsTr("Turn all barring off")
             onClicked: prefsPage._startBarring()
         }
+    }
 
-        // ---- Dialing shortcuts ---------------------------------------------
+    Dialog {
+        id: errorDialog
+        function show(message) {
+            errorText.text = message;
+            open();
+        }
+        modal: true
+        title: qsTr("Phone Preferences")
+        standardButtons: Dialog.Ok
+        Label {
+            id: errorText
+            width: parent.width
+            wrapMode: Text.WordWrap
+        }
+    }
 
-        FormGroup {
-            title: qsTr("Dialing Shortcuts")
-            visible: !!prefsPage.dialingShortcuts
+    /*
+     * Adding a dialing shortcut: the legacy scene's own page. WHEN I DIAL a
+     * number of so many digits, USE THIS DIALING PREFIX; Done stays off until
+     * there is a prefix.
+     */
+    Loader {
+        id: shortcutEditorLoader
 
-            Repeater {
-                model: prefsPage.dialingShortcuts ? prefsPage.dialingShortcuts.supportedLengths : []
+        parent: prefsPage
+        anchors.fill: parent
+        active: false
+        z: 1
 
-                delegate: LabelAndTextField {
-                    required property var modelData
+        sourceComponent: AppPage {
+            id: shortcutEditor
 
-                    label: qsTr("%1-digit numbers").arg(modelData)
-                    placeholderText: qsTr("None")
-                    inputMethodHints: Qt.ImhDialableCharactersOnly | Qt.ImhNoPredictiveText
-                    fieldWidth: prefsPage.numberFieldWidth
-                    text: prefsPage.dialingShortcuts.prefixFor(modelData)
-                    onCommitted: (text) => prefsPage.dialingShortcuts.setPrefix(modelData, text)
+            header: AppHeader {
+                height: Units.gu(7.5)
+                title: qsTr("Dialing Shortcuts")
+                icon: Qt.resolvedUrl("../../icon.png")
+                compact: width < Units.gu(50)
+            }
+            footer: DoneBar {
+                enabled: prefixField.text.length > 0
+                onClicked: {
+                    prefsPage.dialingShortcuts.setPrefix(lengthSelector.value, prefixField.text);
+                    shortcutEditorLoader.active = false;
+                }
+            }
+
+            // The back gesture leaves without adding anything
+            Keys.onReleased: (event) => {
+                if (event.key === Qt.Key_Escape) {
+                    shortcutEditorLoader.active = false;
+                    event.accepted = true;
+                }
+            }
+            Component.onCompleted: forceActiveFocus()
+
+            SettingsPageContent {
+                FormGroup {
+                    title: qsTr("When I Dial")
+                    LabelAndSelector {
+                        id: lengthSelector
+                        label: qsTr("Number length")
+                        values: prefsPage.dialingShortcuts.supportedLengths
+                        model: values.map(function(length) { return (length === 1 ? qsTr("1 digit") : qsTr("%1 digits").arg(length)); })
+                        value: values[0]
+                    }
+                }
+                FormGroup {
+                    title: qsTr("Use This Dialing Prefix")
+                    NumberRow {
+                        id: prefixField
+                        placeholderText: qsTr("Enter Number")
+                    }
+                }
+                ExplanationText {
+                    width: parent.width
+                    text: qsTr("These shortcuts are digits added to the beginning of the number you are attempting to call. Example: (510) 123-xxxx")
                 }
             }
         }
+    }
 
-        ExplanationText {
-            width: parent.width
-            visible: !!prefsPage.dialingShortcuts
-            text: qsTr("The prefix is put in front of a number dialled with that many digits.")
+    /*
+     * Locking and unlocking the SIM: SecurityScene's "Lock SIM Card" asked for
+     * the PIN on the same card the PIN change uses.
+     */
+    Loader {
+        id: simLockLoader
+
+        parent: prefsPage
+        anchors.fill: parent
+        active: false
+        z: 1
+
+        sourceComponent: SimPinCard {
+            appTheme: prefsPage.appTheme
+
+            title: prefsPage._simLockTitle
+            subText: prefsPage._simLockSubText
+            maximumLength: 8
+
+            onAccepted: prefsPage._simLockAccepted(pin)
+            onCanceled: simLockLoader.active = false
+            onEmergencyCallRequested: emergencyLoader.active = true
+            onKeyed: prefsPage._clearSimLockError()
         }
+    }
 
-        // ---- SIM -----------------------------------------------------------
+    property string _simLockTitle: ""
+    property string _simLockSubText: ""
+    property bool _simLockInError: false
+    property bool _simLocking: false
 
-        FormGroup {
-            title: qsTr("SIM")
+    function _resetSimLock() {
+        _simLockTitle = qsTr("Enter PIN");
+        _simLockSubText = _simLocking ? qsTr("Enter PIN to lock the SIM card")
+                                      : qsTr("Enter PIN to unlock the SIM card");
+        _simLockInError = false;
+        if (simLockLoader.item)
+            simLockLoader.item.clear();
+    }
 
-            LabelAndValue {
-                label: qsTr("Network")
-                value: telephonyManager ? (telephonyManager.networkName || qsTr("No service")) : ""
-            }
-            LabelAndValue {
-                label: qsTr("Signal")
-                value: telephonyManager ? (telephonyManager.signalStrength + "%") : ""
-            }
+    function _startSimLock() {
+        _simLocking = !telephonyManager.simPinLocked;
+        _resetSimLock();
+        simLockLoader.active = true;
+    }
+
+    function _clearSimLockError() {
+        if (_simLockInError)
+            _resetSimLock();
+    }
+
+    function _simLockAccepted(entered) {
+        if (entered.length === 0) {
+            simLockLoader.active = false;
+            return;
         }
-        Button {
-            width: parent.width
-            text: qsTr("Change SIM Card PIN")
-            onClicked: prefsPage._startPinChange()
+        if (_simLocking)
+            supplementaryServices.lockSimPin(entered);
+        else
+            supplementaryServices.unlockSimPin(entered);
+    }
+
+    Connections {
+        target: simLockLoader.active ? prefsPage.supplementaryServices : null
+
+        function onCompleted(success, message) {
+            if (success) {
+                simLockLoader.active = false;
+                return;
+            }
+            prefsPage._resetSimLock();
+            prefsPage._simLockTitle = qsTr("PIN incorrect");
+            prefsPage._simLockSubText = message;
+            prefsPage._simLockInError = true;
         }
     }
 

@@ -37,6 +37,11 @@ Item {
 
     /// Emitted when a command finished, with a message ready to show the user.
     signal completed(bool success, string message);
+    /// The preferences' own writes, each answered on its own so a toggle the
+    /// network turned down can be put back
+    signal forwardingSet(bool success);
+    signal callerIdSet(bool success);
+    signal callWaitingSet(bool success);
     /// Emitted for interrogations, with the current setting.
     signal queried(string what, string status, string details);
 
@@ -93,6 +98,11 @@ Item {
      * Preferences-facing API. These are the same operations the MMI codes reach,
      * exposed under readable names for PhonePrefsPage.
      */
+    /// oFono has read the settings from the network ("Reading from network"
+    /// until then)
+    readonly property bool forwardingReady: callForwarding.ready
+    readonly property bool callSettingsReady: callSettings.ready
+
     property alias callForwardingUnconditional: callForwarding.voiceUnconditional
     property alias callForwardingBusy: callForwarding.voiceBusy
     property alias callForwardingNoReply: callForwarding.voiceNoReply
@@ -382,7 +392,7 @@ Item {
         id: callForwarding
         modemPath: supplementaryServices.modemPath
 
-        onVoiceUnconditionalComplete: (success) => _onSetComplete(success)
+        onVoiceUnconditionalComplete: (success) => { _onSetComplete(success); forwardingSet(success); }
         onVoiceBusyComplete: (success) => _onSetComplete(success)
         onVoiceNoReplyComplete: (success) => _onSetComplete(success)
         onVoiceNotReachableComplete: (success) => _onSetComplete(success)
@@ -393,8 +403,8 @@ Item {
         id: callSettings
         modemPath: supplementaryServices.modemPath
 
-        onVoiceCallWaitingComplete: (success) => _onSetComplete(success)
-        onHideCallerIdComplete: (success) => _onSetComplete(success)
+        onVoiceCallWaitingComplete: (success) => { _onSetComplete(success); callWaitingSet(success); }
+        onHideCallerIdComplete: (success) => { _onSetComplete(success); callerIdSet(success); }
         onGetPropertiesFailed: _propertiesUnavailable()
     }
 
