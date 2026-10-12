@@ -28,16 +28,17 @@ import Eos.Window 0.1
 
 import LunaNext.Common 0.1
 import LuneOS.Service 1.0
+import LuneOS.System 1.0
 
 WebOSWindow {
     id: root
 
+    // qml-runner shows the window it was given on every relaunch; this one is
+    // never meant to appear (see windowType), so it goes straight back.
     visible: false
     onVisibleChanged: {
-        if (root.visible) {
+        if (root.visible)
             root.visible = false;
-            root.launchParamsChanged();
-        }
     }
 
     /// Set by the desktop host. A device has a system app menu of its own and
@@ -70,25 +71,10 @@ WebOSWindow {
      * `mode` and `launchedAtBoot`.
      */
     function handleLaunchParams(params) {
-        if (!params)
+        // The status bar's app menu command, or another palm-command: either
+        // way nothing to show or dial (LaunchParams below opens the menu)
+        if (launch.isCommand(params))
             return;
-
-        /*
-         * The status bar's menu does not draw anything itself: it relaunches
-         * the app with this command and leaves the app to put its own menu up.
-         * On a device that is the only way in, since the app draws no menu
-         * button of its own there.
-         */
-        // The command may arrive on its own or still wrapped in the launch
-        // request the shell sent, depending on what the runner hands over.
-        var command = params["palm-command"] ||
-                      (params.params ? params.params["palm-command"] : undefined);
-
-        if (command === "open-app-menu") {
-            console.log("Opening the app menu for the status bar");
-            phoneWindow.openAppMenu();
-            return;
-        }
 
         if (params.mode && params.mode === "first-use") {
             // PIN window will now open automatically when the PIN is required
@@ -115,46 +101,21 @@ WebOSWindow {
             phoneWindow.show();
     }
 
-    Component.onCompleted: {
-        // with qml-runner, launchParams are set later on
-        if(typeof root.params === "undefined") {
-            var launchParams = {"mode": "first-use"};
-            if (typeof application !== "undefined")
-                launchParams = JSON.parse(application.launchParameters);
-
-            console.log("Parsing Launch Params: " + JSON.stringify(launchParams));
-            handleLaunchParams(launchParams);
-        }
-    }
-
-    onLaunchParamsChanged: {
-        console.log("DEBUG: Relaunched with parameters: " + launchParams);
-        handleLaunchParams(params);
-    }
-
-    Connections {
-        target: typeof application !== "undefined" ? application : null
-        function onRelaunched(parameters) {
-            console.log("DEBUG: Relaunched with parameters: " + parameters);
-
-            var params = {};
-            try {
-                params = JSON.parse(parameters);
-            } catch (error) {
-                console.log("Could not parse relaunch parameters: " + error);
-            }
-
-            var hasCommand = params["palm-command"] ||
-                             (params.params && params.params["palm-command"]);
-
-            if (params.action || params.address || hasCommand) {
-                root.handleLaunchParams(params);
-                return;
-            }
-
-            // If we're launched at boot time we're not yet visible so bring our window
-            // to the foreground
-            phoneWindow.show();
+    /*
+     * The launch at boot, and every relaunch after it: the launcher icon (an
+     * empty relaunch, which shows the phone window), another app's action, or
+     * the status bar's app menu. The status bar's menu does not draw anything
+     * itself: it relaunches the app with a command and leaves the app to put
+     * its own menu up. On a device that is the only way in, since the app
+     * draws no menu button of its own there.
+     */
+    LaunchParams {
+        id: launch
+        window: root
+        onLaunched: (params) => root.handleLaunchParams(params)
+        onAppMenuRequested: {
+            console.log("Opening the app menu for the status bar");
+            phoneWindow.openAppMenu();
         }
     }
 

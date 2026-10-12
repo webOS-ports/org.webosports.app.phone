@@ -17,7 +17,7 @@
 
 import QtQuick 2.0
 
-import LuneOS.Service 1.0
+import LuneOS.System 1.0
 
 /**
  * Dialing shortcuts, as in the legacy app's Dialingshortcut preference: a
@@ -47,9 +47,8 @@ Item {
         var payload = {};
         payload[key] = prefix || "";
 
-        lunaService.call("luna://com.webos.service.systemservice/setPreferences",
-                         JSON.stringify(payload), undefined,
-                         function(error) { console.log("Could not store dialing shortcut: " + error); });
+        if (!prefs.setMany(payload))
+            console.log("Could not store dialing shortcut before the stored ones were read");
     }
 
     function _updateFromPreferences(preferences) {
@@ -68,16 +67,11 @@ Item {
         hasShortcuts = any;
     }
 
-    LunaService {
-        id: lunaService
-        name: "org.webosports.app.phone"
-    }
-
-    Component.onCompleted: {
-        var keys = supportedLengths.map(function(length) { return length + "DigitNumber"; });
-        lunaService.subscribe("luna://com.webos.service.systemservice/getPreferences",
-                              JSON.stringify({ keys: keys, subscribe: true }),
-                              function(message) { _updateFromPreferences(JSON.parse(message.payload)); },
-                              function(error) { console.log("No dialing shortcuts configured: " + error); });
+    SystemPreferences {
+        id: prefs
+        clientName: "org.webosports.app.phone"
+        keys: supportedLengths.map(function(length) { return length + "DigitNumber"; })
+        onUpdated: (response) => _updateFromPreferences(response)
+        onError: (message) => console.log("No dialing shortcuts configured: " + message)
     }
 }

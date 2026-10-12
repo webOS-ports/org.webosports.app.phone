@@ -30,7 +30,7 @@ f  o|  o|__     "`-.
 import QtQuick 2.0
 import QtMultimedia 6.3
 
-import LuneOS.Service 1.0
+import LuneOS.System 1.0
 
 /**
  * Plays the ringtone for an incoming call.
@@ -113,18 +113,14 @@ Item {
         }
     }
 
-    Component.onCompleted: {
-        __lunaNextLS2Service.subscribe("luna://com.palm.systemservice/getPreferences",
-                                       JSON.stringify({ keys: ["ringtone", "phoneIncomingCallOnCallSound"],
-                                                        subscribe: true }),
-                                       _getPreferencesSuccess, _getPreferencesFailure)
+    SystemPreferences {
+        clientName: "org.webosports.app.phone"
+        keys: ["ringtone", "phoneIncomingCallOnCallSound"]
+        onUpdated: (response) => _getPreferencesSuccess(response)
+        onError: (message) => _getPreferencesFailure(message)
     }
-    LunaService {
-        id: __lunaNextLS2Service
-        name: "org.webosports.app.phone"
-    }
-    function _getPreferencesSuccess(message) {
-        var response = JSON.parse(message.payload)
+
+    function _getPreferencesSuccess(response) {
         if (response.ringtone && response.ringtone.fullPath) {
             console.log("phone: set ringtone to: " + response.ringtone.fullPath);
             ringtonePath = response.ringtone.fullPath;

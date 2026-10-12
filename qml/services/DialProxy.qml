@@ -17,7 +17,7 @@
 
 import QtQuick 2.0
 
-import LuneOS.Service 1.0
+import LuneOS.System 1.0
 
 import "DialStringParser.js" as DialStringParser
 
@@ -96,9 +96,8 @@ Item {
         var payload = {};
         payload[international ? preferenceInternational : preferenceDomestic] = transportId;
 
-        lunaService.call("luna://com.webos.service.systemservice/setPreferences",
-                         JSON.stringify(payload), undefined,
-                         function(error) { console.log("Could not store the preferred service: " + error); });
+        if (!prefs.setMany(payload))
+            console.log("Could not store the preferred service before the stored one was read");
     }
 
     /**
@@ -146,16 +145,12 @@ Item {
             preferredInternationalService = preferences[preferenceInternational];
     }
 
-    LunaService {
-        id: lunaService
-        name: "org.webosports.app.phone"
+    SystemPreferences {
+        id: prefs
+        clientName: "org.webosports.app.phone"
+        keys: [preferenceDomestic, preferenceInternational]
+        onUpdated: (response) => _onPreferences(response)
+        onError: (message) => console.log("No preferred phone service set: " + message)
     }
 
-    Component.onCompleted: {
-        lunaService.subscribe("luna://com.webos.service.systemservice/getPreferences",
-                              JSON.stringify({ keys: [preferenceDomestic, preferenceInternational],
-                                               subscribe: true }),
-                              function(message) { _onPreferences(JSON.parse(message.payload)); },
-                              function(error) { console.log("No preferred phone service set: " + error); });
-    }
 }

@@ -485,6 +485,8 @@ Item {
             voiceCallMgrWrapper: tabView.voiceCallManager
             supplementaryServices: tabView.supplementaryServices
             dialingShortcuts: tabView.dialingShortcuts
+            // The calling accounts behind Domestic and International Calls
+            callTransports: tabView.callTransports
 
             onClosed: tabView.hideOverlayPage(prefsLoader)
         }

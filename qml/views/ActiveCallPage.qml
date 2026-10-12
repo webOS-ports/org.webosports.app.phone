@@ -21,7 +21,7 @@ import QtQuick.Layouts 1.0
 
 import org.nemomobile.voicecall 1.0
 
-import LuneOS.Service 1.0
+import LuneOS.System 1.0
 import LuneOS.Telephony 1.0
 
 import LunaNext.Common 0.1
@@ -500,15 +500,16 @@ BasePage {
     }
 
     function _addToContacts(address) {
-        lunaService.call("luna://com.webos.applicationManager/launch",
-                         JSON.stringify({ id: "com.palm.app.contacts",
-                                          params: { newContact: { phoneNumbers: [ { value: address } ] } } }),
-                         undefined,
-                         function(error) { console.log("Could not open Contacts: " + error); });
+        launcher.launch("com.palm.app.contacts",
+                        { newContact: { phoneNumbers: [ { value: address } ] } }, undefined,
+                        function(error) { console.log("Could not open Contacts: " + error); });
     }
 
-    LunaService {
-        id: lunaService
-        name: "org.webosports.app.phone"
+    AppLauncher {
+
+        id: launcher
+
+        clientName: "org.webosports.app.phone"
+
     }
 }

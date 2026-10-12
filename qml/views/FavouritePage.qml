@@ -22,7 +22,7 @@ import QtQuick.Layouts 1.2
 
 import LunaNext.Common 0.1
 import LuneOS.Components 1.0
-import LuneOS.Service 1.0
+import LuneOS.System 1.0
 
 import "../model"
 import "../services/PhoneNumberUtils.js" as PhoneNumberUtils
@@ -379,13 +379,15 @@ BasePage {
     }
 
     function _launch(appId, params) {
-        lunaService.call("luna://com.webos.applicationManager/launch",
-                         JSON.stringify({ id: appId, params: params }), undefined,
-                         function(error) { console.log("Could not launch " + appId + ": " + error); });
+        launcher.launch(appId, params, undefined,
+                        function(error) { console.log("Could not launch " + appId + ": " + error); });
     }
 
-    LunaService {
-        id: lunaService
-        name: "org.webosports.app.phone"
+    AppLauncher {
+
+        id: launcher
+
+        clientName: "org.webosports.app.phone"
+
     }
 }

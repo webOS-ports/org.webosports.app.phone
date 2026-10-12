@@ -46,6 +46,10 @@ Item {
     property var serviceNumbers: simManager.serviceNumbers
     property bool fixedDialing: simManager.fixedDialing
     property int pinRequired: simManager.pinRequired
+    /// The SIM asks for its PIN at power-on ("Lock SIM Card" in the preferences)
+    readonly property bool simPinLocked: !!simManager.lockedPins
+                                         && simManager.lockedPins.indexOf(OfonoSimManager.SimPin) >= 0
+    readonly property bool pukRequired: simManager.pinRequired === OfonoSimManager.SimPuk
 
     // Network registration
     property string networkStatus: netreg.status        // unregistered/registered/searching/denied/unknown/roaming

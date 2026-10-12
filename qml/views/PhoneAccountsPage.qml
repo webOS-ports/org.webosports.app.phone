@@ -24,7 +24,10 @@ import QtQuick.Controls.LuneOS 2.0
 import QtQuick.Layouts 1.2
 
 import LunaNext.Common 0.1
-import LuneOS.Service 1.0
+import LuneOS.Forms 1.0
+import LuneOS.System 1.0
+
+import "../services"
 
 /**
  * "Your phone accounts": which services this device can place calls over.
@@ -32,214 +35,117 @@ import LuneOS.Service 1.0
  * Ports the legacy firstLaunch/ConnectPhone scene, generalised. It is shown on
  * its own when no calling account exists at all -- with no SIM and no connector
  * there is nothing the dialpad could do -- and is reachable from the
- * preferences the rest of the time.
+ * preferences the rest of the time. In the look of the settings apps, like
+ * the preferences.
  */
-BasePage {
+AppPage {
     id: accountsPage
 
-    pageName: "PhoneAccounts"
-
-    // A preference scene is light, and belongs to the settings world rather
-    // than to the call -- so it does not take the call card's gradient.
-    gradient: null
-    color: appTheme.prefsBackgroundColor
-
-    Rectangle {
-        id: prefsHeader
-
-        anchors { top: parent.top; left: parent.left; right: parent.right }
-        height: Units.gu(5)
-        color: appTheme.prefsHeaderColor
-
-        Row {
-            anchors.centerIn: parent
-            spacing: Units.gu(0.8)
-
-            Image {
-                anchors.verticalCenter: parent.verticalCenter
-                width: Units.gu(2.8)
-                height: Units.gu(2.8)
-                fillMode: Image.PreserveAspectFit
-                source: Qt.resolvedUrl("../../icon.png")
-            }
-
-            Text {
-                anchors.verticalCenter: parent.verticalCenter
-                color: appTheme.prefsTextColor
-                font.pixelSize: FontUtils.sizeToPixels("large")
-                text: qsTr("Phone Accounts")
-            }
-        }
-
-        Rectangle {
-            anchors { left: parent.left; right: parent.right; bottom: parent.bottom }
-            height: 1
-            color: appTheme.prefsRowDividerColor
-        }
-    }
-
+    // What PhoneTabView hands the page
+    property UiTheme appTheme
+    property CallTransports callTransports
 
     signal closed();
 
-    Text {
-        id: header
+    // Done sits at the foot, as in every webOS preferences scene
+    footer: DoneBar { onClicked: accountsPage.closed() }
 
-        anchors {
-            top: prefsHeader.bottom
-            left: parent.left
-            right: parent.right
-            margins: Units.gu(1.5)
-        }
-        horizontalAlignment: Text.AlignHCenter
-        wrapMode: Text.Wrap
-        color: accountsPage.appTheme.prefsTextColor
-        font.bold: true
-        font.pixelSize: FontUtils.sizeToPixels("large")
-        text: qsTr("Your phone accounts")
+    header: AppHeader {
+        height: Units.gu(7.5)
+        title: qsTr("Phone Accounts")
+        icon: Qt.resolvedUrl("../../icon.png")
+        compact: width < Units.gu(50)
     }
 
-    Text {
-        id: subheader
+    readonly property var _transportIds: callTransports ? callTransports.callableTransportIds() : []
 
-        anchors {
-            top: header.bottom
-            left: parent.left
-            right: parent.right
-            margins: Units.gu(1.5)
-        }
-        horizontalAlignment: Text.AlignHCenter
-        wrapMode: Text.Wrap
-        color: accountsPage.appTheme.prefsSecondaryTextColor
-        font.pixelSize: FontUtils.sizeToPixels("small")
-        text: accountsPage.callTransports && accountsPage.callTransports.callableTransportIds().length > 0
-                  ? qsTr("Calls can be placed over any of these.")
-                  : qsTr("Add an account that can place calls, or insert a SIM card.")
-    }
-
-    Flickable {
-        anchors {
-            top: subheader.bottom
-            bottom: doneButton.top
-            left: parent.left
-            right: parent.right
-            margins: Units.gu(1.5)
-        }
-        contentHeight: accountsColumn.height
-        clip: true
-
-        Column {
-            id: accountsColumn
-
+    SettingsPageContent {
+        ExplanationText {
             width: parent.width
-            spacing: Units.gu(1.5)
+            horizontalAlignment: Text.AlignHCenter
+            text: accountsPage._transportIds.length > 0
+                      ? qsTr("Calls can be placed over any of these.")
+                      : qsTr("Add an account that can place calls, or insert a SIM card.")
+        }
 
-            // The accounts, in a group of their own as the preferences scene
-            // shows them -- not as dark panels floating on a light page.
-            PrefsGroup {
-                width: parent.width
-                appTheme: accountsPage.appTheme
-                title: qsTr("Accounts")
+        FormGroup {
+            title: qsTr("Accounts")
 
-                Repeater {
-                    model: accountsPage.callTransports
-                               ? accountsPage.callTransports.callableTransportIds() : []
+            Repeater {
+                model: accountsPage._transportIds
 
-                    delegate: Item {
-                        required property var modelData
-                        readonly property var transport:
-                            accountsPage.callTransports.transportFor(modelData)
+                delegate: Item {
+                    required property var modelData
+                    readonly property var transport:
+                        accountsPage.callTransports.transportFor(modelData)
 
-                        width: accountsColumn.width - Units.gu(1.6)
-                        height: Units.gu(5.5)
+                    width: parent ? parent.width : 0
+                    height: Units.gu(6.5)
 
-                        RowLayout {
-                            anchors.fill: parent
-                            anchors.leftMargin: Units.gu(0.4)
-                            anchors.rightMargin: Units.gu(0.4)
-                            spacing: Units.gu(1)
+                    RowLayout {
+                        anchors.fill: parent
+                        spacing: Units.gu(1)
 
-                            Image {
-                                Layout.preferredWidth: Units.gu(3.4)
-                                Layout.preferredHeight: Units.gu(3.4)
-                                fillMode: Image.PreserveAspectFit
-                                visible: !!source && String(source).length > 0
-                                source: (transport && transport.icon) ? transport.icon : ""
-                            }
+                        Image {
+                            Layout.preferredWidth: Units.gu(3.4)
+                            Layout.preferredHeight: Units.gu(3.4)
+                            fillMode: Image.PreserveAspectFit
+                            visible: !!source && String(source).length > 0
+                            source: (transport && transport.icon) ? transport.icon : ""
+                        }
 
-                            ColumnLayout {
+                        ColumnLayout {
+                            Layout.fillWidth: true
+                            spacing: 0
+
+                            Label {
                                 Layout.fillWidth: true
-                                spacing: 0
-
-                                Text {
-                                    Layout.fillWidth: true
-                                    color: accountsPage.appTheme.prefsTextColor
-                                    elide: Text.ElideRight
-                                    font.pixelSize: FontUtils.sizeToPixels("medium")
-                                    text: accountsPage.callTransports.labelFor(modelData)
-                                }
-                                Text {
-                                    Layout.fillWidth: true
-                                    color: accountsPage.appTheme.prefsSecondaryTextColor
-                                    elide: Text.ElideRight
-                                    font.pixelSize: FontUtils.sizeToPixels("small")
-                                    text: {
-                                        if (transport && transport.alias && transport.alias.length > 0)
-                                            return transport.alias;
-
-                                        return accountsPage.callTransports.isAvailable(modelData)
-                                                   ? qsTr("Ready") : qsTr("Not available");
-                                    }
-                                }
+                                elide: Text.ElideRight
+                                font.pixelSize: FontUtils.sizeToPixels("16pt")
+                                text: accountsPage.callTransports.labelFor(modelData)
                             }
-
-                            Text {
-                                color: accountsPage.appTheme.prefsSecondaryTextColor
+                            Label {
+                                Layout.fillWidth: true
+                                elide: Text.ElideRight
+                                color: Colors.secondaryText
                                 font.pixelSize: FontUtils.sizeToPixels("small")
-                                visible: accountsPage.callTransports.supportsVideo(modelData)
-                                text: qsTr("Video")
+                                text: {
+                                    if (transport && transport.alias && transport.alias.length > 0)
+                                        return transport.alias;
+
+                                    return accountsPage.callTransports.isAvailable(modelData)
+                                               ? qsTr("Ready") : qsTr("Not available");
+                                }
                             }
+                        }
+
+                        Label {
+                            color: Colors.secondaryText
+                            font.pixelSize: FontUtils.sizeToPixels("small")
+                            visible: accountsPage.callTransports.supportsVideo(modelData)
+                            text: qsTr("Video")
                         }
                     }
                 }
-
-                Item {
-                    width: accountsColumn.width - Units.gu(1.6)
-                    height: Units.gu(5.5)
-                    visible: !accountsPage.callTransports ||
-                             accountsPage.callTransports.callableTransportIds().length === 0
-
-                    Text {
-                        anchors.centerIn: parent
-                        color: accountsPage.appTheme.prefsSecondaryTextColor
-                        font.pixelSize: FontUtils.sizeToPixels("medium")
-                        text: qsTr("No calling accounts yet")
-                    }
-                }
             }
 
-            PrefsLightButton {
-                width: parent.width
-                appTheme: accountsPage.appTheme
-                text: qsTr("Add an account")
-
-                onClicked: lunaService.call("luna://com.webos.applicationManager/launch",
-                                            JSON.stringify({ id: "com.palm.app.accounts" }), undefined,
-                                            function(error) { console.log("Could not open Accounts: " + error); })
+            LabelAndValue {
+                visible: accountsPage._transportIds.length === 0
+                label: qsTr("No calling accounts yet")
             }
+        }
+
+        Button {
+            width: parent.width
+            text: qsTr("Add an account")
+
+            onClicked: launcher.launch("com.palm.app.accounts", null, undefined,
+                                       function(error) { console.log("Could not open Accounts: " + error); })
         }
     }
 
-    PrefsDoneBar {
-        id: doneButton
-
-        anchors { bottom: parent.bottom; left: parent.left; right: parent.right }
-        appTheme: accountsPage.appTheme
-
-        onClicked: accountsPage.closed()
-    }
-
-    LunaService {
-        id: lunaService
-        name: "org.webosports.app.phone"
+    AppLauncher {
+        id: launcher
+        clientName: "org.webosports.app.phone"
     }
 }

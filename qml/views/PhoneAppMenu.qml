@@ -22,7 +22,7 @@ import QtQuick.Controls 2.5
 // be drawn by the platform's style rather than whatever Controls defaults to.
 import QtQuick.Controls.LuneOS 2.0
 
-import LuneOS.Service 1.0
+import LuneOS.System 1.0
 
 import "../services"
 
@@ -87,13 +87,15 @@ Menu {
     }
 
     function _launch(appId) {
-        lunaService.call("luna://com.webos.applicationManager/launch",
-                         JSON.stringify({ id: appId }), undefined,
-                         function(error) { console.log("Could not launch " + appId + ": " + error); });
+        launcher.launch(appId, null, undefined,
+                        function(error) { console.log("Could not launch " + appId + ": " + error); });
     }
 
-    LunaService {
-        id: lunaService
-        name: "org.webosports.app.phone"
+    AppLauncher {
+
+        id: launcher
+
+        clientName: "org.webosports.app.phone"
+
     }
 }
