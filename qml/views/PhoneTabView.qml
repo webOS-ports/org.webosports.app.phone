@@ -158,6 +158,18 @@ Item {
             return;
         }
 
+        /*
+         * Nor is a view the window has stopped showing. A call screen is pushed
+         * over this view and the view is hidden under it, but the keypad, being
+         * in the overlay, stayed up on top of the call: only placing a call
+         * closed it, so an answered incoming call was buried under the keys,
+         * its buttons out of reach. It comes back when the call screen goes.
+         */
+        if (!tabView.visible) {
+            dialpadOverlay.close();
+            return;
+        }
+
         if (!tabView.phoneUi)
             return;
 
@@ -179,7 +191,7 @@ Item {
         syncDialpad();
     }
 
-    onVisibleChanged: if (visible) syncDialpad()
+    onVisibleChanged: syncDialpad()
 
     Connections {
         target: contentStack
