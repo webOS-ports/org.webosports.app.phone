@@ -180,6 +180,31 @@ Item {
                allCallsList.some(function(call) { return call.status === VoiceCall.STATUS_ACTIVE; });
     }
 
+    /**
+     * A call that needs the modem's voice path: talking, on hold, or dialling
+     * out (ringback and early media come through the voice path too). Not an
+     * incoming call that is only ringing - the ringtone plays on the normal
+     * output, and the voicecall profile would take it away from the speaker.
+     *
+     * Not hasActiveCall either: the manager makes a ringing call its
+     * activeVoiceCall, so that flag is already true while the phone rings,
+     * which put audiod into the call (and paused the music) before anyone
+     * had answered. Every call has to be positively in one of the states
+     * below - a freshly reported call starts out with no status at all, and
+     * "not ringing" let that through for a moment too.
+     */
+    readonly property bool hasCallInProgress: {
+        callsRevision;
+        function inProgress(call) {
+            return call.status === VoiceCall.STATUS_ACTIVE ||
+                   call.status === VoiceCall.STATUS_HELD ||
+                   call.status === VoiceCall.STATUS_DIALING ||
+                   call.status === VoiceCall.STATUS_ALERTING;
+        }
+        return (!!activeVoiceCall && inProgress(activeVoiceCall)) ||
+               allCallsList.some(inProgress);
+    }
+
     readonly property bool canSwap: hasActiveCall && hasHeldCall
     readonly property bool canMerge: canSwap && !hasConference
     readonly property bool canSplit: hasConference
@@ -402,19 +427,52 @@ Item {
     }
 
     /**
-     * Audio passthroughs, so callers work against this wrapper rather than
-     * reaching into the nemo manager behind it.
+     * Call audio, from audiod.
+     *
+     * Not the nemo manager's setAudioMode()/setMuteMicrophone(): its playback
+     * manager plugin hands those to org.maemo.Playback.Manager on the session
+     * bus, which nothing on LuneOS provides, so the speaker and mute buttons
+     * changed the button and nothing else. audiod is what switches the card
+     * and its ports, and it also follows the headphone jack on its own - a
+     * plug takes the call from the earpiece without anything here asking.
+     *
+     * Everything below mirrors audiod's getStatus, so the buttons show what
+     * the hardware is actually doing.
      */
-    property alias audioMode: voiceCallManagerId.audioMode
-    property alias isMicrophoneMuted: voiceCallManagerId.isMicrophoneMuted
-    property alias isSpeakerMuted: voiceCallManagerId.isSpeakerMuted
+    property bool speakerMode: false
+    property bool isMicrophoneMuted: false
+    property bool headsetConnected: false
+    property bool bluetoothAudio: false
+
+    /// The route in the names AudioRouteManager uses.
+    readonly property string audioMode: speakerMode ? "ihf"
+                                      : headsetConnected ? "wired_headset"
+                                      : "earpiece"
 
     function setAudioMode(mode) {
-        return manager.setAudioMode(mode);
+        // Earpiece and wired headset are the same request: not the speaker.
+        // audiod sends it to the jack when something is plugged in.
+        __lunaNextLS2Service.call("luna://org.webosports.service.audio/setCallMode",
+                                  JSON.stringify({ speakerMode: mode === "ihf" }),
+                                  undefined, root.__setCallModeError);
     }
 
     function setMuteMicrophone(on) {
-        return manager.setMuteMicrophone(on);
+        __lunaNextLS2Service.call("luna://org.webosports.service.audio/setMicMute",
+                                  JSON.stringify({ micMute: on }),
+                                  undefined, function(message) {
+                                      console.log("Problem when calling luna://org.webosports.service.audio/setMicMute : " + message);
+                                  });
+    }
+
+    function __audioStatus(message) {
+        var status = JSON.parse(message.payload);
+        if (status.returnValue === false)
+            return;
+        speakerMode = status.speakerMode === true;
+        isMicrophoneMuted = status.micMute === true;
+        headsetConnected = status.headset === true;
+        bluetoothAudio = status.bluetoothAudio === true;
     }
 
     /**
@@ -448,18 +506,28 @@ Item {
             return;
         __callModeSet = inCall;
         console.log("phone: telling audiod inCall=" + inCall);
-        __lunaNextLS2Service.call("luna://org.webosports.service.audio/setCallMode", JSON.stringify({ inCall: inCall }),
+        // A new call starts on the earpiece; speakerphone and a muted mic do
+        // not carry over from the last one. Not on a forced resync: then the
+        // call may already be up, with the speaker on for a reason.
+        var request = { inCall: inCall };
+        if (inCall && !force) {
+            request.speakerMode = false;
+            setMuteMicrophone(false);
+        }
+        __lunaNextLS2Service.call("luna://org.webosports.service.audio/setCallMode", JSON.stringify(request),
                                   undefined, root.__setCallModeError);
     }
 
     /**
-     * Drive it from hasActiveCall rather than activeVoiceCall alone. The
+     * Drive it from hasCallInProgress rather than activeVoiceCall alone. The
      * manager unsets activeVoiceCall during a conference and briefly while
      * calls are swapped - the same reason currentCall() exists - and each of
      * those transitions used to send a spurious inCall:false, and on the way
-     * back a true that no later event was guaranteed to undo.
+     * back a true that no later event was guaranteed to undo. Held and
+     * dialling calls count too: on hold the call must not drop out of the
+     * voicecall profile, and while dialling the ringback comes through it.
      */
-    onHasActiveCallChanged: __setCallMode(hasActiveCall)
+    onHasCallInProgressChanged: __setCallMode(hasCallInProgress)
 
     onActiveVoiceCallChanged: {
         // A queued post-dial string is sent as soon as its call goes active.
@@ -722,9 +790,17 @@ Item {
         // Forced, because our own __callModeSet starts false and would
         // otherwise suppress the very call that repairs a stale true.
         // If a call really is up (we were restarted mid-call) this sends true,
-        // and if calls have not been enumerated yet the hasActiveCall handler
-        // sends it as soon as they are.
-        __setCallMode(hasActiveCall, true);
+        // and if calls have not been enumerated yet the hasCallInProgress
+        // handler sends it as soon as they are.
+        __setCallMode(hasCallInProgress, true);
+
+        // What the call audio is actually doing - speaker, mute, headphones.
+        __lunaNextLS2Service.subscribe("luna://org.webosports.service.audio/getStatus",
+                                       JSON.stringify({ subscribe: true }),
+                                       root.__audioStatus,
+                                       function(message) {
+                                           console.log("No audio status from audiod: " + message);
+                                       });
     }
 
     /**

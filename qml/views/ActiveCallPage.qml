@@ -360,7 +360,7 @@ BasePage {
                         color: '#ffffff'
                         font.bold: true
                         font.pixelSize: Units.gu(1.6)
-                        visible: voiceCallManager ? voiceCallManager.isMicrophoneMuted : false
+                        visible: voiceCallMgrWrapper ? voiceCallMgrWrapper.isMicrophoneMuted : false
                         text: qsTr("MUTE")
                     }
 
@@ -458,8 +458,10 @@ BasePage {
             visible: root.voiceCallIsActive
             iconSource: appTheme.image("menu-icon-mute.png")
             label: qsTr("Mute")
-            active: voiceCallManager ? voiceCallManager.isMicrophoneMuted : false
-            onClicked: voiceCallManager.setMuteMicrophone(!voiceCallManager.isMicrophoneMuted)
+            // Through the wrapper, which asks audiod: the nemo manager hands mute to
+            // org.maemo.Playback.Manager, which nothing on LuneOS provides.
+            active: voiceCallMgrWrapper ? voiceCallMgrWrapper.isMicrophoneMuted : false
+            onClicked: voiceCallMgrWrapper.setMuteMicrophone(!voiceCallMgrWrapper.isMicrophoneMuted)
         }
 
         CallActionButton {

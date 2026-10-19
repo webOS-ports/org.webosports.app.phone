@@ -43,16 +43,18 @@ Item {
     readonly property string currentRoute: voiceCallManager ? voiceCallManager.audioMode : routeEarpiece
 
     property bool bluetoothAvailable: false
-    property bool wiredHeadsetConnected: false
+    /// From audiod, which follows the jack itself and routes the call to it.
+    readonly property bool wiredHeadsetConnected: voiceCallManager ? voiceCallManager.headsetConnected : false
     property bool onCharger: false
     property bool onInductiveCharger: false
 
     readonly property bool speakerOn: currentRoute === routeSpeaker
 
     /// Routes the user can pick from right now, most-preferred first.
+    /// With headphones plugged in the earpiece is not a choice: audiod gives
+    /// the call to the jack whenever the speaker is off.
     readonly property var availableRoutes: {
-        var routes = [routeEarpiece, routeSpeaker];
-        if (wiredHeadsetConnected) routes.push(routeWiredHeadset);
+        var routes = [wiredHeadsetConnected ? routeWiredHeadset : routeEarpiece, routeSpeaker];
         if (bluetoothAvailable) routes.push(routeBluetooth);
         return routes;
     }
@@ -131,18 +133,6 @@ Item {
                               function(error) {
                                   console.log("No bluetooth handsfree status: " + error);
                                   bluetoothAvailable = false;
-                              });
-
-        lunaService.subscribe("luna://com.palm.keys/audio/status",
-                              JSON.stringify({ subscribe: true }),
-                              function(message) {
-                                  var response = JSON.parse(message.payload);
-                                  wiredHeadsetConnected = (response.headset === true) ||
-                                                          (response.headsetMic === true);
-                              },
-                              function(error) {
-                                  console.log("No wired headset status: " + error);
-                                  wiredHeadsetConnected = false;
                               });
 
         lunaService.subscribe("luna://com.palm.power/com/palm/power/chargerStatus",
