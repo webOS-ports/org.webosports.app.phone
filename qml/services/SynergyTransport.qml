@@ -179,15 +179,36 @@ Item {
         _call(method, params);
     }
 
+    /**
+     * The connector's service URI, normalised and ending in "/".
+     *
+     * A template may declare its call service with either scheme - com.palm.whatsapp says
+     * `palm://com.palm.whatsapp.call` - and the two are the same bus. Prefixing "luna://"
+     * whenever the string did not already start with it turned that into
+     * `luna://palm://com.palm.whatsapp.call`, which ls-hubd rejects outright:
+     *
+     *     LS_INV_URI_SNAME ... Not a valid service name in uri luna://palm://com.palm.whatsapp.call
+     *
+     * Every call failed, every subscribe failed, and the failure handler restarts
+     * resubscribeTimer - so the app retried every five seconds for as long as the account
+     * existed, which is what it was doing on a MindPhone after a WhatsApp account was added.
+     */
+    function _serviceUri() {
+        var uri = implementation;
+        if (uri.indexOf("palm://") === 0)
+            uri = "luna://" + uri.substring(7);
+        else if (uri.indexOf("luna://") !== 0)
+            uri = "luna://" + uri;
+        if (uri.charAt(uri.length - 1) !== "/")
+            uri += "/";
+        return uri;
+    }
+
     function _call(method, params, onSuccess, onFailure) {
         if (implementation.length === 0)
             return;
 
-        var uri = implementation;
-        if (uri.indexOf("luna://") !== 0)
-            uri = "luna://" + uri;
-        if (uri.charAt(uri.length - 1) !== "/")
-            uri += "/";
+        var uri = _serviceUri();
 
         lunaService.call(uri + method, JSON.stringify(params || {}), onSuccess,
                          onFailure || function(error) {
@@ -236,11 +257,7 @@ Item {
         if (_subscribed || implementation.length === 0)
             return;
 
-        var uri = implementation;
-        if (uri.indexOf("luna://") !== 0)
-            uri = "luna://" + uri;
-        if (uri.charAt(uri.length - 1) !== "/")
-            uri += "/";
+        var uri = _serviceUri();
 
         console.log("Watching call state on " + transportId + " (" + uri + ")");
         _subscribed = true;
