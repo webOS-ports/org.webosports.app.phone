@@ -137,6 +137,27 @@ Item {
             compare(sw.checked, false);
         }
 
+        // And keeps following the network after that
+        function test_a_refused_change_leaves_the_switches_bound() {
+            var waiting = row("Call Waiting");
+            waiting.toggle();
+            supplementary.callWaitingSet(false);
+            supplementary.callWaiting = "enabled";
+            compare(waiting.checked, true, "call waiting stopped following the network");
+
+            var callerId = row("Show My Caller ID");
+            callerId.toggle();
+            supplementary.callerIdSet(false);
+            supplementary.hideCallerId = "enabled";
+            compare(callerId.checked, false, "caller ID stopped following the network");
+
+            var forwarding = row("Call Forwarding");
+            forwarding.toggle();
+            supplementary.forwardingSet(false);
+            supplementary.callForwardingUnconditional = "+31612345678";
+            compare(forwarding.checked, true, "call forwarding stopped following the network");
+        }
+
         function test_shortcuts_list_only_what_is_set() {
             tryVerify(function() { return shortcuts.hasShortcuts !== undefined; });
             var rows = findAll(page, function(o) { return o.hasOwnProperty("swipe") && o.hasOwnProperty("modelData"); });

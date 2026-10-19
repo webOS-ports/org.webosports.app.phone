@@ -116,34 +116,37 @@ AppPage {
         }
     }
 
-    // Puts a switch back on the value it shows when the network turned a
-    // change down (the user's tap had moved it off its binding's value)
-    function _revert(row, value) {
-        row.checked = value;
-    }
-
     property bool _forwardOpen: false
     readonly property bool _forwarding: !!supplementaryServices
                                         && supplementaryServices.callForwardingUnconditional.length > 0
+    readonly property bool _forwardingShown: _forwardOpen || _forwarding
+    readonly property bool _callerIdShown: !!supplementaryServices && supplementaryServices.hideCallerId !== "enabled"
+    readonly property bool _callWaitingShown: !!supplementaryServices && supplementaryServices.callWaiting === "enabled"
+
+    // Puts a switch back on its binding when the network turned a change
+    // down (the user's tap had moved it off the binding's value)
+    function _rebind(row, shown) {
+        row.checked = Qt.binding(shown);
+    }
 
     Connections {
         target: prefsPage.supplementaryServices
         function onForwardingSet(success) {
             if (!success) {
                 prefsPage._forwardOpen = false;
-                prefsPage._revert(forwardingSwitch, prefsPage._forwarding);
+                prefsPage._rebind(forwardingSwitch, () => prefsPage._forwardingShown);
                 errorDialog.show(qsTr("Call forwarding could not be set. You need a network connection to your wireless service provider to change it."));
             }
         }
         function onCallerIdSet(success) {
             if (!success) {
-                prefsPage._revert(callerIdSwitch, prefsPage.supplementaryServices.hideCallerId !== "enabled");
+                prefsPage._rebind(callerIdSwitch, () => prefsPage._callerIdShown);
                 errorDialog.show(qsTr("Caller ID could not be set."));
             }
         }
         function onCallWaitingSet(success) {
             if (!success) {
-                prefsPage._revert(callWaitingSwitch, prefsPage.supplementaryServices.callWaiting === "enabled");
+                prefsPage._rebind(callWaitingSwitch, () => prefsPage._callWaitingShown);
                 errorDialog.show(qsTr("Call waiting could not be set."));
             }
         }
@@ -216,7 +219,7 @@ AppPage {
                 visible: prefsPage._unavailableText.length === 0
                          && !!prefsPage.supplementaryServices && prefsPage.supplementaryServices.forwardingReady
                 label: qsTr("Call Forwarding")
-                checked: prefsPage._forwardOpen || prefsPage._forwarding
+                checked: prefsPage._forwardingShown
                 onToggled: {
                     if (checked) {
                         // On shows where the number goes; it is set once
@@ -256,14 +259,14 @@ AppPage {
                          && !!prefsPage.supplementaryServices && prefsPage.supplementaryServices.callSettingsReady
                 label: qsTr("Show My Caller ID")
                 // "default" leaves it to the network, which shows it
-                checked: !!prefsPage.supplementaryServices && prefsPage.supplementaryServices.hideCallerId !== "enabled"
+                checked: prefsPage._callerIdShown
                 onToggled: prefsPage.supplementaryServices.hideCallerId = checked ? "disabled" : "enabled"
             }
             LabelAndSwitch {
                 id: callWaitingSwitch
                 visible: callerIdSwitch.visible
                 label: qsTr("Call Waiting")
-                checked: !!prefsPage.supplementaryServices && prefsPage.supplementaryServices.callWaiting === "enabled"
+                checked: prefsPage._callWaitingShown
                 onToggled: prefsPage.supplementaryServices.callWaiting = checked ? "enabled" : "disabled"
             }
         }
