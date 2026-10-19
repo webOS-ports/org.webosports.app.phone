@@ -103,6 +103,19 @@ BasePage {
     }
 
     /**
+     * Height left for the photo once the rest of the card and the controls
+     * below it have theirs: the page's height less the gap above the card,
+     * the card's other rows and the controls. Summed from the rows rather
+     * than taken from the card, whose height includes the photo itself.
+     * The original was laid out for a 320x480 portrait screen; a square one
+     * such as the Zinwa Q25's has nothing like the height for all of it.
+     */
+    readonly property real _photoRoom: height - Units.gu(2)
+                                       - nameSlot.height - flipable.height - postDialSlot.height
+                                       - durationSlot.height - hangupSlot.height
+                                       - Units.gu(1.5) - controlsRow.height - Units.gu(1)
+
+    /**
      * The call card
      **/
 
@@ -138,6 +151,7 @@ BasePage {
             // address over a fourteen pixel network label, all centred, as
             // .single-call-display-name / -address / -label have them.
             Item {
+                id: nameSlot
                 width: parent.width
                 height: visible ? nameColumn.height + Units.gu(1.6) : 0
                 visible: !root.multipleCalls
@@ -235,15 +249,19 @@ BasePage {
             }
 
             // The contact's photo in its stamp frame, shown for a single call.
+            // It is the one thing on the card that can give way: on a short
+            // screen it shrinks, and goes, before the controls below the card
+            // are pushed off the bottom.
             Item {
+                id: photoSlot
                 width: parent.width
-                height: visible ? Units.gu(16.6) : 0
-                visible: !root.multipleCalls && !flipable.flipped
+                height: visible ? Math.min(Units.gu(16.6), root._photoRoom) : 0
+                visible: !root.multipleCalls && !flipable.flipped && root._photoRoom >= Units.gu(7)
 
                 Item {
                     anchors.centerIn: parent
-                    width: Units.gu(17)
-                    height: Units.gu(14)
+                    height: Math.min(Units.gu(14), parent.height - Units.gu(2.6))
+                    width: Math.round(height * 17 / 14)
 
                     Image {
                         id: imageAvatar
@@ -316,6 +334,7 @@ BasePage {
 
             // A post-dial string that stopped at a 'wait' needs the user to say go.
             Item {
+                id: postDialSlot
                 width: parent.width
                 height: visible ? Units.gu(5) : 0
                 visible: postDialPrompt.remainder.length > 0
@@ -349,6 +368,7 @@ BasePage {
             // How long the call has been up, with MUTE called out in front of
             // it while the microphone is off -- LineState's prefix label.
             Item {
+                id: durationSlot
                 width: parent.width
                 height: Units.gu(4.5)
 
@@ -360,7 +380,7 @@ BasePage {
                         color: '#ffffff'
                         font.bold: true
                         font.pixelSize: Units.gu(1.6)
-                        visible: voiceCallManager ? voiceCallManager.isMicrophoneMuted : false
+                        visible: voiceCallMgrWrapper ? voiceCallMgrWrapper.isMicrophoneMuted : false
                         text: qsTr("MUTE")
                     }
 
@@ -377,6 +397,7 @@ BasePage {
             // With a single call this ends it; with several, each line carries
             // its own hangup and this ends them all.
             Item {
+                id: hangupSlot
                 width: parent.width
                 height: Units.gu(6.6)
 
@@ -458,8 +479,10 @@ BasePage {
             visible: root.voiceCallIsActive
             iconSource: appTheme.image("menu-icon-mute.png")
             label: qsTr("Mute")
-            active: voiceCallManager ? voiceCallManager.isMicrophoneMuted : false
-            onClicked: voiceCallManager.setMuteMicrophone(!voiceCallManager.isMicrophoneMuted)
+            // Through the wrapper, which asks audiod: the nemo manager hands mute to
+            // org.maemo.Playback.Manager, which nothing on LuneOS provides.
+            active: voiceCallMgrWrapper ? voiceCallMgrWrapper.isMicrophoneMuted : false
+            onClicked: voiceCallMgrWrapper.setMuteMicrophone(!voiceCallMgrWrapper.isMicrophoneMuted)
         }
 
         CallActionButton {
