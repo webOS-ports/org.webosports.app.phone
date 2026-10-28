@@ -31,6 +31,7 @@ import QtQuick 2.0
 import QtMultimedia 6.3
 
 import LuneOS.System 1.0
+import org.nemomobile.voicecall 1.0
 
 /**
  * Plays the ringtone for an incoming call.
@@ -85,7 +86,28 @@ Item {
     MediaPlayer {
          id: ringtone
          loops: MediaPlayer.Infinite
-         audioOutput: AudioOutput {}
+         audioOutput: AudioOutput { id: ringtoneOutput }
+    }
+
+    // Ring through the "pringtones" sink rather than the default one: the
+    // audio policy only knows a stream is a ringtone by the sink it is played
+    // on, and gives it the ringtone volume and the loudspeaker as well as the
+    // headphones. Without that sink (a desktop) the default output is kept.
+    MediaDevices {
+        id: mediaDevices
+        onAudioOutputsChanged: ringMgrItem._useRingtoneSink()
+    }
+
+    Component.onCompleted: _useRingtoneSink()
+
+    function _useRingtoneSink() {
+        var outputs = mediaDevices.audioOutputs;
+        for (var i = 0; i < outputs.length; i++) {
+            if (outputs[i].id == "pringtones") {
+                ringtoneOutput.device = outputs[i];
+                return;
+            }
+        }
     }
 
     Connections {
@@ -93,9 +115,11 @@ Item {
 
         function onIncomingCall(voiceCall) {
             // Another call already up means this is call waiting, not a
-            // ringing phone.
-            var alreadyOnACall = voiceCallManager.callCount > 1 ||
-                                 !!voiceCallManager.activeVoiceCall;
+            // ringing phone. Not activeVoiceCall: the manager makes the call
+            // that is ringing its active call, so that would make every call
+            // a waiting one, and the phone would never ring.
+            var alreadyOnACall = voiceCall.status === VoiceCall.STATUS_WAITING ||
+                                 voiceCallManager.callCount > 1;
 
             ringMgrItem.state = alreadyOnACall ? "callWaiting" : "ringing";
         }
