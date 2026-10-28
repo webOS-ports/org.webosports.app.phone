@@ -46,14 +46,25 @@ Item {
         return _buddies[serviceName + "|" + username] || null;
     }
 
-    /// True when the buddy is reachable right now. Connectors that publish no
-    /// presence at all are treated as available rather than hidden.
+    /// The availability values every connector writes, imlibpurple's
+    /// PalmAvailability and the legacy IMAddress.STATUS: the lower, the more
+    /// reachable.
+    readonly property var availability: ({ online: 0, mobile: 1, idle: 2, invisible: 3,
+                                           offline: 4, pending: 5, noPresence: 6 })
+
+    /// True when the buddy is reachable right now: online, on mobile, or idle
+    /// (busy), as the legacy phone offered a call to 0 and 2. Invisible,
+    /// offline and pending are not. Connectors that publish no presence at
+    /// all, or no presence for this buddy, are treated as available rather
+    /// than hidden.
     function isAvailable(serviceName, username) {
         var buddy = buddyInfo(serviceName, username);
         if (!buddy)
             return true;
 
-        return _availability(buddy) !== 0;
+        var value = _availability(buddy);
+        return value !== availability.invisible && value !== availability.offline
+                && value !== availability.pending;
     }
 
     function _availability(buddy) {
@@ -110,5 +121,13 @@ Item {
         }
 
         onCountChanged: imBuddyStatus._refresh()
+    }
+
+    // The device's Db8Model reloads a watched query with a model reset, and
+    // signals countChanged only when the number of rows changed: a buddy
+    // going from offline to online arrives only as the reset.
+    Connections {
+        target: buddyModel
+        function onModelReset() { imBuddyStatus._refresh(); }
     }
 }
