@@ -199,6 +199,27 @@ Item {
             compare(endingSpy.count, 1);
         }
 
+        // --- what audiod hears ---
+
+        function test_aSynergyCallIsInProgressButNotACellularOne() {
+            var wrapper = makeWrapperWithSpy();
+            var call = makeCall("whatsapp-1", VoiceCall.STATUS_ACTIVE);
+            call.providerId = "com.palm.whatsapp";
+            listCalls(wrapper, [call]);
+            // The call screens follow it...
+            verify(wrapper.hasCallInProgress);
+            // ...but audiod must not put the modem's voice path on for it:
+            // its connector plays and records on the normal audio path.
+            verify(!wrapper.hasCellularCallInProgress);
+        }
+
+        function test_aRingingSynergyCallIsNotInProgress() {
+            var wrapper = makeWrapperWithSpy();
+            var call = makeCall("whatsapp-2", VoiceCall.STATUS_INCOMING);
+            listCalls(wrapper, [call]);
+            verify(!wrapper.hasCallInProgress);
+        }
+
         // --- the strip follows its call ---
 
         function showAlertFor(call) {

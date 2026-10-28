@@ -186,6 +186,11 @@ Item {
      * incoming call that is only ringing - the ringtone plays on the normal
      * output, and the voicecall profile would take it away from the speaker.
      *
+     * Cellular calls only. A Synergy call goes over the normal audio path,
+     * and its connector reports it to audiod itself (phone/CallStatusUpdate,
+     * with its own transport); counting it here told audiod it was a modem
+     * call, which moved its audio onto the voicecall profile.
+     *
      * Not hasActiveCall either: the manager makes a ringing call its
      * activeVoiceCall, so that flag is already true while the phone rings,
      * which put audiod into the call (and paused the music) before anyone
@@ -193,16 +198,37 @@ Item {
      * below - a freshly reported call starts out with no status at all, and
      * "not ringing" let that through for a moment too.
      */
-    readonly property bool hasCallInProgress: {
+    readonly property bool hasCellularCallInProgress: {
         callsRevision;
         function inProgress(call) {
+            return !!call &&
+                   (call.status === VoiceCall.STATUS_ACTIVE ||
+                    call.status === VoiceCall.STATUS_HELD ||
+                    call.status === VoiceCall.STATUS_DIALING ||
+                    call.status === VoiceCall.STATUS_ALERTING);
+        }
+        if (inProgress(activeVoiceCall))
+            return true;
+        for (var i = 0; i < (calls ? calls.count : 0); ++i) {
+            if (inProgress(calls.instance(i)))
+                return true;
+        }
+        return false;
+    }
+
+    /**
+     * A call in progress on any transport, cellular or Synergy, in the same
+     * states as above: what the call screens follow. audiod hears about the
+     * cellular ones only (hasCellularCallInProgress).
+     */
+    readonly property bool hasCallInProgress: {
+        callsRevision;
+        return allCallsList.some(function(call) {
             return call.status === VoiceCall.STATUS_ACTIVE ||
                    call.status === VoiceCall.STATUS_HELD ||
                    call.status === VoiceCall.STATUS_DIALING ||
                    call.status === VoiceCall.STATUS_ALERTING;
-        }
-        return (!!activeVoiceCall && inProgress(activeVoiceCall)) ||
-               allCallsList.some(inProgress);
+        });
     }
 
     readonly property bool canSwap: hasActiveCall && hasHeldCall
@@ -519,7 +545,7 @@ Item {
     }
 
     /**
-     * Drive it from hasCallInProgress rather than activeVoiceCall alone. The
+     * Drive it from hasCellularCallInProgress rather than activeVoiceCall alone. The
      * manager unsets activeVoiceCall during a conference and briefly while
      * calls are swapped - the same reason currentCall() exists - and each of
      * those transitions used to send a spurious inCall:false, and on the way
@@ -527,7 +553,7 @@ Item {
      * dialling calls count too: on hold the call must not drop out of the
      * voicecall profile, and while dialling the ringback comes through it.
      */
-    onHasCallInProgressChanged: __setCallMode(hasCallInProgress)
+    onHasCellularCallInProgressChanged: __setCallMode(hasCellularCallInProgress)
 
     onActiveVoiceCallChanged: {
         // A queued post-dial string is sent as soon as its call goes active.
@@ -858,9 +884,9 @@ Item {
         // Forced, because our own __callModeSet starts false and would
         // otherwise suppress the very call that repairs a stale true.
         // If a call really is up (we were restarted mid-call) this sends true,
-        // and if calls have not been enumerated yet the hasCallInProgress
+        // and if calls have not been enumerated yet the hasCellularCallInProgress
         // handler sends it as soon as they are.
-        __setCallMode(hasCallInProgress, true);
+        __setCallMode(hasCellularCallInProgress, true);
         __subscribeAudioStatus();
 
         // audiod can go away and come back - a crash, an update - and a new
@@ -901,8 +927,8 @@ Item {
         // A new audiod: tell it about the call, forced, since it remembers
         // nothing, and listen to it rather than to the one that went away.
         __audiodWasDown = false;
-        console.log("phone: audiod is back, resyncing inCall=" + hasCallInProgress);
-        __setCallMode(hasCallInProgress, true);
+        console.log("phone: audiod is back, resyncing inCall=" + hasCellularCallInProgress);
+        __setCallMode(hasCellularCallInProgress, true);
         __subscribeAudioStatus();
     }
 
