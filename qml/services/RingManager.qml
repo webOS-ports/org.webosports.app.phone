@@ -62,9 +62,7 @@ Item {
             name: "ringing"
             StateChangeScript {
                 script: {
-                    ringtone.source = ringMgrItem.ringtonePath;
-                    ringtone.loops = MediaPlayer.Infinite;
-                    ringtone.play();
+                    ringMgrItem._play(ringMgrItem.ringtonePath, MediaPlayer.Infinite);
                 }
             }
         },
@@ -72,9 +70,7 @@ Item {
             name: "callWaiting"
             StateChangeScript {
                 script: {
-                    ringtone.source = ringMgrItem.onCallSoundPath;
-                    ringtone.loops = 2;
-                    ringtone.play();
+                    ringMgrItem._play(ringMgrItem.onCallSoundPath, 2);
                 }
             }
         }
@@ -86,28 +82,48 @@ Item {
     MediaPlayer {
          id: ringtone
          loops: MediaPlayer.Infinite
-         audioOutput: AudioOutput { id: ringtoneOutput }
     }
 
     // Ring through the "pringtones" sink rather than the default one: the
     // audio policy only knows a stream is a ringtone by the sink it is played
     // on, and gives it the ringtone volume and the loudspeaker as well as the
     // headphones. Without that sink (a desktop) the default output is kept.
-    MediaDevices {
-        id: mediaDevices
-        onAudioOutputsChanged: ringMgrItem._useRingtoneSink()
+    //
+    // Every ring gets a fresh output. Once the player has been stopped, Qt's
+    // GStreamer backend plays the next source on the default sink, whatever
+    // device the old output still names, so only the first ring would reach
+    // pringtones. Looking the sink up again each time also finds it after a
+    // PulseAudio restart.
+    Component {
+        id: ringtoneOutput
+        AudioOutput {}
     }
 
-    Component.onCompleted: _useRingtoneSink()
+    MediaDevices {
+        id: mediaDevices
+    }
 
-    function _useRingtoneSink() {
+    function _ringtoneSink() {
         var outputs = mediaDevices.audioOutputs;
         for (var i = 0; i < outputs.length; i++) {
-            if (outputs[i].id == "pringtones") {
-                ringtoneOutput.device = outputs[i];
-                return;
-            }
+            if (outputs[i].id == "pringtones")
+                return outputs[i];
         }
+        return null;
+    }
+
+    function _play(source, loops) {
+        var previous = ringtone.audioOutput;
+        var sink = _ringtoneSink();
+
+        ringtone.audioOutput = ringtoneOutput.createObject(ringMgrItem,
+                                                           sink ? { device: sink } : {});
+        if (previous)
+            previous.destroy();
+
+        ringtone.source = source;
+        ringtone.loops = loops;
+        ringtone.play();
     }
 
     Connections {
