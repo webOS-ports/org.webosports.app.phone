@@ -793,14 +793,49 @@ Item {
         // and if calls have not been enumerated yet the hasCallInProgress
         // handler sends it as soon as they are.
         __setCallMode(hasCallInProgress, true);
+        __subscribeAudioStatus();
 
-        // What the call audio is actually doing - speaker, mute, headphones.
-        __lunaNextLS2Service.subscribe("luna://org.webosports.service.audio/getStatus",
-                                       JSON.stringify({ subscribe: true }),
-                                       root.__audioStatus,
+        // audiod can go away and come back - a crash, an update - and a new
+        // one starts with no call, so a call in progress would lose its audio,
+        // and our subscription to its status is gone with the old one: the
+        // speaker and mute buttons would keep showing whatever it last said.
+        __lunaNextLS2Service.subscribe("luna://com.webos.service.bus/signal/registerServerStatus",
+                                       JSON.stringify({ serviceName: "org.webosports.service.audio" }),
+                                       root.__audiodServerStatus,
                                        function(message) {
-                                           console.log("No audio status from audiod: " + message);
+                                           console.log("Cannot watch audiod: " + message);
                                        });
+    }
+
+    property QtObject __audioStatusCall: null
+    property bool __audiodWasDown: false
+
+    // What the call audio is actually doing - speaker, mute, headphones.
+    function __subscribeAudioStatus() {
+        if (__audioStatusCall)
+            __audioStatusCall.cancel();
+        __audioStatusCall = __lunaNextLS2Service.subscribe("luna://org.webosports.service.audio/getStatus",
+                                                           JSON.stringify({ subscribe: true }),
+                                                           root.__audioStatus,
+                                                           function(message) {
+                                                               console.log("No audio status from audiod: " + message);
+                                                           });
+    }
+
+    function __audiodServerStatus(message) {
+        var status = JSON.parse(message.payload);
+        if (status.connected === false) {
+            __audiodWasDown = true;
+            return;
+        }
+        if (status.connected !== true || !__audiodWasDown)
+            return;
+        // A new audiod: tell it about the call, forced, since it remembers
+        // nothing, and listen to it rather than to the one that went away.
+        __audiodWasDown = false;
+        console.log("phone: audiod is back, resyncing inCall=" + hasCallInProgress);
+        __setCallMode(hasCallInProgress, true);
+        __subscribeAudioStatus();
     }
 
     /**
