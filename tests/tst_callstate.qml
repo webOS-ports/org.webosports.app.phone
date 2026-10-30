@@ -220,6 +220,25 @@ Item {
             verify(!wrapper.hasCallInProgress);
         }
 
+        Component {
+            id: synergyCallComponent
+            SynergyCall {}
+        }
+        SignalSpy { id: controlSpy; signalName: "callControlRequested" }
+
+        function test_aSynergyCallIsHungUpWithDisconnect() {
+            var call = createTemporaryObject(synergyCallComponent, root,
+                                             { transport: "com.palm.whatsapp", callId: "wa-1" });
+            verify(call !== null, "the call did not load");
+            controlSpy.clear();
+            controlSpy.target = call;
+            call.hangup();
+            compare(controlSpy.count, 1);
+            // What the connectors implement; "hangup" is not a method there.
+            compare(controlSpy.signalArguments[0][0], "disconnect");
+            compare(controlSpy.signalArguments[0][1].id, "wa-1");
+        }
+
         // --- the strip follows its call ---
 
         function showAlertFor(call) {
