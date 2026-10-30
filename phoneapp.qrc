@@ -65,6 +65,8 @@
         <file>qml/views/IncomingAcceptButton.qml</file>
         <file>qml/views/IncomingCallAlert.qml</file>
         <file>qml/views/IncomingCallPage.qml</file>
+        <file>qml/views/IncomingCallStrip.qml</file>
+        <file>qml/views/IncomingCallView.qml</file>
         <file>qml/views/IncomingRejectButton.qml</file>
         <file>qml/views/IncomingUSSDAlert.qml</file>
         <file>qml/views/KeypadButton.qml</file>
@@ -100,6 +102,10 @@
         <file>qml/views/images/phone/backdrop-firstuse.png</file>
         <file>qml/views/images/phone/backdrop-phone.png</file>
         <file>qml/views/images/phone/button-ignore-answer.png</file>
+        <file>qml/views/images/phone/incoming-call-frame-full-size.png</file>
+        <file>qml/views/images/phone/incoming-notification-gradient.png</file>
+        <file>qml/views/images/phone/incoming-text.png</file>
+        <file>qml/views/images/phone/incoming-text-pressed.png</file>
         <file>qml/views/images/phone/button-sprite.png</file>
         <file>qml/views/images/phone/button_divider.png</file>
         <file>qml/views/images/phone/buttons-numpad-pressed.png</file>
@@ -176,6 +182,8 @@
         <file>qml/views/images/tablet/backdrop-firstuse.png</file>
         <file>qml/views/images/tablet/backdrop-phone.png</file>
         <file>qml/views/images/tablet/button-ignore-answer.png</file>
+        <file>qml/views/images/tablet/incoming-text.png</file>
+        <file>qml/views/images/tablet/incoming-text-pressed.png</file>
         <file>qml/views/images/tablet/button-sprite.png</file>
         <file>qml/views/images/tablet/button_divider.png</file>
         <file>qml/views/images/tablet/buttons-numpad-pressed.png</file>

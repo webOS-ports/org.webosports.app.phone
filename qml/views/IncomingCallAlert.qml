@@ -29,12 +29,13 @@ import "../services/IncomingCallsService.js" as IncomingCallsService
 /**
  * The incoming call while the phone app is not in front: a system alert
  * window, so it can come up over whatever is on screen, and over the lock
- * screen too. It shows the same IncomingCallView as the in-app page.
+ * screen too. It is the legacy popup strip (IncomingCallStrip), not the
+ * in-app page: 2.2.4's on a handset, 3.0.5's on a tablet, at the height
+ * those opened it - more with a photo than without.
  *
- * It asks for the whole screen; the shell fits it into the space between the
- * status bar and the gesture area. LuneOS_overLockScreen tells the shell this
- * alert belongs above the lock screen and is not dismissed by a tap outside
- * it: a call is answered or declined, not swiped away.
+ * LuneOS_overLockScreen tells the shell this alert belongs above the lock
+ * screen and is not dismissed by a tap outside it: a call is answered or
+ * declined, not swiped away.
  */
 WebOSWindow {
     id: incomingCallAlert
@@ -47,7 +48,10 @@ WebOSWindow {
     property Contact currentContact: Contact { contactsModel: contacts; lineId: voiceCall ? voiceCall.lineId : "" }
 
     width: Settings.displayWidth
-    height: Settings.displayHeight
+    height: strip.implicitHeight
+    // The tablet's strip has no fill of its own: the shell's panel shows
+    // through it, as the system's alert frame did behind 3.0.5's popup.
+    color: "transparent"
 
     keepAlive: true
     windowType: "_WEBOS_WINDOW_TYPE_SYSTEM_UI"
@@ -58,17 +62,13 @@ WebOSWindow {
         voiceCall = null;
     }
 
-    Rectangle {
-        anchors.fill: parent
-        gradient: appTheme ? appTheme.mainGradient : undefined
-    }
-
     Component.onCompleted: {
         incomingCallAlert.setWindowProperty("LuneOS_window", "popupalert");
         incomingCallAlert.setWindowProperty("LuneOS_overLockScreen", "true");
     }
 
-    IncomingCallView {
+    IncomingCallStrip {
+        id: strip
         anchors.fill: parent
 
         appTheme: incomingCallAlert.appTheme

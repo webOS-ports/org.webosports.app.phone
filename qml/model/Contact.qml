@@ -46,6 +46,11 @@ QtObject {
     /// number that is not in the contacts.
     property string numberType: ""
 
+    /// A photo of the contact's own, not the unknown-caller stand-in. The
+    /// legacy incoming call popup only made room for a photo when there was
+    /// one.
+    readonly property bool hasPhoto: avatarPath.length > 0 && avatarPath !== _genericAvatarPath
+
     /*
      * The stand-in for a contact with no photo.
      *
