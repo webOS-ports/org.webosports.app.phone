@@ -186,6 +186,7 @@ WebOSWindow {
     }
 
     NotificationManager {
+        id: notificationManagerId
         voiceCallManager: voiceCallMgrWrapperId
         telephonyManager: telephonyManagerId
         contacts: personListModelId
@@ -256,6 +257,9 @@ WebOSWindow {
         appTheme: phoneUiTheme
         dialHandler: dialHandlerId
         visible: false
+
+        onMinimized: (lineId, displayName, missedAt) =>
+                         notificationManagerId.postMissedCall(lineId, displayName, missedAt)
     }
 
     SimPinWindow {
