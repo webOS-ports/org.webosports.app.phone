@@ -16,6 +16,7 @@
         <file>qml/model/FavoritesModel.qml</file>
         <file>qml/model/FilteredContactsModel.qml</file>
         <file>qml/services/AudioRouteManager.qml</file>
+        <file>qml/services/CallLines.js</file>
         <file>qml/services/CallMessages.js</file>
         <file>qml/services/CallTransports.qml</file>
         <file>qml/services/ContactCallOptions.js</file>
@@ -53,6 +54,7 @@
         <file>qml/views/CallGroupDelegate.qml</file>
         <file>qml/views/CallGroupDetails.qml</file>
         <file>qml/views/CallLineDelegate.qml</file>
+        <file>qml/views/ConferenceMembers.qml</file>
         <file>qml/views/ContactLookupPage.qml</file>
         <file>qml/views/CornerShader.qml</file>
         <file>qml/views/DialButton.qml</file>
@@ -103,6 +105,7 @@
         <file>qml/views/images/phone/backdrop-firstuse.png</file>
         <file>qml/views/images/phone/backdrop-phone.png</file>
         <file>qml/views/images/phone/button-ignore-answer.png</file>
+        <file>qml/views/images/phone/conf-list-buttons.png</file>
         <file>qml/views/images/phone/incoming-call-frame-full-size.png</file>
         <file>qml/views/images/phone/incoming-notification-gradient.png</file>
         <file>qml/views/images/phone/incoming-text.png</file>
@@ -184,6 +187,7 @@
         <file>qml/views/images/tablet/backdrop-firstuse.png</file>
         <file>qml/views/images/tablet/backdrop-phone.png</file>
         <file>qml/views/images/tablet/button-ignore-answer.png</file>
+        <file>qml/views/images/tablet/conf-list-buttons.png</file>
         <file>qml/views/images/tablet/incoming-text.png</file>
         <file>qml/views/images/tablet/incoming-text-pressed.png</file>
         <file>qml/views/images/tablet/menu-icon-unlock.png</file>

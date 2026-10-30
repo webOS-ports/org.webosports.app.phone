@@ -49,6 +49,13 @@ Item {
     /// With a single call the card carries the hangup button, so the line does
     /// not repeat it. Only stacked lines need their own.
     property bool showFooter: false
+    /// The line is the whole conference, shown through voiceCall, one of its
+    /// members: titled "Conference call" with its time and nothing else, as
+    /// 2.x's MiniConferenceCall was.
+    property bool conference: voiceCall ? !!voiceCall.isMultiparty : false
+    /// How long the line has been up. A conference's members each have their
+    /// own duration; the conference has been up as long as the longest.
+    property real lineDuration: voiceCall ? voiceCall.duration : 0
 
     signal clicked();
     signal hangupRequested();
@@ -64,7 +71,7 @@ Item {
 
     readonly property string displayName: {
         if (!voiceCall) return "";
-        if (voiceCall.isMultiparty) return CallMessages.conferenceCall;
+        if (conference) return CallMessages.conferenceCall;
         if (isKnownContact) return lineContact.displayLabel;
         if (voiceCall.displayName && voiceCall.displayName.length > 0) return voiceCall.displayName;
 
@@ -72,14 +79,14 @@ Item {
     }
 
     readonly property string displayAddress: {
-        if (!voiceCall) return "";
+        if (!voiceCall || conference) return "";
         return PhoneNumberUtils.formatForDisplay(voiceCall.lineId,
                                                  contacts ? contacts.countryCode : "US", false);
     }
 
     /// "TELEGRAM", "SIGNAL", ... Cellular stays unlabelled, as on the original.
     readonly property string serviceLabel: {
-        if (!voiceCall || !callTransports) return "";
+        if (!voiceCall || !callTransports || conference) return "";
 
         var provider = voiceCall.providerId || "";
         if (provider.length === 0 || provider === callTransports.cellularTransport)
@@ -98,7 +105,7 @@ Item {
 
         switch (voiceCall.status) {
         case VoiceCall.STATUS_ACTIVE:
-            return PhoneNumberUtils.formatDuration(voiceCall.duration / 1000);
+            return PhoneNumberUtils.formatDuration(lineDuration / 1000);
         case VoiceCall.STATUS_HELD:       return CallMessages.callStateHold;
         case VoiceCall.STATUS_DIALING:
         case VoiceCall.STATUS_ALERTING:   return qsTr("Connecting");
@@ -147,6 +154,7 @@ Item {
             RowLayout {
                 Layout.alignment: Qt.AlignHCenter
                 spacing: Units.gu(0.8)
+                visible: !callLine.conference
 
                 Text {
                     color: appTheme.primaryTextColor
@@ -182,7 +190,7 @@ Item {
             height: Units.gu(2.6)
             source: appTheme.image("menu-icon-addcontact.png")
             frame: addContactArea.pressed ? 1 : 0
-            visible: !callLine.isKnownContact && callLine.voiceCall &&
+            visible: !callLine.conference && !callLine.isKnownContact && callLine.voiceCall &&
                      callLine.voiceCall.lineId.length > 0
 
             MouseArea {
