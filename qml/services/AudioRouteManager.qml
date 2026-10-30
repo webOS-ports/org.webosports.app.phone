@@ -38,11 +38,16 @@ Item {
     readonly property string routeSpeaker: "ihf"
     readonly property string routeBluetooth: "bt_sco"
     readonly property string routeWiredHeadset: "wired_headset"
+    /// Not a route of its own: whatever audiod picks - the jack or a
+    /// hands-free headset, whichever was connected last, else the earpiece.
+    readonly property string routeDefault: "default"
 
     /// The route currently in use, as reported by the voicecall manager.
     readonly property string currentRoute: voiceCallManager ? voiceCallManager.audioMode : routeEarpiece
 
-    property bool bluetoothAvailable: false
+    /// From audiod, which is oFono's hands-free audio agent and sees the
+    /// headsets connect.
+    readonly property bool bluetoothAvailable: voiceCallManager ? voiceCallManager.bluetoothCall : false
     /// From audiod, which follows the jack itself and routes the call to it.
     readonly property bool wiredHeadsetConnected: voiceCallManager ? voiceCallManager.headsetConnected : false
     property bool onCharger: false
@@ -68,10 +73,14 @@ Item {
         }
     }
 
+    /// Every route asked of the voicecall manager, as it is asked.
+    signal routeRequested(string route)
+
     function setRoute(route) {
         if (!voiceCallManager) return;
 
         console.log("Switching call audio to " + route);
+        routeRequested(route);
         voiceCallManager.setAudioMode(route);
     }
 
@@ -88,9 +97,7 @@ Item {
     }
 
     function _defaultRoute() {
-        if (wiredHeadsetConnected) return routeWiredHeadset;
-        if (bluetoothAvailable) return routeBluetooth;
-        return routeEarpiece;
+        return routeDefault;
     }
 
     /// Called when a call starts, to pick a sensible route without the user
@@ -113,8 +120,10 @@ Item {
             return;
 
         // Plugging a headset in takes the call; unplugging must never silently
-        // hand the call to the loudspeaker.
-        setRoute(wiredHeadsetConnected ? routeWiredHeadset : routeEarpiece);
+        // hand the call to the loudspeaker. audiod does both by itself (and
+        // gives the call to a hands-free headset when the plug goes); this
+        // only undoes a speakerphone or an explicit earpiece.
+        setRoute(routeDefault);
     }
 
     LunaService {
@@ -123,18 +132,6 @@ Item {
     }
 
     Component.onCompleted: {
-        lunaService.subscribe("luna://com.palm.bluetooth/hfg/monitorstatus",
-                              JSON.stringify({ subscribe: true }),
-                              function(message) {
-                                  var response = JSON.parse(message.payload);
-                                  bluetoothAvailable = (response.connected === true) ||
-                                                       (response.status === "connected");
-                              },
-                              function(error) {
-                                  console.log("No bluetooth handsfree status: " + error);
-                                  bluetoothAvailable = false;
-                              });
-
         lunaService.subscribe("luna://com.palm.power/com/palm/power/chargerStatus",
                               JSON.stringify({ subscribe: true }),
                               function(message) {

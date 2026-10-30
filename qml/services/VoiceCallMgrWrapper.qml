@@ -443,17 +443,37 @@ Item {
     property bool isMicrophoneMuted: false
     property bool headsetConnected: false
     property bool bluetoothAudio: false
+    /// A hands-free Bluetooth headset is connected, so a call can go to it.
+    property bool bluetoothCall: false
+    /// The call is on that headset right now.
+    property bool bluetoothCallActive: false
 
     /// The route in the names AudioRouteManager uses.
     readonly property string audioMode: speakerMode ? "ihf"
+                                      : bluetoothCallActive ? "bt_sco"
                                       : headsetConnected ? "wired_headset"
                                       : "earpiece"
 
+    /**
+     * What audiod's setCallMode is asked for a route picked here. Earpiece
+     * and wired headset are the same request, the handset: audiod sends it
+     * to the jack when something is plugged in, and with a hands-free
+     * headset connected "handset" is what keeps the call off the headset.
+     * "default" leaves it to audiod: the jack or the headset, whichever was
+     * connected last, else the earpiece.
+     */
+    function _callModeRequest(mode) {
+        switch (mode) {
+        case "ihf":    return { route: "speaker" };
+        case "bt_sco": return { route: "bluetooth" };
+        case "default": return { route: "default" };
+        default:       return { route: "handset" };
+        }
+    }
+
     function setAudioMode(mode) {
-        // Earpiece and wired headset are the same request: not the speaker.
-        // audiod sends it to the jack when something is plugged in.
         __lunaNextLS2Service.call("luna://org.webosports.service.audio/setCallMode",
-                                  JSON.stringify({ speakerMode: mode === "ihf" }),
+                                  JSON.stringify(_callModeRequest(mode)),
                                   undefined, root.__setCallModeError);
     }
 
@@ -473,6 +493,8 @@ Item {
         isMicrophoneMuted = status.micMute === true;
         headsetConnected = status.headset === true;
         bluetoothAudio = status.bluetoothAudio === true;
+        bluetoothCall = status.bluetoothCall === true;
+        bluetoothCallActive = status.bluetoothCallActive === true;
     }
 
     /**
