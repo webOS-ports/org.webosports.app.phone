@@ -127,6 +127,78 @@ Item {
             compare(IncomingCallsService.getActionForCall("rangout-1"), IncomingCallsService.Missed);
         }
 
+        // --- a call that goes without disconnecting ---
+
+        SignalSpy { id: endingSpy; signalName: "endingCall" }
+
+        function makeWrapperWithSpy() {
+            var wrapper = createTemporaryObject(wrapperComponent, root);
+            verify(wrapper !== null, "the wrapper did not load");
+            endingSpy.clear();
+            endingSpy.target = wrapper;
+            return wrapper;
+        }
+
+        // Stands in for a transport whose list the call is still in.
+        function listCalls(wrapper, calls) {
+            wrapper.synergyTransports = { "test": { calls: calls } };
+            wrapper.callsRevision = wrapper.callsRevision + 1;
+        }
+
+        function test_aCallThatVanishesWhileActiveIsEnded() {
+            var wrapper = makeWrapperWithSpy();
+            var call = makeCall("vanish-1", VoiceCall.STATUS_INCOMING);
+            listCalls(wrapper, [call]);
+            wrapper._updateState(call, true);
+            call.status = VoiceCall.STATUS_ACTIVE;
+            wrapper._updateState(call, true);
+
+            // Both ends hung up at once: the row goes, still active.
+            listCalls(wrapper, []);
+            wrapper._endVanishedCalls();
+
+            compare(endingSpy.count, 1);
+            var ended = endingSpy.signalArguments[0][0];
+            compare(ended.handlerId, "vanish-1");
+            compare(ended.lineId, "5550100");
+            compare(ended.status, VoiceCall.STATUS_DISCONNECTED);
+            verify(ended.isIncoming);
+        }
+
+        function test_aCallStillListedIsNotEnded() {
+            var wrapper = makeWrapperWithSpy();
+            var call = makeCall("listed-1", VoiceCall.STATUS_ACTIVE);
+            listCalls(wrapper, [call]);
+            wrapper._updateState(call, true);
+            wrapper._endVanishedCalls();
+            compare(endingSpy.count, 0);
+        }
+
+        function test_aLateDisconnectDoesNotEndTheCallTwice() {
+            var wrapper = makeWrapperWithSpy();
+            var call = makeCall("late-1", VoiceCall.STATUS_ACTIVE);
+            listCalls(wrapper, [call]);
+            wrapper._updateState(call, true);
+            listCalls(wrapper, []);
+            wrapper._endVanishedCalls();
+
+            call.status = VoiceCall.STATUS_DISCONNECTED;
+            wrapper._updateState(call, true);
+            compare(endingSpy.count, 1);
+        }
+
+        function test_aDisconnectedCallIsNotEndedAgainWhenItsRowGoes() {
+            var wrapper = makeWrapperWithSpy();
+            var call = makeCall("normal-1", VoiceCall.STATUS_ACTIVE);
+            listCalls(wrapper, [call]);
+            wrapper._updateState(call, true);
+            call.status = VoiceCall.STATUS_DISCONNECTED;
+            wrapper._updateState(call, true);
+            listCalls(wrapper, []);
+            wrapper._endVanishedCalls();
+            compare(endingSpy.count, 1);
+        }
+
         // --- the strip follows its call ---
 
         function showAlertFor(call) {
