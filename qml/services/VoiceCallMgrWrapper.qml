@@ -186,6 +186,11 @@ Item {
      * incoming call that is only ringing - the ringtone plays on the normal
      * output, and the voicecall profile would take it away from the speaker.
      *
+     * Cellular calls only. A Synergy call goes over the normal audio path,
+     * and its connector reports it to audiod itself (phone/CallStatusUpdate,
+     * with its own transport); counting it here told audiod it was a modem
+     * call, which moved its audio onto the voicecall profile.
+     *
      * Not hasActiveCall either: the manager makes a ringing call its
      * activeVoiceCall, so that flag is already true while the phone rings,
      * which put audiod into the call (and paused the music) before anyone
@@ -193,16 +198,37 @@ Item {
      * below - a freshly reported call starts out with no status at all, and
      * "not ringing" let that through for a moment too.
      */
-    readonly property bool hasCallInProgress: {
+    readonly property bool hasCellularCallInProgress: {
         callsRevision;
         function inProgress(call) {
+            return !!call &&
+                   (call.status === VoiceCall.STATUS_ACTIVE ||
+                    call.status === VoiceCall.STATUS_HELD ||
+                    call.status === VoiceCall.STATUS_DIALING ||
+                    call.status === VoiceCall.STATUS_ALERTING);
+        }
+        if (inProgress(activeVoiceCall))
+            return true;
+        for (var i = 0; i < (calls ? calls.count : 0); ++i) {
+            if (inProgress(calls.instance(i)))
+                return true;
+        }
+        return false;
+    }
+
+    /**
+     * A call in progress on any transport, cellular or Synergy, in the same
+     * states as above: what the call screens follow. audiod hears about the
+     * cellular ones only (hasCellularCallInProgress).
+     */
+    readonly property bool hasCallInProgress: {
+        callsRevision;
+        return allCallsList.some(function(call) {
             return call.status === VoiceCall.STATUS_ACTIVE ||
                    call.status === VoiceCall.STATUS_HELD ||
                    call.status === VoiceCall.STATUS_DIALING ||
                    call.status === VoiceCall.STATUS_ALERTING;
-        }
-        return (!!activeVoiceCall && inProgress(activeVoiceCall)) ||
-               allCallsList.some(inProgress);
+        });
     }
 
     readonly property bool canSwap: hasActiveCall && hasHeldCall
@@ -519,7 +545,7 @@ Item {
     }
 
     /**
-     * Drive it from hasCallInProgress rather than activeVoiceCall alone. The
+     * Drive it from hasCellularCallInProgress rather than activeVoiceCall alone. The
      * manager unsets activeVoiceCall during a conference and briefly while
      * calls are swapped - the same reason currentCall() exists - and each of
      * those transitions used to send a spurious inCall:false, and on the way
@@ -527,7 +553,7 @@ Item {
      * dialling calls count too: on hold the call must not drop out of the
      * voicecall profile, and while dialling the ringback comes through it.
      */
-    onHasCallInProgressChanged: __setCallMode(hasCallInProgress)
+    onHasCellularCallInProgressChanged: __setCallMode(hasCellularCallInProgress)
 
     onActiveVoiceCallChanged: {
         // A queued post-dial string is sent as soon as its call goes active.
@@ -582,6 +608,83 @@ Item {
         _flushPostDial(voiceCall);
     }
 
+    /*
+     * The calls seen and not yet ended, by handler id: what endingCall() would
+     * carry for each, kept up to date with every state it reports, and when it
+     * went live.
+     *
+     * A call can leave the list without ever reporting STATUS_DISCONNECTED:
+     * hung up at both ends at once, the row goes and its last state is
+     * active. Ending calls only on that state left the call screen up with
+     * no call behind it, the call out of the history and the window not put
+     * back. Such a call is ended when it is found missing (_endVanishedCalls).
+     */
+    property var _liveCalls: ({})
+    // Ended calls, so that one ended as missing is not ended again if its
+    // disconnected state does come in after all.
+    property var _endedCalls: ({})
+
+    function _callRecord(voiceCall, isIncoming) {
+        return {
+            handlerId: voiceCall.handlerId,
+            providerId: voiceCall.providerId,
+            status: voiceCall.status,
+            statusText: voiceCall.statusText,
+            lineId:voiceCall.lineId,
+            startedAt: voiceCall.startedAt,
+            duration: voiceCall.duration,
+            isIncoming: isIncoming,
+            isEmergency: voiceCall.isEmergency,
+            isMultiparty: voiceCall.isMultiparty,
+            isForwarded: voiceCall.isForwarded,
+            isRemoteHeld: voiceCall.isRemoteHeld
+        };
+    }
+
+    function _endCall(endedVoiceCall) {
+        var handlerId = endedVoiceCall.handlerId;
+        if (_endedCalls[handlerId])
+            return;
+        _endedCalls[handlerId] = true;
+        delete _liveCalls[handlerId];
+
+        if (root.heldCall && root.heldCall.handlerId === handlerId)
+            root.heldCall = null;
+        delete _postDialStrings[handlerId];
+
+        // A call that never connected and was not rejected by the user did
+        // not "end", it failed to be placed.
+        if (!endedVoiceCall.isIncoming && endedVoiceCall.duration === 0 &&
+            IncomingCallsService.getActionForCall(handlerId) === IncomingCallsService.Missed) {
+            root.dialFailed(endedVoiceCall.lineId, "callfailed");
+        }
+
+        root.endingCall(endedVoiceCall);
+    }
+
+    /// Ends every call we saw that is no longer in the list.
+    function _endVanishedCalls() {
+        var listed = {};
+        allCallsList.forEach(function(call) { listed[call.handlerId] = true; });
+
+        for (var handlerId in _liveCalls) {
+            if (listed[handlerId])
+                continue;
+
+            var live = _liveCalls[handlerId];
+            var ended = live.record;
+            console.log("Call " + ended.lineId + " went away without disconnecting; ending it");
+            ended.status = VoiceCall.STATUS_DISCONNECTED;
+            ended.statusText = "disconnected";
+            ended.isIncoming = IncomingCallsService.wasIncoming(handlerId, ended.isIncoming);
+            // The handler is gone, and its duration stopped with the last
+            // state it reported: count from when it went live instead.
+            if (live.liveSince > 0)
+                ended.duration = Math.max(ended.duration, Date.now() - live.liveSince);
+            _endCall(ended);
+        }
+    }
+
     function _updateState(voiceCall, isIncoming) {
         console.log("Currently we have " + manager.voiceCalls.count + " calls");
 
@@ -591,8 +694,20 @@ Item {
         console.log("Looking at call " + voiceCall.lineId + " with state " + voiceCall.statusText + " "
                     + voiceCall.status);
 
+        if (voiceCall.status !== VoiceCall.STATUS_NULL
+                && voiceCall.status !== VoiceCall.STATUS_DISCONNECTED
+                && !_endedCalls[voiceCall.handlerId]) {
+            var known = _liveCalls[voiceCall.handlerId];
+            var liveSince = known ? known.liveSince : 0;
+            if (!liveSince && voiceCall.status === VoiceCall.STATUS_ACTIVE)
+                liveSince = Date.now();
+            _liveCalls[voiceCall.handlerId] = { record: _callRecord(voiceCall, isIncoming),
+                                                liveSince: liveSince };
+        }
+
         switch (voiceCall.status) {
         case VoiceCall.STATUS_ACTIVE:
+            IncomingCallsService.callWentLive(voiceCall.handlerId);
             if (root.heldCall && root.heldCall.handlerId === voiceCall.handlerId)
                 root.heldCall = null;
             root.activeCall(voiceCall);
@@ -622,33 +737,7 @@ Item {
             isIncoming = IncomingCallsService.wasIncoming(voiceCall.handlerId, isIncoming);
 
             // the voicecall object is soon to be destroyed, so save its state before sending the signal
-            var endedVoiceCall = {
-                handlerId: voiceCall.handlerId,
-                providerId: voiceCall.providerId,
-                status: voiceCall.status,
-                statusText: voiceCall.statusText,
-                lineId:voiceCall.lineId,
-                startedAt: voiceCall.startedAt,
-                duration: voiceCall.duration,
-                isIncoming: isIncoming,
-                isEmergency: voiceCall.isEmergency,
-                isMultiparty: voiceCall.isMultiparty,
-                isForwarded: voiceCall.isForwarded,
-                isRemoteHeld: voiceCall.isRemoteHeld
-            };
-
-            if (root.heldCall && root.heldCall.handlerId === voiceCall.handlerId)
-                root.heldCall = null;
-            delete _postDialStrings[voiceCall.handlerId];
-
-            // A call that never connected and was not rejected by the user did
-            // not "end", it failed to be placed.
-            if (!isIncoming && endedVoiceCall.duration === 0 &&
-                IncomingCallsService.getActionForCall(voiceCall.handlerId) === IncomingCallsService.Missed) {
-                root.dialFailed(endedVoiceCall.lineId, "callfailed");
-            }
-
-            root.endingCall(endedVoiceCall);
+            _endCall(_callRecord(voiceCall, isIncoming));
             break;
         case VoiceCall.STATUS_NULL:
             root.resetCall(voiceCall);
@@ -660,6 +749,7 @@ Item {
         target: calls
         function onRowsRemoved(parent, first, last) {
             root.callsRevision = root.callsRevision + 1;
+            root._endVanishedCalls();
         }
         function onRowsInserted(parent, first, last) {
             root.callsRevision = root.callsRevision + 1;
@@ -719,9 +809,13 @@ Item {
 
             onCallRemoved: (call) => {
                 root.callsRevision = root.callsRevision + 1;
+                root._endVanishedCalls();
             }
 
-            onCallsChanged: root.callsRevision = root.callsRevision + 1
+            onCallsChanged: {
+                root.callsRevision = root.callsRevision + 1;
+                root._endVanishedCalls();
+            }
 
             onDialFailed: (address, reason) => root.dialFailed(address, reason)
 
@@ -790,17 +884,52 @@ Item {
         // Forced, because our own __callModeSet starts false and would
         // otherwise suppress the very call that repairs a stale true.
         // If a call really is up (we were restarted mid-call) this sends true,
-        // and if calls have not been enumerated yet the hasCallInProgress
+        // and if calls have not been enumerated yet the hasCellularCallInProgress
         // handler sends it as soon as they are.
-        __setCallMode(hasCallInProgress, true);
+        __setCallMode(hasCellularCallInProgress, true);
+        __subscribeAudioStatus();
 
-        // What the call audio is actually doing - speaker, mute, headphones.
-        __lunaNextLS2Service.subscribe("luna://org.webosports.service.audio/getStatus",
-                                       JSON.stringify({ subscribe: true }),
-                                       root.__audioStatus,
+        // audiod can go away and come back - a crash, an update - and a new
+        // one starts with no call, so a call in progress would lose its audio,
+        // and our subscription to its status is gone with the old one: the
+        // speaker and mute buttons would keep showing whatever it last said.
+        __lunaNextLS2Service.subscribe("luna://com.webos.service.bus/signal/registerServerStatus",
+                                       JSON.stringify({ serviceName: "org.webosports.service.audio" }),
+                                       root.__audiodServerStatus,
                                        function(message) {
-                                           console.log("No audio status from audiod: " + message);
+                                           console.log("Cannot watch audiod: " + message);
                                        });
+    }
+
+    property QtObject __audioStatusCall: null
+    property bool __audiodWasDown: false
+
+    // What the call audio is actually doing - speaker, mute, headphones.
+    function __subscribeAudioStatus() {
+        if (__audioStatusCall)
+            __audioStatusCall.cancel();
+        __audioStatusCall = __lunaNextLS2Service.subscribe("luna://org.webosports.service.audio/getStatus",
+                                                           JSON.stringify({ subscribe: true }),
+                                                           root.__audioStatus,
+                                                           function(message) {
+                                                               console.log("No audio status from audiod: " + message);
+                                                           });
+    }
+
+    function __audiodServerStatus(message) {
+        var status = JSON.parse(message.payload);
+        if (status.connected === false) {
+            __audiodWasDown = true;
+            return;
+        }
+        if (status.connected !== true || !__audiodWasDown)
+            return;
+        // A new audiod: tell it about the call, forced, since it remembers
+        // nothing, and listen to it rather than to the one that went away.
+        __audiodWasDown = false;
+        console.log("phone: audiod is back, resyncing inCall=" + hasCellularCallInProgress);
+        __setCallMode(hasCellularCallInProgress, true);
+        __subscribeAudioStatus();
     }
 
     /**

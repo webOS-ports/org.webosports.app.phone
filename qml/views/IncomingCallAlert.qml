@@ -26,6 +26,17 @@ import "../services"
 import "../model"
 import "../services/IncomingCallsService.js" as IncomingCallsService
 
+/**
+ * The incoming call while the phone app is not in front: a system alert
+ * window, so it can come up over whatever is on screen, and over the lock
+ * screen too. It is the legacy popup strip (IncomingCallStrip), not the
+ * in-app page: 2.2.4's on a handset, 3.0.5's on a tablet, at the height
+ * those opened it - more with a photo than without.
+ *
+ * LuneOS_overLockScreen tells the shell this alert belongs above the lock
+ * screen and is not dismissed by a tap outside it: a call is answered or
+ * declined, not swiped away.
+ */
 WebOSWindow {
     id: incomingCallAlert
 
@@ -37,95 +48,63 @@ WebOSWindow {
     property Contact currentContact: Contact { contactsModel: contacts; lineId: voiceCall ? voiceCall.lineId : "" }
 
     width: Settings.displayWidth
-    height: Units.gu(24)
+    height: strip.implicitHeight
+    // The tablet's strip has no fill of its own: the shell's panel shows
+    // through it, as the system's alert frame did behind 3.0.5's popup.
+    color: "transparent"
 
     keepAlive: true
     windowType: "_WEBOS_WINDOW_TYPE_SYSTEM_UI"
 
-    Rectangle {
-        anchors.fill: parent
-        gradient: appTheme ? appTheme.mainGradient : undefined
+    /// Takes the call away from the alert, answered, declined or ended.
+    function dismiss() {
+        incomingCallAlert.hide();
+        voiceCall = null;
+    }
+
+    /*
+     * The strip is for a call that is ringing or waiting, and goes as soon as
+     * it is neither - however that came about. A call answered by a headset
+     * button or rejected elsewhere, or a waiting call taken with hold and
+     * answer, never passes through the buttons below, and the strip used to
+     * stay up over the call screen until the last call ended.
+     */
+    Connections {
+        target: incomingCallAlert.voiceCall
+        ignoreUnknownSignals: true
+
+        function onStatusChanged() {
+            var status = incomingCallAlert.voiceCall.status;
+            if (status !== VoiceCall.STATUS_INCOMING && status !== VoiceCall.STATUS_WAITING)
+                incomingCallAlert.dismiss();
+        }
     }
 
     Component.onCompleted: {
         incomingCallAlert.setWindowProperty("LuneOS_window", "popupalert");
+        incomingCallAlert.setWindowProperty("LuneOS_overLockScreen", "true");
     }
 
-    Text {
-        id: lineIdText
-        anchors {
-            top: parent.top
-            bottom: buttons.top
-            margins: Units.gu(1)
-            left: parent.left
-            right: parent.right
+    IncomingCallStrip {
+        id: strip
+        anchors.fill: parent
+
+        appTheme: incomingCallAlert.appTheme
+        currentContact: incomingCallAlert.currentContact
+
+        onAnswerClicked: {
+            if (!voiceCall)
+                return;
+            IncomingCallsService.setActionForCall(voiceCall.handlerId, IncomingCallsService.Accepted);
+            voiceCall.answer();
+            incomingCallAlert.dismiss();
         }
-
-        font.pixelSize: Units.dp(30)
-        fontSizeMode: Text.Fit
-        horizontalAlignment: Text.AlignHCenter
-        verticalAlignment: Text.AlignVCenter
-        color: "white"
-        text: currentContact.personId ? (currentContact.displayLabel +"\n" + currentContact.addr) :
-                                        (currentContact.lineId + "\n"+ currentContact.geoLocation);
-    }
-
-    Row {
-        id: buttons
-        height: Units.gu(12)
-        anchors {
-            bottom: parent.bottom
-            horizontalCenter:parent.horizontalCenter
-        }
-
-        spacing: Units.gu(1)
-
-        IncomingAcceptButton {
-            appTheme: incomingCallAlert.appTheme
-            anchors.verticalCenter: buttons.verticalCenter
-            height: parent.height
-            width: parent.height
-            onClicked: {
-                IncomingCallsService.setActionForCall(voiceCall.handlerId, IncomingCallsService.Accepted);
-                voiceCall.answer();
-                incomingCallAlert.hide();
-                voiceCall = null;
-            }
-        }
-
-        Item {
-            anchors.verticalCenter: buttons.verticalCenter
-
-            width: incomingCallAlert.width - 2*parent.height - Units.gu(1)
-            height: buttons.height
-
-            Image {
-                id: imageAvatar
-                anchors.fill: parent
-                asynchronous:true
-                fillMode:Image.PreserveAspectFit
-                smooth:true
-                source: currentContact.avatarPath
-                visible: false
-            }
-            CornerShader {
-                radius: 30
-                source: imageAvatar
-                anchors.fill: imageAvatar
-            }
-        }
-
-        IncomingRejectButton {
-            appTheme: incomingCallAlert.appTheme
-            anchors.verticalCenter: buttons.verticalCenter
-            height: parent.height
-            width: parent.height
-            onClicked: {
-                IncomingCallsService.setActionForCall(voiceCall.handlerId, IncomingCallsService.Ignored);
-                voiceCall.hangup();
-                incomingCallAlert.hide();
-                voiceCall = null;
-            }
+        onRejectClicked: {
+            if (!voiceCall)
+                return;
+            IncomingCallsService.setActionForCall(voiceCall.handlerId, IncomingCallsService.Ignored);
+            voiceCall.hangup();
+            incomingCallAlert.dismiss();
         }
     }
 }

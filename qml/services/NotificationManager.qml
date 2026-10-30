@@ -16,6 +16,7 @@
  */
 
 import QtQuick 2.0
+import QtQml
 
 import LuneOS.Service 1.0
 
@@ -30,6 +31,11 @@ import "CallMessages.js" as CallMessages
  * phonePopups/sources/MissedCall.js; on LuneOS the equivalent is a toast from
  * com.webos.notification. Tapping the toast relaunches the phone app on the
  * call log.
+ *
+ * A missed call first comes up as MissedCallAlert, as 2.2.4's popup did, and
+ * only goes to the notifications when that alert is minimized without being
+ * answered (postMissedCall) - with the red missed call icon 2.2.4's dashboard
+ * showed, notification-large-missed.png.
  */
 Item {
     id: notificationManager
@@ -47,10 +53,20 @@ Item {
     function notifyMissedCall(lineId, displayName) {
         var name = (displayName && displayName.length > 0) ? displayName : lineId;
 
-        _createToast(CallMessages.missedCallTitle + ": " + name,
-                     { id: appId, params: { action: "calllog" } });
-
         missedCall(lineId, name);
+    }
+
+    /// The missed call alert was minimized: the call goes to the notifications.
+    /// Answers the toast posted.
+    function postMissedCall(lineId, displayName, missedAt) {
+        var name = (displayName && displayName.length > 0) ? displayName : lineId;
+        var when = Qt.formatTime(missedAt, Qt.locale().timeFormat(Locale.ShortFormat));
+
+        return _createToast(qsTr("%1 at %2").arg(name).arg(when),
+                     { id: appId, params: { action: "calllog" } },
+                     { title: CallMessages.missedCallTitle,
+                       iconUrl: "/usr/palm/applications/" + appId
+                                + "/qml/views/images/phone/notification-large-missed.png" });
     }
 
     function notifyVoicemail(count) {
@@ -62,17 +78,22 @@ Item {
                      { id: appId, params: { action: "voicemail" } });
     }
 
-    function _createToast(message, launchParams) {
+    /// `overrides` adds to or replaces fields of the payload: a title, or an
+    /// icon of the notification's own. Answers the payload posted.
+    function _createToast(message, launchParams, overrides) {
         var payload = {
             sourceId: appId,
             message: message,
             iconUrl: "/usr/palm/applications/" + appId + "/icon.png",
             onclick: { appId: launchParams.id, params: launchParams.params }
         };
+        for (var key in (overrides || {}))
+            payload[key] = overrides[key];
 
         lunaService.call("luna://com.webos.notification/createToast", JSON.stringify(payload),
                          undefined,
                          function(error) { console.log("Could not post notification: " + error); });
+        return payload;
     }
 
     function _displayNameFor(lineId) {

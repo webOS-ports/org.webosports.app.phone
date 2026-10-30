@@ -29,6 +29,7 @@ import LuneOS.Components 1.0
 
 import "../services/PhoneNumberUtils.js" as PhoneNumberUtils
 import "../services/CallMessages.js" as CallMessages
+import "../services/CallLines.js" as CallLines
 
 /**
  * The in-call screen.
@@ -54,11 +55,27 @@ BasePage {
     /// Emitted when the user taps "Add call" and wants the dialpad back.
     signal addCallRequested();
 
+    /**
+     * The call screen over the lock screen. Legacy's PIN card held the same
+     * ActiveCall in lockedmode: everything a call needs, but "Add Call" -
+     * which would open the dialpad and the rest of the phone - becomes
+     * "Unlock", which goes to the lock screen to be unlocked first.
+     */
+    property bool lockedMode: false
+    /// Emitted when the user taps "Unlock" in lockedMode.
+    signal unlockRequested();
+
     property bool voiceCallIsActive: voiceCall && voiceCall.status === VoiceCall.STATUS_ACTIVE
 
-    // Every call in progress. With one call the card holds one line.
+    // Every call in progress, in lines as webOS 2.x had them: a call on its
+    // own is a line, the whole conference is one. One line fills the card;
+    // with more, each stacks in it with its own hangup (MultiLineView).
     readonly property var allCalls: voiceCallMgrWrapper ? voiceCallMgrWrapper.allCallsList : []
-    readonly property bool multipleCalls: allCalls.length > 1
+    readonly property var lines: CallLines.group(allCalls)
+    readonly property bool multipleLines: lines.length > 1
+    /// A conference and nothing else: 2.x's SingleConferenceCall, the card
+    /// titled "Conference call" over the list of who is in it.
+    readonly property bool conferenceOnly: lines.length === 1 && lines[0].conference
 
     // Which call the controls apply to. Follows the active call unless the user
     // taps another line.
@@ -154,7 +171,7 @@ BasePage {
                 id: nameSlot
                 width: parent.width
                 height: visible ? nameColumn.height + Units.gu(1.6) : 0
-                visible: !root.multipleCalls
+                visible: !root.multipleLines
 
                 Column {
                     id: nameColumn
@@ -185,7 +202,8 @@ BasePage {
                         font.pixelSize: Units.gu(1.8)
                         lineHeight: Units.gu(3.6)
                         lineHeightMode: Text.FixedHeight
-                        text: contactName.length > 0 ? contactName : root.formattedAddress
+                        text: root.conferenceOnly ? CallMessages.conferenceCall
+                            : contactName.length > 0 ? contactName : root.formattedAddress
                     }
 
                     Text {
@@ -194,7 +212,7 @@ BasePage {
                         elide: Text.ElideRight
                         color: '#ffffff'
                         font.pixelSize: Units.gu(1.6)
-                        visible: displayName.contactName.length > 0 && text.length > 0
+                        visible: !root.conferenceOnly && displayName.contactName.length > 0 && text.length > 0
                         text: root.formattedAddress
                     }
 
@@ -204,16 +222,17 @@ BasePage {
                         elide: Text.ElideRight
                         color: '#999999'
                         font.pixelSize: Units.gu(1.4)
-                        visible: text.length > 0
+                        visible: !root.conferenceOnly && text.length > 0
                         text: root.serviceLabel
                     }
                 }
             }
 
-            // One line per call. The photo only appears for a single call --
-            // with two lines up there is no room, exactly as on the original.
+            // One line per line of calls - a call, or the whole conference.
+            // The photo only appears for a single call -- with two lines up
+            // there is no room, exactly as on the original.
             Repeater {
-                model: root.allCalls
+                model: root.lines
 
                 delegate: Column {
                     required property var modelData
@@ -231,19 +250,22 @@ BasePage {
                     CallLineDelegate {
                         width: cardColumn.width
 
-                        voiceCall: modelData
+                        voiceCall: modelData.call
+                        conference: modelData.conference
+                        lineDuration: CallLines.duration(modelData)
                         contacts: root.contacts
                         appTheme: root.appTheme
                         callTransports: root.callTransports
-                        selected: root.multipleCalls && root.selectedCall === modelData
-                        showFooter: root.multipleCalls
-                        canJoin: root.multipleCalls && voiceCallMgrWrapper.canMerge
-                        visible: root.multipleCalls
+                        selected: root.multipleLines && CallLines.lineOf(root.lines, root.selectedCall) === modelData
+                        showFooter: root.multipleLines
+                        canJoin: root.multipleLines && voiceCallMgrWrapper.canMerge
+                        visible: root.multipleLines
 
-                        onClicked: root.selectedCall = modelData
-                        onHangupRequested: modelData.hangup()
+                        onClicked: root.selectedCall = modelData.call
+                        // The conference's hangup ends the conference.
+                        onHangupRequested: modelData.calls.forEach(function(call) { call.hangup(); })
                         onJoinRequested: voiceCallMgrWrapper.merge()
-                        onAddContactRequested: root._addToContacts(modelData.lineId)
+                        onAddContactRequested: root._addToContacts(modelData.call.lineId)
                     }
                 }
             }
@@ -256,7 +278,7 @@ BasePage {
                 id: photoSlot
                 width: parent.width
                 height: visible ? Math.min(Units.gu(16.6), root._photoRoom) : 0
-                visible: !root.multipleCalls && !flipable.flipped && root._photoRoom >= Units.gu(7)
+                visible: !root.multipleLines && !root.conferenceOnly && !flipable.flipped && root._photoRoom >= Units.gu(7)
 
                 Item {
                     anchors.centerIn: parent
@@ -282,6 +304,23 @@ BasePage {
                         source: appTheme.image("active-photo-overlay.png")
                     }
                 }
+            }
+
+            // In place of the photo, who is in the conference, as 2.x's
+            // SingleConferenceCall listed them. Tapping one opens a drawer to
+            // hang up on them alone or take them aside into a private call.
+            ConferenceMembers {
+                id: conferenceSlot
+                width: parent.width
+                visible: root.conferenceOnly && !flipable.flipped
+                height: visible ? implicitHeight : 0
+
+                calls: root.conferenceOnly ? root.lines[0].calls : []
+                contacts: root.contacts
+                appTheme: root.appTheme
+
+                onHangupRequested: (call) => call.hangup()
+                onPrivateRequested: (call) => voiceCallMgrWrapper.split(call)
             }
 
             // The DTMF pad takes the photo's place when the dialpad is on.
@@ -370,7 +409,10 @@ BasePage {
             Item {
                 id: durationSlot
                 width: parent.width
-                height: Units.gu(4.5)
+                height: visible ? Units.gu(4.5) : 0
+                // With several lines each carries its own time; a timer of the
+                // card's own under them belonged to no line in particular.
+                visible: !root.multipleLines
 
                 Row {
                     anchors.centerIn: parent
@@ -387,7 +429,9 @@ BasePage {
                     Text {
                         color: '#ffffff'
                         font.pixelSize: Units.gu(1.6)
-                        text: root.selectedCall
+                        text: root.conferenceOnly
+                                  ? PhoneNumberUtils.formatDuration(CallLines.duration(root.lines[0]) / 1000)
+                              : root.selectedCall
                                   ? PhoneNumberUtils.formatDuration(root.selectedCall.duration / 1000)
                                   : ""
                     }
@@ -422,7 +466,7 @@ BasePage {
                     id: hangupAllArea
                     anchors.fill: parent
                     onClicked: {
-                        if (root.multipleCalls)
+                        if (root.multipleLines || root.conferenceOnly)
                             voiceCallMgrWrapper.hangupAll();
                         else if (root.selectedCall)
                             root.selectedCall.hangup();
@@ -515,14 +559,17 @@ BasePage {
 
         CallActionButton {
             appTheme: root.appTheme
-            visible: voiceCallMgrWrapper.canAddCall
-            iconSource: appTheme.image("menu-icon-addcall.png")
-            label: qsTr("Add Call")
-            onClicked: root.addCallRequested()
+            visible: root.lockedMode || voiceCallMgrWrapper.canAddCall
+            iconSource: appTheme.image(root.lockedMode ? "menu-icon-unlock.png" : "menu-icon-addcall.png")
+            label: root.lockedMode ? qsTr("Unlock") : qsTr("Add Call")
+            onClicked: root.lockedMode ? root.unlockRequested() : root.addCallRequested()
         }
     }
 
     function _addToContacts(address) {
+        // Contacts would open behind the lock screen, out of reach.
+        if (root.lockedMode)
+            return;
         launcher.launch("com.palm.app.contacts",
                         { newContact: { phoneNumbers: [ { value: address } ] } }, undefined,
                         function(error) { console.log("Could not open Contacts: " + error); });

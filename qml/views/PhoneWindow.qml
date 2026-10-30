@@ -28,6 +28,7 @@ import QtQuick.Window 2.3
 import Eos.Window 0.1
 
 import LunaNext.Common 0.1
+import LuneOS.Service 1.0
 
 WebOSWindow {
     id: phoneWindowId
@@ -61,6 +62,57 @@ WebOSWindow {
     color: phoneUiAppTheme.backgroundColor
 
     property bool hideWindowWhenCallEnds: false
+
+    /*
+     * The lock screen covers the window without taking it out of front, so
+     * the window stays active under it: a call taken in place would ring
+     * behind the lock screen with nothing to answer it on.
+     */
+    property bool screenLocked: false
+
+    function __handleLockStatus(message) {
+        var status = JSON.parse(message.payload);
+        if (status.lockState !== undefined)
+            screenLocked = (status.lockState === "locked");
+    }
+
+    /*
+     * The call screen over the lock screen, as legacy's PIN card was: up for
+     * as long as the screen is locked with a call in progress, whether the
+     * call was answered on the lock screen or the screen locked during it.
+     * Not while a call is ringing - the incoming call alert has the screen
+     * then - and not once "Unlock" has sent the user to the lock screen.
+     */
+    property LockedCallWindow lockedCallWindow
+    property bool lockedCallSteppedAside: false
+    readonly property bool lockedCallWanted: screenLocked
+        && !!voiceCallMgrWrapper && voiceCallMgrWrapper.hasCallInProgress
+        && !lockedCallSteppedAside
+        && !(incomingCallAlertWindow && incomingCallAlertWindow.visible)
+
+    onLockedCallWantedChanged: {
+        if (!lockedCallWindow)
+            return;
+        if (lockedCallWanted) {
+            lockedCallWindow.voiceCall = voiceCallMgrWrapper.activeVoiceCall || voiceCallMgrWrapper.callAt(0);
+            lockedCallWindow.show();
+        } else {
+            lockedCallWindow.dismiss();
+        }
+    }
+    // Stepping aside lasts until the lock state changes or the call is over.
+    onScreenLockedChanged: lockedCallSteppedAside = false
+    Connections {
+        target: voiceCallMgrWrapper
+        function onHasCallInProgressChanged() {
+            if (!voiceCallMgrWrapper.hasCallInProgress)
+                phoneWindowId.lockedCallSteppedAside = false;
+        }
+    }
+    Connections {
+        target: lockedCallWindow
+        function onUnlockRequested() { phoneWindowId.lockedCallSteppedAside = true; }
+    }
 
     /**
      * Navigation, driven both by the tabs and by launch parameters coming from
@@ -151,8 +203,15 @@ WebOSWindow {
                     phoneWindowId.hide();
                     simPinWindow.show();
                 }
-                else if(!phoneWindowId.visible) {
-                    // delegate management to incomingCallAlertWindow
+                else if(!phoneWindowId.active || phoneWindowId.screenLocked) {
+                    // delegate management to incomingCallAlertWindow. Not
+                    // only when the window is hidden: a card in card view is
+                    // visible but a thumbnail, and a window behind another
+                    // alert is not in front either. Only the window the user
+                    // is using takes the call in place. Hidden first, so a
+                    // window left showing by a call we never saw end is put
+                    // up afresh for this one.
+                    incomingCallAlertWindow.dismiss();
                     incomingCallAlertWindow.voiceCall = voiceCall;
                     incomingCallAlertWindow.show();
                 }
@@ -215,11 +274,13 @@ WebOSWindow {
             if (tabView.item && tabView.item.phoneUi)
                 tabView.item.showContacts();
             // Guarded: this handler still has work to do after it, and a
-            // throw here would skip the rest of the cleanup.
-            if (incomingCallAlertWindow && incomingCallAlertWindow.visible) {
-                incomingCallAlertWindow.hide();
-                incomingCallAlertWindow.voiceCall = null;
-            }
+            // throw here would skip the rest of the cleanup. Not gated on the
+            // alert being visible: a window the shell has taken off screen (it
+            // used to close every alert on a tap outside, the lock screen
+            // hides them) still holds the ended call, and kept it for the
+            // next one, which then never showed.
+            if (incomingCallAlertWindow)
+                incomingCallAlertWindow.dismiss();
             currentContact.lineId = "";
         }
     }
@@ -302,6 +363,25 @@ WebOSWindow {
 
         if (!phoneWindowId.visible) {
             phoneWindowId.show();
+        } else if (!phoneWindowId.active) {
+            // Answered from the alert while the card was in card view: show()
+            // does nothing for a window that is already visible, and the call
+            // screen would stay a thumbnail. A relaunch is what brings a card
+            // forward (see main.qml's relaunch handling).
+            appManager.call("luna://com.webos.service.applicationmanager/launch",
+                            JSON.stringify({ id: "org.webosports.app.phone" }), undefined,
+                            function(error) { console.log("Could not bring the phone forward: " + error); });
+        }
+    }
+
+    LunaService {
+        id: appManager
+        name: "org.webosports.app.phone"
+        Component.onCompleted: {
+            appManager.subscribe("luna://com.palm.display/control/lockStatus",
+                                 JSON.stringify({ subscribe: true }),
+                                 phoneWindowId.__handleLockStatus,
+                                 function(error) { console.log("No lock status: " + error); });
         }
     }
 

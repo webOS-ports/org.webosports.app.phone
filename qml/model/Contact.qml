@@ -41,6 +41,16 @@ QtObject {
 
     property string geoLocation: "Unknown"
 
+    /// What the matched number is to the contact - "Mobile", "Work" - as the
+    /// legacy incoming call popup showed it under the number. Empty for a
+    /// number that is not in the contacts.
+    property string numberType: ""
+
+    /// A photo of the contact's own, not the unknown-caller stand-in. The
+    /// legacy incoming call popup only made room for a photo when there was
+    /// one.
+    readonly property bool hasPhoto: avatarPath.length > 0 && avatarPath !== _genericAvatarPath
+
     /*
      * The stand-in for a contact with no photo.
      *
@@ -71,6 +81,9 @@ QtObject {
             if(person.foundPerson.photos) {
                 contactObj.avatarPath = person.foundPerson.photos.listPhotoPath;
             }
+            if(person.foundPhoneNumber && person.foundPhoneNumber.type) {
+                contactObj.numberType = contactsModel.getPhoneNumberTypeStr(person.foundPhoneNumber.type);
+            }
         }
 
         LibPhoneNumber.getNumberGeolocation(contactObj.lineId, contactsModel.countryCode, contactObj.setTextFromGeoLocation);
@@ -95,5 +108,6 @@ QtObject {
         contactObj.familyName = "";
         contactObj.givenName = "";
         contactObj.personId = "";
+        contactObj.numberType = "";
     }
 }

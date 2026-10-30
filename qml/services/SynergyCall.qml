@@ -101,8 +101,10 @@ QtObject {
         duration = _connectedAt ? (Date.now() - _connectedAt) : 0;
     }
 
+    // The method names are the call services' - webOS 2.x's CallSynergizer
+    // and every LuneOS connector call ending a call "disconnect".
     function answer()          { callControlRequested("answer", { id: callId }); }
-    function hangup()          { callControlRequested("hangup", { id: callId }); }
+    function hangup()          { callControlRequested("disconnect", { id: callId }); }
     function hold(on)          { callControlRequested(on ? "hold" : "resume", { id: callId }); }
     function deflect(target)   { callControlRequested("deflect", { id: callId, address: target }); }
     function sendDtmf(tones)   { callControlRequested("dtmf", { id: callId, tone: tones }); }

@@ -56,6 +56,23 @@ UiTheme {
     drawerCallRowHeight: Units.gu(3.6)
 
     /**
+     * The incoming call alert, as webOS 3.0.5 drew it on the TouchPad: no
+     * fill of its own, so the shell's dark panel shows through, no artwork
+     * behind the caller, and the name in bold. CallSynergizer opened it 140
+     * high with a photo and 110 without; the photo is 50 square with its
+     * corners rounded by four, and .incoming-small-has-image drops the
+     * buttons 26 to sit level with the text under it.
+     */
+    incomingAlertGloss: false
+    incomingAlertPhotoHeight: Units.gu(14)
+    incomingAlertPhotoSize: Units.gu(5)
+    incomingAlertPhotoRadius: Units.gu(0.4)
+    incomingAlertButtonDrop: Units.gu(2.6)
+    incomingAlertTextBox: false
+    incomingAlertNameBold: true
+    incomingAlertLineHeight: Units.gu(2)
+
+    /**
      * The SIM PIN card.
      *
      * A panel four hundred by five hundred, centred on the screen, rather

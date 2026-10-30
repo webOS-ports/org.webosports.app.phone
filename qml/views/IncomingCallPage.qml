@@ -17,123 +17,27 @@
 
 import QtQuick 2.0
 
-import LunaNext.Common 0.1
-
-import LuneOS.Telephony 1.0
-
 import "../services/IncomingCallsService.js" as IncomingCallsService
 
+/// The incoming call while the phone app is in front; IncomingCallAlert shows
+/// the same view when it is not.
 BasePage {
     id: incommingCallDialog
     pageName: "IncomingCall"
 
-    BorderImage {
-        id: avatarBackground
+    IncomingCallView {
+        anchors.fill: parent
 
-        source: appTheme.image("frame-background.png")
-        border.left: 70; border.top: 70
-        border.right: 70; border.bottom: 70
+        appTheme: incommingCallDialog.appTheme
+        currentContact: incommingCallDialog.currentContact
 
-        anchors {
-            top: parent.top
-            left: parent.left
-            right: parent.right
-            bottom: answerRejectBtns.top
-            margins: Units.gu(1)
+        onAnswerClicked: {
+            IncomingCallsService.setActionForCall(voiceCall.handlerId, IncomingCallsService.Accepted);
+            voiceCall.answer();
         }
-    }
-
-    Image {
-        id:imageAvatar
-        anchors {
-            top: avatarBackground.top
-            topMargin: Units.gu(3)
-            horizontalCenter:avatarBackground.horizontalCenter
-        }
-
-        width: Math.min(avatarBackground.width*0.6, avatarBackground.height*0.6)
-        height: width
-
-        asynchronous:true
-        fillMode:Image.PreserveAspectFit
-        smooth:true
-        source: currentContact.avatarPath
-
-        visible: false
-    }
-    CornerShader {
-        anchors.fill: imageAvatar
-        source: imageAvatar
-        radius: 35
-    }
-    Image {
-        id: avatarFrame
-        anchors.centerIn: imageAvatar
-
-        width: imageAvatar.width + Units.gu(2)
-        height: width
-        source: appTheme.image("contacts-icon-frame.png")
-        fillMode:Image.Stretch
-        asynchronous:true
-        smooth:true
-    }
-
-    Text {
-        id: lineIdText
-        anchors {
-            top: imageAvatar.bottom
-            bottom: avatarBackground.bottom
-            topMargin: Units.gu(1)
-            bottomMargin: Units.gu(1)
-            leftMargin: 50
-            rightMargin: 50
-            left: avatarBackground.left
-            right: avatarBackground.right
-        }
-
-        font.pixelSize: Units.dp(30)
-        fontSizeMode: Text.Fit
-        horizontalAlignment: Text.AlignHCenter
-        verticalAlignment: Text.AlignVCenter
-        color: appTheme.headerTitle
-        text: currentContact.personId ? (currentContact.displayLabel +"\n" + currentContact.addr) :
-                                        (currentContact.lineId + "\n"+ currentContact.geoLocation);
-    }
-
-    Item {
-        id: answerRejectBtns
-        height: Units.gu(13)
-        anchors {
-            bottom: parent.bottom
-            bottomMargin: Units.gu(1)
-            left: parent.left
-            leftMargin: Units.gu(3)
-            right: parent.right
-            rightMargin: Units.gu(3)
-        }
-
-        IncomingAcceptButton {
-            appTheme: incommingCallDialog.appTheme
-            height: answerRejectBtns.height
-            width: answerRejectBtns.height
-            anchors.left: parent.left
-            anchors.verticalCenter: parent.verticalCenter
-            onClicked: {
-                IncomingCallsService.setActionForCall(voiceCall.handlerId, IncomingCallsService.Accepted);
-                voiceCall.answer();
-            }
-        }
-
-        IncomingRejectButton {
-            appTheme: incommingCallDialog.appTheme
-            height: answerRejectBtns.height
-            width: answerRejectBtns.height
-            anchors.right: parent.right
-            anchors.verticalCenter: parent.verticalCenter
-            onClicked: {
-                IncomingCallsService.setActionForCall(voiceCall.handlerId, IncomingCallsService.Ignored);
-                voiceCall.hangup();
-            }
+        onRejectClicked: {
+            IncomingCallsService.setActionForCall(voiceCall.handlerId, IncomingCallsService.Ignored);
+            voiceCall.hangup();
         }
     }
 }

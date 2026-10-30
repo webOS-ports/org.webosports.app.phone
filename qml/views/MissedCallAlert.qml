@@ -27,19 +27,41 @@ import "../services/CallMessages.js" as CallMessages
  * The "Missed call / Call back" alert, ported from the legacy
  * phonePopups/sources/MissedCall.js. The QML app dropped missed calls into the
  * call log and told the user nothing.
+ *
+ * As there, the alert is up for a minute at most. If it goes without "Call
+ * back" or "Dismiss" - the minute is up, the screen comes on after it, the
+ * shell closes it, or another missed call takes its place - it is minimized:
+ * 2.2.4 put it on the missed call dashboard, and minimized() asks for the
+ * same here, the notification with the red missed call icon.
  */
 MessageAlert {
     id: missedCallAlert
 
     property DialHandler dialHandler
 
+    /// MissedCall.kTimeoutMs: how long the alert stays up.
+    property int timeoutMs: 60000
+
+    /// The alert went without being answered; the call is to be minimized.
+    signal minimized(string lineId, string displayName, date missedAt)
+
     property string _missedNumber: ""
+    property string _missedName: ""
+    property date _missedAt
+    /// Up and not yet answered with either button.
+    property bool _pending: false
 
     function showMissedCall(lineId, displayName) {
+        // Another missed call while one is still up: the first is minimized
+        // rather than lost.
+        _minimize();
+
         _missedNumber = lineId || "";
 
         var name = (displayName && displayName.length > 0) ? displayName : lineId;
-        var when = Qt.formatTime(new Date(), Qt.locale().timeFormat(Locale.ShortFormat));
+        _missedName = name || "";
+        _missedAt = new Date();
+        var when = Qt.formatTime(_missedAt, Qt.locale().timeFormat(Locale.ShortFormat));
 
         // Wake the screen, as the legacy popup did, so the alert is actually seen.
         lunaService.call("luna://com.palm.display/control/setState",
@@ -51,6 +73,48 @@ MessageAlert {
                      appTheme.image("popup-icon-missed.png"),
                      qsTr("Call back"),
                      missedCallAlert._callBack);
+
+        _pending = true;
+        timeout.restart();
+    }
+
+    /// Takes the alert down and minimizes the call, unless it was answered.
+    function _minimize() {
+        if (!_pending)
+            return;
+        _pending = false;
+        timeout.stop();
+        hide();
+        minimized(_missedNumber, _missedName, _missedAt);
+    }
+
+    function _answered() {
+        _pending = false;
+        timeout.stop();
+    }
+
+    onAccepted: _answered()
+    onDismissed: _answered()
+    // The shell closed it: Eos.Window lets the window go without its visible
+    // turning false first.
+    onWindowCloseRequested: _minimize()
+
+    Timer {
+        id: timeout
+        interval: missedCallAlert.timeoutMs
+        onTriggered: missedCallAlert._minimize()
+    }
+
+    /*
+     * A timer does not run while the device sleeps, which is where a missed
+     * call usually leaves it. 2.2.4 checked when the screen came back on, and
+     * took down an alert older than the minute then.
+     */
+    function _displayStatus(message) {
+        var status = JSON.parse(message.payload);
+        if (status.event === "displayOn" && _pending
+                && Date.now() - _missedAt.getTime() > timeoutMs)
+            _minimize();
     }
 
     function _callBack() {
@@ -62,5 +126,11 @@ MessageAlert {
     LunaService {
         id: lunaService
         name: "org.webosports.app.phone"
+        Component.onCompleted: {
+            lunaService.subscribe("luna://com.palm.display/control/status",
+                                  JSON.stringify({ subscribe: true }),
+                                  missedCallAlert._displayStatus,
+                                  function(error) { console.log("No display status: " + error); });
+        }
     }
 }

@@ -49,6 +49,17 @@ function getActionForCall(handlerId) {
 }
 
 /**
+ * An incoming call that went live was answered, wherever it was answered:
+ * on our alert or page, but also by a headset or car kit button, or by
+ * another client of the modem, none of which tell us. Without this such a
+ * call ended as Missed and put up a "Missed call" alert.
+ */
+function callWentLive(handlerId) {
+    if (__callDirections[handlerId] === true)
+        __callsActions[handlerId] = Accepted;
+}
+
+/**
  * Remembers which way a call went, taken from a state only one direction can
  * reach: dialling or alerting means we placed it, ringing or waiting means it
  * came to us.
