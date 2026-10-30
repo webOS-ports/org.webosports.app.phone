@@ -54,6 +54,16 @@ BasePage {
     /// Emitted when the user taps "Add call" and wants the dialpad back.
     signal addCallRequested();
 
+    /**
+     * The call screen over the lock screen. Legacy's PIN card held the same
+     * ActiveCall in lockedmode: everything a call needs, but "Add Call" -
+     * which would open the dialpad and the rest of the phone - becomes
+     * "Unlock", which goes to the lock screen to be unlocked first.
+     */
+    property bool lockedMode: false
+    /// Emitted when the user taps "Unlock" in lockedMode.
+    signal unlockRequested();
+
     property bool voiceCallIsActive: voiceCall && voiceCall.status === VoiceCall.STATUS_ACTIVE
 
     // Every call in progress. With one call the card holds one line.
@@ -515,14 +525,17 @@ BasePage {
 
         CallActionButton {
             appTheme: root.appTheme
-            visible: voiceCallMgrWrapper.canAddCall
-            iconSource: appTheme.image("menu-icon-addcall.png")
-            label: qsTr("Add Call")
-            onClicked: root.addCallRequested()
+            visible: root.lockedMode || voiceCallMgrWrapper.canAddCall
+            iconSource: appTheme.image(root.lockedMode ? "menu-icon-unlock.png" : "menu-icon-addcall.png")
+            label: root.lockedMode ? qsTr("Unlock") : qsTr("Add Call")
+            onClicked: root.lockedMode ? root.unlockRequested() : root.addCallRequested()
         }
     }
 
     function _addToContacts(address) {
+        // Contacts would open behind the lock screen, out of reach.
+        if (root.lockedMode)
+            return;
         launcher.launch("com.palm.app.contacts",
                         { newContact: { phoneNumbers: [ { value: address } ] } }, undefined,
                         function(error) { console.log("Could not open Contacts: " + error); });

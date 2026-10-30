@@ -266,11 +266,24 @@ WebOSWindow {
         visible: false
     }
 
+    LockedCallWindow {
+        id: lockedCallWindowId
+        appTheme: phoneUiTheme
+        contacts: personListModelId
+        currentContact: phoneWindow.currentContact
+        voiceCallMgrWrapper: voiceCallMgrWrapperId
+        telephonyManager: telephonyManagerId
+        audioRouteManager: audioRouteManagerId
+        callTransports: callTransportsId
+        visible: false
+    }
+
     PhoneWindow {
         id: phoneWindow
         runningOnDesktop: root.runningOnDesktop
         simPinWindow: simPinWindowId
         incomingCallAlertWindow: incomingCallAlertWindowId
+        lockedCallWindow: lockedCallWindowId
         contacts: personListModelId
         voiceCallMgrWrapper: voiceCallMgrWrapperId
         telephonyManager: telephonyManagerId

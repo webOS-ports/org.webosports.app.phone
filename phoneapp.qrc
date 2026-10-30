@@ -73,6 +73,7 @@
         <file>qml/views/ListSeparator.qml</file>
         <file>qml/views/MessageAlert.qml</file>
         <file>qml/views/MissedCallAlert.qml</file>
+        <file>qml/views/LockedCallWindow.qml</file>
         <file>qml/views/MuteButton.qml</file>
         <file>qml/views/NumPad.qml</file>
         <file>qml/views/NumPadButton.qml</file>
@@ -106,6 +107,7 @@
         <file>qml/views/images/phone/incoming-notification-gradient.png</file>
         <file>qml/views/images/phone/incoming-text.png</file>
         <file>qml/views/images/phone/incoming-text-pressed.png</file>
+        <file>qml/views/images/phone/menu-icon-unlock.png</file>
         <file>qml/views/images/phone/button-sprite.png</file>
         <file>qml/views/images/phone/button_divider.png</file>
         <file>qml/views/images/phone/buttons-numpad-pressed.png</file>
@@ -184,6 +186,7 @@
         <file>qml/views/images/tablet/button-ignore-answer.png</file>
         <file>qml/views/images/tablet/incoming-text.png</file>
         <file>qml/views/images/tablet/incoming-text-pressed.png</file>
+        <file>qml/views/images/tablet/menu-icon-unlock.png</file>
         <file>qml/views/images/tablet/button-sprite.png</file>
         <file>qml/views/images/tablet/button_divider.png</file>
         <file>qml/views/images/tablet/buttons-numpad-pressed.png</file>

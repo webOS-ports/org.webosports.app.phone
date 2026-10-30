@@ -76,6 +76,44 @@ WebOSWindow {
             screenLocked = (status.lockState === "locked");
     }
 
+    /*
+     * The call screen over the lock screen, as legacy's PIN card was: up for
+     * as long as the screen is locked with a call in progress, whether the
+     * call was answered on the lock screen or the screen locked during it.
+     * Not while a call is ringing - the incoming call alert has the screen
+     * then - and not once "Unlock" has sent the user to the lock screen.
+     */
+    property LockedCallWindow lockedCallWindow
+    property bool lockedCallSteppedAside: false
+    readonly property bool lockedCallWanted: screenLocked
+        && !!voiceCallMgrWrapper && voiceCallMgrWrapper.hasCallInProgress
+        && !lockedCallSteppedAside
+        && !(incomingCallAlertWindow && incomingCallAlertWindow.visible)
+
+    onLockedCallWantedChanged: {
+        if (!lockedCallWindow)
+            return;
+        if (lockedCallWanted) {
+            lockedCallWindow.voiceCall = voiceCallMgrWrapper.activeVoiceCall || voiceCallMgrWrapper.callAt(0);
+            lockedCallWindow.show();
+        } else {
+            lockedCallWindow.dismiss();
+        }
+    }
+    // Stepping aside lasts until the lock state changes or the call is over.
+    onScreenLockedChanged: lockedCallSteppedAside = false
+    Connections {
+        target: voiceCallMgrWrapper
+        function onHasCallInProgressChanged() {
+            if (!voiceCallMgrWrapper.hasCallInProgress)
+                phoneWindowId.lockedCallSteppedAside = false;
+        }
+    }
+    Connections {
+        target: lockedCallWindow
+        function onUnlockRequested() { phoneWindowId.lockedCallSteppedAside = true; }
+    }
+
     /**
      * Navigation, driven both by the tabs and by launch parameters coming from
      * other apps (see LaunchActionHandler).

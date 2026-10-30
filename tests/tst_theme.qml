@@ -45,6 +45,7 @@ TestCase {
         "dialpad-backspace.png", "dialpad-bg.png", "disconnect-button.png",
         "expand-button.png", "favorites-star-blue.png",
         "incoming-text.png", "incoming-text-pressed.png", "list-avatar-default.png",
+        "menu-icon-unlock.png",
         "pin-menu-button.png", "pin-menu-button-pressed.png",
         "popup-icon-error.png", "search-button.png"
     ]
