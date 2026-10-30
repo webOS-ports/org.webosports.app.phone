@@ -62,6 +62,24 @@ WebOSWindow {
         voiceCall = null;
     }
 
+    /*
+     * The strip is for a call that is ringing or waiting, and goes as soon as
+     * it is neither - however that came about. A call answered by a headset
+     * button or rejected elsewhere, or a waiting call taken with hold and
+     * answer, never passes through the buttons below, and the strip used to
+     * stay up over the call screen until the last call ended.
+     */
+    Connections {
+        target: incomingCallAlert.voiceCall
+        ignoreUnknownSignals: true
+
+        function onStatusChanged() {
+            var status = incomingCallAlert.voiceCall.status;
+            if (status !== VoiceCall.STATUS_INCOMING && status !== VoiceCall.STATUS_WAITING)
+                incomingCallAlert.dismiss();
+        }
+    }
+
     Component.onCompleted: {
         incomingCallAlert.setWindowProperty("LuneOS_window", "popupalert");
         incomingCallAlert.setWindowProperty("LuneOS_overLockScreen", "true");

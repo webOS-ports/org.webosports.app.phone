@@ -593,6 +593,7 @@ Item {
 
         switch (voiceCall.status) {
         case VoiceCall.STATUS_ACTIVE:
+            IncomingCallsService.callWentLive(voiceCall.handlerId);
             if (root.heldCall && root.heldCall.handlerId === voiceCall.handlerId)
                 root.heldCall = null;
             root.activeCall(voiceCall);

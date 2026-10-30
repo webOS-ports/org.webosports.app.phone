@@ -84,6 +84,11 @@ Item {
         var provider = voiceCall.providerId || "";
         if (provider.length === 0 || provider === callTransports.cellularTransport)
             return "";
+        // As on ActiveCallPage: a provider the registry does not know is not
+        // a service, and its id tidied into a label ("OFONO-/PHONES...") is
+        // not a name to show.
+        if (!callTransports.transportFor(provider))
+            return "";
 
         return callTransports.labelFor(provider).toUpperCase();
     }
