@@ -31,6 +31,11 @@ import "../qml/views"
  * use. Those glyphs are two 3:2 frames; drawn as a square one-frame icon
  * both frames showed at once, under "Speaker", while the call was on the
  * headset.
+ *
+ * Every glyph sits in the same square box as the neighbouring buttons'
+ * icons, centred the same way, and a drop-down glyph shows only its left
+ * square there, without the caret, as the Enyo app of 2.2.4 and 3.0.5 drew
+ * it in its 32x32 .enyo-button-icon.
  */
 Item {
     id: root
@@ -56,6 +61,10 @@ Item {
             id: buttonComponent
             AudioRouteButton {}
         }
+        Component {
+            id: neighbourComponent
+            CallActionButton { label: "Mute"; x: 200 }
+        }
 
         function status(wrapper, fields) {
             var s = { returnValue: true, speakerMode: false, micMute: false,
@@ -76,7 +85,14 @@ Item {
             verify(button !== null, "the button did not load");
             var icon = findChild(button, "icon");
             verify(icon !== null, "the button has no icon");
-            return { wrapper: wrapper, routes: routes, button: button, icon: icon };
+            var box = findChild(button, "iconBox");
+            verify(box !== null, "the button has no icon box");
+            var mute = createTemporaryObject(neighbourComponent, root,
+                                             { appTheme: theme || phone,
+                                               iconSource: (theme || phone).image("menu-icon-mute.png") });
+            verify(mute !== null, "the neighbour did not load");
+            return { wrapper: wrapper, routes: routes, button: button, icon: icon, box: box,
+                     neighbourBox: findChild(mute, "iconBox") };
         }
 
         /// The glyph, the label, whether it is lit, and that what is drawn is
@@ -94,6 +110,21 @@ Item {
             var frameH = image.sourceSize.height / frames;
             fuzzyCompare(o.icon.width / o.icon.height, frameW / frameH, 0.01,
                          glyph + " is squashed into a box of the wrong shape");
+
+            // The neighbours' box: the same square, centred the same way,
+            // and the glyph drawn from its left edge and clipped to it.
+            compare(o.box.width, o.neighbourBox.width, "the icon box is wider than Mute's");
+            compare(o.box.height, o.neighbourBox.height, "the icon box is taller than Mute's");
+            compare(o.box.width, o.box.height, "the icon box is not square");
+            verify(o.box.clip, "a wide glyph is not clipped to the box");
+            compare(o.icon.x, 0);
+            compare(o.icon.y, 0);
+            compare(o.icon.height, o.box.height);
+            var c = o.box.mapToItem(o.button, o.box.width / 2, o.box.height / 2);
+            var n = o.neighbourBox.mapToItem(o.neighbourBox.parent.parent.parent,
+                                             o.neighbourBox.width / 2, o.neighbourBox.height / 2);
+            fuzzyCompare(c.x, o.button.width / 2, 0.5, "the icon is off the button's centre");
+            fuzzyCompare(c.y, n.y, 0.5, "the icon sits higher or lower than Mute's");
         }
 
         function test_earpiece_data() {

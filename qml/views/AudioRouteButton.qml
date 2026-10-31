@@ -27,6 +27,11 @@ import "../services"
  * speaker are all there is, and "Audio" with the drop-down glyphs
  * (audioRouteImagesPopup) once a Bluetooth headset is connected. Tapping
  * steps to the next route; 2.x opened a menu of them instead.
+ *
+ * The Enyo app of 2.2.4 and 3.0.5 drew every one of these in the same 32x32
+ * .enyo-button-icon box as Mute, Key pad and Add Call, from the top left,
+ * so of a drop-down glyph only its left square showed - the glyph without
+ * its caret - and the pressed frame below it while held.
  */
 CallActionButton {
     id: audioRouteButton
@@ -55,7 +60,8 @@ CallActionButton {
     }
 
     iconSource: appTheme ? appTheme.image(iconName) : ""
-    // The drop-down glyphs are two 3:2 frames, normal over pressed.
+    // The drop-down glyphs are two 3:2 frames, normal over pressed; the
+    // button's square icon box shows the left square of the one in use.
     iconAspect: _menu ? 1.5 : 1
     iconFrameCount: _menu ? 2 : 0
     label: audioRouteManager ? audioRouteManager.buttonLabel : ""

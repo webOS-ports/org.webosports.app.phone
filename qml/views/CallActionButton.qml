@@ -33,8 +33,11 @@ Item {
     property UiTheme appTheme
 
     property url iconSource
-    /// Width over height of one frame of the icon; legacy's drop-down glyphs
-    /// carry their caret to the right and are half as wide again.
+    /// Width over height of one frame of the icon. The icon box stays the
+    /// same square on every button and shows a wider frame's left square,
+    /// as Enyo's 32x32 .enyo-button-icon did in webOS 2.2.4 and 3.0.5: the
+    /// drop-down glyphs are half as wide again, and their caret falls
+    /// outside the box.
     property real iconAspect: 1
     /// Frames in the icon's strip; 0 leaves SpriteIcon to assume square ones,
     /// which a wide strip is not.
@@ -67,14 +70,21 @@ Item {
             anchors.centerIn: parent
             spacing: Units.gu(0.4)
 
-            SpriteIcon {
+            Item {
+                objectName: "iconBox"
                 anchors.horizontalCenter: parent.horizontalCenter
-                objectName: "icon"
-                width: Units.gu(3) * callActionButton.iconAspect
+                width: Units.gu(3)
                 height: Units.gu(3)
-                source: callActionButton.iconSource
-                frameCount: callActionButton.iconFrameCount
-                frame: mouseArea.pressed ? 1 : 0
+                clip: true
+
+                SpriteIcon {
+                    objectName: "icon"
+                    width: parent.height * callActionButton.iconAspect
+                    height: parent.height
+                    source: callActionButton.iconSource
+                    frameCount: callActionButton.iconFrameCount
+                    frame: mouseArea.pressed ? 1 : 0
+                }
             }
 
             Text {
