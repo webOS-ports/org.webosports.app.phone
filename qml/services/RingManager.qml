@@ -56,7 +56,7 @@ Item {
     states: [
         State {
             name: "default"
-            StateChangeScript { script: ringtone.stop(); }
+            StateChangeScript { script: ringMgrItem._stop(); }
         },
         State {
             name: "ringing"
@@ -82,6 +82,14 @@ Item {
     MediaPlayer {
          id: ringtone
          loops: MediaPlayer.Infinite
+
+         // Nothing rings: whatever started the player again is overruled.
+         onPlaybackStateChanged: {
+             if (playbackState === MediaPlayer.PlayingState && ringMgrItem.state === "default") {
+                 console.warn("phone: the ringtone started again with no call ringing, stopping it");
+                 ringMgrItem._stop();
+             }
+         }
     }
 
     // Ring through the "pringtones" sink rather than the default one: the
@@ -144,8 +152,37 @@ Item {
         ringtone.play();
     }
 
+    // Stops the ring so that it stays stopped. stop() alone is not enough
+    // with a looping player: Qt 6.12's GStreamer backend answers an
+    // end-of-stream message with gst_play_play() whenever loops are left
+    // (QGstreamerMediaPlayer::processBusMessageApplication, doLoop()),
+    // without asking whether the player has been stopped since. A ring
+    // answered just as the ringtone reached its end had that message waiting
+    // behind the stop(), so the ringtone started over - on the default sink,
+    // through the call and after it, until the app went.
+    //
+    // So: no loops left, then the stop, then no source (an end-of-stream
+    // still to come finds nothing seekable to loop over), then no output (if
+    // the pipeline plays all the same, it plays into a fakesink). Each ring
+    // sets all of it up again.
+    function _stop() {
+        ringtone.loops = 1;
+        ringtone.stop();
+        ringtone.source = "";
+        var output = ringtone.audioOutput;
+        if (output) {
+            ringtone.audioOutput = null;
+            output.destroy();
+        }
+    }
+
+    function _silence() {
+        ringMgrItem.state = "default";
+        _stop();
+    }
+
     Connections {
-        target: voiceCallManager
+        target: ringMgrItem.voiceCallManager
 
         function onIncomingCall(voiceCall) {
             // Another call already up means this is call waiting, not a
@@ -153,29 +190,32 @@ Item {
             // that is ringing its active call, so that would make every call
             // a waiting one, and the phone would never ring.
             var alreadyOnACall = voiceCall.status === VoiceCall.STATUS_WAITING ||
-                                 voiceCallManager.callCount > 1;
+                                 ringMgrItem.voiceCallManager.callCount > 1;
 
             ringMgrItem.state = alreadyOnACall ? "callWaiting" : "ringing";
         }
 
+        // Each of these stops the player itself as well: when the state is
+        // "default" already, setting it again runs no StateChangeScript, and
+        // a ring that started over behind it went on through the whole call.
         function onActiveCall(voiceCall) {
-            ringMgrItem.state = "default";
+            ringMgrItem._silence();
         }
 
         function onEndingCall(voiceCall) {
-            ringMgrItem.state = "default";
+            ringMgrItem._silence();
         }
 
         function onResetCall(voiceCall) {
-            ringMgrItem.state = "default";
+            ringMgrItem._silence();
         }
     }
 
     SystemPreferences {
         clientName: "org.webosports.app.phone"
         keys: ["ringtone", "phoneIncomingCallOnCallSound"]
-        onUpdated: (response) => _getPreferencesSuccess(response)
-        onError: (message) => _getPreferencesFailure(message)
+        onUpdated: (response) => ringMgrItem._getPreferencesSuccess(response)
+        onError: (message) => ringMgrItem._getPreferencesFailure(message)
     }
 
     function _getPreferencesSuccess(response) {
