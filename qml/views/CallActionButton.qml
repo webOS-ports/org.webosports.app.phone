@@ -33,6 +33,12 @@ Item {
     property UiTheme appTheme
 
     property url iconSource
+    /// Width over height of one frame of the icon; legacy's drop-down glyphs
+    /// carry their caret to the right and are half as wide again.
+    property real iconAspect: 1
+    /// Frames in the icon's strip; 0 leaves SpriteIcon to assume square ones,
+    /// which a wide strip is not.
+    property int iconFrameCount: 0
     property string label: ""
     property bool active: false
     property bool actionEnabled: true
@@ -63,9 +69,11 @@ Item {
 
             SpriteIcon {
                 anchors.horizontalCenter: parent.horizontalCenter
-                width: Units.gu(3)
+                objectName: "icon"
+                width: Units.gu(3) * callActionButton.iconAspect
                 height: Units.gu(3)
                 source: callActionButton.iconSource
+                frameCount: callActionButton.iconFrameCount
                 frame: mouseArea.pressed ? 1 : 0
             }
 

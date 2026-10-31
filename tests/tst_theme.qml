@@ -44,6 +44,10 @@ TestCase {
         "dashboard-unread.png", "dial-button.png", "dialer-entry-bg.png",
         "dialpad-backspace.png", "dialpad-bg.png", "disconnect-button.png",
         "expand-button.png", "favorites-star-blue.png", "list-avatar-default.png",
+        "menu-icon-headset.png", "menu-icon-speaker-bluetooth.png",
+        "menu-icon-speaker-external.png", "menu-icon-speaker-internal.png",
+        "menu-popup-bluetooth.png", "menu-popup-bluetooth-headset.png",
+        "menu-popup-bluetooth-internal.png", "menu-popup-bluetooth-speaker.png",
         "pin-menu-button.png", "pin-menu-button-pressed.png",
         "popup-icon-error.png", "search-button.png"
     ]

@@ -55,6 +55,19 @@ Item {
 
     readonly property bool speakerOn: currentRoute === routeSpeaker
 
+    /**
+     * What the route button is, as webOS 2.x's ActiveCall
+     * updateActiveAudioRouteButtonImage had it. With the handset and the
+     * speaker only (a plugged-in headset stands in for the handset) it is
+     * the "Speaker" toggle, lit while the speaker is on. A Bluetooth headset
+     * makes it a menu of routes: "Audio", never lit, showing the route in
+     * use by its glyph alone.
+     */
+    readonly property bool buttonIsMenu: bluetoothAvailable || currentRoute === routeBluetooth
+    readonly property string buttonLabel: buttonIsMenu ? CallMessages.audioRouteMenu
+                                                       : CallMessages.audioRouteSpeaker
+    readonly property bool buttonActive: !buttonIsMenu && speakerOn
+
     /// Routes the user can pick from right now, most-preferred first.
     /// With headphones plugged in the earpiece is not a choice: audiod gives
     /// the call to the jack whenever the speaker is off.

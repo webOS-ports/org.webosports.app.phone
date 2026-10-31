@@ -48,6 +48,7 @@
         <file>qml/views/AcceptButton.qml</file>
         <file>qml/views/ActiveCallPage.qml</file>
         <file>qml/views/AddCallButton.qml</file>
+        <file>qml/views/AudioRouteButton.qml</file>
         <file>qml/views/BasePage.qml</file>
         <file>qml/views/CallActionButton.qml</file>
         <file>qml/views/CallGroupDelegate.qml</file>
@@ -146,9 +147,13 @@
         <file>qml/views/images/phone/menu-icon-new-contact.png</file>
         <file>qml/views/images/phone/menu-icon-speaker-bluetooth.png</file>
         <file>qml/views/images/phone/menu-icon-speaker-external.png</file>
+        <file>qml/views/images/phone/menu-icon-speaker-internal.png</file>
         <file>qml/views/images/phone/menu-icon-speaker.png</file>
         <file>qml/views/images/phone/menu-icon-video.png</file>
         <file>qml/views/images/phone/menu-icon-voicemail.png</file>
+        <file>qml/views/images/phone/menu-popup-bluetooth-headset.png</file>
+        <file>qml/views/images/phone/menu-popup-bluetooth-internal.png</file>
+        <file>qml/views/images/phone/menu-popup-bluetooth-speaker.png</file>
         <file>qml/views/images/phone/menu-popup-bluetooth.png</file>
         <file>qml/views/images/phone/missed-call-frame.png</file>
         <file>qml/views/images/phone/multicall-disconnect-button-full-all.png</file>
@@ -222,9 +227,13 @@
         <file>qml/views/images/tablet/menu-icon-new-contact.png</file>
         <file>qml/views/images/tablet/menu-icon-speaker-bluetooth.png</file>
         <file>qml/views/images/tablet/menu-icon-speaker-external.png</file>
+        <file>qml/views/images/tablet/menu-icon-speaker-internal.png</file>
         <file>qml/views/images/tablet/menu-icon-speaker.png</file>
         <file>qml/views/images/tablet/menu-icon-video.png</file>
         <file>qml/views/images/tablet/menu-icon-voicemail.png</file>
+        <file>qml/views/images/tablet/menu-popup-bluetooth-headset.png</file>
+        <file>qml/views/images/tablet/menu-popup-bluetooth-internal.png</file>
+        <file>qml/views/images/tablet/menu-popup-bluetooth-speaker.png</file>
         <file>qml/views/images/tablet/menu-popup-bluetooth.png</file>
         <file>qml/views/images/tablet/missed-call-frame.png</file>
         <file>qml/views/images/tablet/multicall-disconnect-button-full-all.png</file>

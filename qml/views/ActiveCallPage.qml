@@ -448,30 +448,10 @@ BasePage {
         }
         spacing: Units.gu(0.6)
 
-        // Cycles earpiece -> speaker -> headset -> bluetooth, showing which one
-        // is in use. The legacy app used a popup menu for the same thing.
-        CallActionButton {
+        AudioRouteButton {
             appTheme: root.appTheme
+            audioRouteManager: root.audioRouteManager
             visible: root.voiceCallIsActive
-            iconSource: {
-                if (!root.audioRouteManager)
-                    return appTheme.image("menu-icon-speaker.png");
-
-                switch (root.audioRouteManager.currentRoute) {
-                case root.audioRouteManager.routeBluetooth:
-                    return appTheme.image("menu-popup-bluetooth.png");
-                case root.audioRouteManager.routeWiredHeadset:
-                    return appTheme.image("menu-icon-headset.png");
-                default:
-                    return appTheme.image("menu-icon-speaker.png");
-                }
-            }
-            label: qsTr("Speaker")
-            active: root.audioRouteManager ? root.audioRouteManager.speakerOn : false
-            onClicked: {
-                if (root.audioRouteManager)
-                    root.audioRouteManager.nextRoute();
-            }
         }
 
         CallActionButton {
