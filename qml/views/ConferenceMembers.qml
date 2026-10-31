@@ -36,6 +36,8 @@ Column {
     id: members
 
     property var calls: []
+    /// The conference is on hold: no taking anyone aside, as on legacy.
+    property bool canPrivate: true
     property ContactsModel contacts
     property UiTheme appTheme
 
@@ -141,11 +143,12 @@ Column {
                         height: Units.gu(4.8)
                         source: members.appTheme ? members.appTheme.image("conf-list-buttons.png") : ""
                         frameCount: 6
-                        frame: privateArea.pressed ? 5 : 3
+                        frame: !members.canPrivate ? 4 : privateArea.pressed ? 5 : 3
 
                         MouseArea {
                             id: privateArea
                             anchors.fill: parent
+                            enabled: members.canPrivate
                             onClicked: {
                                 members.openIndex = -1;
                                 members.privateRequested(row.modelData);

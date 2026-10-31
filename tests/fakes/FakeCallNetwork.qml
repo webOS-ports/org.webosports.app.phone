@@ -34,6 +34,15 @@ import org.nemomobile.voicecall 1.0
  *   several is AT+CHLD=1<n>, rejecting a waiting call AT+CHLD=0, as the
  *   Mindphone's radio log shows them.
  *
+ * - oFono takes one request at a time: with busyMs set, a hangup under way
+ *   refuses the next with InProgress (src/voicecall.c, vc->pending), and
+ *   the request is dropped. A merge or split is refused the same way;
+ * - CreateMultiparty is AT+CHLD=3, joining the active and held calls, all
+ *   of them active afterwards; PrivateChat is AT+CHLD=2<n>, leaving that
+ *   call active and the conference held, and only with nothing on hold.
+ *   refuseCallControl makes the network turn them down: oFono's Failed,
+ *   reported through the provider, every call as it was.
+ *
  * `commands` records what the modem would have been sent.
  */
 Item {
@@ -42,6 +51,13 @@ Item {
     property var activeVoiceCall: null
     property string defaultProviderId: "ofono/ril_0"
     property var commands: []
+
+    /// How long a hangup keeps oFono busy; 0 for no time at all.
+    property int busyMs: 0
+    property bool refuseCallControl: false
+    property bool busy: false
+    /// Requests oFono turned away with InProgress.
+    property int refused: 0
 
     /// Calls report "disconnected" before their row goes; with this off the
     /// row goes first, as for a call that vanished without saying so.
@@ -115,6 +131,8 @@ Item {
             _remove(call);
             call.status = VoiceCall.STATUS_DISCONNECTED;
         }
+        call.isMultiparty = false;
+        _leaveConference();
     }
 
     // --- what the handlers ask of oFono ---
@@ -141,14 +159,81 @@ Item {
     function holdAndAnswer() { swapCalls(); }
 
     function hangup(call) {
+        if (busy) {
+            refused = refused + 1;
+            return;
+        }
+
         if (call.status === VoiceCall.STATUS_WAITING)
             _send("AT+CHLD=0");
         else if (voiceCalls.count > 1)
             _send("AT+CHLD=1" + call.index);
         else
             _send("ATH");
+
+        if (busyMs > 0) {
+            busy = true;
+            ending = call;
+            busyTimer.restart();
+            return;
+        }
         end(call);
     }
+
+    property var ending: null
+
+    Timer {
+        id: busyTimer
+        interval: network.busyMs
+        onTriggered: {
+            network.busy = false;
+            network.end(network.ending);
+            network.ending = null;
+        }
+    }
+
+    function _leaveConference() {
+        var members = voiceCalls.list.filter(function(call) { return call.isMultiparty; });
+        if (members.length === 1)
+            members[0].isMultiparty = false;
+    }
+
+    function createMultiparty(call, otherHandlerId) {
+        if (busy) {
+            error("CreateMultiparty: org.ofono.Error.InProgress Operation already in progress");
+            return;
+        }
+        _send("AT+CHLD=3");
+        if (refuseCallControl) {
+            error("CreateMultiparty: org.ofono.Error.Failed Operation failed");
+            return;
+        }
+        voiceCalls.list.forEach(function(member) {
+            if (member.status === VoiceCall.STATUS_ACTIVE || member.status === VoiceCall.STATUS_HELD) {
+                member.isMultiparty = true;
+                member.status = VoiceCall.STATUS_ACTIVE;
+            }
+        });
+    }
+
+    function privateChat(call) {
+        if (_withStatus(VoiceCall.STATUS_HELD).length > 0) {
+            error("PrivateChat: org.ofono.Error.Failed Operation failed");
+            return;
+        }
+        _send("AT+CHLD=2" + call.index);
+        if (refuseCallControl) {
+            error("PrivateChat: org.ofono.Error.Failed Operation failed");
+            return;
+        }
+        voiceCalls.list.forEach(function(member) {
+            if (member.isMultiparty && member !== call)
+                member.status = VoiceCall.STATUS_HELD;
+        });
+        call.isMultiparty = false;
+        _leaveConference();
+    }
+
 
     function dial(providerId, number) { console.log("FakeCallNetwork: dial " + number); }
     function silenceRingtone() {}

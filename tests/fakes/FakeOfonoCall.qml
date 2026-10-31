@@ -56,7 +56,9 @@ QtObject {
     }
 
     function sendDtmf(tones) {}
-    function merge(otherHandlerId) {}
-    function split() {}
+    // OfonoVoiceCallHandler::merge: oFono's CreateMultiparty.
+    function merge(otherHandlerId) { network.createMultiparty(this, otherHandlerId); }
+    // OfonoVoiceCallHandler::split: oFono's PrivateChat.
+    function split() { network.privateChat(this); }
     function deflect(target) {}
 }

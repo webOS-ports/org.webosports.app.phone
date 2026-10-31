@@ -25,6 +25,7 @@ import LuneOS.System 1.0
 import org.nemomobile.voicecall 1.0
 
 import "../model"
+import "CallMessages.js" as CallMessages
 import "DialStringParser.js" as DialStringParser
 import "IncomingCallsService.js" as IncomingCallsService
 
@@ -92,6 +93,9 @@ Item {
 
     /// A call could not be placed. `reason` keys into CallMessages.dialFailure.
     signal dialFailed(string number, string reason);
+    /// A merge or split was refused. Nothing changed: the calls stay as they
+    /// were. `message` is for the user.
+    signal callControlFailed(string message);
     /// A connected call went away without either side hanging up.
     signal callDropped(var voiceCall, string reason);
 
@@ -333,8 +337,21 @@ Item {
      * waiting call instead, and an outgoing one is the call being made.
      */
     readonly property bool canResume: hasHeldCall && !hasActiveCall && !hasRingingCall && !hasOutgoingCall
-    readonly property bool canMerge: canSwap && !hasConference
-    readonly property bool canSplit: hasConference
+    /**
+     * The biggest conference there can be (3GPP 22.084: five others), as
+     * legacy, which took the merge button away at that size. A call on hold
+     * or in the conference can join the other, as on legacy: oFono's
+     * CreateMultiparty joins whatever is active with whatever is held.
+     */
+    readonly property int maxConferenceSize: 5
+    readonly property int conferenceSize: {
+        callsRevision;
+        return allCallsList.filter(function(call) { return call.isMultiparty; }).length;
+    }
+    readonly property bool canMerge: canSwap && conferenceSize < maxConferenceSize
+    /// oFono's PrivateChat refuses with any call on hold, and legacy's extract
+    /// was off unless the conference was the active line.
+    readonly property bool canSplit: hasConference && !hasHeldCall
     readonly property bool canAddCall: callCount > 0 && callCount < 2 && hasActiveCall
     readonly property bool canHangupAll: callCount > 1
 
@@ -411,8 +428,7 @@ Item {
     property string _dialTransportAfterHold: ""
 
     function hangupAll() {
-        // Take a copy first: hanging a call up removes it from the list.
-        allCallsList.slice().forEach(function(voiceCall) { voiceCall.hangup(); });
+        hangupCalls(allCallsList);
     }
 
     /**
@@ -422,9 +438,70 @@ Item {
      * ending the calls on the card used to reject it as well.
      */
     function hangupInProgress() {
-        allCallsList.filter(function(call) {
+        hangupCalls(allCallsList.filter(function(call) {
             return call.status !== VoiceCall.STATUS_INCOMING && call.status !== VoiceCall.STATUS_WAITING;
-        }).forEach(function(voiceCall) { voiceCall.hangup(); });
+        }));
+    }
+
+    /*
+     * Ends `calls` one at a time, each once the one before has gone. oFono
+     * takes one call control request at a time and refuses the next with
+     * InProgress until the last is done, so hanging up on two calls in one
+     * go ended the first and left the second up: a conference tapped off
+     * was still there with one person in it.
+     */
+    property var _hangupQueue: []
+    property string _hangupWaitingFor: ""
+    property int _hangupTurnMs: 5000
+
+    function hangupCalls(calls) {
+        _hangupQueue = calls.map(function(call) { return call.handlerId; });
+        _hangupWaitingFor = "";
+        _hangupNext();
+    }
+
+    function _callInProgress(handlerId) {
+        var found = allCallsList.filter(function(call) {
+            return call.handlerId === handlerId && call.status !== VoiceCall.STATUS_DISCONNECTED;
+        });
+        return found.length > 0 ? found[0] : null;
+    }
+
+    function _hangupNext() {
+        if (_hangupWaitingFor.length > 0 && _callInProgress(_hangupWaitingFor))
+            return;
+
+        _hangupWaitingFor = "";
+        while (_hangupQueue.length > 0) {
+            var handlerId = _hangupQueue[0];
+            _hangupQueue = _hangupQueue.slice(1);
+
+            var call = _callInProgress(handlerId);
+            if (!call)
+                continue;
+
+            if (_hangupQueue.length > 0) {
+                _hangupWaitingFor = handlerId;
+                hangupTurn.restart();
+            }
+            call.hangup();
+            return;
+        }
+    }
+
+    onCallsRevisionChanged: {
+        if (_hangupQueue.length > 0)
+            Qt.callLater(_hangupNext);
+    }
+
+    // The call would not go: the rest still get their turn.
+    Timer {
+        id: hangupTurn
+        interval: root._hangupTurnMs
+        onTriggered: {
+            root._hangupWaitingFor = "";
+            root._hangupNext();
+        }
     }
 
     function _cellularTransport() {
@@ -491,7 +568,7 @@ Item {
 
     /// Takes one participant back out of the conference into a private chat.
     function split(voiceCall) {
-        var target = voiceCall || conferenceCall();
+        var target = voiceCall && voiceCall.isMultiparty ? voiceCall : conferenceCall();
         if (target) target.split();
     }
 
@@ -967,6 +1044,9 @@ Item {
         function onError(message) {
             console.log("VoiceCallManager error: " + message);
 
+            if (root._reportCallControlError(message))
+                return;
+
             if (root._pendingDialNumber.length === 0 ||
                 Date.now() - root._dialAttemptedAt > root._dialInFlightMs) {
                 console.log("  ... not ours: pending='" + root._pendingDialNumber +
@@ -980,6 +1060,22 @@ Item {
             root._pendingDialNumber = "";
             root._pendingPostDial = "";
         }
+    }
+
+    /*
+     * The oFono provider starts a merge's or a split's errors with the oFono
+     * method. InProgress is a second tap while the first is under way, which
+     * will report for itself.
+     */
+    function _reportCallControlError(message) {
+        var text = String(message);
+        var isMerge = text.indexOf("CreateMultiparty:") === 0;
+        if (!isMerge && text.indexOf("PrivateChat:") !== 0)
+            return false;
+
+        if (text.indexOf("org.ofono.Error.InProgress") < 0)
+            root.callControlFailed(isMerge ? CallMessages.conferenceFailed : CallMessages.extractFailed);
+        return true;
     }
 
     // The manager reports errors as free text; map the ones we recognise onto
