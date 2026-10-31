@@ -213,6 +213,30 @@ Item {
     }
 
     /**
+     * A ringing call that comes in on top of another one: a call waiting.
+     * Legacy put that up in its popup strip over the call card, never as a
+     * page in place of it (see PhoneWindow.onIncomingCall).
+     */
+    function isCallWaiting(voiceCall) {
+        if (!voiceCall)
+            return false;
+        if (voiceCall.status === VoiceCall.STATUS_WAITING)
+            return true;
+        return allCalls().some(function(call) {
+            return call !== voiceCall &&
+                   (call.status === VoiceCall.STATUS_ACTIVE ||
+                    call.status === VoiceCall.STATUS_HELD ||
+                    call.status === VoiceCall.STATUS_DIALING ||
+                    call.status === VoiceCall.STATUS_ALERTING);
+        });
+    }
+
+    function conferenceCall() {
+        var conference = allCalls().filter(function(call) { return call.isMultiparty; });
+        return conference.length > 0 ? conference[0] : null;
+    }
+
+    /**
      * Which controls the active call UI should offer. Mirrors the legacy
      * AbstractCallButtons rules: with one call you can only hang up, with two
      * you can swap and merge, and once merged you can split again.
@@ -389,6 +413,18 @@ Item {
     function hangupAll() {
         // Take a copy first: hanging a call up removes it from the list.
         allCallsList.slice().forEach(function(voiceCall) { voiceCall.hangup(); });
+    }
+
+    /**
+     * Ends every call in progress - talking, held, being dialled - and lets
+     * a ringing one be: what the call card's own hangup does. A call waiting
+     * rings in the strip over the card, and is answered or ignored there;
+     * ending the calls on the card used to reject it as well.
+     */
+    function hangupInProgress() {
+        allCallsList.filter(function(call) {
+            return call.status !== VoiceCall.STATUS_INCOMING && call.status !== VoiceCall.STATUS_WAITING;
+        }).forEach(function(voiceCall) { voiceCall.hangup(); });
     }
 
     function _cellularTransport() {

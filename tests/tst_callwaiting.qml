@@ -84,6 +84,7 @@ Item {
 
             var second = network.wait("0600000002");
             compare(wrapper.incomingVoiceCall(), second);
+            verify(wrapper.isCallWaiting(second), "a second call is a call waiting");
             // What the strip's Answer does with a waiting call.
             second.answer();
 
@@ -220,6 +221,22 @@ Item {
             verify(!wrapper.canResume);
         }
 
+        function test_theCardsHangupLeavesTheCallWaitingRinging() {
+            var first = network.ring("0600000001");
+            wrapper.answer();
+            var second = network.wait("0600000002");
+            var page = createTemporaryObject(pageComponent, root,
+                                             { appTheme: theme, voiceCallMgrWrapper: wrapper,
+                                               voiceCall: first });
+            verify(page !== null, "the call page did not load");
+            verify(page.multipleLines);
+            waitForRendering(page);
+            mouseClick(findChild(page, "hangupArea"));
+            compare(sent(), "ATA AT+CHLD=11");
+            compare(second.status, VoiceCall.STATUS_WAITING);
+            compare(wrapper.incomingVoiceCall(), second);
+        }
+
         function test_theOtherEndHangsUpTheHeldCall() {
             var calls = holdAndAnswer();
             network.end(calls[0]);
@@ -234,6 +251,8 @@ Item {
             wrapper.answer();
             first.hangup();
             compare(wrapper.callAfterEnding(first.handlerId), null);
+            verify(!wrapper.isCallWaiting(network.ring("0600000001")),
+                   "a call on its own is not a call waiting");
         }
     }
 }

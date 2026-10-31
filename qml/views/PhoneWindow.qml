@@ -204,7 +204,8 @@ WebOSWindow {
                     phoneWindowId.hide();
                     simPinWindow.show();
                 }
-                else if(!phoneWindowId.active || phoneWindowId.screenLocked) {
+                else if(!phoneWindowId.active || phoneWindowId.screenLocked ||
+                        voiceCallMgrWrapper.isCallWaiting(voiceCall)) {
                     // delegate management to incomingCallAlertWindow. Not
                     // only when the window is hidden: a card in card view is
                     // visible but a thumbnail, and a window behind another
@@ -212,6 +213,12 @@ WebOSWindow {
                     // is using takes the call in place. Hidden first, so a
                     // window left showing by a call we never saw end is put
                     // up afresh for this one.
+                    //
+                    // A call waiting always goes to the strip, the call card
+                    // staying up behind it: 2.2.4 opened the same small
+                    // IncomingCall popup for it as for any call
+                    // (CallSynergizer.handleIncoming), never a page over the
+                    // call in progress.
                     incomingCallAlertWindow.dismiss();
                     incomingCallAlertWindow.voiceCall = voiceCall;
                     incomingCallAlertWindow.show();

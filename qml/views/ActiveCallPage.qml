@@ -499,10 +499,11 @@ BasePage {
 
                 MouseArea {
                     id: hangupAllArea
+                    objectName: "hangupArea"
                     anchors.fill: parent
                     onClicked: {
                         if (root.multipleLines || root.conferenceOnly)
-                            voiceCallMgrWrapper.hangupAll();
+                            voiceCallMgrWrapper.hangupInProgress();
                         else if (root.selectedCall)
                             root.selectedCall.hangup();
 
