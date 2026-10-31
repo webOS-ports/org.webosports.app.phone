@@ -25,6 +25,7 @@ import LuneOS.Components 1.0
 import LunaNext.Common 0.1
 
 import "../AppTweaks"
+import "../services"
 import "../services/PhoneNumberUtils.js" as PhoneNumberUtils
 
 BasePage {
@@ -197,7 +198,7 @@ BasePage {
         // time.
         if (voiceCallMgrWrapper && voiceCallMgrWrapper.activeVoiceCall) {
             voiceCallMgrWrapper.sendDtmf(character);
-            playKeyTone(character, true);
+            keyTonePlayer.play(character, true);
             return;
         }
 
@@ -206,23 +207,9 @@ BasePage {
         // routes through ngfd, which LuneOS does not run, so it is silent
         // here. audiod plays a self-stopping one-shot; only 0-9, * and #
         // have tones.
-        playKeyTone(character, false);
+        keyTonePlayer.play(character, false);
 
         numEntry.insert(character);
-    }
-
-    // Only 0-9, * and # have tones, and only with sound feedback switched on.
-    function playKeyTone(character, inCall) {
-        var feedback = AppTweaks.dialpadFeedbackTweakValue;
-        if (!(feedback === "vibrateSound" || feedback === "soundOnly"))
-            return;
-        if (!((character >= "0" && character <= "9") || character === "*" || character === "#"))
-            return;
-        var request = { name: character };
-        if (inCall)
-            request.feedbackOnly = true;
-        service.call("luna://com.palm.audio/dtmf/playDTMF",
-                     JSON.stringify(request), undefined, numPad.dtmfFailure);
     }
 
     // Shared by the dial button and the hardware Call/Enter keys.
@@ -256,6 +243,10 @@ BasePage {
         id: service
         name: "org.webosports.app.phone"
     }
+
+    readonly property alias keyTone: keyTonePlayer
+
+    KeyTonePlayer { id: keyTonePlayer }
 
     /**
      * On a handset the keypad is the screen, so it takes all of it. On a
@@ -459,10 +450,6 @@ BasePage {
 
         function vibrateFailure(message) {
             console.log("Unable to vibrate");
-        }
-
-        function dtmfFailure(message) {
-            console.log("Unable to play DTMF tone");
         }
 
         onSendKey: (keycode) => {
