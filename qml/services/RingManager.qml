@@ -103,10 +103,19 @@ Item {
         id: mediaDevices
     }
 
+    property string ringtoneSinkName: "pringtones"
+
     function _ringtoneSink() {
+        return _audioOutputNamed(ringtoneSinkName);
+    }
+
+    // An audio device's id is a QByteArray, which QML hands out as an
+    // ArrayBuffer: compare its text. "id === name" is never true, and "=="
+    // only matches through the ArrayBuffer's toString().
+    function _audioOutputNamed(name) {
         var outputs = mediaDevices.audioOutputs;
         for (var i = 0; i < outputs.length; i++) {
-            if (outputs[i].id == "pringtones")
+            if (outputs[i].id.toString() === name)
                 return outputs[i];
         }
         return null;
@@ -116,6 +125,15 @@ Item {
         var previous = ringtone.audioOutput;
         var sink = _ringtoneSink();
 
+        // Let go of the old output before taking the new one. Going straight
+        // from one output to another, Qt 6.12's QMediaPlayer::setAudioOutput()
+        // runs the old output's disconnect callback, which sets the player's
+        // output to null under it: the property then reads null although the
+        // new output plays, the next ring cannot find that output to drop it,
+        // and the one left over keeps a callback into the player that takes a
+        // later ring's output away when it goes, or runs on a player already
+        // gone when the app closes.
+        ringtone.audioOutput = null;
         ringtone.audioOutput = ringtoneOutput.createObject(ringMgrItem,
                                                            sink ? { device: sink } : {});
         if (previous)
