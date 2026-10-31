@@ -24,6 +24,8 @@
         <file>qml/services/DialProxy.qml</file>
         <file>qml/services/DialStringParser.js</file>
         <file>qml/services/DialingShortcuts.qml</file>
+        <file>qml/services/HeadsetCallButton.qml</file>
+        <file>qml/services/HeadsetCallKeys.js</file>
         <file>qml/services/ImBuddyStatus.qml</file>
         <file>qml/services/IncomingCallsService.js</file>
         <file>qml/services/LaunchActionHandler.js</file>
