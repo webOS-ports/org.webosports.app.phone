@@ -29,6 +29,7 @@ import Eos.Window 0.1
 
 import LunaNext.Common 0.1
 import LuneOS.Service 1.0
+import org.nemomobile.voicecall 1.0
 
 WebOSWindow {
     id: phoneWindowId
@@ -244,11 +245,29 @@ WebOSWindow {
         function onEndingCall(voiceCall) {
             console.log("VoiceCall " + voiceCall.lineId + " ended")
 
-            // With another call still up, stay on the active call screen rather
-            // than tearing the whole stack down.
-            if (voiceCallMgrWrapper.callCount > 1) {
-                currentContact.lineId = voiceCallMgrWrapper.activeVoiceCall
-                                            ? voiceCallMgrWrapper.activeVoiceCall.lineId : "";
+            /*
+             * With another call still up, stay on the call screen and point
+             * it at that call - the one being talked on, else the one on
+             * hold, which then offers Resume. Not "callCount > 1": the ended
+             * call is still counted when its disconnected state comes in
+             * before its row goes, and not when it went without one, which
+             * tore the screen down over a call on hold. And not
+             * activeVoiceCall, which is whichever call came first (the held
+             * one here): the screen stayed on the call that had ended, with
+             * no Resume and a Swap that did nothing.
+             */
+            var remaining = voiceCallMgrWrapper.callAfterEnding(voiceCall.handlerId);
+            if (remaining) {
+                currentContact.lineId = remaining.lineId;
+                if (remaining.status === VoiceCall.STATUS_INCOMING ||
+                    remaining.status === VoiceCall.STATUS_WAITING) {
+                    // Only a call ringing is left: it has its strip (or its
+                    // page) already, and the call screen has nothing to show.
+                    if (stackView.currentItem as ActiveCallPage)
+                        stackView.pop(null);
+                } else {
+                    stackView.openPage(_isVideoCall(remaining) ? "VideoCall" : "ActiveCall", remaining);
+                }
                 return;
             }
 
