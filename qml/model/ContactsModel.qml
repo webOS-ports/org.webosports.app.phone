@@ -44,17 +44,25 @@ Db8Model {
         return LibPhoneNumber.getPhoneNumberTypeStr(phoneNumberType);
     }
 
-    /// Phone numbers of a person, as a plain array regardless of whether the
-    /// record came from db8 or from the test data file.
+    /// Phone numbers of a person, as a plain array whatever shape the list
+    /// arrived in.
+    ///
+    /// A record from the device's Db8Model is a QVariant, so its arrays reach
+    /// QML as QVariantLists: the engine's array-likes, which index with [] and
+    /// have a length, but for which Array.isArray() is false and which have
+    /// no get(). The test data's records hold plain arrays, and a list in a
+    /// ListModel row is a model, with count and get(). So: get() where there
+    /// is one, [] everywhere else.
     function phoneNumbersOf(person)
     {
         if (!person || !person.phoneNumbers) return [];
 
         var list = person.phoneNumbers;
-        var count = (typeof list.length !== 'undefined') ? list.length : list.count;
+        var hasGet = typeof list.get === "function";
+        var count = hasGet && typeof list.count === "number" ? list.count : list.length;
         var result = [];
         for (var i = 0; i < count; ++i)
-            result.push(Array.isArray(list) ? list[i] : list.get(i));
+            result.push(hasGet ? list.get(i) : list[i]);
 
         return result;
     }
@@ -132,15 +140,21 @@ Db8Model {
         // number _without_ the area, country or prefix codes.
         // only the extension and the national number are taken into account.
 
-        var strippedNormalizedPhoneNumber = normalizedPhoneNumber.split("-", 2).join("-");
+        var strippedNormalizedPhoneNumber = String(normalizedPhoneNumber || "").split("-", 2).join("-");
 
         console.log("Looking up contacts for normalized phone number: " + normalizedPhoneNumber);
+        // No number (a withheld caller) is nobody's: every number starts with "".
+        if (strippedNormalizedPhoneNumber.length === 0) {
+            console.log(" ... no number to look up.");
+            return null;
+        }
         for( var i=0; i<db8model.count; ++i ) {
             var person = db8model.get(i);
-            var nbPhoneNunmbers = (typeof person.phoneNumbers.length !== 'undefined') ? person.phoneNumbers.length : person.phoneNumbers.count
-            for( var j=0; j<nbPhoneNunmbers; ++j ) {
-                var personPhoneNumber = Array.isArray(person.phoneNumbers) ? person.phoneNumbers[j] : person.phoneNumbers.get(j);
-                if( personPhoneNumber.normalizedValue.substr(0, strippedNormalizedPhoneNumber.length) === strippedNormalizedPhoneNumber ) {
+            var personPhoneNumbers = phoneNumbersOf(person);
+            for( var j=0; j<personPhoneNumbers.length; ++j ) {
+                var personPhoneNumber = personPhoneNumbers[j];
+                var normalizedValue = String((personPhoneNumber && personPhoneNumber.normalizedValue) || "");
+                if( normalizedValue.substr(0, strippedNormalizedPhoneNumber.length) === strippedNormalizedPhoneNumber ) {
                     console.log(" ... found " + person.nickname);
                     return { foundPerson: person, foundPhoneNumber: personPhoneNumber };
                 }
