@@ -27,6 +27,7 @@ import LuneOS.Telephony 1.0
 import LunaNext.Common 0.1
 import LuneOS.Components 1.0
 
+import "../services"
 import "../services/PhoneNumberUtils.js" as PhoneNumberUtils
 import "../services/CallMessages.js" as CallMessages
 import "../services/CallLines.js" as CallLines
@@ -86,6 +87,10 @@ BasePage {
     property var selectedCall: voiceCall
 
     onVoiceCallChanged: selectedCall = voiceCall
+
+    readonly property alias keyTone: keyTonePlayer
+
+    KeyTonePlayer { id: keyTonePlayer }
 
     /*
      * The call the controls act on is gone: it ended, and the page was not
@@ -383,6 +388,7 @@ BasePage {
                 }
 
                 NumPad {
+                    objectName: "dtmfPad"
                     appTheme: root.appTheme
                     anchors {
                         top: tLineId.bottom
@@ -394,12 +400,17 @@ BasePage {
 
                     // Send the tone down the line as well as echoing it, which
                     // the original page never did -- the pad looked live but
-                    // was not.
+                    // was not. The beep goes after it and waits for nothing,
+                    // and not for a call on hold, which takes no tones
+                    // (Android's CallsManager.playDtmfTone).
                     onSendKey: (keycode) => {
                         var tone = String.fromCharCode(keycode);
                         tLineId.text += tone;
-                        if (root.selectedCall)
+                        if (root.selectedCall) {
                             root.selectedCall.sendDtmf(tone);
+                            if (root.selectedCall.status !== VoiceCall.STATUS_HELD)
+                                keyTonePlayer.play(tone, true);
+                        }
                     }
                 }
             }

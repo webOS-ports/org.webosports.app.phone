@@ -55,7 +55,7 @@ QtObject {
         network.swapCalls();
     }
 
-    function sendDtmf(tones) {}
+    function sendDtmf(tones) { network._send("AT+VTS=" + tones); }
     // OfonoVoiceCallHandler::merge: oFono's CreateMultiparty.
     function merge(otherHandlerId) { network.createMultiparty(this, otherHandlerId); }
     // OfonoVoiceCallHandler::split: oFono's PrivateChat.
