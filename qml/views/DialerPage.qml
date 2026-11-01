@@ -190,9 +190,14 @@ BasePage {
     }
 
     function handleDialCharacter(character) {
-        // With a call up, the dialpad doubles as a DTMF pad.
+        // With a call up, the dialpad doubles as a DTMF pad: the tone goes to
+        // the network through the call, and the key beeps here as well, as it
+        // does while dialling, so a press is not silent on this end.
+        // feedbackOnly, or audiod would send the tone to the network a second
+        // time.
         if (voiceCallMgrWrapper && voiceCallMgrWrapper.activeVoiceCall) {
             voiceCallMgrWrapper.sendDtmf(character);
+            playKeyTone(character, true);
             return;
         }
 
@@ -201,13 +206,23 @@ BasePage {
         // routes through ngfd, which LuneOS does not run, so it is silent
         // here. audiod plays a self-stopping one-shot; only 0-9, * and #
         // have tones.
-        var feedback = AppTweaks.dialpadFeedbackTweakValue;
-        if ((feedback === "vibrateSound" || feedback === "soundOnly") &&
-            ((character >= "0" && character <= "9") || character === "*" || character === "#"))
-            service.call("luna://com.palm.audio/dtmf/playDTMF",
-                         JSON.stringify({name: character}), undefined, numPad.dtmfFailure);
+        playKeyTone(character, false);
 
         numEntry.insert(character);
+    }
+
+    // Only 0-9, * and # have tones, and only with sound feedback switched on.
+    function playKeyTone(character, inCall) {
+        var feedback = AppTweaks.dialpadFeedbackTweakValue;
+        if (!(feedback === "vibrateSound" || feedback === "soundOnly"))
+            return;
+        if (!((character >= "0" && character <= "9") || character === "*" || character === "#"))
+            return;
+        var request = { name: character };
+        if (inCall)
+            request.feedbackOnly = true;
+        service.call("luna://com.palm.audio/dtmf/playDTMF",
+                     JSON.stringify(request), undefined, numPad.dtmfFailure);
     }
 
     // Shared by the dial button and the hardware Call/Enter keys.

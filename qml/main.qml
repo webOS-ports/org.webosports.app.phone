@@ -185,7 +185,12 @@ WebOSWindow {
         audioRouteManager: audioRouteManagerId
     }
 
+    HeadsetCallButton {
+        voiceCallManager: voiceCallMgrWrapperId
+    }
+
     NotificationManager {
+        id: notificationManagerId
         voiceCallManager: voiceCallMgrWrapperId
         telephonyManager: telephonyManagerId
         contacts: personListModelId
@@ -256,6 +261,9 @@ WebOSWindow {
         appTheme: phoneUiTheme
         dialHandler: dialHandlerId
         visible: false
+
+        onMinimized: (lineId, displayName, missedAt) =>
+                         notificationManagerId.postMissedCall(lineId, displayName, missedAt)
     }
 
     SimPinWindow {
@@ -266,11 +274,24 @@ WebOSWindow {
         visible: false
     }
 
+    LockedCallWindow {
+        id: lockedCallWindowId
+        appTheme: phoneUiTheme
+        contacts: personListModelId
+        currentContact: phoneWindow.currentContact
+        voiceCallMgrWrapper: voiceCallMgrWrapperId
+        telephonyManager: telephonyManagerId
+        audioRouteManager: audioRouteManagerId
+        callTransports: callTransportsId
+        visible: false
+    }
+
     PhoneWindow {
         id: phoneWindow
         runningOnDesktop: root.runningOnDesktop
         simPinWindow: simPinWindowId
         incomingCallAlertWindow: incomingCallAlertWindowId
+        lockedCallWindow: lockedCallWindowId
         contacts: personListModelId
         voiceCallMgrWrapper: voiceCallMgrWrapperId
         telephonyManager: telephonyManagerId

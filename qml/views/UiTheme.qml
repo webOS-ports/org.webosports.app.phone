@@ -206,6 +206,32 @@ QtObject {
     property real callLogRowHeight: Units.gu(7.9)
 
     /**
+     * The incoming call alert, the strip the call comes in on while the
+     * phone is not in front.
+     *
+     * The handset is webOS 2.2.4's phonePopups IncomingCall: black, with
+     * incoming-notification-gradient.png's gloss over it, or the full-size
+     * frame when there is a photo, answer and ignore either side of the
+     * caller box. CallSynergizer opened it 195 high with a photo and 110
+     * without; the photo is 80 square above the box. The tablet look is
+     * 3.0.5's, in TabletUiTheme.
+     */
+    /// Black with the gloss over it; false is the tablet's bare strip on the
+    /// shell's own dark panel.
+    property bool incomingAlertGloss: true
+    property real incomingAlertHeight: Units.gu(11)
+    property real incomingAlertPhotoHeight: Units.gu(19.5)
+    property real incomingAlertPhotoSize: Units.gu(8)
+    property real incomingAlertPhotoRadius: 0
+    /// How far down the buttons sit when there is a photo: 3.0.5 drops them
+    /// level with the box, 2.2.4 leaves them centred.
+    property real incomingAlertButtonDrop: 0
+    /// The caller box drawn with incoming-text.png, as 2.2.4 had it.
+    property bool incomingAlertTextBox: true
+    property bool incomingAlertNameBold: false
+    property real incomingAlertLineHeight: Units.gu(2.2)
+
+    /**
      * The SIM PIN card.
      *
      * The two looks disagree about this one more than about anything else:

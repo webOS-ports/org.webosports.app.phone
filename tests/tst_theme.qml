@@ -48,6 +48,9 @@ TestCase {
         "menu-icon-speaker-external.png", "menu-icon-speaker-internal.png",
         "menu-popup-bluetooth.png", "menu-popup-bluetooth-headset.png",
         "menu-popup-bluetooth-internal.png", "menu-popup-bluetooth-speaker.png",
+        "conf-list-buttons.png", "expand-button.png", "favorites-star-blue.png",
+        "incoming-text.png", "incoming-text-pressed.png", "list-avatar-default.png",
+        "menu-icon-unlock.png",
         "pin-menu-button.png", "pin-menu-button-pressed.png",
         "popup-icon-error.png", "search-button.png"
     ]
