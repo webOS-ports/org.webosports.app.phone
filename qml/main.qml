@@ -185,6 +185,10 @@ WebOSWindow {
         audioRouteManager: audioRouteManagerId
     }
 
+    HeadsetCallButton {
+        voiceCallManager: voiceCallMgrWrapperId
+    }
+
     NotificationManager {
         id: notificationManagerId
         voiceCallManager: voiceCallMgrWrapperId
