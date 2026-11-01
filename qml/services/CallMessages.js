@@ -67,6 +67,8 @@ var audioRouteEarpiece = qsTr("Handset");
 var audioRouteBluetooth = qsTr("Bluetooth");
 var audioRouteSpeaker = qsTr("Speaker");
 var audioRouteWiredHeadset = qsTr("Wired headset");
+// The route button's label once it is a menu of routes, as 2.x had it.
+var audioRouteMenu = qsTr("Audio");
 
 // Reason strings reported by the modem/telephony stack when a call cannot be
 // placed. Keyed the same way the legacy DialFail popup keyed them.
