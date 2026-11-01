@@ -116,7 +116,45 @@ BasePage {
         target: root.voiceCallMgrWrapper
         ignoreUnknownSignals: true
         function onCallsRevisionChanged() { root._followRemainingCall(); }
+        function onCallControlPendingChanged() {
+            if (!root.voiceCallMgrWrapper.callControlPending)
+                tapGuardTime.restart();
+        }
     }
+
+    /*
+     * The card changes shape when a merge or a split lands, a second or so
+     * after the tap, and a second tap on a control that seemed to do nothing
+     * lands on whatever came to be there. So the spot that was tapped takes no
+     * taps until the change has settled. It is that spot and no more, and
+     * Split, which has just come up, waits the same time. For End see
+     * _linesBottom.
+     */
+    property int tapGuardMs: 1500
+
+    function _guardTapSpot(button) {
+        var spot = button.mapToItem(root, 0, 0);
+        tapGuard.x = spot.x;
+        tapGuard.y = spot.y;
+        tapGuard.width = button.width;
+        tapGuard.height = button.height;
+        tapGuardTime.restart();
+    }
+
+    Timer {
+        id: tapGuardTime
+        interval: root.tapGuardMs
+    }
+
+    /*
+     * Where the card ended with several lines. A conference alone is a much
+     * shorter card, and centred it brought End up over where the lower merge
+     * arrow had been, for as long as the conference lasted: a tap there nearly
+     * three seconds after a merge ended both calls. So it keeps that bottom
+     * edge, End and the controls staying where they were, and the arrow's spot
+     * is the call's time. A conference with no lines before it is centred.
+     */
+    property real _linesBottom: -1
 
     readonly property string formattedAddress: selectedCall
         ? PhoneNumberUtils.formatForDisplay(selectedCall.lineId,
@@ -173,12 +211,22 @@ BasePage {
 
     Item {
         id: card
+        objectName: "callCard"
 
         anchors.horizontalCenter: parent.horizontalCenter
-        y: Math.max(Units.gu(2), (parent.height - controlsRow.height - Units.gu(4) - height) / 2)
+        y: Math.max(Units.gu(2), root.conferenceOnly && root._linesBottom >= 0
+                                     ? root._linesBottom - height
+                                     : (parent.height - controlsRow.height - Units.gu(4) - height) / 2)
 
         width: Math.min(parent.width - Units.gu(4), Units.gu(40))
         height: cardColumn.height
+
+        function _noteBottom() {
+            if (root.multipleLines)
+                root._linesBottom = y + height;
+        }
+        onYChanged: _noteBottom()
+        onHeightChanged: _noteBottom()
 
         /*
          * The glass the call sits behind. One nine-slice covers what the
@@ -283,6 +331,8 @@ BasePage {
                     }
 
                     CallLineDelegate {
+                        id: callLine
+
                         objectName: "callLine" + index
                         width: cardColumn.width
 
@@ -295,12 +345,16 @@ BasePage {
                         selected: root.multipleLines && CallLines.lineOf(root.lines, root.selectedCall) === modelData
                         showFooter: root.multipleLines
                         canJoin: root.multipleLines && voiceCallMgrWrapper.canMerge
+                        joinPending: !!voiceCallMgrWrapper.callControlPending
                         visible: root.multipleLines
 
                         onClicked: root.selectedCall = modelData.call
                         // The conference's hangup ends the conference.
                         onHangupRequested: voiceCallMgrWrapper.hangupCalls(modelData.calls)
-                        onJoinRequested: voiceCallMgrWrapper.merge()
+                        onJoinRequested: {
+                            root._guardTapSpot(callLine.joinButton);
+                            voiceCallMgrWrapper.merge();
+                        }
                         onAddContactRequested: root._addToContacts(modelData.call.lineId)
                     }
                 }
@@ -358,7 +412,10 @@ BasePage {
                 appTheme: root.appTheme
 
                 onHangupRequested: (call) => call.hangup()
-                onPrivateRequested: (call) => voiceCallMgrWrapper.split(call)
+                onPrivateRequested: (call, button) => {
+                    root._guardTapSpot(button);
+                    voiceCallMgrWrapper.split(call);
+                }
             }
 
             // The DTMF pad takes the photo's place when the dialpad is on.
@@ -592,11 +649,17 @@ BasePage {
         }
 
         CallActionButton {
+            id: splitButton
+            objectName: "splitButton"
             appTheme: root.appTheme
             visible: voiceCallMgrWrapper.canSplit
+            actionEnabled: !tapGuard.enabled
             iconSource: appTheme.image("multicall-resume-button.png")
             label: qsTr("Split")
-            onClicked: voiceCallMgrWrapper.split(root.selectedCall)
+            onClicked: {
+                root._guardTapSpot(splitButton);
+                voiceCallMgrWrapper.split(root.selectedCall);
+            }
         }
 
         CallActionButton {
@@ -606,6 +669,14 @@ BasePage {
             label: root.lockedMode ? qsTr("Unlock") : qsTr("Add Call")
             onClicked: root.lockedMode ? root.unlockRequested() : root.addCallRequested()
         }
+    }
+
+    // Over the card and the controls, wherever _guardTapSpot put it.
+    MouseArea {
+        id: tapGuard
+        objectName: "tapGuard"
+        z: 1
+        enabled: tapGuardTime.running || !!root.voiceCallMgrWrapper.callControlPending
     }
 
     function _addToContacts(address) {
