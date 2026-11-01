@@ -27,8 +27,9 @@ import "../model"
 import "../services/IncomingCallsService.js" as IncomingCallsService
 
 /**
- * The incoming call while the phone app is not in front: a system alert
- * window, so it can come up over whatever is on screen, and over the lock
+ * The incoming call while the phone app is not in front, and a call
+ * waiting whether it is or not: a system alert window, so it can come up
+ * over whatever is on screen - the call card included - and over the lock
  * screen too. It is the legacy popup strip (IncomingCallStrip), not the
  * in-app page: 2.2.4's on a handset, 3.0.5's on a tablet, at the height
  * those opened it - more with a photo than without.

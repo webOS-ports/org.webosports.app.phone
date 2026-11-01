@@ -50,7 +50,7 @@ BasePage {
     pageName: "ActiveCall"
 
     property Item dtmfKeypadDialog
-    property VoiceCallManager voiceCallManager: voiceCallMgrWrapper.manager
+    property var voiceCallManager: voiceCallMgrWrapper ? voiceCallMgrWrapper.manager : null
 
     /// Emitted when the user taps "Add call" and wants the dialpad back.
     signal addCallRequested();
@@ -65,7 +65,11 @@ BasePage {
     /// Emitted when the user taps "Unlock" in lockedMode.
     signal unlockRequested();
 
-    property bool voiceCallIsActive: voiceCall && voiceCall.status === VoiceCall.STATUS_ACTIVE
+    /// A call is being talked on, so speaker, mute and the dialpad mean
+    /// something. Any call, not just the page's own: with a call on hold the
+    /// page can be showing that one.
+    property bool voiceCallIsActive: voiceCallMgrWrapper ? voiceCallMgrWrapper.hasActiveCall
+                                                         : (!!voiceCall && voiceCall.status === VoiceCall.STATUS_ACTIVE)
 
     // Every call in progress, in lines as webOS 2.x had them: a call on its
     // own is a line, the whole conference is one. One line fills the card;
@@ -82,6 +86,32 @@ BasePage {
     property var selectedCall: voiceCall
 
     onVoiceCallChanged: selectedCall = voiceCall
+
+    /*
+     * The call the controls act on is gone: it ended, and the page was not
+     * told which call to show next (PhoneWindow does tell it, but not, say,
+     * over the lock screen). Move to the call that is left - the held one,
+     * if that is all there is, so the card shows it and Resume takes it back
+     * - rather than go on showing a call that has ended.
+     */
+    function _followRemainingCall() {
+        if (!voiceCallMgrWrapper)
+            return;
+        var current = root.selectedCall;
+        if (current && root.allCalls.indexOf(current) >= 0 &&
+            current.status !== VoiceCall.STATUS_DISCONNECTED &&
+            current.status !== VoiceCall.STATUS_NULL)
+            return;
+        var next = voiceCallMgrWrapper.callAfterEnding(current ? current.handlerId : "");
+        if (next)
+            root.selectedCall = next;
+    }
+
+    Connections {
+        target: root.voiceCallMgrWrapper
+        ignoreUnknownSignals: true
+        function onCallsRevisionChanged() { root._followRemainingCall(); }
+    }
 
     readonly property string formattedAddress: selectedCall
         ? PhoneNumberUtils.formatForDisplay(selectedCall.lineId,
@@ -427,9 +457,14 @@ BasePage {
                     }
 
                     Text {
+                        objectName: "callState"
                         color: '#ffffff'
                         font.pixelSize: Units.gu(1.6)
-                        text: root.conferenceOnly
+                        // "On hold" for a call left on hold on its own, as
+                        // LineState labelled it; the time otherwise.
+                        text: root.selectedCall && root.selectedCall.status === VoiceCall.STATUS_HELD
+                                  ? CallMessages.callStateHold
+                              : root.conferenceOnly
                                   ? PhoneNumberUtils.formatDuration(CallLines.duration(root.lines[0]) / 1000)
                               : root.selectedCall
                                   ? PhoneNumberUtils.formatDuration(root.selectedCall.duration / 1000)
@@ -464,10 +499,11 @@ BasePage {
 
                 MouseArea {
                     id: hangupAllArea
+                    objectName: "hangupArea"
                     anchors.fill: parent
                     onClicked: {
                         if (root.multipleLines || root.conferenceOnly)
-                            voiceCallMgrWrapper.hangupAll();
+                            voiceCallMgrWrapper.hangupInProgress();
                         else if (root.selectedCall)
                             root.selectedCall.hangup();
 
@@ -542,11 +578,23 @@ BasePage {
         // is how the legacy AbstractCallButtons decided too. Merge lives on the
         // call line itself, as it does on the original card.
         CallActionButton {
+            objectName: "swapButton"
             appTheme: root.appTheme
             visible: voiceCallMgrWrapper.canSwap
             iconSource: appTheme.image("multicall-switch-button.png")
             label: qsTr("Swap")
             onClicked: voiceCallMgrWrapper.swap()
+        }
+
+        // The call left on hold when the other one ended: legacy's single
+        // held line had Disconnect and Resume, Resume being its swap.
+        CallActionButton {
+            objectName: "resumeButton"
+            appTheme: root.appTheme
+            visible: root.voiceCallMgrWrapper.canResume
+            iconSource: root.appTheme.image("multicall-resume-button.png")
+            label: qsTr("Resume")
+            onClicked: root.voiceCallMgrWrapper.resume()
         }
 
         CallActionButton {
