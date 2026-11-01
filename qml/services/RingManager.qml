@@ -40,14 +40,23 @@ import org.nemomobile.voicecall 1.0
  * ringtone but with the short call-waiting tone, as the legacy app did through
  * the phoneIncomingCallOnCallSound preference. Ringing over a conversation in
  * progress is exactly what call waiting is meant to avoid.
+ *
+ * The tone plays on the "pfeedback" sink, as the keypad's beep in a call does,
+ * not on "pringtones". Both end up on the droid card's primary output, which
+ * on the Mediatek HAL goes to the modem as background sound: in the call's
+ * route, not to the far end. But a stream on pringtones plays at the ringtone
+ * volume, which is set for a phone ringing on the loudspeaker (30 dB down at
+ * 26 of 100), it is muted with the ringtone, and it tells audiod that the
+ * phone is ringing. Legacy kept this tone off the ringtones class as well.
  */
 Item {
     id: ringMgrItem
     property VoiceCallMgrWrapper voiceCallManager
 
     readonly property string defaultRingtone: "/usr/palm/sounds/ringtone.mp3"
-    readonly property string defaultOnCallSound:
-        "/usr/palm/applications/com.palm.app.phone/sounds/incoming-call-active.wav"
+    // Synthesised for this app, modelled on what legacy played here.
+    readonly property string defaultOnCallSound: Qt.resolvedUrl("../assets/call-waiting.wav")
+    readonly property string onCallSinkName: "pfeedback"
 
     property string ringtonePath: defaultRingtone
     property string onCallSoundPath: defaultOnCallSound
@@ -62,7 +71,8 @@ Item {
             name: "ringing"
             StateChangeScript {
                 script: {
-                    ringMgrItem._play(ringMgrItem.ringtonePath, MediaPlayer.Infinite);
+                    ringMgrItem._play(ringMgrItem.ringtonePath, MediaPlayer.Infinite,
+                                    ringMgrItem._ringtoneSink());
                 }
             }
         },
@@ -70,7 +80,8 @@ Item {
             name: "callWaiting"
             StateChangeScript {
                 script: {
-                    ringMgrItem._play(ringMgrItem.onCallSoundPath, 2);
+                    ringMgrItem._play(ringMgrItem.onCallSoundPath, 2,
+                                    ringMgrItem._audioOutputNamed(ringMgrItem.onCallSinkName));
                 }
             }
         }
@@ -90,6 +101,8 @@ Item {
                  ringMgrItem._stop();
              }
          }
+
+         onErrorOccurred: ringMgrItem._onCallSoundFailed()
     }
 
     // Ring through the "pringtones" sink rather than the default one: the
@@ -129,9 +142,8 @@ Item {
         return null;
     }
 
-    function _play(source, loops) {
+    function _play(source, loops, sink) {
         var previous = ringtone.audioOutput;
-        var sink = _ringtoneSink();
 
         // Let go of the old output before taking the new one. Going straight
         // from one output to another, Qt 6.12's QMediaPlayer::setAudioOutput()
@@ -174,6 +186,22 @@ Item {
             ringtone.audioOutput = null;
             output.destroy();
         }
+        return null;
+    }
+
+    // A sound picked in the preference that cannot be played (the legacy
+    // default names a file that does not exist here) must not leave a second
+    // call silent. Later, as the player is still inside its error.
+    function _onCallSoundFailed() {
+        Qt.callLater(_playDefaultOnCallSound);
+    }
+
+    function _playDefaultOnCallSound() {
+        if (state !== "callWaiting" || ringtone.source.toString() === defaultOnCallSound)
+            return;
+        console.warn("phone: cannot play " + ringtone.source + ", using the default call-waiting tone");
+        ringtone.source = defaultOnCallSound;
+        ringtone.play();
     }
 
     function _silence() {
