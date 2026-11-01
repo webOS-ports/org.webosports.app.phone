@@ -71,6 +71,8 @@ Item {
     property string voicemailNumber: messageWaiting.voicemailMailboxNumber
     property bool voicemailWaiting: messageWaiting.voicemailWaiting
     property int voicemailMessageCount: messageWaiting.voicemailMessageCount
+    /// The count above is the SIM's and no longer just the starting zero.
+    readonly property bool voicemailCountKnown: messageWaiting.valid === true
 
     // True when a call could plausibly be placed right now.
     readonly property bool canPlaceCalls: radioOnline && registered

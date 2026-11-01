@@ -37,6 +37,7 @@ MessageAlert {
 
     property DialHandler dialHandler
     property TelephonyManager telephonyManager
+    property CallAlertSounds alertSounds
 
     property string _pendingNumber: ""
 
@@ -47,6 +48,10 @@ MessageAlert {
 
         var text = CallMessages.lookup(CallMessages.dialFailure, reason,
                                        CallMessages.dialFailureDefault);
+
+        // announceDialFail's popup: soundclass "alerts".
+        if (alertSounds)
+            alertSounds.playAlert();
 
         // Airplane mode is the one failure the user can fix from here, so it
         // gets a button instead of just an explanation.

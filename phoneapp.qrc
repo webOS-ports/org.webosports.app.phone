@@ -21,6 +21,9 @@
         <file>qml/services/CallTransports.qml</file>
         <file>qml/services/ContactCallOptions.js</file>
         <file>qml/services/DialHandler.qml</file>
+        <file>qml/services/CallAlertSounds.qml</file>
+        <file>qml/services/CallEndClassifier.qml</file>
+        <file>qml/services/CallEndReasons.qml</file>
         <file>qml/services/DialProxy.qml</file>
         <file>qml/services/DialStringParser.js</file>
         <file>qml/services/DialingShortcuts.qml</file>
@@ -63,6 +66,7 @@
         <file>qml/views/CornerShader.qml</file>
         <file>qml/views/DialButton.qml</file>
         <file>qml/views/DialFailAlert.qml</file>
+        <file>qml/views/DroppedCallAlert.qml</file>
         <file>qml/views/DialerPage.qml</file>
         <file>qml/views/DisconnectButton.qml</file>
         <file>qml/views/EmergencyDialerPage.qml</file>

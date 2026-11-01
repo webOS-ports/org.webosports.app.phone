@@ -96,7 +96,8 @@ Item {
     /// A merge or split was refused. Nothing changed: the calls stay as they
     /// were. `message` is for the user.
     signal callControlFailed(string message);
-    /// A connected call went away without either side hanging up.
+    /// A connected call went away without either side hanging up. `reason`
+    /// keys into CallMessages.droppedCall.
     signal callDropped(var voiceCall, string reason);
 
     /**
@@ -897,6 +898,7 @@ Item {
         if (_endedCalls[handlerId])
             return;
         _endedCalls[handlerId] = true;
+        var wentLive = _liveCalls[handlerId] ? _liveCalls[handlerId].liveSince > 0 : false;
         delete _liveCalls[handlerId];
 
         if (root.heldCall && root.heldCall.handlerId === handlerId)
@@ -904,13 +906,37 @@ Item {
         delete _postDialStrings[handlerId];
 
         // A call that never connected and was not rejected by the user did
-        // not "end", it failed to be placed.
-        if (!endedVoiceCall.isIncoming && endedVoiceCall.duration === 0 &&
+        // not "end", it failed to be placed, unless the user took it back.
+        // Which of those, and whether a connected one dropped, the reason says.
+        if (!endedVoiceCall.isIncoming && endedVoiceCall.duration === 0 && !wentLive &&
             IncomingCallsService.getActionForCall(handlerId) === IncomingCallsService.Missed) {
-            root.dialFailed(endedVoiceCall.lineId, "callfailed");
+            callEndClassifier.callEnded(endedVoiceCall, false);
+        } else if (wentLive || endedVoiceCall.duration > 0) {
+            callEndClassifier.callEnded(endedVoiceCall, true);
         }
 
         root.endingCall(endedVoiceCall);
+    }
+
+    property alias _callEnds: callEndClassifier
+
+    CallEndClassifier {
+        id: callEndClassifier
+        reasonsAvailable: callEndReasons.status === Loader.Ready
+        onFailed: (call) => root.dialFailed(call.lineId, "callfailed")
+        onDropped: (call, reason) => root.callDropped(call, reason)
+    }
+
+    Loader {
+        id: callEndReasons
+        source: "CallEndReasons.qml"
+    }
+
+    Connections {
+        target: callEndReasons.item
+        function onReasonReported(lineId, reason) {
+            callEndClassifier.reasonReported(lineId, reason);
+        }
     }
 
     /// Ends every call we saw that is no longer in the list.
