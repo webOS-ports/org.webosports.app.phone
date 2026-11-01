@@ -318,6 +318,10 @@ WebOSWindow {
         function onDialFailed(number, reason) {
             dialFailAlert.showDialFailure(number, reason);
         }
+
+        function onCallControlFailed(message) {
+            messageAlert.showMessage("", message, "");
+        }
     }
 
     Connections {

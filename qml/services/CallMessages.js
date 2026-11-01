@@ -70,6 +70,10 @@ var audioRouteWiredHeadset = qsTr("Wired headset");
 
 // Reason strings reported by the modem/telephony stack when a call cannot be
 // placed. Keyed the same way the legacy DialFail popup keyed them.
+// A merge or split the modem or the network refused, as phoneapp's Messages had them.
+var conferenceFailed = qsTr("Conference failed.");
+var extractFailed = qsTr("Extract failed.");
+
 var dialFailureTitle = qsTr("Unable to connect");
 var dialFailureDefault = qsTr("Call failed.");
 var dialFailure = {

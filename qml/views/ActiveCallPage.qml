@@ -278,6 +278,7 @@ BasePage {
                     }
 
                     CallLineDelegate {
+                        objectName: "callLine" + index
                         width: cardColumn.width
 
                         voiceCall: modelData.call
@@ -293,7 +294,7 @@ BasePage {
 
                         onClicked: root.selectedCall = modelData.call
                         // The conference's hangup ends the conference.
-                        onHangupRequested: modelData.calls.forEach(function(call) { call.hangup(); })
+                        onHangupRequested: voiceCallMgrWrapper.hangupCalls(modelData.calls)
                         onJoinRequested: voiceCallMgrWrapper.merge()
                         onAddContactRequested: root._addToContacts(modelData.call.lineId)
                     }
@@ -341,11 +342,13 @@ BasePage {
             // hang up on them alone or take them aside into a private call.
             ConferenceMembers {
                 id: conferenceSlot
+                objectName: "conferenceMembers"
                 width: parent.width
                 visible: root.conferenceOnly && !flipable.flipped
                 height: visible ? implicitHeight : 0
 
                 calls: root.conferenceOnly ? root.lines[0].calls : []
+                canPrivate: voiceCallMgrWrapper.canSplit
                 contacts: root.contacts
                 appTheme: root.appTheme
 
