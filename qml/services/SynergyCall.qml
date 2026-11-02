@@ -82,6 +82,76 @@ QtObject {
     /// Name the connector supplied for the remote party, when it has one.
     property string displayName: ""
 
+    /**
+     * Video, as the connector's line reports it (legacy CallSynergizer names).
+     **/
+
+    /// We are receiving the far side's picture.
+    property bool incomingVideo: false
+    /// We are sending ours.
+    property bool outgoingVideo: false
+    /// "unavailable", "available" (offered) or "streaming" (arriving).
+    property string incomingVideoState: "unavailable"
+    /// The connector may turn video down for a call altogether.
+    property bool allowVideoCalls: true
+    /// The connector says video needs no question to the user.
+    property bool autoAcceptVideoCalls: false
+    /// Where the connector publishes the decoded far-side picture (a gst-shm
+    /// socket of luneos-rtc-engine), and its frame size. Empty while nothing
+    /// is being decoded.
+    property string videoURI: ""
+    property int videoWidth: 0
+    property int videoHeight: 0
+
+    /**
+     * Whether the user lets video on this call: "" not asked yet, "granted"
+     * or "refused". As in 2.2.4's ActiveCall.updateWithCallState, asking
+     * happens once, and video we send ourselves counts as granted.
+     */
+    property string videoAuthorization: ""
+
+    /// The call screen shows the far side's picture.
+    readonly property bool showsVideo: allowVideoCalls && videoAuthorization === "granted"
+                                       && videoURI.length > 0
+
+    /// Asks the user whether to switch to video: the far side started sending.
+    signal videoRequested();
+
+    property bool _videoAsked: false
+    property bool _incomingVideoAsked: false
+
+    /// Applies the legacy authorisation rules to the latest line update.
+    function _evaluateVideo() {
+        if (!allowVideoCalls)
+            return;
+        var streaming = incomingVideoState === "streaming" || incomingVideo;
+        if (videoAuthorization === "" && (outgoingVideo || autoAcceptVideoCalls))
+            videoAuthorization = "granted";
+        if (videoAuthorization === "" && streaming && !_videoAsked) {
+            _videoAsked = true;
+            videoRequested();
+        }
+        // Granted: make sure the connector decodes what arrives. Once per
+        // stream, so a "no" sent from elsewhere is not overridden in a loop.
+        if (videoAuthorization === "granted" && streaming && !_incomingVideoAsked) {
+            _incomingVideoAsked = true;
+            changeMedia(true, undefined);
+        }
+        if (!streaming)
+            _incomingVideoAsked = false;
+    }
+
+    /// The user's answer to videoRequested(). `sendOwn`: also send our camera.
+    function acceptVideo(sendOwn) {
+        videoAuthorization = "granted";
+        _incomingVideoAsked = true;
+        changeMedia(true, sendOwn === true ? true : undefined);
+    }
+    function refuseVideo() {
+        videoAuthorization = "refused";
+        changeMedia(false, false);
+    }
+
     // `status` is a property, so QML already gives us statusChanged() -- the
     // call manager connects to that. Declaring it again would collide with the
     // generated one.
@@ -110,4 +180,15 @@ QtObject {
     function sendDtmf(tones)   { callControlRequested("dtmf", { id: callId, tone: tones }); }
     function merge(handle)     { callControlRequested("merge", { id: callId, otherId: handle }); }
     function split()           { callControlRequested("extract", { id: callId }); }
+
+    /// Video on or off per direction; undefined leaves that direction as it
+    /// is, as the connectors read it (legacy VideoRequest.changeMedia).
+    function changeMedia(incoming, outgoing) {
+        var params = { id: callId };
+        if (incoming !== undefined)
+            params.incomingVideo = incoming;
+        if (outgoing !== undefined)
+            params.outgoingVideo = outgoing;
+        callControlRequested("changeMedia", params);
+    }
 }

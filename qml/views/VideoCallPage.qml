@@ -27,9 +27,10 @@ import "../services/PhoneNumberUtils.js" as PhoneNumberUtils
  * the running time with a button at each end, the far side's picture filling
  * what is left, and this side's inset into the corner of it.
  *
- * There is no video here yet -- nothing in the stack produces a stream to
- * show. The places both pictures go are laid out and labelled, so that when
- * something does, it has somewhere to be put.
+ * The far side's picture comes from the connector's call engine
+ * (luneos-rtc-engine), which decodes it and publishes the frames where the
+ * call's videoURI says; RemoteVideo renders them. This side's inset is only
+ * there while the call sends our camera.
  */
 BasePage {
     id: videoCallPage
@@ -63,8 +64,29 @@ BasePage {
         }
         color: 'black'
 
+        Loader {
+            id: remotePicture
+            objectName: "remotePicture"
+            anchors.fill: parent
+            active: !!videoCallPage.voiceCall && String(videoCallPage.voiceCall.videoURI || "").length > 0
+            source: "RemoteVideo.qml"
+            onLoaded: {
+                item.shmPath = Qt.binding(function() {
+                    return videoCallPage.voiceCall ? String(videoCallPage.voiceCall.videoURI || "") : "";
+                });
+                item.frameWidth = Qt.binding(function() {
+                    return videoCallPage.voiceCall ? (videoCallPage.voiceCall.videoWidth || 0) : 0;
+                });
+                item.frameHeight = Qt.binding(function() {
+                    return videoCallPage.voiceCall ? (videoCallPage.voiceCall.videoHeight || 0) : 0;
+                });
+            }
+        }
+
         Text {
+            objectName: "noVideoLabel"
             anchors.centerIn: parent
+            visible: !(remotePicture.item && remotePicture.item.running)
             color: '#4a4a4a'
             font.pixelSize: Units.gu(1.8)
             text: qsTr("No video")
@@ -77,6 +99,10 @@ BasePage {
          */
         BorderImage {
             id: pip
+            objectName: "pip"
+
+            // Only while we send our own picture.
+            visible: !!videoCallPage.voiceCall && videoCallPage.voiceCall.outgoingVideo === true
 
             width: Units.gu(20.2)
             height: Units.gu(15.4)
@@ -166,21 +192,25 @@ BasePage {
 
         }
 
-        // Turning the camera off leaves the call up as a voice one.
+        // Our camera on or off; the far side's picture stays. Only on a device
+        // that can send video at all.
         VideoCallHeaderButton {
             appTheme: videoCallPage.appTheme
             id: videoButton
+            objectName: "videoButton"
 
             anchors { left: parent.left; top: parent.top; bottom: parent.bottom }
+            visible: !!videoCallPage.voiceCallMgrWrapper
+                     && videoCallPage.voiceCallMgrWrapper.videoSendCapable === true
 
             iconSource: appTheme.image("video_on_off.png")
             label: qsTr("Video")
             dividerOnLeft: false
-            on: videoCallPage.voiceCall ? videoCallPage.voiceCall.isVideo === true : false
+            on: videoCallPage.voiceCall ? videoCallPage.voiceCall.outgoingVideo === true : false
 
             onClicked: {
-                if (videoCallPage.voiceCall && videoCallPage.voiceCall.isVideo !== undefined)
-                    videoCallPage.voiceCall.isVideo = !videoCallPage.voiceCall.isVideo;
+                if (videoCallPage.voiceCall && videoCallPage.voiceCall.changeMedia)
+                    videoCallPage.voiceCall.changeMedia(undefined, !videoCallPage.voiceCall.outgoingVideo);
             }
         }
 

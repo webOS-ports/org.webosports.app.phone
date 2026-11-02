@@ -388,10 +388,92 @@ WebOSWindow {
         preferredServiceAlert.ask(callData);
     }
 
-    /// A call carries video only if the account placing it does; a cellular
-    /// call has no such property at all.
+    /// The call screen shows video once a messaging call's far-side picture
+    /// is being decoded and the user let it on; a cellular call has no such
+    /// property at all.
     function _isVideoCall(voiceCall) {
-        return !!voiceCall && voiceCall.isVideo === true;
+        return !!voiceCall && voiceCall.showsVideo === true;
+    }
+
+    /**
+     * Video on a messaging call, as 2.2.4's phonePopups VideoRequest: the far
+     * side starts sending, and the user is asked whether to switch to video.
+     */
+    MessageAlert {
+        id: videoRequestAlert
+        appTheme: phoneUiAppTheme
+        property var voiceCall: null
+    }
+
+    function _videoCallerName(voiceCall) {
+        if (voiceCall.displayName && String(voiceCall.displayName).length > 0)
+            return voiceCall.displayName;
+        if (currentContact && currentContact.lineId === voiceCall.lineId
+                && String(currentContact.displayLabel || "").trim().length > 0)
+            return String(currentContact.displayLabel).trim();
+        return voiceCall.lineId;
+    }
+
+    function _askVideo(voiceCall) {
+        videoRequestAlert.voiceCall = voiceCall;
+        videoRequestAlert.showQuestion(qsTr("Switch to video?"),
+            qsTr("%1 wants to start a video call.").arg(_videoCallerName(voiceCall)), "",
+            qsTr("Accept"),
+            function() {
+                voiceCall.acceptVideo(voiceCallMgrWrapper.videoSendCapable);
+                videoRequestAlert.voiceCall = null;
+            },
+            qsTr("Reject"),
+            function() {
+                voiceCall.refuseVideo();
+                videoRequestAlert.voiceCall = null;
+            });
+    }
+
+    property bool _videoCapabilityAsked: false
+
+    Connections {
+        target: voiceCallMgrWrapper
+
+        function onVideoRequested(voiceCall) {
+            if (!voiceCall)
+                return;
+            // What we can send decides whether accepting turns our camera on
+            // too, so learn it before the question is put.
+            if (phoneWindowId._videoCapabilityAsked) {
+                phoneWindowId._askVideo(voiceCall);
+                return;
+            }
+            phoneWindowId._videoCapabilityAsked = true;
+            appManager.call("luna://org.webosports.rtcengine/capabilities", "{}",
+                function(message) {
+                    var reply = JSON.parse(message.payload);
+                    voiceCallMgrWrapper.videoSendCapable = reply.returnValue === true
+                                                           && reply.videoCallCapable === true;
+                    phoneWindowId._askVideo(voiceCall);
+                },
+                function(error) {
+                    console.log("No video call capabilities: " + error);
+                    phoneWindowId._askVideo(voiceCall);
+                });
+        }
+
+        // Switch the call screen between voice and video for the call on it.
+        function onCallVideoChanged(voiceCall) {
+            var page = stackView.currentItem as BasePage;
+            if (!page || page.voiceCall !== voiceCall)
+                return;
+            if (page.pageName !== "ActiveCall" && page.pageName !== "VideoCall")
+                return;
+            stackView.openPage(_isVideoCall(voiceCall) ? "VideoCall" : "ActiveCall", voiceCall);
+        }
+
+        function onEndingCall(voiceCall) {
+            if (videoRequestAlert.voiceCall === voiceCall) {
+                videoRequestAlert.hide();
+                videoRequestAlert.voiceCall = null;
+            }
+        }
     }
 
     function activeCallDialog(voiceCall) {

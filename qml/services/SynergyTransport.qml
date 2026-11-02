@@ -152,7 +152,10 @@ Item {
                     call.lineId = entry.address;
 
                 call.isMultiparty = conference || (line.calls.length > 1);
-                call.isVideo = call.isVideo || video;
+                call.isVideo = call.isVideo || video
+                               || line.incomingVideoState === "available"
+                               || line.incomingVideoState === "streaming";
+                _applyVideo(call, line, payload);
 
                 call.status = status;
             });
@@ -173,6 +176,29 @@ Item {
             callRemoved(call);
             call.destroy();
         });
+
+        // After callAdded, so a call that turns up already streaming video has
+        // its listeners connected before it asks the user.
+        calls.forEach(function(call) {
+            if (call.status !== VoiceCall.STATUS_DISCONNECTED)
+                call._evaluateVideo();
+        });
+    }
+
+    // The line's video fields onto the call. The decoded picture's location is
+    // on the payload, not the line: a connector decodes one call at a time.
+    function _applyVideo(call, line, payload) {
+        call.incomingVideo = line.incomingVideo === true;
+        call.outgoingVideo = line.outgoingVideo === true;
+        call.incomingVideoState = line.incomingVideoState || "unavailable";
+        var allow = line.allowVideoCalls !== undefined ? line.allowVideoCalls
+                  : (payload && payload.allowVideoCalls !== undefined ? payload.allowVideoCalls : true);
+        call.allowVideoCalls = allow !== false;
+        call.autoAcceptVideoCalls = line.autoAcceptVideoCalls === true;
+        var uri = payload && typeof payload.videoURI === "string" ? payload.videoURI : "";
+        call.videoWidth = uri.length > 0 ? (payload.videoWidth || 0) : 0;
+        call.videoHeight = uri.length > 0 ? (payload.videoHeight || 0) : 0;
+        call.videoURI = uri;
     }
 
     function _onCallControlRequested(method, params) {

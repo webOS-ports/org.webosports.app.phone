@@ -99,6 +99,16 @@ Item {
     /// A connected call went away without either side hanging up. `reason`
     /// keys into CallMessages.droppedCall.
     signal callDropped(var voiceCall, string reason);
+    /// The far side of a messaging call started video: ask the user (legacy
+    /// "Switch to video?").
+    signal videoRequested(var voiceCall);
+    /// A call started or stopped showing the far side's picture.
+    signal callVideoChanged(var voiceCall);
+
+    /// The device can send video (luneos-rtc-engine's capabilities, which
+    /// honour the device's own video-call setting). Asked the first time a
+    /// call offers video; false until then.
+    property bool videoSendCapable: false
 
     /**
      * Call inventory
@@ -1072,6 +1082,8 @@ Item {
             onCallAdded: (call) => {
                 console.log("Synergy call added on " + transportId + ": " + call.lineId);
                 call.statusChanged.connect(function() { root._updateState(call, call.isIncoming); });
+                call.videoRequested.connect(function() { root.videoRequested(call); });
+                call.showsVideoChanged.connect(function() { root.callVideoChanged(call); });
 
                 if (!call.isIncoming && root._pendingPostDial.length > 0) {
                     root._postDialStrings[call.handlerId] = root._pendingPostDial;
