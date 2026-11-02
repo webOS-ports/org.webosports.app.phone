@@ -25,6 +25,7 @@ import LuneOS.System 1.0
 import org.nemomobile.voicecall 1.0
 
 import "../model"
+import "CallMessages.js" as CallMessages
 import "DialStringParser.js" as DialStringParser
 import "IncomingCallsService.js" as IncomingCallsService
 
@@ -45,12 +46,28 @@ Item {
         name: "org.webosports.app.phone"
     }
 
-    property VoiceCallManager manager: VoiceCallManager {
+    /// The nemo call manager. A var rather than a VoiceCallManager so the
+    /// tests can put a stand-in in its place that behaves like the real
+    /// daemon, which the mock in luneos-components does not (see
+    /// activeVoiceCall below).
+    property var manager: voiceCallManagerId
+
+    VoiceCallManager {
         id: voiceCallManagerId
     }
 
-    property alias calls: voiceCallManagerId.voiceCalls
-    property alias activeVoiceCall: voiceCallManagerId.activeVoiceCall
+    readonly property var calls: manager ? manager.voiceCalls : null
+
+    /**
+     * What the nemo manager calls its active call. Not the call in the
+     * active state: voicecall-manager makes the first call it is told about
+     * its activeVoiceCall and keeps it until that call is removed
+     * (src/voicecallmanager.cpp, onVoiceCallAdded / onVoiceCallRemoved),
+     * whatever the call does meanwhile. With a call waiting taken by hold
+     * and answer it is the call on hold. Ask currentCall() for the call
+     * the user is talking on.
+     */
+    readonly property var activeVoiceCall: manager ? manager.activeVoiceCall : null
 
     property string countryCode: 'US'
 
@@ -76,6 +93,9 @@ Item {
 
     /// A call could not be placed. `reason` keys into CallMessages.dialFailure.
     signal dialFailed(string number, string reason);
+    /// A merge or split was refused. Nothing changed: the calls stay as they
+    /// were. `message` is for the user.
+    signal callControlFailed(string message);
     /// A connected call went away without either side hanging up.
     signal callDropped(var voiceCall, string reason);
 
@@ -142,17 +162,77 @@ Item {
     }
 
     /**
-     * The call the user is talking on. Prefers what the manager reports, but
-     * falls back to the first connected call: during a conference, or briefly
-     * while calls are being swapped, activeVoiceCall can be unset even though
-     * there is plainly a call to act on.
+     * The call the user is talking on: a call in the active state, or failing
+     * that one being dialled. Never a call on hold or one still ringing.
+     *
+     * Not activeVoiceCall on its own say-so. That is the first call of the
+     * lot, held or not (see above), and taking it for the active one sent
+     * every Swap to the held call - whose hold(true) does nothing, since it
+     * is already held - so swapping did nothing at all, and the headset
+     * button hung up the held call instead of the one being talked on. It is
+     * still preferred when it really is active, so a single call and a
+     * conference come out as before.
      */
     function currentCall() {
-        if (activeVoiceCall)
+        if (activeVoiceCall && activeVoiceCall.status === VoiceCall.STATUS_ACTIVE)
             return activeVoiceCall;
 
         var active = callsWithStatus(VoiceCall.STATUS_ACTIVE);
-        return active.length > 0 ? active[0] : null;
+        if (active.length > 0)
+            return active[0];
+
+        var outgoing = callsWithStatus(VoiceCall.STATUS_DIALING)
+                           .concat(callsWithStatus(VoiceCall.STATUS_ALERTING));
+        return outgoing.length > 0 ? outgoing[0] : null;
+    }
+
+    /**
+     * The call the call screen should show once `endedHandlerId` has gone,
+     * or null if it was the last. The one being talked on, else the one on
+     * hold, else whatever else is left (one being dialled or ringing).
+     *
+     * The ended call can still be in the list - its disconnected state
+     * comes before its row goes - or already out of it, when it went
+     * without reporting one; neither counts.
+     */
+    function callAfterEnding(endedHandlerId) {
+        var remaining = allCalls().filter(function(call) {
+            return call.handlerId !== endedHandlerId &&
+                   call.status !== VoiceCall.STATUS_DISCONNECTED &&
+                   call.status !== VoiceCall.STATUS_NULL;
+        });
+        if (remaining.length === 0)
+            return null;
+
+        function first(status) {
+            for (var i = 0; i < remaining.length; ++i) {
+                if (remaining[i].status === status)
+                    return remaining[i];
+            }
+            return null;
+        }
+        return first(VoiceCall.STATUS_ACTIVE) || first(VoiceCall.STATUS_HELD)
+            || first(VoiceCall.STATUS_DIALING) || first(VoiceCall.STATUS_ALERTING)
+            || remaining[0];
+    }
+
+    /**
+     * A ringing call that comes in on top of another one: a call waiting.
+     * Legacy put that up in its popup strip over the call card, never as a
+     * page in place of it (see PhoneWindow.onIncomingCall).
+     */
+    function isCallWaiting(voiceCall) {
+        if (!voiceCall)
+            return false;
+        if (voiceCall.status === VoiceCall.STATUS_WAITING)
+            return true;
+        return allCalls().some(function(call) {
+            return call !== voiceCall &&
+                   (call.status === VoiceCall.STATUS_ACTIVE ||
+                    call.status === VoiceCall.STATUS_HELD ||
+                    call.status === VoiceCall.STATUS_DIALING ||
+                    call.status === VoiceCall.STATUS_ALERTING);
+        });
     }
 
     function conferenceCall() {
@@ -174,10 +254,26 @@ Item {
         return allCallsList.some(function(call) { return call.status === VoiceCall.STATUS_HELD; });
     }
 
+    /// A call in the active state. Not just activeVoiceCall being set: that
+    /// is the held call once the other has gone, and counting it here offered
+    /// Swap - to nothing - instead of Resume.
     readonly property bool hasActiveCall: {
         callsRevision;
-        return !!activeVoiceCall ||
-               allCallsList.some(function(call) { return call.status === VoiceCall.STATUS_ACTIVE; });
+        return allCallsList.some(function(call) { return call.status === VoiceCall.STATUS_ACTIVE; });
+    }
+
+    readonly property bool hasRingingCall: {
+        callsRevision;
+        return allCallsList.some(function(call) {
+            return call.status === VoiceCall.STATUS_INCOMING || call.status === VoiceCall.STATUS_WAITING;
+        });
+    }
+
+    readonly property bool hasOutgoingCall: {
+        callsRevision;
+        return allCallsList.some(function(call) {
+            return call.status === VoiceCall.STATUS_DIALING || call.status === VoiceCall.STATUS_ALERTING;
+        });
     }
 
     /**
@@ -232,8 +328,30 @@ Item {
     }
 
     readonly property bool canSwap: hasActiveCall && hasHeldCall
-    readonly property bool canMerge: canSwap && !hasConference
-    readonly property bool canSplit: hasConference
+    /**
+     * Calls on hold and none to talk on: the active one ended - here or at
+     * the other end - and left the held one behind. Legacy's single held
+     * line showed Disconnect and Resume (AbstractCallButtons.singleFullResume)
+     * and left the call on hold until Resume was tapped; so does this. Not
+     * while a call rings or is dialled: oFono's SwapCalls would take a
+     * waiting call instead, and an outgoing one is the call being made.
+     */
+    readonly property bool canResume: hasHeldCall && !hasActiveCall && !hasRingingCall && !hasOutgoingCall
+    /**
+     * The biggest conference there can be (3GPP 22.084: five others), as
+     * legacy, which took the merge button away at that size. A call on hold
+     * or in the conference can join the other, as on legacy: oFono's
+     * CreateMultiparty joins whatever is active with whatever is held.
+     */
+    readonly property int maxConferenceSize: 5
+    readonly property int conferenceSize: {
+        callsRevision;
+        return allCallsList.filter(function(call) { return call.isMultiparty; }).length;
+    }
+    readonly property bool canMerge: canSwap && conferenceSize < maxConferenceSize
+    /// oFono's PrivateChat refuses with any call on hold, and legacy's extract
+    /// was off unless the conference was the active line.
+    readonly property bool canSplit: hasConference && !hasHeldCall
     readonly property bool canAddCall: callCount > 0 && callCount < 2 && hasActiveCall
     readonly property bool canHangupAll: callCount > 1
 
@@ -310,8 +428,80 @@ Item {
     property string _dialTransportAfterHold: ""
 
     function hangupAll() {
-        // Take a copy first: hanging a call up removes it from the list.
-        allCallsList.slice().forEach(function(voiceCall) { voiceCall.hangup(); });
+        hangupCalls(allCallsList);
+    }
+
+    /**
+     * Ends every call in progress - talking, held, being dialled - and lets
+     * a ringing one be: what the call card's own hangup does. A call waiting
+     * rings in the strip over the card, and is answered or ignored there;
+     * ending the calls on the card used to reject it as well.
+     */
+    function hangupInProgress() {
+        hangupCalls(allCallsList.filter(function(call) {
+            return call.status !== VoiceCall.STATUS_INCOMING && call.status !== VoiceCall.STATUS_WAITING;
+        }));
+    }
+
+    /*
+     * Ends `calls` one at a time, each once the one before has gone. oFono
+     * takes one call control request at a time and refuses the next with
+     * InProgress until the last is done, so hanging up on two calls in one
+     * go ended the first and left the second up: a conference tapped off
+     * was still there with one person in it.
+     */
+    property var _hangupQueue: []
+    property string _hangupWaitingFor: ""
+    property int _hangupTurnMs: 5000
+
+    function hangupCalls(calls) {
+        _hangupQueue = calls.map(function(call) { return call.handlerId; });
+        _hangupWaitingFor = "";
+        _hangupNext();
+    }
+
+    function _callInProgress(handlerId) {
+        var found = allCallsList.filter(function(call) {
+            return call.handlerId === handlerId && call.status !== VoiceCall.STATUS_DISCONNECTED;
+        });
+        return found.length > 0 ? found[0] : null;
+    }
+
+    function _hangupNext() {
+        if (_hangupWaitingFor.length > 0 && _callInProgress(_hangupWaitingFor))
+            return;
+
+        _hangupWaitingFor = "";
+        while (_hangupQueue.length > 0) {
+            var handlerId = _hangupQueue[0];
+            _hangupQueue = _hangupQueue.slice(1);
+
+            var call = _callInProgress(handlerId);
+            if (!call)
+                continue;
+
+            if (_hangupQueue.length > 0) {
+                _hangupWaitingFor = handlerId;
+                hangupTurn.restart();
+            }
+            call.hangup();
+            return;
+        }
+    }
+
+    onCallsRevisionChanged: {
+        if (_hangupQueue.length > 0)
+            Qt.callLater(_hangupNext);
+    }
+
+    // The call would not go: the rest still get their turn.
+    Timer {
+        id: hangupTurn
+        interval: root._hangupTurnMs
+        onTriggered: {
+            root._hangupWaitingFor = "";
+            root._hangupNext();
+        }
     }
 
     function _cellularTransport() {
@@ -349,13 +539,20 @@ Item {
             return;
         }
 
+        // hold() on either call is oFono's SwapCalls, which swaps them all;
+        // it has to be asked of a call that is not already in that state,
+        // or the handler drops it as nothing to do.
         var call = currentCall();
-        if (call)
+        if (call && call.status === VoiceCall.STATUS_ACTIVE)
             call.hold(true);
-        else {
-            var held = heldVoiceCall();
-            if (held) held.hold(false);
-        }
+        else
+            resume();
+    }
+
+    /// Takes the held call back (SwapCalls with nothing active: AT+CHLD=2).
+    function resume() {
+        var held = heldVoiceCall();
+        if (held) held.hold(false);
     }
 
     /// Joins the active and held calls into a conference.
@@ -371,7 +568,7 @@ Item {
 
     /// Takes one participant back out of the conference into a private chat.
     function split(voiceCall) {
-        var target = voiceCall || conferenceCall();
+        var target = voiceCall && voiceCall.isMultiparty ? voiceCall : conferenceCall();
         if (target) target.split();
     }
 
@@ -869,6 +1066,9 @@ Item {
         function onError(message) {
             console.log("VoiceCallManager error: " + message);
 
+            if (root._reportCallControlError(message))
+                return;
+
             if (root._pendingDialNumber.length === 0 ||
                 Date.now() - root._dialAttemptedAt > root._dialInFlightMs) {
                 console.log("  ... not ours: pending='" + root._pendingDialNumber +
@@ -882,6 +1082,22 @@ Item {
             root._pendingDialNumber = "";
             root._pendingPostDial = "";
         }
+    }
+
+    /*
+     * The oFono provider starts a merge's or a split's errors with the oFono
+     * method. InProgress is a second tap while the first is under way, which
+     * will report for itself.
+     */
+    function _reportCallControlError(message) {
+        var text = String(message);
+        var isMerge = text.indexOf("CreateMultiparty:") === 0;
+        if (!isMerge && text.indexOf("PrivateChat:") !== 0)
+            return false;
+
+        if (text.indexOf("org.ofono.Error.InProgress") < 0)
+            root.callControlFailed(isMerge ? CallMessages.conferenceFailed : CallMessages.extractFailed);
+        return true;
     }
 
     // The manager reports errors as free text; map the ones we recognise onto

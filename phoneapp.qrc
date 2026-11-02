@@ -28,6 +28,7 @@
         <file>qml/services/HeadsetCallKeys.js</file>
         <file>qml/services/ImBuddyStatus.qml</file>
         <file>qml/services/IncomingCallsService.js</file>
+        <file>qml/services/KeyTonePlayer.qml</file>
         <file>qml/services/LaunchActionHandler.js</file>
         <file>qml/services/MmiCodes.js</file>
         <file>qml/services/NotificationManager.qml</file>
