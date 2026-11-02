@@ -20,6 +20,7 @@ import QtQuick 2.0
 import QtQml 2.2
 
 import QOfono 0.2
+import LuneOS.Service 1.0
 
 /**
  * Facade over the oFono modem: SIM state, network registration, radio power,
@@ -107,6 +108,22 @@ Item {
         modem.powered = true;
         modem.online = online;
         return true;
+    }
+
+    /// Leaves airplane mode altogether, as the legacy popup did: the shell owns
+    /// it and acts on this preference, for every radio and the status bar.
+    function turnOffAirplaneMode() {
+        __systemService.call("luna://com.webos.service.systemservice/setPreferences",
+                             JSON.stringify({ "airplaneMode": false }),
+                             function (message) { },
+                             function (message) {
+                                 console.log("Could not turn off airplane mode: " + message.payload);
+                             });
+    }
+
+    LunaService {
+        id: __systemService
+        name: "org.webosports.app.phone"
     }
 
     /**

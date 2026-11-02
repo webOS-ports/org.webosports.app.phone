@@ -67,8 +67,10 @@ MessageAlert {
     }
 
     function _enableRadioAndRedial() {
-        if (!telephonyManager || !telephonyManager.setRadioOnline(true))
+        if (!telephonyManager)
             return;
+
+        telephonyManager.turnOffAirplaneMode();
 
         // The dial handler waits for registration before redialling, so just
         // hand the number back to it.
