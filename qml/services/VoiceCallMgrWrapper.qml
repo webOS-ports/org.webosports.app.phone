@@ -832,6 +832,8 @@ Item {
 
     // A ',' pauses for a moment and keeps going; a ';' (or 'w') waits for the
     // user to confirm before sending the rest. Only the pause form is automatic.
+    // oFono's SendTones takes the pause as 'p' (3 s each, TS 22.101 A.21) and
+    // refuses ',', so a ',' goes out as a 'p' rather than not at all.
     function _flushPostDial(voiceCall) {
         var pending = _postDialStrings[voiceCall.handlerId];
         if (!pending || pending.length === 0)
@@ -841,8 +843,8 @@ Item {
         var toSend = (waitIndex < 0) ? pending : pending.slice(0, waitIndex);
         var remainder = (waitIndex < 0) ? "" : pending.slice(waitIndex + 1);
 
-        var tones = toSend.replace(/[,p]/gi, "");
-        if (tones.length > 0) {
+        var tones = toSend.replace(/,/g, "p");
+        if (/[^pP]/.test(tones)) {
             console.log("Sending post-dial DTMF: " + tones);
             voiceCall.sendDtmf(tones);
         }
