@@ -96,7 +96,8 @@ Item {
     /// A merge or split was refused. Nothing changed: the calls stay as they
     /// were. `message` is for the user.
     signal callControlFailed(string message);
-    /// A connected call went away without either side hanging up.
+    /// A connected call went away without either side hanging up. `reason`
+    /// keys into CallMessages.droppedCall.
     signal callDropped(var voiceCall, string reason);
 
     /**
@@ -555,21 +556,53 @@ Item {
         if (held) held.hold(false);
     }
 
+    /**
+     * A merge or split has gone to oFono and has not come back. It can take
+     * a second, and takes one request at a time: a second tap meanwhile is
+     * dropped here. The answer is the conference changing size or an error;
+     * the timer is for a request that never gets either.
+     */
+    property bool callControlPending: false
+    property int _callControlTurnMs: 5000
+
+    function _startCallControl() {
+        callControlPending = true;
+        callControlTurn.restart();
+    }
+
+    onConferenceSizeChanged: callControlPending = false
+
+    Timer {
+        id: callControlTurn
+        interval: root._callControlTurnMs
+        onTriggered: root.callControlPending = false
+    }
+
     /// Joins the active and held calls into a conference.
     function merge() {
+        if (callControlPending)
+            return;
+
         var call = currentCall();
         var held = heldVoiceCall();
         if (!call || !held) {
             console.log("Cannot merge: need one active and one held call");
             return;
         }
+        _startCallControl();
         call.merge(held.handlerId);
     }
 
     /// Takes one participant back out of the conference into a private chat.
     function split(voiceCall) {
+        if (callControlPending)
+            return;
+
         var target = voiceCall && voiceCall.isMultiparty ? voiceCall : conferenceCall();
-        if (target) target.split();
+        if (target) {
+            _startCallControl();
+            target.split();
+        }
     }
 
     /// Releases every held call; if a call is waiting, rejects it instead
@@ -865,6 +898,7 @@ Item {
         if (_endedCalls[handlerId])
             return;
         _endedCalls[handlerId] = true;
+        var wentLive = _liveCalls[handlerId] ? _liveCalls[handlerId].liveSince > 0 : false;
         delete _liveCalls[handlerId];
 
         if (root.heldCall && root.heldCall.handlerId === handlerId)
@@ -872,13 +906,37 @@ Item {
         delete _postDialStrings[handlerId];
 
         // A call that never connected and was not rejected by the user did
-        // not "end", it failed to be placed.
-        if (!endedVoiceCall.isIncoming && endedVoiceCall.duration === 0 &&
+        // not "end", it failed to be placed, unless the user took it back.
+        // Which of those, and whether a connected one dropped, the reason says.
+        if (!endedVoiceCall.isIncoming && endedVoiceCall.duration === 0 && !wentLive &&
             IncomingCallsService.getActionForCall(handlerId) === IncomingCallsService.Missed) {
-            root.dialFailed(endedVoiceCall.lineId, "callfailed");
+            callEndClassifier.callEnded(endedVoiceCall, false);
+        } else if (wentLive || endedVoiceCall.duration > 0) {
+            callEndClassifier.callEnded(endedVoiceCall, true);
         }
 
         root.endingCall(endedVoiceCall);
+    }
+
+    property alias _callEnds: callEndClassifier
+
+    CallEndClassifier {
+        id: callEndClassifier
+        reasonsAvailable: callEndReasons.status === Loader.Ready
+        onFailed: (call) => root.dialFailed(call.lineId, "callfailed")
+        onDropped: (call, reason) => root.callDropped(call, reason)
+    }
+
+    Loader {
+        id: callEndReasons
+        source: "CallEndReasons.qml"
+    }
+
+    Connections {
+        target: callEndReasons.item
+        function onReasonReported(lineId, reason) {
+            callEndClassifier.reasonReported(lineId, reason);
+        }
     }
 
     /// Ends every call we saw that is no longer in the list.
@@ -1086,8 +1144,8 @@ Item {
 
     /*
      * The oFono provider starts a merge's or a split's errors with the oFono
-     * method. InProgress is a second tap while the first is under way, which
-     * will report for itself.
+     * method. InProgress is oFono busy with something else: not worth saying,
+     * but this request is over all the same.
      */
     function _reportCallControlError(message) {
         var text = String(message);
@@ -1095,6 +1153,7 @@ Item {
         if (!isMerge && text.indexOf("PrivateChat:") !== 0)
             return false;
 
+        callControlPending = false;
         if (text.indexOf("org.ofono.Error.InProgress") < 0)
             root.callControlFailed(isMerge ? CallMessages.conferenceFailed : CallMessages.extractFailed);
         return true;

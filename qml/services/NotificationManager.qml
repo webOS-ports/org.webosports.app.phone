@@ -36,6 +36,10 @@ import "CallMessages.js" as CallMessages
  * only goes to the notifications when that alert is minimized without being
  * answered (postMissedCall) - with the red missed call icon 2.2.4's dashboard
  * showed, notification-large-missed.png.
+ *
+ * Their sounds are legacy's too, both of the notifications class: a voicemail
+ * in its banner, a missed call as its alert comes up, and not again when it
+ * is minimized.
  */
 Item {
     id: notificationManager
@@ -43,6 +47,7 @@ Item {
     property VoiceCallMgrWrapper voiceCallManager
     property TelephonyManager telephonyManager
     property ContactsModel contacts
+    property CallAlertSounds alertSounds
 
     readonly property string appId: "org.webosports.app.phone"
 
@@ -52,6 +57,9 @@ Item {
 
     function notifyMissedCall(lineId, displayName) {
         var name = (displayName && displayName.length > 0) ? displayName : lineId;
+
+        if (alertSounds)
+            alertSounds.playNotification();
 
         missedCall(lineId, name);
     }
@@ -69,13 +77,30 @@ Item {
                                 + "/qml/views/images/phone/notification-large-missed.png" });
     }
 
-    function notifyVoicemail(count) {
+    /// `silent`: the count did not bring anything new. Answers the payload
+    /// posted, if any.
+    function notifyVoicemail(count, silent) {
         if (count <= 0)
-            return;
+            return undefined;
 
-        _createToast(count === 1 ? qsTr("1 new voicemail message")
-                                 : qsTr("%1 new voicemail messages").arg(count),
-                     { id: appId, params: { action: "voicemail" } });
+        return _createToast(count === 1 ? qsTr("1 new voicemail message")
+                                        : qsTr("%1 new voicemail messages").arg(count),
+                            { id: appId, params: { action: "voicemail" } },
+                            silent ? undefined : { soundClass: "notifications" });
+    }
+
+    /*
+     * As legacy's VoicemailService: no sound for the first count after a
+     * start, or for one that went down, which is the user having heard a
+     * message. -1 until the SIM's count is known.
+     */
+    property int _voicemailCount: -1
+
+    function _voicemailCountUpdated(count, known) {
+        var isNew = _voicemailCount >= 0 && count > _voicemailCount;
+        if (known)
+            _voicemailCount = count;
+        return notifyVoicemail(count, !isNew);
     }
 
     /// `overrides` adds to or replaces fields of the payload: a title, or an
@@ -127,7 +152,13 @@ Item {
         target: notificationManager.telephonyManager
 
         function onVoicemailMessageCountChanged() {
-            notifyVoicemail(telephonyManager.voicemailMessageCount);
+            notificationManager._voicemailCountUpdated(telephonyManager.voicemailMessageCount,
+                                                       telephonyManager.voicemailCountKnown);
+        }
+
+        function onVoicemailCountKnownChanged() {
+            if (telephonyManager.voicemailCountKnown)
+                notificationManager._voicemailCount = telephonyManager.voicemailMessageCount;
         }
     }
 

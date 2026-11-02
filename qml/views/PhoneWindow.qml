@@ -46,6 +46,7 @@ WebOSWindow {
     property DialHandler dialHandler;
     property SupplementaryServices supplementaryServices;
     property AudioRouteManager audioRouteManager;
+    property CallAlertSounds alertSounds;
     property DialingShortcuts dialingShortcuts;
     property CallTransports callTransports;
     property ImBuddyStatus imBuddyStatus;
@@ -322,6 +323,15 @@ WebOSWindow {
         function onCallControlFailed(message) {
             messageAlert.showMessage("", message, "");
         }
+
+        function onCallDropped(voiceCall, reason) {
+            var match = contacts ? contacts.personByPhoneNumber(voiceCall.lineId) : null;
+            var person = match ? match.foundPerson : null;
+            var name = !person ? ""
+                     : person.nickname ? person.nickname
+                     : (person.name.givenName + " " + person.name.familyName).trim();
+            droppedCallAlert.showDropped(voiceCall.lineId, name, reason);
+        }
     }
 
     Connections {
@@ -341,6 +351,14 @@ WebOSWindow {
         appTheme: phoneUiAppTheme
         dialHandler: phoneWindowId.dialHandler
         telephonyManager: phoneWindowId.telephonyManager
+        alertSounds: phoneWindowId.alertSounds
+    }
+
+    DroppedCallAlert {
+        id: droppedCallAlert
+        appTheme: phoneUiAppTheme
+        dialHandler: phoneWindowId.dialHandler
+        alertSounds: phoneWindowId.alertSounds
     }
 
     MessageAlert {

@@ -189,11 +189,16 @@ WebOSWindow {
         voiceCallManager: voiceCallMgrWrapperId
     }
 
+    CallAlertSounds {
+        id: callAlertSoundsId
+    }
+
     NotificationManager {
         id: notificationManagerId
         voiceCallManager: voiceCallMgrWrapperId
         telephonyManager: telephonyManagerId
         contacts: personListModelId
+        alertSounds: callAlertSoundsId
 
         onMissedCall: (lineId, displayName) => missedCallAlertId.showMissedCall(lineId, displayName)
     }
@@ -289,6 +294,7 @@ WebOSWindow {
     PhoneWindow {
         id: phoneWindow
         runningOnDesktop: root.runningOnDesktop
+        alertSounds: callAlertSoundsId
         simPinWindow: simPinWindowId
         incomingCallAlertWindow: incomingCallAlertWindowId
         lockedCallWindow: lockedCallWindowId

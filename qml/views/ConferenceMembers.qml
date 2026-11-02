@@ -45,7 +45,8 @@ Column {
     property int openIndex: -1
 
     signal hangupRequested(var call)
-    signal privateRequested(var call)
+    /// `button` is what the tap landed on, for the card to place its tap guard.
+    signal privateRequested(var call, Item button)
 
     // A member leaving shifts the rows; close the drawer rather than leave it
     // open under someone else.
@@ -150,8 +151,8 @@ Column {
                             anchors.fill: parent
                             enabled: members.canPrivate
                             onClicked: {
+                                members.privateRequested(row.modelData, privateArea);
                                 members.openIndex = -1;
-                                members.privateRequested(row.modelData);
                             }
                         }
                     }

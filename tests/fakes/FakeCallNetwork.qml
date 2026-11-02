@@ -41,7 +41,8 @@ import org.nemomobile.voicecall 1.0
  *   of them active afterwards; PrivateChat is AT+CHLD=2<n>, leaving that
  *   call active and the conference held, and only with nothing on hold.
  *   refuseCallControl makes the network turn them down: oFono's Failed,
- *   reported through the provider, every call as it was.
+ *   reported through the provider, every call as it was. oFono reports the
+ *   held call active before it reports Multiparty on any of them.
  *
  * `commands` records what the modem would have been sent.
  */
@@ -55,6 +56,8 @@ Item {
     /// How long a hangup keeps oFono busy; 0 for no time at all.
     property int busyMs: 0
     property bool refuseCallControl: false
+    /// A merge is answered only when the test calls mergeStatus, mergeLands.
+    property bool mergeLags: false
     property bool busy: false
     /// Requests oFono turned away with InProgress.
     property int refused: 0
@@ -208,11 +211,23 @@ Item {
             error("CreateMultiparty: org.ofono.Error.Failed Operation failed");
             return;
         }
-        voiceCalls.list.forEach(function(member) {
-            if (member.status === VoiceCall.STATUS_ACTIVE || member.status === VoiceCall.STATUS_HELD) {
-                member.isMultiparty = true;
-                member.status = VoiceCall.STATUS_ACTIVE;
-            }
+        if (mergeLags)
+            return;
+        mergeStatus();
+        mergeLands();
+    }
+
+    /// The two halves of a merge's answer, for a test to step through with
+    /// mergeLags on: the held call goes active, and then they are Multiparty.
+    function mergeStatus() {
+        _withStatus(VoiceCall.STATUS_HELD).forEach(function(member) {
+            member.status = VoiceCall.STATUS_ACTIVE;
+        });
+    }
+
+    function mergeLands() {
+        _withStatus(VoiceCall.STATUS_ACTIVE).forEach(function(member) {
+            member.isMultiparty = true;
         });
     }
 

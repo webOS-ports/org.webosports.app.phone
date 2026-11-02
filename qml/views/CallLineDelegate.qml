@@ -44,8 +44,11 @@ Item {
     property UiTheme appTheme
     property CallTransports callTransports
     property bool selected: false
-    /// Shows the merge/swap arrow; the card decides when that is meaningful.
+    /// The merge/swap arrow works; the card decides when that is meaningful.
+    /// When it does not the arrow stays, greyed: legacy's .disabled.
     property bool canJoin: false
+    /// A merge has been asked for and the network has not answered yet.
+    property bool joinPending: false
     /// With a single call the card carries the hangup button, so the line does
     /// not repeat it. Only stacked lines need their own.
     property bool showFooter: false
@@ -61,6 +64,9 @@ Item {
     signal hangupRequested();
     signal joinRequested();
     signal addContactRequested();
+
+    /// What a tap on the arrow lands on, for the card to place its tap guard.
+    readonly property alias joinButton: joinArea
 
     property Contact lineContact: Contact {
         contactsModel: callLine.contacts
@@ -207,7 +213,10 @@ Item {
         }
     }
 
-    // Hangup on the left, join/swap on the right, split by a hairline.
+    // Hangup on the left, join/swap on the right, split by a hairline, and
+    // the halves stay put whether or not the arrow works, as legacy's did
+    // (.multicall-disconnect-button 160px, .gsm .multicall-merge-button left:
+    // 160px): a hangup that widens lands under the finger still on the arrow.
     Item {
         id: footer
 
@@ -224,7 +233,7 @@ Item {
             anchors.fill: parent
 
             Item {
-                width: callLine.canJoin ? parent.width / 2 : parent.width
+                width: parent.width / 2
                 height: parent.height
 
                 SpriteIcon {
@@ -236,32 +245,37 @@ Item {
 
                 MouseArea {
                     id: hangupArea
+                    objectName: "lineHangupArea"
                     anchors.fill: parent
                     onClicked: callLine.hangupRequested()
                 }
             }
 
             Rectangle {
-                width: callLine.canJoin ? 1 : 0
+                width: 1
                 height: parent.height
                 color: appTheme.buttonBorderColor
             }
 
             Item {
-                width: callLine.canJoin ? (parent.width / 2 - 1) : 0
+                width: parent.width / 2 - 1
                 height: parent.height
-                visible: callLine.canJoin
 
                 SpriteIcon {
+                    objectName: "joinSprite"
                     anchors.fill: parent
                     source: appTheme.image("multicall-merge-button.png")
                     frameCount: 3
-                    frame: joinArea.pressed ? 1 : 0
+                    // Up, down, disabled. A tap that has gone greys the arrow
+                    // at once: the network can take a second to answer.
+                    frame: !joinArea.enabled ? 2 : joinArea.pressed ? 1 : 0
                 }
 
                 MouseArea {
                     id: joinArea
+                    objectName: "joinArea"
                     anchors.fill: parent
+                    enabled: callLine.canJoin && !callLine.joinPending
                     onClicked: callLine.joinRequested()
                 }
             }
