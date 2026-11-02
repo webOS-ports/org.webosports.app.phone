@@ -1,7 +1,8 @@
 {
   "comment": [
-    "Mock com.palm.imbuddystatus:1 presence. availability 0 means offline, so",
-    "the Telegram row for that contact shows dimmed in the contact list."
+    "Mock com.palm.imbuddystatus:1 presence, availability as imlibpurple writes it",
+    "(0 online, 1 mobile, 2 idle, 3 invisible, 4 offline, 5 pending, 6 none): the",
+    "Telegram row for that contact shows (Offline) in the contact list."
   ],
   "data": [
     {
@@ -17,7 +18,7 @@
       "_kind": "com.palm.imbuddystatus.libpurple:1",
       "serviceName": "type_telegram",
       "username": "id8864003499",
-      "availability": 0,
+      "availability": 4,
       "status": "Offline"
     }
   ]
