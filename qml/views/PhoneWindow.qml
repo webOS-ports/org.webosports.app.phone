@@ -78,6 +78,31 @@ WebOSWindow {
             screenLocked = (status.lockState === "locked");
     }
 
+    /**
+     * Whether this card is the one on screen, by the application manager's
+     * account rather than the window's.
+     *
+     * The window's own `active` is not to be trusted for that: a card hidden
+     * when a call ends, or one whose surface the compositor dropped, can stay
+     * active with nothing on screen, the compositor sending no focus change
+     * (sargo, 2026-11-03). The application manager reports the foreground app
+     * from the compositor's side. Where it is not there to ask - a desktop, a
+     * test - the window's `active` is all there is.
+     */
+    readonly property bool inFront: _foregroundKnown
+                                    ? (visible && _foregroundAppId === "org.webosports.app.phone")
+                                    : active
+    property bool _foregroundKnown: false
+    property string _foregroundAppId: ""
+
+    function __handleForegroundApp(message) {
+        var info = JSON.parse(message.payload);
+        if (info.appId === undefined)  // a failed reply carries none
+            return;
+        _foregroundAppId = info.appId;
+        _foregroundKnown = true;
+    }
+
     /*
      * The call screen over the lock screen, as legacy's PIN card was: up for
      * as long as the screen is locked with a call in progress, whether the
@@ -145,11 +170,15 @@ WebOSWindow {
         activeCallDialog(voiceCallMgrWrapper.activeVoiceCall || voiceCallMgrWrapper.callAt(0));
     }
 
+    /// Set while surfaceRecovery hides and shows the window for a new surface:
+    /// that hide is not the app being closed.
+    property bool _resurfacing: false
+
     /**
      * When PhoneApp is closed, hang up any active calls.
      */
     onVisibleChanged: {
-        if(!visible) {
+        if(!visible && !_resurfacing) {
             console.log("Window not active - Cleaning up");
             voiceCallMgrWrapper.hangupAll();
             if (tabView.item)
@@ -205,8 +234,9 @@ WebOSWindow {
                     phoneWindowId.hide();
                     simPinWindow.show();
                 }
-                else if(!phoneWindowId.active || phoneWindowId.screenLocked ||
-                        voiceCallMgrWrapper.isCallWaiting(voiceCall)) {
+                else if(!phoneWindowId.takesCallsInPlace(phoneWindowId.visible, phoneWindowId.inFront,
+                                                         phoneWindowId.screenLocked,
+                                                         voiceCallMgrWrapper.isCallWaiting(voiceCall))) {
                     // delegate management to incomingCallAlertWindow. Not
                     // only when the window is hidden: a card in card view is
                     // visible but a thumbnail, and a window behind another
@@ -220,9 +250,7 @@ WebOSWindow {
                     // IncomingCall popup for it as for any call
                     // (CallSynergizer.handleIncoming), never a page over the
                     // call in progress.
-                    incomingCallAlertWindow.dismiss();
-                    incomingCallAlertWindow.voiceCall = voiceCall;
-                    incomingCallAlertWindow.show();
+                    incomingCallAlertWindow.present(voiceCall);
                 }
                 else {
                     incomingCall(voiceCall);
@@ -493,7 +521,10 @@ WebOSWindow {
 
         if (!phoneWindowId.visible) {
             phoneWindowId.show();
-        } else if (!phoneWindowId.active) {
+            // A hidden card shown again can be left unmapped too (sargo,
+            // 2026-11-03: answered from the strip, no call screen).
+            surfaceRecovery.restart();
+        } else if (!phoneWindowId.inFront) {
             // Answered from the alert while the card was in card view: show()
             // does nothing for a window that is already visible, and the call
             // screen would stay a thumbnail. A relaunch is what brings a card
@@ -501,6 +532,33 @@ WebOSWindow {
             appManager.call("luna://com.webos.service.applicationmanager/launch",
                             JSON.stringify({ id: "org.webosports.app.phone" }), undefined,
                             function(error) { console.log("Could not bring the phone forward: " + error); });
+            surfaceRecovery.restart();
+        }
+    }
+
+    /*
+     * A card put away to card view can lose its surface: the compositor logs
+     * it unmapped, and from then on it ignores the window's requests to come
+     * back ("state change on unmapped surface"). Qt still holds the window
+     * visible, so show() does nothing, and the call screen never appears --
+     * on sargo three calls out of five that found the card put away. If the
+     * relaunch has not brought the card forward by now, give it a new
+     * surface: hidden and shown again, it maps afresh in front.
+     */
+    Timer {
+        id: surfaceRecovery
+        objectName: "surfaceRecovery"
+        interval: 1500
+        onTriggered: {
+            if (phoneWindowId.inFront)
+                return;
+            if (!voiceCallMgrWrapper || voiceCallMgrWrapper.callCount === 0)
+                return;
+            console.log("Phone card did not come forward for the call; showing it afresh");
+            phoneWindowId._resurfacing = true;
+            phoneWindowId.hide();
+            phoneWindowId.show();
+            phoneWindowId._resurfacing = false;
         }
     }
 
@@ -512,6 +570,10 @@ WebOSWindow {
                                  JSON.stringify({ subscribe: true }),
                                  phoneWindowId.__handleLockStatus,
                                  function(error) { console.log("No lock status: " + error); });
+            appManager.subscribe("luna://com.webos.service.applicationmanager/getForegroundAppInfo",
+                                 JSON.stringify({ subscribe: true }),
+                                 phoneWindowId.__handleForegroundApp,
+                                 function(error) { console.log("No foreground app info: " + error); });
         }
     }
 
@@ -519,6 +581,21 @@ WebOSWindow {
     function openAppMenu() {
         if (tabView.item && tabView.item.openAppMenu)
             tabView.item.openAppMenu();
+    }
+
+    /**
+     * Whether an incoming call opens on the call screen inside this window
+     * rather than in the alert strip: only when the window is the one the
+     * user is looking at, unlocked, and the call is not a call waiting.
+     *
+     * Visible as well as active: a card hidden when the call before ended can
+     * stay active, the compositor sending no focus change when it unmaps a
+     * window nothing else takes the focus from. On sargo on 2026-11-03 two
+     * calls in a row after a hung-up one opened their page in that hidden
+     * window - the ringtone, and nothing on screen.
+     */
+    function takesCallsInPlace(visible, active, locked, waiting) {
+        return visible === true && active === true && !locked && !waiting;
     }
 
     function incomingCall(voiceCall) {

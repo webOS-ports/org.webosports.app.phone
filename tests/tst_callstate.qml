@@ -282,6 +282,87 @@ Item {
             compare(alert.voiceCall, call);
         }
 
+        // --- the strip is shown afresh when the shell never takes it up ---
+
+        function presentAlertFor(call) {
+            var alert = createTemporaryObject(alertComponent, root, { appTheme: theme });
+            verify(alert !== null, "the alert did not load");
+            alert.present(call);
+            verify(alert.visible);
+            compare(alert.voiceCall, call);
+            return alert;
+        }
+
+        function findTimer(alert) {
+            var kids = alert.data || [];
+            for (var i = 0; i < kids.length; ++i)
+                if (kids[i].objectName === "drawWatch")
+                    return kids[i];
+            return null;
+        }
+
+        function test_aDrawnStripIsLeftAlone() {
+            var alert = presentAlertFor(makeCall("draw-1", VoiceCall.STATUS_INCOMING));
+            tryVerify(function() { return alert._drawn; }, 3000, "the strip never drew a frame");
+            var changes = [];
+            alert.visibleChanged.connect(function() { changes.push(alert.visible); });
+            alert._checkDrawn();
+            compare(changes, []);
+            compare(alert._reshows, 0);
+        }
+
+        // The window the shell never configured: no frame comes. Stood in for
+        // by marking it undrawn after the fact, as the offscreen test platform
+        // draws everything it is given.
+        function test_anUndrawnStripIsShownAfreshTwiceAtMost() {
+            var call = makeCall("draw-2", VoiceCall.STATUS_INCOMING);
+            var alert = presentAlertFor(call);
+            tryVerify(function() { return alert._drawn; }, 3000);
+            alert._drawn = false;
+            var changes = [];
+            alert.visibleChanged.connect(function() { changes.push(alert.visible); });
+            alert._checkDrawn();
+            compare(changes, [false, true], "hidden, then shown again");
+            compare(alert.voiceCall, call, "still the call it is for");
+            verify(findTimer(alert).running, "not watched again");
+            alert._drawn = false;
+            alert._checkDrawn();
+            alert._drawn = false;
+            alert._checkDrawn();
+            compare(alert._reshows, alert.maxReshows);
+            compare(changes, [false, true, false, true], "shown afresh more than maxReshows times");
+            verify(alert.visible, "given up on by hiding it");
+        }
+
+        function test_aDismissedStripIsNotBroughtBack() {
+            var alert = presentAlertFor(makeCall("draw-3", VoiceCall.STATUS_INCOMING));
+            alert.dismiss();
+            verify(!findTimer(alert).running, "still watching a dismissed strip");
+            alert._drawn = false;
+            alert._checkDrawn();
+            verify(!alert.visible, "a dismissed strip came back");
+        }
+
+        // Hidden some other way than dismiss() - the shell closing it - is
+        // not a strip to bring back either.
+        function test_aHiddenStripIsNotBroughtBack() {
+            var alert = presentAlertFor(makeCall("draw-6", VoiceCall.STATUS_INCOMING));
+            alert.hide();
+            alert._drawn = false;
+            alert._checkDrawn();
+            verify(!alert.visible, "a hidden strip came back");
+        }
+
+        function test_presentingAgainStartsAfresh() {
+            var alert = presentAlertFor(makeCall("draw-4", VoiceCall.STATUS_INCOMING));
+            alert._reshows = alert.maxReshows;
+            var second = makeCall("draw-5", VoiceCall.STATUS_INCOMING);
+            alert.present(second);
+            compare(alert._reshows, 0);
+            compare(alert.voiceCall, second);
+            verify(alert.visible);
+        }
+
         // --- labels ---
 
         function test_callLineHasNoLabelForAnUnknownProvider() {
