@@ -280,6 +280,33 @@ QtObject {
     }
 
     /**
+     * Video call
+     *
+     * The tablet's videocall-tablet.css: an eighty-nine pixel header of
+     * vidHeader.png with the caller's name alone, the running time dropped to
+     * just above a hangup button 116 by 37.
+     **/
+
+    property string videoHeaderImage: "vidHeader.png"
+    property real videoTitleSize: Units.gu(2.4)
+    /// Whether the call's state and running time sit under the name in the
+    /// header, rather than above the hangup button.
+    property bool videoStateInHeader: false
+    property real videoStateSize: Units.gu(1.4)
+    property real videoHeaderHeight: Units.gu(8.9)
+    /// The Video and Audio buttons in the header: .muteButton/.videoButton.
+    property real videoButtonWidth: Units.gu(15)
+    /// Pixels of the button artwork per tenth of a grid unit: the strips are
+    /// drawn at the scale their stylesheet's pixels are.
+    property real videoButtonArtScale: 1
+    property real videoButtonIconTop: Units.gu(0.8)
+    property real videoButtonLabelTop: Units.gu(5)
+    property real videoButtonLabelSize: Units.gu(1.8)
+    property real videoHangupWidth: Units.gu(11.6)
+    property real videoHangupHeight: Units.gu(3.7)
+    property real videoHangupMargin: Units.gu(1.5)
+
+    /**
      * Retained for compatibility with the existing views.
      **/
 

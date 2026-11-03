@@ -177,6 +177,20 @@ BasePage {
         return callTransports.labelFor(provider).toUpperCase();
     }
 
+    /**
+     * The header's "change to video" button, as 2.2.4's GlassCallHeader:
+     * shown for a single messaging call whose account declares a video format
+     * (SingleLineSingleCall.videoSupported), not once the call shows video.
+     * It is enabled once the call is up and greys out after the tap.
+     */
+    readonly property bool videoSwitchShown: !!selectedCall && !multipleLines && !conferenceOnly
+        && typeof selectedCall.switchToVideo === "function"
+        && !!callTransports && callTransports.supportsVideo(selectedCall.providerId || "")
+        && selectedCall.showsVideo !== true
+    readonly property bool videoSwitchEnabled: videoSwitchShown
+        && selectedCall.status === VoiceCall.STATUS_ACTIVE
+        && selectedCall.videoSwitchRequested !== true
+
     function open() { root.visible = true }
     function close() { root.visible = false }
 
@@ -256,16 +270,58 @@ BasePage {
                 height: visible ? nameColumn.height + Units.gu(1.6) : 0
                 visible: !root.multipleLines
 
+                // The legacy button: shared/images/voice_to_video.png, a
+                // 70x154 sprite with the normal state at y 8 and the pressed
+                // and disabled state at y 81, 68 pixels square, at the left
+                // of the header (glasscallheader.css, activecall.css).
+                Item {
+                    id: videoSwitchButton
+                    objectName: "videoSwitchButton"
+
+                    readonly property bool lit: !root.videoSwitchEnabled || videoSwitchArea.pressed
+
+                    anchors {
+                        left: parent.left
+                        leftMargin: Units.gu(0.6)
+                        verticalCenter: nameColumn.verticalCenter
+                    }
+                    width: Units.gu(6.8)
+                    height: Units.gu(6.8)
+                    clip: true
+                    visible: root.videoSwitchShown
+
+                    Image {
+                        x: 0
+                        y: videoSwitchButton.lit ? -Units.gu(8.1) : -Units.gu(0.8)
+                        width: Units.gu(7.0)
+                        height: Units.gu(15.4)
+                        source: root.appTheme.image("voice_to_video.png")
+                        smooth: true
+                    }
+
+                    MouseArea {
+                        id: videoSwitchArea
+                        objectName: "videoSwitchArea"
+                        anchors.fill: parent
+                        enabled: root.videoSwitchEnabled
+                        onClicked: root.selectedCall.switchToVideo()
+                    }
+                }
+
                 Column {
                     id: nameColumn
+
+                    // Room for the button on both sides keeps the name centred.
+                    readonly property real sideMargin: root.videoSwitchShown
+                        ? videoSwitchButton.width + Units.gu(0.8) : Units.gu(1.2)
 
                     anchors {
                         top: parent.top
                         topMargin: Units.gu(0.8)
                         left: parent.left
                         right: parent.right
-                        leftMargin: Units.gu(1.2)
-                        rightMargin: Units.gu(1.2)
+                        leftMargin: sideMargin
+                        rightMargin: sideMargin
                     }
                     spacing: 0
 

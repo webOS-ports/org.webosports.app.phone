@@ -59,9 +59,76 @@ WebOSWindow {
 
     /// Takes the call away from the alert, answered, declined or ended.
     function dismiss() {
+        drawWatch.stop();
         incomingCallAlert.hide();
         voiceCall = null;
     }
+
+    /**
+     * Puts the alert up for a ringing call.
+     *
+     * On sargo on 2026-11-03 the shell once never took the window up: show()
+     * went out, the compositor sent no configure, nothing was drawn, the
+     * screen stayed dark and the call rang out unseen - even after the power
+     * key turned the screen on. It could not be made to happen again on
+     * purpose. A window that is up draws its first frame within a frame or
+     * two; one that has not after drawTimeoutMs is hidden and shown again,
+     * which gives it a new surface, as surfaceRecovery does for the call card.
+     */
+    function present(call) {
+        dismiss();
+        voiceCall = call;
+        _drawn = false;
+        _reshows = 0;
+        _shownAt = Date.now();
+        console.log("Incoming call alert: showing");
+        show();
+        drawWatch.restart();
+    }
+
+    /// How long the alert may take to draw before it is shown afresh.
+    property int drawTimeoutMs: 1500
+    /// How many times it is shown afresh before giving up.
+    property int maxReshows: 2
+
+    property bool _drawn: true
+    property int _reshows: 0
+    property double _shownAt: 0
+
+    // Only the first frame counts. (Connections has no `enabled` under the
+    // QtQuick 2.0 import this file uses; the strip draws few frames anyway.)
+    Connections {
+        target: incomingCallAlert
+        function onFrameSwapped() {
+            if (incomingCallAlert._drawn)
+                return;
+            incomingCallAlert._drawn = true;
+            console.log("Incoming call alert: drawn " + (Date.now() - incomingCallAlert._shownAt) + " ms after show");
+        }
+    }
+
+    function _checkDrawn() {
+        if (_drawn || !visible || !voiceCall)
+            return;
+        if (_reshows >= maxReshows) {
+            console.warn("Incoming call alert: still not drawn after " + _reshows + " fresh shows");
+            return;
+        }
+        _reshows++;
+        console.warn("Incoming call alert: not drawn " + (Date.now() - _shownAt) + " ms after show; showing it afresh");
+        hide();
+        show();
+        drawWatch.restart();
+    }
+
+    Timer {
+        id: drawWatch
+        objectName: "drawWatch"
+        interval: incomingCallAlert.drawTimeoutMs
+        onTriggered: incomingCallAlert._checkDrawn()
+    }
+
+    onVisibleChanged: console.log("Incoming call alert: visible " + visible)
 
     /*
      * The strip is for a call that is ringing or waiting, and goes as soon as

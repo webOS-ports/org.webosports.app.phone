@@ -55,6 +55,8 @@ WebOSWindow {
 
     /// Called when the user takes the affirmative action.
     property var acceptAction: null
+    /// Called when the user turns it down.
+    property var declineAction: null
 
     signal accepted();
     signal dismissed();
@@ -82,18 +84,23 @@ WebOSWindow {
         cancelLabel = "";
         affirmative = false;
         acceptAction = null;
+        declineAction = null;
         show();
     }
 
-    /// Shows an alert with an affirmative action, e.g. "Call back".
-    function showQuestion(alertTitle, alertMessage, icon, affirmativeLabel, action) {
+    /// Shows an alert with an affirmative action, e.g. "Call back". The
+    /// negative button reads "Dismiss" unless `negativeLabel` is given, and
+    /// runs `negativeAction` when there is one.
+    function showQuestion(alertTitle, alertMessage, icon, affirmativeLabel, action,
+                          negativeLabel, negativeAction) {
         title = alertTitle || "";
         message = alertMessage || "";
         iconSource = icon || "";
         acceptLabel = affirmativeLabel;
-        cancelLabel = qsTr("Dismiss");
+        cancelLabel = negativeLabel || qsTr("Dismiss");
         affirmative = true;
         acceptAction = action;
+        declineAction = negativeAction || null;
         show();
     }
 
@@ -195,6 +202,8 @@ WebOSWindow {
 
             onClicked: {
                 messageAlert.hide();
+                if (messageAlert.declineAction)
+                    messageAlert.declineAction();
                 messageAlert.dismissed();
             }
         }

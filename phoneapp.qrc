@@ -190,8 +190,10 @@
         <file>qml/views/images/phone/search-button-cancel.png</file>
         <file>qml/views/images/phone/search-button.png</file>
         <file>qml/views/images/phone/selected_button_bg.png</file>
+        <file>qml/views/images/phone/header_catfish.png</file>
         <file>qml/views/images/phone/vidHeader.png</file>
         <file>qml/views/images/phone/video_on_off.png</file>
+        <file>qml/views/images/phone/voice_to_video.png</file>
         <file>qml/views/images/phone/voicemail-icon.png</file>
         <file>qml/views/images/tablet/Camera-Icon.png</file>
         <file>qml/views/images/tablet/active-photo-overlay.png</file>
@@ -276,6 +278,7 @@
         <file>qml/views/images/tablet/selected_button_bg.png</file>
         <file>qml/views/images/tablet/vidHeader.png</file>
         <file>qml/views/images/tablet/video_on_off.png</file>
+        <file>qml/views/images/tablet/voice_to_video.png</file>
         <file>qml/views/images/tablet/voicemail-icon.png</file>
         <file>tests/tst_profile.qml</file>
         <file>tests/tst_theme.qml</file>

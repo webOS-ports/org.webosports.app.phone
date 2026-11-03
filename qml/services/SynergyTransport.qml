@@ -152,7 +152,10 @@ Item {
                     call.lineId = entry.address;
 
                 call.isMultiparty = conference || (line.calls.length > 1);
-                call.isVideo = call.isVideo || video;
+                call.isVideo = call.isVideo || video
+                               || line.incomingVideoState === "available"
+                               || line.incomingVideoState === "streaming";
+                _applyVideo(call, line, payload);
 
                 call.status = status;
             });
@@ -173,6 +176,36 @@ Item {
             callRemoved(call);
             call.destroy();
         });
+
+        // After callAdded, so a call that turns up already streaming video has
+        // its listeners connected before it asks the user.
+        calls.forEach(function(call) {
+            if (call.status !== VoiceCall.STATUS_DISCONNECTED)
+                call._evaluateVideo();
+        });
+    }
+
+    // The line's video fields onto the call. The decoded picture's location is
+    // on the payload, not the line: a connector decodes one call at a time.
+    function _applyVideo(call, line, payload) {
+        call.incomingVideo = line.incomingVideo === true;
+        call.outgoingVideo = line.outgoingVideo === true;
+        call.incomingVideoState = line.incomingVideoState || "unavailable";
+        call.incomingVideoOrientation = (line.incomingVideoOrientation | 0) & 3;
+        var allow = line.allowVideoCalls !== undefined ? line.allowVideoCalls
+                  : (payload && payload.allowVideoCalls !== undefined ? payload.allowVideoCalls : true);
+        call.allowVideoCalls = allow !== false;
+        call.autoAcceptVideoCalls = line.autoAcceptVideoCalls === true;
+        var uri = payload && typeof payload.videoURI === "string" ? payload.videoURI : "";
+        call.videoWidth = uri.length > 0 ? (payload.videoWidth || 0) : 0;
+        call.videoHeight = uri.length > 0 ? (payload.videoHeight || 0) : 0;
+        call.videoURI = uri;
+        var preview = uri.length > 0 && typeof payload.videoPreviewURI === "string" ? payload.videoPreviewURI : "";
+        call.videoPreviewWidth = preview.length > 0 ? (payload.videoPreviewWidth || 0) : 0;
+        call.videoPreviewHeight = preview.length > 0 ? (payload.videoPreviewHeight || 0) : 0;
+        call.videoPreviewOrientation = preview.length > 0 ? ((payload.videoPreviewOrientation | 0) & 3) : 0;
+        call.videoPreviewMirrored = preview.length > 0 && payload.videoPreviewMirrored === true;
+        call.videoPreviewURI = preview;
     }
 
     function _onCallControlRequested(method, params) {
@@ -264,22 +297,45 @@ Item {
 
         lunaService.subscribe(uri + "callStateQuery", JSON.stringify({ subscribe: true }),
                               function(message) {
-                                  var payload = JSON.parse(message.payload);
-                                  // The first response is just {returnValue:true}.
-                                  if (!payload.lines)
-                                      return;
-
-                                  synergyTransport._onLines(payload.lines, payload);
+                                  synergyTransport._onCallState(JSON.parse(message.payload));
                               },
                               function(error) {
-                                  console.log("Lost call state for " + transportId + ": " + error);
-                                  synergyTransport._subscribed = false;
-                                  resubscribeTimer.restart();
+                                  synergyTransport._lostCallState(error);
                               });
+    }
+
+    /**
+     * One reply on the callStateQuery subscription.
+     *
+     * When the connector's service goes away (imlibpurpleservice restarted,
+     * say) the hub ends the subscription with a {"returnValue":false} reply in
+     * its error category. LunaService hands that to the reply callback, not to
+     * the error callback, and cancels the call - so it has to be caught here,
+     * or the app stops hearing about calls on this transport for good. On
+     * sargo on 2026-11-03 every WhatsApp call after a restart of the service
+     * rang the far side and nothing on the phone.
+     */
+    function _onCallState(payload) {
+        if (!payload || payload.returnValue === false) {
+            _lostCallState(payload ? (payload.errorText || payload.errorCode) : "no payload");
+            return;
+        }
+        // The first response is just {returnValue:true}.
+        if (!payload.lines)
+            return;
+
+        _onLines(payload.lines, payload);
+    }
+
+    function _lostCallState(error) {
+        console.warn("Lost call state for " + transportId + ": " + error);
+        _subscribed = false;
+        resubscribeTimer.restart();
     }
 
     Timer {
         id: resubscribeTimer
+        objectName: "resubscribeTimer"
         interval: 5000
         onTriggered: synergyTransport._subscribe()
     }
