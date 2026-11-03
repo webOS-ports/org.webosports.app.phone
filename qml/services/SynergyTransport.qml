@@ -290,22 +290,45 @@ Item {
 
         lunaService.subscribe(uri + "callStateQuery", JSON.stringify({ subscribe: true }),
                               function(message) {
-                                  var payload = JSON.parse(message.payload);
-                                  // The first response is just {returnValue:true}.
-                                  if (!payload.lines)
-                                      return;
-
-                                  synergyTransport._onLines(payload.lines, payload);
+                                  synergyTransport._onCallState(JSON.parse(message.payload));
                               },
                               function(error) {
-                                  console.log("Lost call state for " + transportId + ": " + error);
-                                  synergyTransport._subscribed = false;
-                                  resubscribeTimer.restart();
+                                  synergyTransport._lostCallState(error);
                               });
+    }
+
+    /**
+     * One reply on the callStateQuery subscription.
+     *
+     * When the connector's service goes away (imlibpurpleservice restarted,
+     * say) the hub ends the subscription with a {"returnValue":false} reply in
+     * its error category. LunaService hands that to the reply callback, not to
+     * the error callback, and cancels the call - so it has to be caught here,
+     * or the app stops hearing about calls on this transport for good. On
+     * sargo on 2026-11-03 every WhatsApp call after a restart of the service
+     * rang the far side and nothing on the phone.
+     */
+    function _onCallState(payload) {
+        if (!payload || payload.returnValue === false) {
+            _lostCallState(payload ? (payload.errorText || payload.errorCode) : "no payload");
+            return;
+        }
+        // The first response is just {returnValue:true}.
+        if (!payload.lines)
+            return;
+
+        _onLines(payload.lines, payload);
+    }
+
+    function _lostCallState(error) {
+        console.warn("Lost call state for " + transportId + ": " + error);
+        _subscribed = false;
+        resubscribeTimer.restart();
     }
 
     Timer {
         id: resubscribeTimer
+        objectName: "resubscribeTimer"
         interval: 5000
         onTriggered: synergyTransport._subscribe()
     }
