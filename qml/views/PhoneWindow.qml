@@ -429,6 +429,7 @@ WebOSWindow {
      */
     MessageAlert {
         id: videoRequestAlert
+        objectName: "videoRequestAlert"
         appTheme: phoneUiAppTheme
         property var voiceCall: null
     }
@@ -458,7 +459,48 @@ WebOSWindow {
             });
     }
 
+    /**
+     * Whether this phone can send video, from luneos-rtc-engine. Learnt the
+     * first time video comes up on a call, whoever started it: the camera
+     * button on the video screen and accepting the far side's video both need
+     * it. A property so the tests can answer it.
+     */
+    property var videoCapabilityQuery: function(answer) {
+        appManager.call("luna://org.webosports.rtcengine/capabilities", "{}",
+            function(message) {
+                var reply = JSON.parse(message.payload);
+                answer(reply.returnValue === true && reply.videoCallCapable === true);
+            },
+            function(error) {
+                console.log("No video call capabilities: " + error);
+                answer(false);
+            });
+    }
+
     property bool _videoCapabilityAsked: false
+    property bool _videoCapabilityKnown: false
+    property var _videoCapabilityWaiting: []
+
+    /// Runs `then` (if any) once the capability is known, asking at most once.
+    function _learnVideoCapability(then) {
+        if (_videoCapabilityKnown) {
+            if (then)
+                then();
+            return;
+        }
+        if (then)
+            _videoCapabilityWaiting.push(then);
+        if (_videoCapabilityAsked)
+            return;
+        _videoCapabilityAsked = true;
+        videoCapabilityQuery(function(capable) {
+            voiceCallMgrWrapper.videoSendCapable = capable === true;
+            _videoCapabilityKnown = true;
+            var waiting = _videoCapabilityWaiting;
+            _videoCapabilityWaiting = [];
+            waiting.forEach(function(run) { run(); });
+        });
+    }
 
     Connections {
         target: voiceCallMgrWrapper
@@ -468,26 +510,15 @@ WebOSWindow {
                 return;
             // What we can send decides whether accepting turns our camera on
             // too, so learn it before the question is put.
-            if (phoneWindowId._videoCapabilityAsked) {
-                phoneWindowId._askVideo(voiceCall);
-                return;
-            }
-            phoneWindowId._videoCapabilityAsked = true;
-            appManager.call("luna://org.webosports.rtcengine/capabilities", "{}",
-                function(message) {
-                    var reply = JSON.parse(message.payload);
-                    voiceCallMgrWrapper.videoSendCapable = reply.returnValue === true
-                                                           && reply.videoCallCapable === true;
-                    phoneWindowId._askVideo(voiceCall);
-                },
-                function(error) {
-                    console.log("No video call capabilities: " + error);
-                    phoneWindowId._askVideo(voiceCall);
-                });
+            phoneWindowId._learnVideoCapability(function() { phoneWindowId._askVideo(voiceCall); });
         }
 
         // Switch the call screen between voice and video for the call on it.
         function onCallVideoChanged(voiceCall) {
+            // Video we started ourselves never asks the far side's question,
+            // and the video screen's camera button needs the answer too.
+            if (phoneWindowId._isVideoCall(voiceCall))
+                phoneWindowId._learnVideoCapability(null);
             var page = stackView.currentItem as BasePage;
             if (!page || page.voiceCall !== voiceCall)
                 return;

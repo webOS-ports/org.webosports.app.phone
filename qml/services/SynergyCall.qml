@@ -102,6 +102,16 @@ QtObject {
     property string videoURI: ""
     property int videoWidth: 0
     property int videoHeight: 0
+    /// How far the far side's phone is turned, in quarter turns (0..3); the
+    /// picture is turned back by as much to stand upright.
+    property int incomingVideoOrientation: 0
+    /// Our own camera's picture while we send it (a gst-shm socket of the
+    /// engine), its size, how far to turn it, and whether to mirror it.
+    property string videoPreviewURI: ""
+    property int videoPreviewWidth: 0
+    property int videoPreviewHeight: 0
+    property int videoPreviewOrientation: 0
+    property bool videoPreviewMirrored: false
 
     /**
      * Whether the user lets video on this call: "" not asked yet, "granted"
@@ -150,6 +160,32 @@ QtObject {
     function refuseVideo() {
         videoAuthorization = "refused";
         changeMedia(false, false);
+    }
+
+    /// The user asked to turn this voice call into a video call.
+    property bool videoSwitchRequested: false
+
+    /**
+     * Turns a voice call into a video call, as 2.2.4's AbstractCall
+     * changeToVideoCall: both directions on in one changeMedia, and the far
+     * side's picture authorised up front, so it shows without asking. Once
+     * per call; the header button stays disabled after it, as legacy's did.
+     */
+    function switchToVideo() {
+        if (videoSwitchRequested)
+            return;
+        videoSwitchRequested = true;
+        videoAuthorization = "granted";
+        _incomingVideoAsked = true;
+        changeMedia(true, true);
+    }
+
+    // Once our camera has been on and goes off again, the call is back to voice
+    // and the switch is offered again; until the connector first reports it on,
+    // the button stays disabled so a second tap cannot ask twice.
+    onOutgoingVideoChanged: {
+        if (!outgoingVideo)
+            videoSwitchRequested = false;
     }
 
     // `status` is a property, so QML already gives us statusChanged() -- the

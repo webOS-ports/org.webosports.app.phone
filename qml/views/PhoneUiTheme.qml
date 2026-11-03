@@ -135,4 +135,33 @@ UiTheme {
     pinCardSubTextSize: Units.gu(1.7)
     pinCardButtonHeight: Units.gu(6)
     pinCardAffirmativeDone: false
+
+    /**
+     * The video call, as videocall.css has it: the header is
+     * header_catfish.png, fifty-nine high, with the name at eighteen pixels
+     * over the call's state at twelve -- all at the stylesheet's 1x (see the
+     * header sizes below); the hangup button, still at the Pre3's 1.5x, is
+     * 172 by 52, ten from the foot.
+     */
+    videoHeaderImage: "header_catfish.png"
+    videoTitleSize: Units.gu(1.8)
+    videoStateInHeader: true
+    videoStateSize: Units.gu(1.2)
+    /*
+     * The header at videocall.css's own size, 1x: drawn at the Pre3's 1.5x it
+     * left the name about a quarter of a 1080 wide screen (sargo, 2026-11-03),
+     * where the Pre3 had more than a third. Buttons 100 by 59 in the corners,
+     * the name at 18 over the state at 12. The 1.5x artwork is drawn at 1x.
+     * The stylesheet puts the caption 22 down, over the icon; here it sits
+     * under the icon, which is what fits the 59.
+     */
+    videoHeaderHeight: Units.gu(5.9)
+    videoButtonWidth: Units.gu(10)
+    videoButtonArtScale: 1.5
+    videoButtonIconTop: Units.gu(1.0)
+    videoButtonLabelTop: Units.gu(3.6)
+    videoButtonLabelSize: Units.gu(1.3)
+    videoHangupWidth: Units.gu(25.8)
+    videoHangupHeight: Units.gu(25.8 * 74 / 232)
+    videoHangupMargin: Units.gu(1.5)
 }

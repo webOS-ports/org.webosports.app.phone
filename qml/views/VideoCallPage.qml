@@ -17,7 +17,10 @@ import QtQuick 2.0
 import LunaNext.Common 0.1
 import LuneOS.Components 1.0
 
+import org.nemomobile.voicecall 1.0
+
 import "../services/PhoneNumberUtils.js" as PhoneNumberUtils
+import "../services/CallMessages.js" as CallMessages
 
 /**
  * A call with video on it.
@@ -42,6 +45,40 @@ BasePage {
     readonly property alias localVideoArea: localVideo
 
     signal closed();
+
+    /// Whether the far side's picture is showing yet. Not read-only only so
+    /// that a test, which has no decoder, can stand in for the first frame.
+    property bool hasRemotePicture: !!remotePicture.item && remotePicture.item.hasPicture === true
+
+    /// The far side's camera is on. When it goes off (<video state=6>) the
+    /// decoder keeps its last frame; showing that would freeze the far side
+    /// on screen, so the picture is hidden until the camera is back.
+    readonly property bool farCameraOn: !!voiceCall && voiceCall.incomingVideoState === "streaming"
+
+    /**
+     * The call's state, where VideoCall.js puts it under the name: "Starting
+     * Video..." until the call is up, then the running time. The far side's
+     * picture can take seconds to follow the call coming up, so it says so
+     * until the first frame too.
+     */
+    readonly property string stateText: {
+        if (!voiceCall)
+            return "";
+        switch (voiceCall.status) {
+        case VoiceCall.STATUS_ACTIVE:
+            // As VideoCall.js lineChanged: an active call shows its time.
+            // "Starting Video..." is for dialing only; holding it until the far
+            // side's picture came kept it up for a whole call with a far side
+            // that has no camera.
+            return PhoneNumberUtils.formatDuration(voiceCall.duration / 1000);
+        case VoiceCall.STATUS_HELD:
+            return CallMessages.callStateHold;
+        case VoiceCall.STATUS_DISCONNECTED:
+            return CallMessages.callStateEnding;
+        default:
+            return CallMessages.videoStateStarting;
+        }
+    }
 
     gradient: null
     color: '#1a1a1a'
@@ -68,6 +105,7 @@ BasePage {
             id: remotePicture
             objectName: "remotePicture"
             anchors.fill: parent
+            visible: videoCallPage.farCameraOn
             active: !!videoCallPage.voiceCall && String(videoCallPage.voiceCall.videoURI || "").length > 0
             source: "RemoteVideo.qml"
             onLoaded: {
@@ -80,13 +118,16 @@ BasePage {
                 item.frameHeight = Qt.binding(function() {
                     return videoCallPage.voiceCall ? (videoCallPage.voiceCall.videoHeight || 0) : 0;
                 });
+                item.quarterTurns = Qt.binding(function() {
+                    return videoCallPage.voiceCall ? (videoCallPage.voiceCall.incomingVideoOrientation || 0) : 0;
+                });
             }
         }
 
         Text {
             objectName: "noVideoLabel"
             anchors.centerIn: parent
-            visible: !(remotePicture.item && remotePicture.item.running)
+            visible: !videoCallPage.hasRemotePicture || !videoCallPage.farCameraOn
             color: '#4a4a4a'
             font.pixelSize: Units.gu(1.8)
             text: qsTr("No video")
@@ -129,6 +170,33 @@ BasePage {
                 anchors.fill: parent
                 anchors.margins: 7
                 color: '#0d0d0d'
+                clip: true
+
+                // Our own camera, as the engine publishes it while we send.
+                Loader {
+                    id: ownPicture
+                    objectName: "ownPicture"
+                    anchors.fill: parent
+                    active: !!videoCallPage.voiceCall && String(videoCallPage.voiceCall.videoPreviewURI || "").length > 0
+                    source: "RemoteVideo.qml"
+                    onLoaded: {
+                        item.shmPath = Qt.binding(function() {
+                            return videoCallPage.voiceCall ? String(videoCallPage.voiceCall.videoPreviewURI || "") : "";
+                        });
+                        item.frameWidth = Qt.binding(function() {
+                            return videoCallPage.voiceCall ? (videoCallPage.voiceCall.videoPreviewWidth || 0) : 0;
+                        });
+                        item.frameHeight = Qt.binding(function() {
+                            return videoCallPage.voiceCall ? (videoCallPage.voiceCall.videoPreviewHeight || 0) : 0;
+                        });
+                        item.quarterTurns = Qt.binding(function() {
+                            return videoCallPage.voiceCall ? (videoCallPage.voiceCall.videoPreviewOrientation || 0) : 0;
+                        });
+                        item.mirrored = Qt.binding(function() {
+                            return !!videoCallPage.voiceCall && videoCallPage.voiceCall.videoPreviewMirrored === true;
+                        });
+                    }
+                }
             }
 
             MouseArea {
@@ -155,17 +223,23 @@ BasePage {
         id: header
 
         anchors { top: parent.top; left: parent.left; right: parent.right }
-        height: Units.gu(8.9)
+        height: videoCallPage.appTheme.videoHeaderHeight
 
+        // One row of the artwork, stretched to the header's height: tiled both
+        // ways it repeated down the header in bands wherever the header is
+        // taller than the file.
         Image {
+            objectName: "headerArt"
             anchors.fill: parent
-            source: appTheme.image("vidHeader.png")
-            fillMode: Image.Tile
+            source: appTheme.image(appTheme.videoHeaderImage)
+            fillMode: Image.TileHorizontally
         }
 
         Column {
+            objectName: "headerTitle"
             anchors.centerIn: parent
-            width: parent.width - Units.gu(32)
+            // Between the two buttons, with a little air either side.
+            width: parent.width - 2 * videoCallPage.appTheme.videoButtonWidth - Units.gu(1)
             spacing: Units.gu(0.2)
 
             Text {
@@ -174,7 +248,7 @@ BasePage {
                 elide: Text.ElideRight
                 color: 'white'
                 font.bold: true
-                font.pixelSize: Units.gu(2.4)
+                font.pixelSize: appTheme.videoTitleSize
                 text: {
                     var name = videoCallPage.currentContact
                                    ? String(videoCallPage.currentContact.displayLabel || "").trim() : "";
@@ -190,6 +264,16 @@ BasePage {
                 }
             }
 
+            Text {
+                objectName: "headerState"
+                width: parent.width
+                visible: appTheme.videoStateInHeader
+                horizontalAlignment: Text.AlignHCenter
+                elide: Text.ElideRight
+                color: 'white'
+                font.pixelSize: appTheme.videoStateSize
+                text: videoCallPage.stateText
+            }
         }
 
         // Our camera on or off; the far side's picture stays. Only on a device
@@ -204,9 +288,13 @@ BasePage {
                      && videoCallPage.voiceCallMgrWrapper.videoSendCapable === true
 
             iconSource: appTheme.image("video_on_off.png")
+            stateWidth: 37
             label: qsTr("Video")
             dividerOnLeft: false
-            on: videoCallPage.voiceCall ? videoCallPage.voiceCall.outgoingVideo === true : false
+            // Lit while our camera is off, as mute is while the microphone
+            // is: VideoCall.js sets the button's state when outgoingVideo is
+            // not true, and the lit artwork is the camera struck through.
+            on: videoCallPage.voiceCall ? videoCallPage.voiceCall.outgoingVideo !== true : false
 
             onClicked: {
                 if (videoCallPage.voiceCall && videoCallPage.voiceCall.changeMedia)
@@ -221,6 +309,7 @@ BasePage {
             anchors { right: parent.right; top: parent.top; bottom: parent.bottom }
 
             iconSource: appTheme.image("mute_on_off.png")
+            stateWidth: 36
             label: qsTr("Audio")
             dividerOnLeft: true
             on: videoCallPage.voiceCallMgrWrapper
@@ -237,9 +326,12 @@ BasePage {
     /*
      * How long the call has been up. The header owns this label, but the
      * tablet stylesheet drops it six hundred pixels down the screen, so it
-     * reads just above the button that ends the call.
+     * reads just above the button that ends the call. The handset keeps it
+     * in the header.
      */
     Text {
+        objectName: "footerState"
+        visible: !appTheme.videoStateInHeader
         anchors {
             bottom: hangup.top
             bottomMargin: Units.gu(1)
@@ -247,24 +339,23 @@ BasePage {
         }
         color: 'white'
         font.bold: true
-        font.pixelSize: Units.gu(1.4)
-        text: videoCallPage.voiceCall
-                  ? PhoneNumberUtils.formatDuration(videoCallPage.voiceCall.duration / 1000)
-                  : ""
+        font.pixelSize: appTheme.videoStateSize
+        text: videoCallPage.stateText
     }
 
     // Ends the call, standing clear of the foot of the screen as the original
-    // has it.
+    // has it, at the size each look's stylesheet gives it.
     SpriteIcon {
         id: hangup
+        objectName: "hangup"
 
         anchors {
             bottom: parent.bottom
-            bottomMargin: Units.gu(1.5)
+            bottomMargin: appTheme.videoHangupMargin
             horizontalCenter: parent.horizontalCenter
         }
-        width: Units.gu(11.6)
-        height: Units.gu(3.7)
+        width: appTheme.videoHangupWidth
+        height: appTheme.videoHangupHeight
 
         // Up, down and disabled, stacked in the one file.
         source: appTheme.image("hangup_dartfish.png")

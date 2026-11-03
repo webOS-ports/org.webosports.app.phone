@@ -191,6 +191,7 @@ Item {
         call.incomingVideo = line.incomingVideo === true;
         call.outgoingVideo = line.outgoingVideo === true;
         call.incomingVideoState = line.incomingVideoState || "unavailable";
+        call.incomingVideoOrientation = (line.incomingVideoOrientation | 0) & 3;
         var allow = line.allowVideoCalls !== undefined ? line.allowVideoCalls
                   : (payload && payload.allowVideoCalls !== undefined ? payload.allowVideoCalls : true);
         call.allowVideoCalls = allow !== false;
@@ -199,6 +200,12 @@ Item {
         call.videoWidth = uri.length > 0 ? (payload.videoWidth || 0) : 0;
         call.videoHeight = uri.length > 0 ? (payload.videoHeight || 0) : 0;
         call.videoURI = uri;
+        var preview = uri.length > 0 && typeof payload.videoPreviewURI === "string" ? payload.videoPreviewURI : "";
+        call.videoPreviewWidth = preview.length > 0 ? (payload.videoPreviewWidth || 0) : 0;
+        call.videoPreviewHeight = preview.length > 0 ? (payload.videoPreviewHeight || 0) : 0;
+        call.videoPreviewOrientation = preview.length > 0 ? ((payload.videoPreviewOrientation | 0) & 3) : 0;
+        call.videoPreviewMirrored = preview.length > 0 && payload.videoPreviewMirrored === true;
+        call.videoPreviewURI = preview;
     }
 
     function _onCallControlRequested(method, params) {

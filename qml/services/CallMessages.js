@@ -35,6 +35,8 @@ var callStateHold = qsTr("On hold");
 var callStateIncoming = qsTr("Incoming");
 var callStateWaiting = qsTr("Call waiting");
 var callStateActive = qsTr("Active");
+// The video call header (shared/activecall/VideoCall.js) until the picture comes.
+var videoStateStarting = qsTr("Starting Video...");
 
 // Call log.
 var logIncoming = qsTr("Incoming call");

@@ -18,6 +18,8 @@
 import QtQuick 2.0
 import QtTest 1.2
 
+import org.nemomobile.voicecall 1.0
+
 import "../qml/views"
 import "../qml/services"
 
@@ -42,6 +44,7 @@ Item {
         when: windowShown
 
         PhoneUiTheme { id: theme }
+        TabletUiTheme { id: tabletTheme }
 
         Component { id: transportComponent; SynergyTransport { transportId: "com.palm.whatsapp" } }
         Component { id: pageComponent; VideoCallPage {} }
@@ -50,8 +53,10 @@ Item {
             id: fakeCallComponent
             QtObject {
                 property string lineId: "+10000000000"
+                property int status: VoiceCall.STATUS_ACTIVE
                 property int duration: 0
                 property bool outgoingVideo: false
+                property string incomingVideoState: "unavailable"
                 property string videoURI: ""
                 property int videoWidth: 0
                 property int videoHeight: 0
@@ -312,6 +317,110 @@ Item {
             verify(loader.active);
             call.videoURI = "";
             verify(!loader.active);
+        }
+
+        function videoPage(callProps, pageTheme) {
+            var call = createTemporaryObject(fakeCallComponent, root, callProps || {});
+            var wrapper = createTemporaryObject(wrapperComponent, root, { videoSendCapable: true });
+            return createTemporaryObject(pageComponent, root,
+                                         { appTheme: pageTheme || theme, voiceCall: call,
+                                           voiceCallMgrWrapper: wrapper });
+        }
+
+        // VideoCall.js lights the camera button when outgoingVideo is not true,
+        // and its lit artwork is the camera struck through: it is lit while
+        // our camera is off, as mute is while the microphone is.
+        function test_theCameraButtonIsLitWhileOurCameraIsOff() {
+            var page = videoPage({ outgoingVideo: true });
+            var button = findByName(page, "videoButton");
+            verify(!button.on);
+            compare(button._state, 0);
+            page.voiceCall.outgoingVideo = false;
+            verify(button.on);
+            compare(button._state, 2);
+        }
+
+        // As legacy: an active call shows its time, picture or not. The far side
+        // may never send one (a phone without a camera).
+        function test_anActiveCallShowsItsTimeBeforeThePictureComes() {
+            var page = videoPage({ videoURI: "/tmp/wa-rtc-video", videoWidth: 480,
+                                   videoHeight: 640, duration: 65000 });
+            compare(page.stateText, "01:05");
+            page.hasRemotePicture = true;
+            compare(page.stateText, "01:05");
+        }
+
+        // The far side turns its camera off (<video state=6>): the decoder keeps
+        // its last frame, which must not stay on screen as if the far side froze.
+        function test_theFarSidesCameraOffHidesItsLastFrame() {
+            var page = videoPage({ videoURI: "/tmp/wa-rtc-video", videoWidth: 480, videoHeight: 640,
+                                   incomingVideoState: "streaming" });
+            page.hasRemotePicture = true;
+            var picture = findByName(page, "remotePicture");
+            var label = findByName(page, "noVideoLabel");
+            verify(picture.visible, "the picture is hidden while the far camera is on");
+            verify(!label.visible);
+            page.voiceCall.incomingVideoState = "available";
+            verify(!picture.visible, "the last frame stays up with the far camera off");
+            verify(label.visible, "nothing says there is no video");
+            page.voiceCall.incomingVideoState = "streaming";
+            verify(picture.visible, "the picture does not come back with the camera");
+        }
+
+        function test_aCallWithoutVideoShowsItsTimeAtOnce() {
+            var page = videoPage({ duration: 65000 });
+            compare(page.stateText, "01:05");
+        }
+
+        function test_theStateFollowsTheCall() {
+            var page = videoPage({ status: VoiceCall.STATUS_DIALING });
+            compare(page.stateText, "Starting Video...");
+            page.voiceCall.status = VoiceCall.STATUS_HELD;
+            compare(page.stateText, "On hold");
+            page.voiceCall.status = VoiceCall.STATUS_DISCONNECTED;
+            compare(page.stateText, "Ending");
+        }
+
+        // videocall.css keeps the state under the name; videocall-tablet.css
+        // drops it to just above the hangup button.
+        function test_eachLookPutsTheStateWhereItsStylesheetDoes() {
+            var phone = videoPage({}, theme);
+            verify(findByName(phone, "headerState").visible);
+            verify(!findByName(phone, "footerState").visible);
+            var tablet = videoPage({}, tabletTheme);
+            verify(!findByName(tablet, "headerState").visible);
+            verify(findByName(tablet, "footerState").visible);
+        }
+
+        function test_eachLookSizesItsHangup() {
+            var phone = findByName(videoPage({}, theme), "hangup");
+            var tablet = findByName(videoPage({}, tabletTheme), "hangup");
+            compare(phone.width, theme.videoHangupWidth);
+            compare(tablet.width, tabletTheme.videoHangupWidth);
+            verify(phone.width > tablet.width, "the handset's is 172 to the tablet's 116");
+        }
+
+        // The handset's header is videocall.css at its own 1x: at the Pre3's
+        // 1.5x the buttons left the name a quarter of a 1080 wide screen.
+        function test_theHandsetHeaderIsTheStylesheetAt1x() {
+            var page = videoPage({}, theme);
+            var button = findByName(page, "videoButton");
+            compare(button.width, theme.videoButtonWidth);
+            verify(theme.videoButtonWidth < tabletTheme.videoButtonWidth, "the handset's buttons are the tablet's");
+            verify(theme.videoHeaderHeight < tabletTheme.videoHeaderHeight, "the handset's header is the tablet's");
+            compare(findByName(page, "headerArt").height, theme.videoHeaderHeight);
+            // The name has the room between the two buttons, less a little air.
+            var title = findByName(page, "headerTitle");
+            var between = page.width - 2 * button.width;
+            verify(title.width <= between, "the name runs under the buttons");
+            verify(title.width > between - button.width / 2, "the name has far less than the room between the buttons");
+        }
+
+        // Tiled both ways, an artwork shorter than the header repeated down it.
+        function test_theHeaderArtworkIsStretchedDownNotRepeated() {
+            var art = findByName(videoPage({}, theme), "headerArt");
+            compare(art.fillMode, Image.TileHorizontally);
+            verify(String(art.source).indexOf("header_catfish.png") >= 0);
         }
 
         // --- the question itself
