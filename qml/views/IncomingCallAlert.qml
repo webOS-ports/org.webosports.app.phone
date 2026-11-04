@@ -45,6 +45,7 @@ WebOSWindow {
     property VoiceCallMgrWrapper voiceCallManager
     property QtObject voiceCall;
     property UiTheme appTheme;
+    property QtObject callTransports
 
     property Contact currentContact: Contact { contactsModel: contacts; lineId: voiceCall ? voiceCall.lineId : "" }
 
@@ -159,6 +160,9 @@ WebOSWindow {
 
         appTheme: incomingCallAlert.appTheme
         currentContact: incomingCallAlert.currentContact
+        serviceLabel: incomingCallAlert.callTransports && incomingCallAlert.voiceCall
+                      ? incomingCallAlert.callTransports.callServiceLabel(incomingCallAlert.voiceCall.providerId)
+                      : ""
 
         onAnswerClicked: {
             if (!voiceCall)

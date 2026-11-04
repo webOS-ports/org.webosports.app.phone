@@ -22,6 +22,7 @@ import LunaNext.Common 0.1
 
 import "../qml/views"
 import "../qml/model"
+import "../qml/services"
 
 /**
  * The incoming call strip, in both looks: the height each legacy release
@@ -49,6 +50,13 @@ Item {
             IncomingCallStrip { width: 480 }
         }
 
+        Component {
+            id: viewComponent
+            IncomingCallView { width: 480; height: 800 }
+        }
+
+        CallTransports { id: transports }
+
         SignalSpy { id: answerSpy; signalName: "answerClicked" }
         SignalSpy { id: rejectSpy; signalName: "rejectClicked" }
 
@@ -66,6 +74,45 @@ Item {
             friend.avatarPath = Qt.resolvedUrl("../qml/views/images/phone/contacts-icon-frame.png");
             answerSpy.clear();
             rejectSpy.clear();
+            transports.transports = {
+                "com.palm.telephony": { templateId: "com.palm.telephony" },
+                "com.palm.teams": { templateId: "com.palm.teams", serviceName: "type_teams" }
+            };
+        }
+
+        function detail(item, name) {
+            var found = findChild(item, name);
+            verify(found !== null, "no " + name);
+            return found.text;
+        }
+
+        // A Teams call from someone not in Contacts said "Unknown" where a
+        // stranger's number says where it is from; an IM address cannot.
+        function test_a_synergy_call_names_its_service() {
+            compare(transports.callServiceLabel("com.palm.teams"), "Teams");
+            compare(transports.callServiceLabel("com.palm.telephony"), "");
+            compare(transports.callServiceLabel("com.palm.nosuch"), "");
+            compare(transports.callServiceLabel(undefined), "");
+
+            var strip = makeStrip(phone, stranger);
+            strip.serviceLabel = transports.callServiceLabel("com.palm.teams");
+            compare(detail(strip, "callerDetail"), "Teams");
+
+            var view = createTemporaryObject(viewComponent, root,
+                                             { appTheme: phone, currentContact: stranger,
+                                               serviceLabel: "Teams" });
+            compare(detail(view, "callerDetail"), "Teams");
+            view.currentContact = friend;
+            compare(detail(view, "callerKind"), "Teams");
+        }
+
+        function test_a_cellular_call_keeps_the_number_details() {
+            var strip = makeStrip(phone, friend);
+            compare(detail(strip, "callerDetail"), friend.numberType);
+
+            var view = createTemporaryObject(viewComponent, root,
+                                             { appTheme: phone, currentContact: stranger });
+            compare(detail(view, "callerDetail"), stranger.geoLocation);
         }
 
         function test_a_stranger_has_no_photo() {

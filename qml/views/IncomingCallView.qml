@@ -40,6 +40,10 @@ Item {
 
     property UiTheme appTheme
     property Contact currentContact
+    // The messaging service a Synergy call comes over ("Teams"); blank for a
+    // cellular call. It stands where a stranger's number would show where it
+    // is from, which an IM address cannot say.
+    property string serviceLabel: ""
 
     signal answerClicked()
     signal rejectClicked()
@@ -137,8 +141,11 @@ Item {
                 elide: Text.ElideRight
                 color: "white"
                 font.pixelSize: Units.gu(1.6)
+                objectName: "callerDetail"
                 text: !root.currentContact ? ""
-                    : callerBox.known ? root.currentContact.addr : root.currentContact.geoLocation
+                    : callerBox.known ? root.currentContact.addr
+                    : root.serviceLabel.length > 0 ? root.serviceLabel
+                    : root.currentContact.geoLocation
             }
             Text {
                 width: parent.width
@@ -147,7 +154,10 @@ Item {
                 elide: Text.ElideRight
                 color: "#cccccc"
                 font.pixelSize: Units.gu(1.4)
-                text: callerBox.known ? root.currentContact.numberType : ""
+                objectName: "callerKind"
+                text: !callerBox.known ? ""
+                    : root.serviceLabel.length > 0 ? root.serviceLabel
+                    : root.currentContact.numberType
             }
         }
 

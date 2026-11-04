@@ -259,6 +259,7 @@ WebOSWindow {
         contacts: personListModelId
         voiceCallManager: voiceCallMgrWrapperId
         appTheme: phoneUiTheme
+        callTransports: callTransportsId
         visible: false
     }
 
