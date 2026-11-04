@@ -78,9 +78,12 @@ QtObject {
             contactObj.familyName = person.foundPerson.name.familyName;
             contactObj.givenName = person.foundPerson.name.givenName;
             contactObj.personId = person.foundPerson._id;
-            if(person.foundPerson.photos) {
-                contactObj.avatarPath = person.foundPerson.photos.listPhotoPath;
-            }
+            // A person without a photo still has a photos record, with every
+            // path in it empty; it keeps the stand-in rather than showing
+            // an empty frame.
+            var photos = person.foundPerson.photos;
+            if (photos && photos.listPhotoPath)
+                contactObj.avatarPath = photos.listPhotoPath;
             if(person.foundPhoneNumber && person.foundPhoneNumber.type) {
                 contactObj.numberType = contactsModel.getPhoneNumberTypeStr(person.foundPhoneNumber.type);
             }
