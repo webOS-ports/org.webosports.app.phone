@@ -33,4 +33,5 @@ export QT_QPA_PLATFORM
 exec "$QMLTESTRUNNER" -input tests \
     -import "$COMPONENTS/modules" \
     -import "$COMPONENTS/test/imports" \
+    -import tests/imports \
     "$@"

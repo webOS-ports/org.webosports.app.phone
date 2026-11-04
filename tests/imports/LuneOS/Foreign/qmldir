@@ -1,0 +1,2 @@
+module LuneOS.Foreign
+singleton RtcVideoFactory 1.0 RtcVideoFactory.qml
