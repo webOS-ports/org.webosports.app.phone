@@ -72,14 +72,20 @@ Item {
         width: Math.min(avatarBackground.width * 0.6, avatarBackground.height * 0.75)
         height: width
 
+        objectName: "callerPhoto"
         asynchronous: true
-        fillMode: Image.PreserveAspectFit
+        // Cropped to the square, as the call screen does: the unknown-caller
+        // stand-in is wider than it is tall, and fitted it left a dark band
+        // across the top and bottom of the frame.
+        fillMode: Image.PreserveAspectCrop
         smooth: true
-        source: root.currentContact ? root.currentContact.avatarPath : ""
+        source: root.currentContact ? root.currentContact.avatarPath
+                                    : root.appTheme.image("contacts-unknown-icon-large.png")
 
         visible: false
     }
     CornerShader {
+        objectName: "callerPhotoShape"
         anchors.fill: imageAvatar
         source: imageAvatar
         radius: 35
