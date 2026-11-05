@@ -108,8 +108,33 @@ elsewhere for the mocks; anything else on the command line is passed through to
 qmltestrunner, so `./run-tests.sh -functions` lists what there is.
 
 The cases that care about the shape of the device switch profile themselves
-through `Settings.setProfile()`, so a single run covers both looks -- there is
-no profile to pass in here.
+through `Settings.setProfile()`, so a single run covers both looks.
+
+### Screens
+
+`screens/tst_screens.qml` builds the whole app, `main.qml` as the desktop host
+does, and goes to each of its screens the way a user would: the dialer (empty,
+and with a number typed), the contact list from the number field, the contacts
+callable over video, favourites, the call log, the app menu, Phone Preferences,
+Phone Accounts, a call being placed (the "which service?" question, dialling,
+then connected), and an incoming call, in the alert strip and on the page.
+Each is saved to `build/test-output/screens/<profile>-<screen>.png`, and
+checked for being there, inside the window, with a size, and with no text off
+the sides.
+
+`run-tests.sh` runs it once per device in `PROFILES`, by default the
+mindphone (480x800), the Q25 (720x720), the TouchPad (1024x768) and the radon
+(720x1600, with a notch and rounded corners). Unlike the cases above it cannot
+switch profile itself: Units and FontUtils read the grid unit once, as they
+load. So each device runs against a copy of luneos-components'
+`LunaNext.Common` whose default profile is that device:
+
+    PROFILES="q25 radon" ./run-tests.sh     # the screens on two devices
+    PROFILES= ./run-tests.sh                # only the cases in tests/
+
+On a handset the contact list cannot be reached from the number field: the
+keypad comes straight back over it. The screens test marks that as an
+expected failure, so a fix shows up as an unexpected pass.
 
 
 How to Build on Linux
