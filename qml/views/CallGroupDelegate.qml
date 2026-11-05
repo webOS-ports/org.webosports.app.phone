@@ -421,14 +421,26 @@ Column {
                 }
             }
 
-            // Tapping the row calls back over whichever account it used;
-            // dragging it sideways reveals the delete button.
+            // Tapping the row calls back over whichever account it used, and
+            // tapping its camera calls back with video; dragging it sideways
+            // reveals the delete button.
             MouseArea {
                 id: rowArea
                 anchors.fill: parent
                 z: -1
 
                 property real _pressX: 0
+
+                // The camera, with a finger's width around it: it is drawn
+                // 3 gu wide, too small to hit on its own.
+                function _onCamera(x, y) {
+                    if (!videoMarker.visible)
+                        return false;
+                    var p = videoMarker.mapFromItem(rowArea, x, y);
+                    var slack = Units.gu(1.5);
+                    return p.x >= -slack && p.x <= videoMarker.width + slack &&
+                           p.y >= -slack && p.y <= videoMarker.height + slack;
+                }
 
                 onPressed: (mouse) => { _pressX = mouse.x; }
                 onReleased: (mouse) => {
@@ -442,7 +454,7 @@ Column {
                                callGroupDelegate.dialHandler && callGroupDelegate.contactAddress.addr) {
                         callGroupDelegate.dialHandler.dial(callGroupDelegate.contactAddress.addr,
                                                            callGroupDelegate.isSynergyCall ? callGroupDelegate.callService : "",
-                                                           false);
+                                                           _onCamera(mouse.x, mouse.y));
                     }
                 }
             }
