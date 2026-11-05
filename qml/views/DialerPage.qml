@@ -335,9 +335,20 @@ BasePage {
      */
     readonly property real keypadWidth: 3 * Math.floor(naturalKeypadWidth * chromeScale / 3)
 
+    /**
+     * On a tall handset the height left over would stretch every key taller
+     * than it is wide - the 720x1600 ones got keys a third taller than wide,
+     * and "voicemail", sized from the key's height, ran out to the edges of
+     * the 1. So a key is at most square, and the panel, centred on the page,
+     * is that much shorter. A Pre3-shaped screen, and anything squatter,
+     * never reaches the cap.
+     */
+    readonly property real padKeysMaximumHeight: 4 * keypadWidth / 3 + Units.gu(2)
+
     readonly property real padKeysHeight: fillsScreen
-                                              ? Math.max(0, height - entryHeight
-                                                            - matchHeight - dialHeight)
+                                              ? Math.min(padKeysMaximumHeight,
+                                                         Math.max(0, height - entryHeight
+                                                                     - matchHeight - dialHeight))
                                               : padWidth * 0.95
 
     Item {

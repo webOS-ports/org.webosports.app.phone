@@ -50,6 +50,14 @@ status=0
     "$@" || status=1
 
 [ -n "$PROFILES" ] || exit $status
+# The screens are drawn through OpenGL, as on a device. Offscreen, Qt Quick
+# otherwise falls back to its software renderer, which leaves out every
+# shader effect - the rounded photos (CornerShader) among them - so the
+# pictures showed empty frames the device never does. QT_QUICK_BACKEND=software
+# puts the software renderer back where there is no OpenGL.
+QT_QUICK_BACKEND=${QT_QUICK_BACKEND-rhi}
+QSG_RHI_BACKEND=${QSG_RHI_BACKEND-opengl}
+export QT_QUICK_BACKEND QSG_RHI_BACKEND
 COMMON=$(mktemp -d)
 trap 'rm -rf "$COMMON"' EXIT
 mkdir -p build/test-output/screens

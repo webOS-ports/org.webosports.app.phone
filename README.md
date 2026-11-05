@@ -115,12 +115,12 @@ through `Settings.setProfile()`, so a single run covers both looks.
 `screens/tst_screens.qml` builds the whole app, `main.qml` as the desktop host
 does, and goes to each of its screens the way a user would: the dialer (empty,
 and with a number typed), the contact list from the number field, the contacts
-callable over video, favourites, the call log, the app menu, Phone Preferences,
-Phone Accounts, a call being placed (the "which service?" question, dialling,
-then connected), and an incoming call, in the alert strip and on the page.
-Each is saved to `build/test-output/screens/<profile>-<screen>.png`, and
-checked for being there, inside the window, with a size, and with no text off
-the sides.
+callable over video, favourites, the call log, the app menu, Phone Preferences
+and Phone Accounts (each also scrolled to its end), a call being placed (the
+"which service?" question, dialling, then connected), and an incoming call, in
+the alert strip and on the page. Each is saved to
+`build/test-output/screens/<profile>-<screen>.png`, and checked for being
+there, inside the window, with a size, and with no text off the sides.
 
 `run-tests.sh` runs it once per device in `PROFILES`, by default the
 mindphone (480x800), the Q25 (720x720), the TouchPad (1024x768) and the radon
@@ -131,6 +131,12 @@ load. So each device runs against a copy of luneos-components'
 
     PROFILES="q25 radon" ./run-tests.sh     # the screens on two devices
     PROFILES= ./run-tests.sh                # only the cases in tests/
+
+The screens are drawn through OpenGL (`QT_QUICK_BACKEND=rhi`,
+`QSG_RHI_BACKEND=opengl`), as on a device: Qt's software renderer, which
+offscreen would otherwise be used, draws no shader effects, and so none of the
+rounded contact photos. On a host with no OpenGL, `QT_QUICK_BACKEND=software`
+runs them anyway, without the check that the caller's photo is drawn.
 
 On a handset the contact list cannot be reached from the number field: the
 keypad comes straight back over it. The screens test marks that as an

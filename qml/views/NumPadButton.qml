@@ -78,6 +78,8 @@ Item {
         anchors.bottomMargin: root.height * 0.12
         color:appTheme.subForegroundColor
         font.pixelSize: fontSize/2.5
+        // Named so the layout tests can measure it.
+        objectName: "subLabel"
     }
 
     ClippedImage {

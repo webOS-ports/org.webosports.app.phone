@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>
  */
 
-import QtQuick 2.0
+import QtQuick 2.15
 import QtTest 1.2
 
 import LunaNext.Common 0.1
@@ -48,6 +48,10 @@ TestCase {
     readonly property string profile: Settings.profileName
     readonly property string shotDir: decodeURIComponent(
         Qt.resolvedUrl("../build/test-output/screens").toString().replace(/^file:\/\//, ""))
+
+    // The software renderer draws no shader effects, so what is drawn
+    // through one cannot be looked for in its pictures.
+    readonly property int graphicsApi: GraphicsInfo.api
 
     property var app: null
     property var win: null
@@ -216,6 +220,19 @@ TestCase {
         inWindow(findChild(win.contentItem, "numberEntry"), "the number field");
         shot("dialer");
         noTextOffSides("dialer");
+        // However tall the screen, a key is no taller than it is wide, and
+        // the letters under each digit keep inside their key.
+        verify(pad.keysHeight <= pad.keysWidth + 1,
+               "a key is " + pad.keysWidth + " wide and " + pad.keysHeight + " tall");
+        var subs = findAll(pad, function(i) { return i.objectName === "subLabel" && shown(i); });
+        verify(subs.length > 0, "the letters under the digits");
+        for (var i = 0; i < subs.length; ++i) {
+            var key = subs[i].parent;
+            var x = subs[i].mapToItem(key, 0, 0).x + (subs[i].width - subs[i].contentWidth) / 2;
+            verify(x >= Units.gu(0.5) && x + subs[i].contentWidth <= key.width - Units.gu(0.5),
+                   "\"" + subs[i].text + "\" inside its key: " + Math.round(x) + ", "
+                       + Math.round(subs[i].contentWidth) + " wide in " + key.width);
+        }
 
         // A number typed: the field, and the contacts it matches.
         findChild(win.contentItem, "numberEntry").text = "555";
@@ -282,6 +299,33 @@ TestCase {
         noTextOffSides("call log");
     }
 
+    /**
+     * A settings page longer than the screen scrolls, by a finger, all the
+     * way to its last row, and that row ends above the Done bar rather than
+     * under it. The end gets a picture of its own.
+     */
+    function scrollsAboveDone(name) {
+        var content = findAll(win.contentItem, function(i) {
+            return i.maximumContentWidth !== undefined && i.contentHeight !== undefined && shown(i);
+        })[0];
+        verify(content, name + ": the page's content");
+        var done = textItem(qsTr("Done"));
+        verify(done, name + ": the Done bar");
+        var doneTop = done.mapToItem(win.contentItem, 0, 0).y;
+        var top = content.mapToItem(win.contentItem, 0, 0).y;
+        verify(top + content.height <= doneTop + 1,
+               name + ": the content ends at " + (top + content.height) + ", under Done at " + doneTop);
+        for (var i = 0; i < 30 && content.contentHeight > content.height && !content.atYEnd; ++i) {
+            mouseDrag(content, content.width / 2, content.height * 0.8, 0, -content.height * 0.6);
+            wait(50);
+        }
+        tryVerify(function() { return content.contentHeight <= content.height || content.atYEnd; }, 3000,
+                  name + ": scrolls to its end, at " + content.contentY + " of "
+                      + (content.contentHeight - content.height));
+        shot(name + "-end");
+        content.contentY = 0;
+    }
+
     function test_5_app_menu_and_preferences() {
         backToTabs();
         win.openAppMenu();
@@ -291,6 +335,7 @@ TestCase {
         settle();
         shot("preferences");
         noTextOffSides("preferences");
+        scrollsAboveDone("preferences");
         clickText(qsTr("Done"));
         settle();
         verify(!textItem(qsTr("Phone Preferences")), "Done closes the preferences");
@@ -301,6 +346,7 @@ TestCase {
         settle();
         shot("accounts");
         noTextOffSides("accounts");
+        scrollsAboveDone("accounts");
         clickText(qsTr("Done"));
         settle();
         verify(!textItem(qsTr("Phone Accounts")), "Done closes the accounts");
@@ -343,6 +389,38 @@ TestCase {
         settle();
     }
 
+    /**
+     * The caller's photo, or the unknown-caller stand-in, fills its square in
+     * the frame: the picture differs from the frame alone in the middle of
+     * the square and near its top edge, where a stand-in fitted rather than
+     * cropped left a band of bare frame.
+     */
+    function callerPhotoDrawn() {
+        var photo = findChild(win.contentItem, "callerPhoto");
+        var shape = findChild(win.contentItem, "callerPhotoShape");
+        verify(photo && shape, "the caller's photo");
+        compare(photo.status, Image.Ready, "the caller's photo loads: " + photo.source);
+        if (graphicsApi === GraphicsInfo.Software) {
+            console.warn("the software renderer draws no CornerShader; not looking for the photo");
+            return;
+        }
+        var r = photo.mapToItem(win.contentItem, 0, 0);
+        var points = [[0.5, 0.5], [0.5, 0.06]];
+        function sample(img) {
+            return points.map(function(p) {
+                return img.pixel(Math.round(r.x + photo.width * p[0]), Math.round(r.y + photo.height * p[1]));
+            });
+        }
+        var withPhoto = sample(grabImage(win.contentItem));
+        shape.visible = false;
+        wait(50);
+        var without = sample(grabImage(win.contentItem));
+        shape.visible = true;
+        for (var i = 0; i < points.length; ++i)
+            verify(!Qt.colorEqual(withPhoto[i], without[i]),
+                   "the photo is drawn at " + points[i] + " of its square: " + withPhoto[i] + " as the bare frame");
+    }
+
     function test_7_incoming_call() {
         backToTabs();
         var vcm = app.launchServices.voiceCallManager;
@@ -373,6 +451,7 @@ TestCase {
         settle();
         shot("incoming");
         noTextOffSides("incoming call");
+        callerPhotoDrawn();
         vcm.hangupAll();
         tryVerify(function() { return vcm.callCount === 0; }, 3000, "the call is gone");
         settle();
