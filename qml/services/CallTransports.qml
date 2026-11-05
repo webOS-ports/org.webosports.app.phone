@@ -157,6 +157,18 @@ Item {
         return ServiceLabels.transportLabel(resolved, transports[resolved]);
     }
 
+    /**
+     * The service name to show for a call's providerId: blank for a cellular
+     * call and for a provider this registry does not know, so an unrecognised
+     * id is never tidied into something that looks like a service name.
+     */
+    function callServiceLabel(providerId) {
+        var provider = providerId || "";
+        if (provider.length === 0 || provider === cellularTransport) return "";
+        if (!transportFor(provider)) return "";
+        return labelFor(provider);
+    }
+
     function implementationFor(id) {
         var transport = transportFor(id);
         return transport ? transport.implementation : "";

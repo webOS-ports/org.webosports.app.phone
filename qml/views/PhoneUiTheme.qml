@@ -164,4 +164,16 @@ UiTheme {
     videoHangupWidth: Units.gu(25.8)
     videoHangupHeight: Units.gu(25.8 * 74 / 232)
     videoHangupMargin: Units.gu(1.5)
+    /*
+     * .videoPip in videocall.css, 1x like the header: 143 by 103 inside a
+     * three pixel shadow, six in from the left and ten up from the foot.
+     * The foot here is the hangup button's top, which stands over the
+     * picture; the stylesheet's sat below it.
+     */
+    videoPipWidth: Units.gu(14.3)
+    videoPipHeight: Units.gu(10.3)
+    videoPipPadding: Units.gu(0.3)
+    videoPipLeft: Units.gu(0.6)
+    videoPipTop: Units.gu(1.0)
+    videoPipAtFoot: true
 }

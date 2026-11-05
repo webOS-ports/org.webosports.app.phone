@@ -68,6 +68,12 @@ Item {
      * code, a USSD string, an in-call control digit or a launch code.
      */
     function dial(rawAddress, transport, video) {
+        // Callers name a service the way their data does: Messaging and the
+        // contact points say "type_signal", the drivers are keyed "com.palm.signal".
+        // Unresolved, the dial found no driver and went out over the modem.
+        if (transport && callTransports)
+            transport = callTransports.resolveTransport(transport) || transport;
+
         // An IM address is not a dial string: it may be a username, and it must
         // not be run through the GSM rules or the speed-dial prefixes.
         if (transport && callTransports &&

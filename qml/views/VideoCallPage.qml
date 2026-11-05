@@ -134,31 +134,57 @@ BasePage {
         }
 
         /*
-         * This side, in its own frame. The original pins it to the corner;
-         * here it can be dragged anywhere over the far side's picture, and is
-         * kept inside it however the window is resized.
+         * This side, in its own frame, where each look's stylesheet puts
+         * .videoPip: the handset's at the foot of the picture, the tablet's at
+         * its top, both to the left. Here it can be dragged anywhere over the
+         * far side's picture, and is kept inside it however the window is
+         * resized.
          */
         BorderImage {
             id: pip
             objectName: "pip"
 
             // Only while we send our own picture.
-            visible: !!videoCallPage.voiceCall && videoCallPage.voiceCall.outgoingVideo === true
+            readonly property bool sending: !!videoCallPage.voiceCall && videoCallPage.voiceCall.outgoingVideo === true
+            visible: sending
 
-            width: Units.gu(20.2)
-            height: Units.gu(15.4)
+            /// Our picture turned on its side (a phone held upright, from a
+            /// sensor that is wider than tall): the frame stands up with it,
+            /// rather than showing a narrow picture in a wide frame.
+            readonly property bool sideways: !!videoCallPage.voiceCall
+                                             && ((videoCallPage.voiceCall.videoPreviewOrientation | 0) & 1) === 1
+            readonly property real frameLong: appTheme.videoPipWidth + 2 * appTheme.videoPipPadding
+            readonly property real frameShort: appTheme.videoPipHeight + 2 * appTheme.videoPipPadding
 
-            x: Units.gu(0.6)
-            y: Units.gu(1.6)
+            width: sideways ? frameShort : frameLong
+            height: sideways ? frameLong : frameShort
+
+            // Where the stylesheet has it, until dragged.
+            x: appTheme.videoPipLeft
+            y: appTheme.videoPipAtFoot
+               ? Math.max(0, hangup.y - remoteVideo.y - appTheme.videoPipTop - height)
+               : appTheme.videoPipTop
 
             source: appTheme.image("dropshadowboarder_PIP.png")
             border { left: 7; right: 7; top: 7; bottom: 7 }
 
+            /// Dragged away from where the stylesheet puts it; from then on it
+            /// stays where it was put, kept inside the picture.
+            property bool moved: false
+
             function keepInside() {
-                x = Math.max(0, Math.min(x, remoteVideo.width - width));
-                y = Math.max(0, Math.min(y, remoteVideo.height - height));
+                if (!moved)
+                    return;
+                var nx = Math.max(0, Math.min(x, remoteVideo.width - width));
+                var ny = Math.max(0, Math.min(y, remoteVideo.height - height));
+                if (nx !== x)
+                    x = nx;
+                if (ny !== y)
+                    y = ny;
             }
 
+            onWidthChanged: keepInside()
+            onHeightChanged: keepInside()
             Connections {
                 target: remoteVideo
                 function onWidthChanged() { pip.keepInside(); }
@@ -168,16 +194,22 @@ BasePage {
             Rectangle {
                 id: localVideo
                 anchors.fill: parent
-                anchors.margins: 7
+                anchors.margins: appTheme.videoPipPadding
                 color: '#0d0d0d'
                 clip: true
 
-                // Our own camera, as the engine publishes it while we send.
+                /*
+                 * Our own camera, as the engine publishes it while we send.
+                 * Read only while the inset shows: a reader nobody looks at
+                 * would still take its frames off the GUI thread, which the
+                 * far side's picture shares.
+                 */
                 Loader {
                     id: ownPicture
                     objectName: "ownPicture"
                     anchors.fill: parent
-                    active: !!videoCallPage.voiceCall && String(videoCallPage.voiceCall.videoPreviewURI || "").length > 0
+                    active: pip.sending && videoCallPage.visible
+                            && String(videoCallPage.voiceCall.videoPreviewURI || "").length > 0
                     source: "RemoteVideo.qml"
                     onLoaded: {
                         item.shmPath = Qt.binding(function() {
@@ -209,6 +241,7 @@ BasePage {
                 drag.maximumX: Math.max(0, remoteVideo.width - pip.width)
                 drag.maximumY: Math.max(0, remoteVideo.height - pip.height)
                 drag.threshold: 0
+                drag.onActiveChanged: if (drag.active) pip.moved = true
 
                 cursorShape: Qt.OpenHandCursor
             }

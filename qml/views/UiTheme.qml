@@ -305,6 +305,18 @@ QtObject {
     property real videoHangupWidth: Units.gu(11.6)
     property real videoHangupHeight: Units.gu(3.7)
     property real videoHangupMargin: Units.gu(1.5)
+    /**
+     * This side's inset, .videoPip: 202 by 154 inside a seven pixel shadow,
+     * sixteen down and six in from the top left of the picture.
+     */
+    property real videoPipWidth: Units.gu(20.2)
+    property real videoPipHeight: Units.gu(15.4)
+    property real videoPipPadding: Units.gu(0.7)
+    property real videoPipLeft: Units.gu(0.6)
+    property real videoPipTop: Units.gu(1.6)
+    /// Whether the inset sits at the foot of the picture rather than at its
+    /// top (videoPipTop is then its distance from the hangup button).
+    property bool videoPipAtFoot: false
 
     /**
      * Retained for compatibility with the existing views.

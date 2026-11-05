@@ -20,6 +20,8 @@ import QtQuick 2.0
 import LuneOS.Service 1.0
 import org.nemomobile.voicecall 1.0
 
+import "IncomingCallsService.js" as IncomingCallsService
+
 /**
  * Drives calls on one Synergy transport.
  *
@@ -107,6 +109,14 @@ Item {
         return state === "conference_active" || state === "conference_hold";
     }
 
+    // A disconnected line carries the connector's reason in
+    // disconnectDetails.cause; "answeredElsewhere" means another of the user's
+    // devices took the call.
+    function _answeredElsewhere(line) {
+        return !!line.disconnectDetails
+                && line.disconnectDetails.cause === "answeredElsewhere";
+    }
+
     function _findCall(callId) {
         for (var i = 0; i < calls.length; ++i) {
             if (calls[i].callId === callId)
@@ -150,6 +160,12 @@ Item {
                     call.displayName = entry.displayName;
                 if (entry.address && entry.address.length > 0)
                     call.lineId = entry.address;
+
+                // Answered on another device: say so before the call is seen to
+                // end, which is when it would be counted as missed.
+                if (status === VoiceCall.STATUS_DISCONNECTED && call.isIncoming
+                        && _answeredElsewhere(line))
+                    IncomingCallsService.callAnsweredElsewhere(call.handlerId);
 
                 call.isMultiparty = conference || (line.calls.length > 1);
                 call.isVideo = call.isVideo || video

@@ -60,6 +60,16 @@ function callWentLive(handlerId) {
 }
 
 /**
+ * An incoming call the service says was answered on another of the user's
+ * devices (a messaging account signed in on a computer or another phone):
+ * it was answered, so it is neither a missed call nor worth a "Missed call"
+ * alert, and the call log files it as incoming.
+ */
+function callAnsweredElsewhere(handlerId) {
+    __callsActions[handlerId] = Accepted;
+}
+
+/**
  * Remembers which way a call went, taken from a state only one direction can
  * reach: dialling or alerting means we placed it, ringing or waiting means it
  * came to us.

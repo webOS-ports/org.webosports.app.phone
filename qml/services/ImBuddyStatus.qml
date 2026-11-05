@@ -76,12 +76,12 @@ Item {
     // connector signal ends up as a db8 merge, and a merge bumps _rev even when
     // it writes the same values. Only wake listeners when something they render
     // actually changed, or a busy roster rebuilds every contact list for nothing.
-    function _refresh() {
+    function _refresh(rows) {
         var buddies = {};
         var signature = [];
 
-        for (var i = 0; i < buddyModel.count; ++i) {
-            var buddy = buddyModel.get(i);
+        for (var i = 0; i < rows.length; ++i) {
+            var buddy = rows[i];
             if (!buddy.username || !buddy.serviceName)
                 continue;
 
@@ -107,27 +107,62 @@ Item {
         onTriggered: imBuddyStatus.revision = imBuddyStatus.revision + 1
     }
 
-    Db8Model {
-        id: buddyModel
+    // Presence is transient, so imlibpurple and the connectors keep this kind
+    // in tempdb, not in the main db8. Db8Model only reaches com.palm.db, where
+    // the kind does not exist ("kind not registered"), so the watch is made on
+    // tempdb directly.
+    readonly property string _findUri: "luna://com.webos.service.tempdb/find"
+    property var _watch: null
+    property int _generation: 0
 
-        kind: "com.palm.imbuddystatus:1"
-        watch: true
-        query: ({})
-
-        Component.onCompleted: {
-            if(buddyModel.setTestDataFile) {
-                buddyModel.setTestDataFile(Qt.resolvedUrl("../test/imbuddystatus.json"));
-            }
-        }
-
-        onCountChanged: imBuddyStatus._refresh()
+    LunaService {
+        id: lunaService
+        name: "org.webosports.app.phone"
     }
 
-    // The device's Db8Model reloads a watched query with a model reset, and
-    // signals countChanged only when the number of rows changed: a buddy
-    // going from offline to online arrives only as the reset.
-    Connections {
-        target: buddyModel
-        function onModelReset() { imBuddyStatus._refresh(); }
+    Component.onCompleted: _query()
+
+    /// Reads every buddy again; the first page carries the watch.
+    function _query() {
+        _generation = _generation + 1;
+        if (_watch && _watch.cancel)
+            _watch.cancel();
+        _watch = _page(null, [], _generation);
+    }
+
+    function _page(page, rows, generation) {
+        var params = { query: { from: "com.palm.imbuddystatus:1" } };
+        if (page)
+            params.query.page = page;
+        else
+            params.watch = true;
+
+        return _send(params, !page, function(response) {
+            if (generation !== _generation)
+                return;
+            if (response.fired) {
+                _query();
+                return;
+            }
+            if (response.returnValue === false) {
+                console.warn("ImBuddyStatus: " + response.errorText);
+                return;
+            }
+            rows = rows.concat(response.results || []);
+            if (response.next)
+                _page(response.next, rows, generation);
+            else
+                _refresh(rows);
+        });
+    }
+
+    /// One find on tempdb. A watch stays open for its "fired" reply, a later
+    /// page is a single reply. The tests replace this.
+    function _send(params, watch, onReply) {
+        var reply = function(message) { onReply(JSON.parse(message.payload)); };
+        var error = function(text) { console.warn("ImBuddyStatus: " + text); };
+        if (watch)
+            return lunaService.subscribe(_findUri, JSON.stringify(params), reply, error);
+        return lunaService.call(_findUri, JSON.stringify(params), reply, error);
     }
 }

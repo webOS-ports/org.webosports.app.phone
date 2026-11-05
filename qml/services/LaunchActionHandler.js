@@ -21,6 +21,9 @@
 //
 //   luna-send -n 1 luna://com.webos.applicationManager/launch \
 //     '{"id":"org.webosports.app.phone","params":{"action":"dial","address":"4157773456"}}'
+//   and over an IM service, as video:
+//     '{"id":"org.webosports.app.phone","params":{"action":"dial","address":"+31611745571",
+//       "transport":"type_whatsapp","video":true}}'
 //
 // Supported actions: dial, answer, reject, swap, merge, extract, dtmf,
 // activecall, voicemail, calllog, favorites, dialpad.
@@ -60,9 +63,12 @@ function isBackgroundAction(action) {
 }
 
 var _handlers = {
+    // `transport` names the service to call over ("type_signal", or a template
+    // id); without it the call is cellular. Messaging sends both, so a chat on
+    // Signal calls on Signal rather than as a phone call.
     "dial": function(params, services) {
         if (!params.address) return;
-        services.dialHandler.dial(params.address);
+        services.dialHandler.dial(params.address, params.transport, params.video === true);
     },
 
     "voicemail": function(params, services) {

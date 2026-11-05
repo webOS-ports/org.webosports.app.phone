@@ -48,11 +48,23 @@ Item {
     /// can be open long before the far side's first picture.
     property bool hasPicture: false
 
+    // Stops the reader before Qt tears the source down: Qt's teardown of a
+    // source that still has frames coming can crash on a streaming thread
+    // (camera turned off in a video call on sargo, 2026-11-04;
+    // RtcVideoFactory.stopShmSource in luneos-rtc-engine). An older
+    // LuneOS.Foreign without it is stopped as before.
+    function _stopSource(session) {
+        var source = session.nativeVideoSource;
+        if (!source)
+            return;
+        if (typeof RtcVideoFactory.stopShmSource === "function")
+            RtcVideoFactory.stopShmSource(source);
+        source.stop();
+        session.nativeVideoSource = null;
+    }
+
     function _stop() {
-        if (captureSession.nativeVideoSource) {
-            captureSession.nativeVideoSource.stop();
-            captureSession.nativeVideoSource = null;
-        }
+        _stopSource(captureSession);
     }
 
     function _restart() {

@@ -50,5 +50,13 @@
 			"update": "allow",
 			"delete": "allow"
         }
+    },
+    {
+        "type": "db.kind",
+        "object": "com.palm.callcapabilities:1",
+        "caller": "com.palm.bluetooth",
+        "operations": {
+			"read": "allow"
+        }
     }
 ]

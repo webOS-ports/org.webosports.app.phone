@@ -91,9 +91,10 @@ WebOSWindow {
                 return;
         }
 
-        // A bare address is the old way of asking for a call.
+        // A bare address is the old way of asking for a call; it may name the
+        // service to call over too, as the legacy launch did.
         if (params.address) {
-            dialHandlerId.dial(params.address);
+            dialHandlerId.dial(params.address, params.transport, params.video === true);
             return;
         }
 
@@ -258,6 +259,7 @@ WebOSWindow {
         contacts: personListModelId
         voiceCallManager: voiceCallMgrWrapperId
         appTheme: phoneUiTheme
+        callTransports: callTransportsId
         visible: false
     }
 

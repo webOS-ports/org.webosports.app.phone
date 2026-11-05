@@ -30,6 +30,9 @@ BasePage {
 
         appTheme: incommingCallDialog.appTheme
         currentContact: incommingCallDialog.currentContact
+        serviceLabel: incommingCallDialog.callTransports && incommingCallDialog.voiceCall
+                      ? incommingCallDialog.callTransports.callServiceLabel(incommingCallDialog.voiceCall.providerId)
+                      : ""
 
         onAnswerClicked: {
             IncomingCallsService.setActionForCall(voiceCall.handlerId, IncomingCallsService.Accepted);
