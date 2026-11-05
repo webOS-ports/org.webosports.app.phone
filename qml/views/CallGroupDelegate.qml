@@ -160,8 +160,14 @@ Column {
 
                     Image {
                         id: avatarPhotoImage
+                        objectName: "avatarPhoto"
                         anchors.fill: parent
-                        source: callGroupDelegate.remotePerson
+                        // A person without a photo still has a photos record,
+                        // with every path in it empty: keep the stand-in, as
+                        // the original always showed one.
+                        source: (callGroupDelegate.remotePerson &&
+                                 callGroupDelegate.remotePerson.photos &&
+                                 callGroupDelegate.remotePerson.photos.listPhotoPath)
                                     ? callGroupDelegate.remotePerson.photos.listPhotoPath
                                     : appTheme.image("list-avatar-default.png")
                         fillMode: Image.PreserveAspectCrop
@@ -189,10 +195,18 @@ Column {
 
                         Text {
                             // Capped against what the row has left for text,
-                            // and shrunk further by the layout when the count
-                            // pill and the star are there to be fitted beside
-                            // it. See detailsWidth.
-                            Layout.maximumWidth: callGroupDelegate.detailsWidth
+                            // less what the count pill and the star beside it
+                            // take, so a long name elides before them instead
+                            // of pushing them onto the call type and the time.
+                            // The original kept the count visible for any name.
+                            // See detailsWidth.
+                            objectName: "nameText"
+                            Layout.maximumWidth: Math.max(Units.gu(4), callGroupDelegate.detailsWidth
+                                                 - (countPill.visible ? countPill.Layout.preferredWidth
+                                                                        + countPill.Layout.leftMargin
+                                                                        + parent.spacing : 0)
+                                                 - (favoriteStar.visible ? favoriteStar.Layout.preferredWidth
+                                                                           + parent.spacing : 0))
                             color: appTheme.listTextColor
                             elide: Text.ElideRight
                             font.pixelSize: FontUtils.sizeToPixels("medium")
@@ -210,6 +224,8 @@ Column {
                          * end and the middle stretched, and set in bold.
                          */
                         BorderImage {
+                            id: countPill
+                            objectName: "countPill"
                             Layout.preferredWidth: Math.max(Units.gu(2.5),
                                                             countText.implicitWidth + Units.gu(1.4))
                             Layout.preferredHeight: Units.gu(2.4)
@@ -233,6 +249,8 @@ Column {
                         }
 
                         Image {
+                            id: favoriteStar
+                            objectName: "favoriteStar"
                             Layout.preferredWidth: Units.gu(1.6)
                             Layout.preferredHeight: Units.gu(1.6)
                             fillMode: Image.PreserveAspectFit
@@ -251,7 +269,12 @@ Column {
                         spacing: Units.gu(0.5)
 
                         Text {
-                            Layout.maximumWidth: callGroupDelegate.detailsWidth
+                            // Less the video marker, so it stays at the end of
+                            // this line and does not land under the call type.
+                            objectName: "serviceText"
+                            Layout.maximumWidth: Math.max(Units.gu(4), callGroupDelegate.detailsWidth
+                                                 - (videoMarker.visible ? videoMarker.Layout.preferredWidth
+                                                                          + parent.spacing : 0))
                             color: appTheme.callLogDetailColor
                             elide: Text.ElideRight
                             font.pixelSize: FontUtils.sizeToPixels("small")
@@ -261,6 +284,8 @@ Column {
                         }
 
                         Image {
+                            id: videoMarker
+                            objectName: "videoMarker"
                             Layout.preferredWidth: Units.gu(2)
                             Layout.preferredHeight: Units.gu(1.2)
                             fillMode: Image.PreserveAspectFit
@@ -277,6 +302,7 @@ Column {
                 // What kind of call it was. Coloured here, because this is the
                 // most recent call; the ones inside the drawer are grey.
                 ClippedImage {
+                    objectName: "callTypeIcon"
                     Layout.preferredWidth: Units.gu(2.2)
                     Layout.preferredHeight: Units.gu(2.2)
 
@@ -291,6 +317,7 @@ Column {
                 }
 
                 Text {
+                    objectName: "timeText"
                     Layout.preferredWidth: Units.gu(5)
                     horizontalAlignment: Text.AlignRight
                     color: appTheme.callLogDetailColor
