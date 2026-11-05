@@ -32,9 +32,10 @@ import "../services/PhoneNumberUtils.js" as PhoneNumberUtils
  * One call group in the call log.
  *
  * Laid out like com.palm.app.phone: the contact's photo on the left, their
- * name with the number of calls and a star if they are a favourite, the
- * service and number underneath, then the type of call, the time, and a button
- * that opens the individual calls.
+ * name with a star if they are a favourite, and the service and the number on
+ * lines of their own underneath. Then two columns that keep their place from
+ * row to row: the number of calls over the video marker, and the type of call
+ * over its time, as on the Pre. Last, a button that opens the individual calls.
  *
  * The artwork is the original's: call-log-list-sprite for the call type,
  * dashboard-unread for the count pill, expand-button for the disclosure.
@@ -76,8 +77,9 @@ Column {
     /**
      * What the name and the service line have left to share.
      *
-     * The row is a photo, two lines of text, the call type, the time and the
-     * disclosure button. Everything but the text has a size of its own, so
+     * The row is a photo, the lines of text, the count and video column, the
+     * call type and time column and the disclosure button. Everything but the
+     * text has a size of its own, so
      * what the text may take is the row less all of them -- and a long enough
      * line has to elide rather than push a neighbour off the end.
      *
@@ -94,13 +96,33 @@ Column {
      */
     readonly property real detailsWidth: {
         var fixed = Units.gu(4.4)          // the photo
-                  + Units.gu(2.2)          // what kind of call it was
-                  + Units.gu(5)            // the time
+                  + badgeColumnWidth       // the count over the video marker
+                  + Units.gu(5)            // the call type over the time
                   + Units.gu(3.4)          // the disclosure button
                   + Units.gu(1) * 4        // the gaps between those and the text
                   + Units.gu(0.8) * 2;     // the row's own margins
 
         return Math.max(Units.gu(6), callGroupDelegate.width - fixed);
+    }
+
+    /// The count and the video marker share one column of a set width, so
+    /// they stand at the same place in every row, whatever the name is. A
+    /// count too wide for it (three digits) widens the column of that row.
+    readonly property real badgeColumnWidth:
+        Math.max(Units.gu(3.4), countPill.width)
+
+    /// The tops of the first line and of the two below it, in the row's text
+    /// and in the two columns beside it, so all three keep to the same lines.
+    readonly property real firstLineHeight: Units.gu(2.4)
+    readonly property real lineGap: Units.gu(0.3)
+
+    /// The number, for its own line; left out when it is what the name line
+    /// already says, as for a username or an unnamed number.
+    readonly property string numberLine: {
+        var shown = nameText.text, n = numberForDisplay;
+        if (!n || n.length === 0) return "";
+        function bare(s) { return String(s).toLowerCase().replace(/[^0-9a-z]/g, ""); }
+        return bare(n) === bare(shown) ? "" : n;
     }
 
     // Swipe-to-delete, as on the legacy call log's SwipeableItem rows.
@@ -160,8 +182,14 @@ Column {
 
                     Image {
                         id: avatarPhotoImage
+                        objectName: "avatarPhoto"
                         anchors.fill: parent
-                        source: callGroupDelegate.remotePerson
+                        // A person without a photo still has a photos record,
+                        // with every path in it empty: keep the stand-in, as
+                        // the original always showed one.
+                        source: (callGroupDelegate.remotePerson &&
+                                 callGroupDelegate.remotePerson.photos &&
+                                 callGroupDelegate.remotePerson.photos.listPhotoPath)
                                     ? callGroupDelegate.remotePerson.photos.listPhotoPath
                                     : appTheme.image("list-avatar-default.png")
                         fillMode: Image.PreserveAspectCrop
@@ -175,31 +203,106 @@ Column {
                     }
                 }
 
-                ColumnLayout {
+                /*
+                 * Up to three lines: the name, the service, the number.
+                 *
+                 * Each has the whole width of the text to itself, so the name
+                 * and the number are seldom elided at all -- on two lines the
+                 * service took the front of the number's, and the count and
+                 * the video marker took the end of both. A line with nothing
+                 * to say is left out: cellular calls have no service, and a
+                 * number the name line already shows is not repeated.
+                 */
+                Item {
                     Layout.fillWidth: true
-                    // The ceiling the two lines are elided against, so a long
-                    // one cannot push the time and the disclosure button off
-                    // the end of the row.
+                    // The ceiling the lines are elided against, so a long one
+                    // cannot push the columns beside it off the end of the
+                    // row. See detailsWidth.
                     Layout.maximumWidth: callGroupDelegate.detailsWidth
-                    spacing: Units.gu(0.2)
+                    Layout.fillHeight: true
 
-                    RowLayout {
-                        Layout.fillWidth: true
-                        spacing: Units.gu(0.6)
+                    Item {
+                        id: textLines
+                        width: parent.width
+                        height: callGroupDelegate.firstLineHeight + callGroupDelegate.lineGap
+                                + lowerLines.height
+                        anchors.verticalCenter: parent.verticalCenter
 
-                        Text {
-                            // Capped against what the row has left for text,
-                            // and shrunk further by the layout when the count
-                            // pill and the star are there to be fitted beside
-                            // it. See detailsWidth.
-                            Layout.maximumWidth: callGroupDelegate.detailsWidth
-                            color: appTheme.listTextColor
-                            elide: Text.ElideRight
-                            font.pixelSize: FontUtils.sizeToPixels("medium")
-                            text: (callGroupDelegate.remotePerson && contactAddress.name)
-                                      ? contactAddress.name
-                                      : callGroupDelegate.numberForDisplay
+                        Row {
+                            height: callGroupDelegate.firstLineHeight
+                            spacing: Units.gu(0.6)
+
+                            Text {
+                                id: nameText
+                                objectName: "nameText"
+                                anchors.verticalCenter: parent.verticalCenter
+                                width: Math.min(implicitWidth, Math.max(Units.gu(4),
+                                           textLines.width - (favoriteStar.visible
+                                                              ? favoriteStar.width + parent.spacing : 0)))
+                                color: appTheme.listTextColor
+                                elide: Text.ElideRight
+                                font.pixelSize: FontUtils.sizeToPixels("medium")
+                                text: (callGroupDelegate.remotePerson && contactAddress.name)
+                                          ? contactAddress.name
+                                          : callGroupDelegate.numberForDisplay
+                            }
+
+                            Image {
+                                id: favoriteStar
+                                objectName: "favoriteStar"
+                                anchors.verticalCenter: parent.verticalCenter
+                                width: Units.gu(1.6)
+                                height: Units.gu(1.6)
+                                fillMode: Image.PreserveAspectFit
+                                source: appTheme.image("favorites-star-blue.png")
+                                visible: !!callGroupDelegate.remotePerson &&
+                                         callGroupDelegate.remotePerson.favorite === true
+                            }
                         }
+
+                        Column {
+                            id: lowerLines
+                            y: callGroupDelegate.firstLineHeight + callGroupDelegate.lineGap
+                            width: parent.width
+
+                            Text {
+                                id: serviceText
+                                objectName: "serviceText"
+                                width: parent.width
+                                visible: text.length > 0
+                                color: appTheme.callLogDetailColor
+                                elide: Text.ElideRight
+                                font.pixelSize: FontUtils.sizeToPixels("small")
+                                text: callGroupDelegate.serviceLabel
+                            }
+
+                            Text {
+                                id: numberText
+                                objectName: "numberText"
+                                width: parent.width
+                                visible: text.length > 0
+                                color: appTheme.callLogDetailColor
+                                elide: Text.ElideRight
+                                font.pixelSize: FontUtils.sizeToPixels("small")
+                                text: callGroupDelegate.numberLine
+                            }
+                        }
+                    }
+                }
+
+                /*
+                 * The count on the name's line, the video marker under it over
+                 * the two lines below. A column of their own beside the call
+                 * type, so both stand in the same place in every row.
+                 */
+                Item {
+                    Layout.preferredWidth: callGroupDelegate.badgeColumnWidth
+                    Layout.fillHeight: true
+
+                    Item {
+                        width: parent.width
+                        height: textLines.height
+                        anchors.verticalCenter: parent.verticalCenter
 
                         /*
                          * How many calls this group stands for.
@@ -210,10 +313,11 @@ Column {
                          * end and the middle stretched, and set in bold.
                          */
                         BorderImage {
-                            Layout.preferredWidth: Math.max(Units.gu(2.5),
-                                                            countText.implicitWidth + Units.gu(1.4))
-                            Layout.preferredHeight: Units.gu(2.4)
-                            Layout.leftMargin: Units.gu(0.4)
+                            id: countPill
+                            objectName: "countPill"
+                            width: Math.max(Units.gu(2.5), countText.implicitWidth + Units.gu(1.4))
+                            height: callGroupDelegate.firstLineHeight
+                            anchors.horizontalCenter: parent.horizontalCenter
 
                             visible: model.callcount > 1
 
@@ -232,72 +336,65 @@ Column {
                             }
                         }
 
-                        Image {
-                            Layout.preferredWidth: Units.gu(1.6)
-                            Layout.preferredHeight: Units.gu(1.6)
-                            fillMode: Image.PreserveAspectFit
-                            source: appTheme.image("favorites-star-blue.png")
-                            visible: !!callGroupDelegate.remotePerson &&
-                                     callGroupDelegate.remotePerson.favorite === true
-                        }
-
-                        Item { Layout.fillWidth: true }
-                    }
-
-                    // "WHATSAPP +31 6 1342 2104": the service, then the number,
-                    // with the small video marker where that account carries it.
-                    RowLayout {
-                        Layout.fillWidth: true
-                        spacing: Units.gu(0.5)
-
-                        Text {
-                            Layout.maximumWidth: callGroupDelegate.detailsWidth
-                            color: appTheme.callLogDetailColor
-                            elide: Text.ElideRight
-                            font.pixelSize: FontUtils.sizeToPixels("small")
-                            text: (callGroupDelegate.serviceLabel.length > 0
-                                       ? callGroupDelegate.serviceLabel + " " : "") +
-                                  callGroupDelegate.numberForDisplay
-                        }
-
-                        Image {
-                            Layout.preferredWidth: Units.gu(2)
-                            Layout.preferredHeight: Units.gu(1.2)
-                            fillMode: Image.PreserveAspectFit
-                            source: appTheme.image("icon-videocall-list.png")
+                        // The camera from the Video tab: the list's own marker
+                        // is drawn for 12 px and is lost at this size.
+                        ClippedImage {
+                            id: videoMarker
+                            objectName: "videoMarker"
+                            anchors.horizontalCenter: parent.horizontalCenter
+                            y: callGroupDelegate.firstLineHeight + callGroupDelegate.lineGap
+                               + (Math.max(lowerLines.height, height) - height) / 2
+                            wantedWidth: Units.gu(3)
+                            wantedHeight: Units.gu(3)
+                            source: appTheme.image("menu-icon-video.png")
+                            patchGridSize: Qt.size(1, 2)
+                            patch: Qt.point(0, 0)
                             visible: callGroupDelegate.isSynergyCall &&
                                      !!callGroupDelegate.callTransports &&
                                      callGroupDelegate.callTransports.supportsVideo(callGroupDelegate.callService)
                         }
-
-                        Item { Layout.fillWidth: true }
                     }
                 }
 
-                // What kind of call it was. Coloured here, because this is the
+                // What kind of call it was over when it was, as on the Pre's
+                // call log. The type is coloured here, because this is the
                 // most recent call; the ones inside the drawer are grey.
-                ClippedImage {
-                    Layout.preferredWidth: Units.gu(2.2)
-                    Layout.preferredHeight: Units.gu(2.2)
-
-                    source: appTheme.image("call-log-list-sprite.png")
-                    wantedWidth: Units.gu(2.2)
-                    wantedHeight: Units.gu(2.2)
-                    // Sized from the image; the two artwork sets differ.
-                    patchGridSize: Qt.size(1, 4)
-                    patch: (model.recentcall_type === "missed") ? Qt.point(0,0) :
-                           (model.recentcall_type === "incoming") ? Qt.point(0,1) :
-                           (model.recentcall_type === "ignored") ? Qt.point(0,3) : Qt.point(0,2)
-                }
-
-                Text {
+                Item {
                     Layout.preferredWidth: Units.gu(5)
-                    horizontalAlignment: Text.AlignRight
-                    color: appTheme.callLogDetailColor
-                    font.pixelSize: FontUtils.sizeToPixels("small")
+                    Layout.fillHeight: true
 
-                    property date timeStamp: new Date(model.timestamp)
-                    text: Qt.formatTime(timeStamp, Qt.locale().timeFormat(Locale.ShortFormat))
+                    Item {
+                        width: parent.width
+                        height: textLines.height
+                        anchors.verticalCenter: parent.verticalCenter
+
+                        ClippedImage {
+                            objectName: "callTypeIcon"
+                            anchors.horizontalCenter: parent.horizontalCenter
+                            y: (callGroupDelegate.firstLineHeight - height) / 2
+
+                            source: appTheme.image("call-log-list-sprite.png")
+                            wantedWidth: Units.gu(2.2)
+                            wantedHeight: Units.gu(2.2)
+                            // Sized from the image; the two artwork sets differ.
+                            patchGridSize: Qt.size(1, 4)
+                            patch: (model.recentcall_type === "missed") ? Qt.point(0,0) :
+                                   (model.recentcall_type === "incoming") ? Qt.point(0,1) :
+                                   (model.recentcall_type === "ignored") ? Qt.point(0,3) : Qt.point(0,2)
+                        }
+
+                        Text {
+                            objectName: "timeText"
+                            width: parent.width
+                            y: callGroupDelegate.firstLineHeight + callGroupDelegate.lineGap
+                            horizontalAlignment: Text.AlignHCenter
+                            color: appTheme.callLogDetailColor
+                            font.pixelSize: FontUtils.sizeToPixels("small")
+
+                            property date timeStamp: new Date(model.timestamp)
+                            text: Qt.formatTime(timeStamp, Qt.locale().timeFormat(Locale.ShortFormat))
+                        }
+                    }
                 }
 
                 // Opens the individual calls in this group.

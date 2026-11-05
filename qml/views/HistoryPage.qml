@@ -166,6 +166,8 @@ BasePage {
                 var eltSrc = sourceModel.get(i);
                 if(filter.length === 0 || historyListViewModel._matches(eltSrc, needle))
                 {
+                    // Sections go by the local date, not the stored UTC day.
+                    eltSrc.local_day = PhoneNumberUtils.localDayNumber(eltSrc.timestamp);
                     historyListViewModel.append(eltSrc);
                 }
             }
@@ -195,7 +197,7 @@ BasePage {
             clip: true
             model: historyListViewModel
 
-            section.property: "timestamp_day"
+            section.property: "local_day"
             section.criteria: ViewSection.FullString
 
             // The day, in grey caps, with a dark rule running to the edge.
@@ -217,8 +219,7 @@ BasePage {
                     font.capitalization: Font.AllUppercase
                     font.pixelSize: FontUtils.sizeToPixels("small")
 
-                    property date _timestamp: new Date(Number(section) * 86400000)
-                    text: PhoneNumberUtils.formatRelativeDay(_timestamp, Qt.locale())
+                    text: PhoneNumberUtils.formatRelativeDay(Number(section), Qt.locale())
                 }
 
                 Rectangle {
@@ -244,7 +245,7 @@ BasePage {
 
                 // The row before a day header must not draw a divider too.
                 lastOfDay: (index + 1) >= historyListViewModel.count ||
-                           historyListViewModel.get(index + 1).timestamp_day !== model.timestamp_day
+                           historyListViewModel.get(index + 1).local_day !== model.local_day
             }
 
             Text {
