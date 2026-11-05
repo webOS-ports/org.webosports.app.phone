@@ -216,7 +216,9 @@ Item {
         call.videoWidth = uri.length > 0 ? (payload.videoWidth || 0) : 0;
         call.videoHeight = uri.length > 0 ? (payload.videoHeight || 0) : 0;
         call.videoURI = uri;
-        var preview = uri.length > 0 && typeof payload.videoPreviewURI === "string" ? payload.videoPreviewURI : "";
+        // Our own camera is read on its own: a call we place sends from the
+        // start, and the far side may turn its camera on much later or never.
+        var preview = payload && typeof payload.videoPreviewURI === "string" ? payload.videoPreviewURI : "";
         call.videoPreviewWidth = preview.length > 0 ? (payload.videoPreviewWidth || 0) : 0;
         call.videoPreviewHeight = preview.length > 0 ? (payload.videoPreviewHeight || 0) : 0;
         call.videoPreviewOrientation = preview.length > 0 ? ((payload.videoPreviewOrientation | 0) & 3) : 0;
