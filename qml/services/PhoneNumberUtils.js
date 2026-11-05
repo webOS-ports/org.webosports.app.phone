@@ -117,15 +117,28 @@ function formatDurationLong(seconds) {
 }
 
 /**
- * The day a call log section stands for: "Today", "Yesterday", the weekday
- * within the last week, and a short numeric date beyond that -- which is what
- * com.palm.app.phone shows. The long locale date is far too wide for a header.
+ * The local calendar day a time in ms falls on, as a day count. The call
+ * group's stored timestamp_day is floor(timestamp / 86400000), a UTC day, so
+ * east of UTC a call made just after midnight lands on the day before, and a
+ * day header turned back into a date (UTC midnight) is not at local midnight.
+ * Two times on the same local date give the same number, whatever the zone.
  */
-function formatRelativeDay(date, locale) {
-    var today = new Date();
-    var startOfToday = new Date(today.getFullYear(), today.getMonth(), today.getDate());
-    var dayMs = 86400000;
-    var diffDays = Math.floor((startOfToday.getTime() - date.getTime()) / dayMs);
+function localDayNumber(ms) {
+    var d = new Date(ms);
+    return Math.floor(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()) / 86400000);
+}
+
+/**
+ * The day a call log section stands for, from its localDayNumber: "Today",
+ * "Yesterday", the weekday within the last week, and a short numeric date
+ * beyond that -- which is what com.palm.app.phone shows. The long locale date
+ * is far too wide for a header. now (ms) is for tests; it defaults to the
+ * current time.
+ */
+function formatRelativeDay(dayNumber, locale, now) {
+    var diffDays = localDayNumber(now !== undefined ? now : Date.now()) - dayNumber;
+    var u = new Date(dayNumber * 86400000);
+    var date = new Date(u.getUTCFullYear(), u.getUTCMonth(), u.getUTCDate());
 
     if (diffDays <= 0) return qsTr("Today");
     if (diffDays === 1) return qsTr("Yesterday");
