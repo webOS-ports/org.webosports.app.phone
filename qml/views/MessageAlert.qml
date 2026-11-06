@@ -177,8 +177,26 @@ WebOSWindow {
         height: Units.gu(4)
         spacing: Units.gu(1)
 
-        // Green to accept and red to decline where the user is being offered
-        // something; the flat dark button where there is only "Ok".
+        // webOS: green for what the user is being offered, the flat dark
+        // button where there is only "Ok"; Dismiss or Decline is the way out,
+        // the default light button on the left. Red is for destructive
+        // actions, and none of these ends or destroys anything (declining
+        // video leaves the call as it is).
+        LuneComponents.DialogButton {
+            text: messageAlert.cancelLabel
+            color: "white"
+            fontcolor: "#292929"
+            buttonWidth: Units.gu(16)
+            visible: messageAlert.cancelLabel.length > 0
+
+            onClicked: {
+                messageAlert.hide();
+                if (messageAlert.declineAction)
+                    messageAlert.declineAction();
+                messageAlert.dismissed();
+            }
+        }
+
         LuneComponents.DialogButton {
             text: messageAlert.acceptLabel
             color: messageAlert.affirmative ? "#2aa100" : "#171717"
@@ -190,21 +208,6 @@ WebOSWindow {
                 if (messageAlert.acceptAction)
                     messageAlert.acceptAction();
                 messageAlert.accepted();
-            }
-        }
-
-        LuneComponents.DialogButton {
-            text: messageAlert.cancelLabel
-            color: "#be0003"
-            fontcolor: "white"
-            buttonWidth: Units.gu(16)
-            visible: messageAlert.cancelLabel.length > 0
-
-            onClicked: {
-                messageAlert.hide();
-                if (messageAlert.declineAction)
-                    messageAlert.declineAction();
-                messageAlert.dismissed();
             }
         }
     }

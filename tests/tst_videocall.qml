@@ -455,6 +455,22 @@ Item {
             compare(answered, ["reject", "accept"]);
         }
 
+        // webOS: green for what is offered, red only for what destroys
+        // something; Dismiss and Decline are the default light button, left
+        // of the offer.
+        function test_theWayOutIsLightAndOnTheLeft() {
+            var alert = createTemporaryObject(alertComponent, root, { appTheme: theme });
+            alert.showQuestion("Switch to video?", "A wants to start a video call.", "",
+                               "Accept", function() {}, "Decline", function() {});
+            var decline = findByText(alert.contentItem, "Decline");
+            var accept = findByText(alert.contentItem, "Accept");
+            verify(Qt.colorEqual(accept.color, "#2aa100"));
+            verify(Qt.colorEqual(decline.color, "white"), "Decline is " + decline.color);
+            verify(!Qt.colorEqual(decline.color, "#be0003"));
+            tryVerify(function() { return decline.width > 0 && decline.mapToItem(null, 0, 0).x < accept.mapToItem(null, 0, 0).x; },
+                      2000, "Decline left of Accept");
+        }
+
         function test_anOrdinaryQuestionStillDismisses() {
             var alert = createTemporaryObject(alertComponent, root, { appTheme: theme });
             var ran = false;
