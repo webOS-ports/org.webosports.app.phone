@@ -294,18 +294,27 @@ Item {
 
     LunaService {
         id: lunaService
+        objectName: "lunaService"
         name: "org.webosports.app.phone"
+        onInitialized: {
+            synergyTransport._registered = true;
+            synergyTransport._subscribe();
+        }
     }
 
-    // Subscribe as soon as we know which service to talk to. The connector may
-    // restart, so this resubscribes rather than giving up.
+    // Subscribe as soon as we know which service to talk to and lunaService
+    // has its name on the bus. implementation is set while the transport is
+    // being created, before lunaService is registered; a call then fails with
+    // "LunaService is not registered" and the first five seconds of call
+    // state were lost to resubscribeTimer. The connector may restart, so this
+    // resubscribes rather than giving up.
     onImplementationChanged: _subscribe()
-    Component.onCompleted: _subscribe()
 
+    property bool _registered: false
     property bool _subscribed: false
 
     function _subscribe() {
-        if (_subscribed || implementation.length === 0)
+        if (_subscribed || !_registered || implementation.length === 0)
             return;
 
         var uri = _serviceUri();
