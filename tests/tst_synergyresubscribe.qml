@@ -63,6 +63,21 @@ Item {
             transport._subscribed = true;
         }
 
+        // implementation arrives while the transport is created, before its
+        // LunaService is registered; subscribing then failed and the call
+        // state of the first five seconds was lost.
+        function test_waitsForTheServiceToRegister() {
+            var fresh = createTemporaryObject(transportComponent, root);
+            var service = findByName(fresh, "lunaService");
+            verify(service !== null, "no lunaService");
+            fresh._registered = false;
+            fresh.implementation = "com.palm.whatsapp.transport";
+            verify(!fresh._subscribed, "subscribed before the service was registered");
+            verify(!findByName(fresh, "resubscribeTimer").running, "a retry was needed");
+            service.initialized();
+            verify(fresh._subscribed, "not subscribed once the service was registered");
+        }
+
         function test_serviceGoingAwayResubscribes() {
             transport._onCallState({ returnValue: false, errorCode: -1,
                                      errorText: "Service is down" });
