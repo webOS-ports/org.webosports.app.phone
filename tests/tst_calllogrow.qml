@@ -54,6 +54,15 @@ Item {
 
     ListModel { id: groups }
 
+    // Records what the row asks to dial instead of dialling.
+    DialHandler {
+        id: fakeDial
+        property var dialled: null
+        function dial(address, transport, video) {
+            dialled = { address: address, transport: transport, video: video === true };
+        }
+    }
+
     ListView {
         id: list
         anchors.fill: parent
@@ -62,6 +71,7 @@ Item {
             width: list.width
             contacts: testContacts
             callTransports: testTransports
+            dialHandler: fakeDial
             appTheme: theme
         }
     }
@@ -191,6 +201,39 @@ Item {
         function test_person_with_photo_keeps_it() {
             var r = row(group("Ann", 1, "p-photo", "com.palm.telegram", "+31612345678"));
             compare(String(part(r, "avatarPhoto").source), "file:///nonexistent/photo.png");
+        }
+
+        // The camera on a row is a video call back; the rest of the row a call without.
+        function test_camera_calls_back_with_video() {
+            var r = row(group("Ann", 1, "p-nophoto", "com.palm.telegram", "ann.1982"));
+            var cam = part(r, "videoMarker");
+            verify(cam.visible, "the account can do video");
+            fakeDial.dialled = null;
+            var c = cam.mapToItem(r, cam.width / 2, cam.height / 2);
+            mouseClick(r, c.x, c.y);
+            verify(fakeDial.dialled !== null, "the camera dials");
+            compare(fakeDial.dialled.address, "ann.1982");
+            compare(fakeDial.dialled.transport, "com.palm.telegram");
+            compare(fakeDial.dialled.video, true);
+
+            fakeDial.dialled = null;
+            var name = part(r, "nameText");
+            var n = name.mapToItem(r, Units.gu(1), name.height / 2);
+            mouseClick(r, n.x, n.y);
+            verify(fakeDial.dialled !== null, "the name dials");
+            compare(fakeDial.dialled.video, false);
+        }
+
+        // Without video on the account there is no camera, and no video call.
+        function test_no_camera_no_video_call() {
+            var r = row(group("Bob", 1, "p-nophoto", "com.palm.skype", "bob.1"));
+            verify(!part(r, "videoMarker").visible);
+            fakeDial.dialled = null;
+            var name = part(r, "nameText");
+            var n = name.mapToItem(r, Units.gu(1), name.height / 2);
+            mouseClick(r, n.x, n.y);
+            verify(fakeDial.dialled !== null);
+            compare(fakeDial.dialled.video, false);
         }
     }
 }

@@ -148,11 +148,21 @@ BasePage {
             readonly property bool sending: !!videoCallPage.voiceCall && videoCallPage.voiceCall.outgoingVideo === true
             visible: sending
 
-            /// Our picture turned on its side (a phone held upright, from a
-            /// sensor that is wider than tall): the frame stands up with it,
-            /// rather than showing a narrow picture in a wide frame.
-            readonly property bool sideways: !!videoCallPage.voiceCall
-                                             && ((videoCallPage.voiceCall.videoPreviewOrientation | 0) & 1) === 1
+            /// Our picture shows taller than wide: the frame stands up with it,
+            /// rather than showing a narrow picture in a wide frame. That is a
+            /// wide sensor's picture turned a quarter (a phone held upright), or
+            /// one that comes upright already, as Teams' does (240x320, no
+            /// turn). Without a size, the turn alone decides.
+            readonly property bool sideways: {
+                var c = videoCallPage.voiceCall;
+                if (!c)
+                    return false;
+                var turned = ((c.videoPreviewOrientation | 0) & 1) === 1;
+                var w = c.videoPreviewWidth | 0, h = c.videoPreviewHeight | 0;
+                if (w <= 0 || h <= 0)
+                    return turned;
+                return turned ? w > h : h > w;
+            }
             readonly property real frameLong: appTheme.videoPipWidth + 2 * appTheme.videoPipPadding
             readonly property real frameShort: appTheme.videoPipHeight + 2 * appTheme.videoPipPadding
 

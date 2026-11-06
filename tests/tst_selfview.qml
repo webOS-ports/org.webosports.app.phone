@@ -144,6 +144,22 @@ Item {
             compare(pip.width, f.h);
         }
 
+        // A picture that comes upright, with no turn (Teams' 240x320): the
+        // frame stands up too, and lies down for a turned one.
+        function test_theInsetStandsUpForAnUprightPicture() {
+            var p = page({ videoPreviewWidth: 240, videoPreviewHeight: 320 }, theme);
+            var pip = findByName(p, "pip");
+            var f = frameOf(theme);
+            compare(pip.width, f.h);
+            compare(pip.height, f.w);
+            p.voiceCall.videoPreviewOrientation = 1;
+            compare(pip.width, f.w, "an upright picture turned a quarter is wide");
+            p.voiceCall.videoPreviewOrientation = 0;
+            p.voiceCall.videoPreviewWidth = 0;
+            p.voiceCall.videoPreviewHeight = 0;
+            compare(pip.width, f.w, "no size and no turn: wide");
+        }
+
         function test_aTurnedInsetStaysClearOfTheHangup() {
             var p = page({ videoPreviewOrientation: 1 }, theme);
             var pip = findByName(p, "pip");
