@@ -130,6 +130,33 @@ Item {
             compare(queries, 1, "asked again after a no");
         }
 
+        // The engine counts the cameras when video comes up, which is when the
+        // call's own media engine may hold the camera: its "no" lasts until
+        // that call ends, and the next call asks again.
+        function test_aNoIsAskedAgainOnTheNextCall() {
+            var first = createTemporaryObject(callComponent, root);
+            wrapper.callVideoChanged(first);
+            pendingAnswer(false);
+            verify(!wrapper.videoSendCapable);
+            wrapper.endingCall(first);
+            var second = createTemporaryObject(callComponent, root);
+            wrapper.callVideoChanged(second);
+            compare(queries, 2, "a no from an earlier call was kept");
+            pendingAnswer(true);
+            verify(wrapper.videoSendCapable, "the second answer was not kept");
+        }
+
+        function test_aYesIsKeptAcrossCalls() {
+            var first = createTemporaryObject(callComponent, root);
+            wrapper.callVideoChanged(first);
+            pendingAnswer(true);
+            wrapper.endingCall(first);
+            var second = createTemporaryObject(callComponent, root);
+            wrapper.callVideoChanged(second);
+            compare(queries, 1, "asked again after a yes");
+            verify(wrapper.videoSendCapable);
+        }
+
         // A call that stops showing video is no reason to ask.
         function test_aCallLeavingVideoDoesNotAsk() {
             var call = createTemporaryObject(callComponent, root, { showsVideo: false });

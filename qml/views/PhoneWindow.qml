@@ -481,7 +481,14 @@ WebOSWindow {
     property bool _videoCapabilityKnown: false
     property var _videoCapabilityWaiting: []
 
-    /// Runs `then` (if any) once the capability is known, asking at most once.
+    /**
+     * Runs `then` (if any) once the capability is known, asking at most once
+     * while a "no" stands. A "yes" is kept for good. A "no" is kept only until
+     * the call ends: the engine counts the cameras when video comes up, and
+     * then the call's own media engine may hold the camera, or the camera
+     * service may not be up yet after a boot. Kept for good, such a "no" hid
+     * the camera button on every later call until the app was restarted.
+     */
     function _learnVideoCapability(then) {
         if (_videoCapabilityKnown) {
             if (then)
@@ -500,6 +507,14 @@ WebOSWindow {
             _videoCapabilityWaiting = [];
             waiting.forEach(function(run) { run(); });
         });
+    }
+
+    /// A "no" from the engine is asked again on the next call (see above).
+    function _forgetVideoCapabilityNo() {
+        if (!_videoCapabilityKnown || voiceCallMgrWrapper.videoSendCapable)
+            return;
+        _videoCapabilityKnown = false;
+        _videoCapabilityAsked = false;
     }
 
     Connections {
@@ -532,6 +547,7 @@ WebOSWindow {
                 videoRequestAlert.hide();
                 videoRequestAlert.voiceCall = null;
             }
+            phoneWindowId._forgetVideoCapabilityNo();
         }
     }
 
