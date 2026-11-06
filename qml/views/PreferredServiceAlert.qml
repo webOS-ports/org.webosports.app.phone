@@ -121,11 +121,15 @@ Item {
             onCheckedChanged: preferredServiceAlert.remember = checked
         }
 
-        // Red, as .enyo-button-negative is in the theme the legacy dialog used.
+        // The way out, at the bottom: the default light button, as
+        // ConfirmDialog's reject. The legacy dialog's theme made it red
+        // (.enyo-button-negative), but the webOS guidelines keep red for
+        // destructive actions, and cancelling a call before it is placed
+        // destroys nothing.
         LuneComponents.DialogButton {
             text: qsTr("Cancel")
-            color: "#be0003"
-            fontcolor: "white"
+            color: "white"
+            fontcolor: "#292929"
             buttonWidth: dialog.dialogWidth - Units.gu(4)
 
             onClicked: preferredServiceAlert.visible = false
