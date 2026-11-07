@@ -56,6 +56,53 @@ Item {
     readonly property bool speakerOn: currentRoute === routeSpeaker
 
     /**
+     * A call with video is going on, on any transport (cellular calls have no
+     * isVideo and never count). Android starts such a call on the speaker
+     * unless a headset or Bluetooth is there - Telecom's
+     * isSpeakerphoneAutoEnabledForVideoCalls, for a call placed, answered or
+     * turned into video - and keeps the proximity sensor off for it
+     * (ProximityManager reads this too).
+     */
+    readonly property bool videoCallActive: {
+        if (!voiceCallManager) return false;
+        var calls = voiceCallManager.allCallsList || [];
+        for (var i = 0; i < calls.length; i++)
+            if (calls[i] && calls[i].isVideo === true) return true;
+        return false;
+    }
+
+    /// The video call is placed or answered, so its audio route matters now.
+    readonly property bool _videoCallLive: videoCallActive && !!voiceCallManager &&
+                                           (voiceCallManager.hasActiveCall || voiceCallManager.hasOutgoingCall)
+
+    /// The speaker was picked for this call's video already. Once per call,
+    /// as on Android: whatever the user picks afterwards stays, and the call
+    /// going back to voice does not move the audio either.
+    property bool _videoSpeakerDone: false
+
+    function _speakerForVideo() {
+        if (_videoSpeakerDone || wiredHeadsetConnected || bluetoothAvailable)
+            return false;
+        _videoSpeakerDone = true;
+        return true;
+    }
+
+    on_VideoCallLiveChanged: {
+        if (_videoCallLive && _speakerForVideo()) {
+            console.log("Video call: audio to the speaker");
+            setRoute(routeSpeaker);
+        }
+    }
+
+    Connections {
+        target: audioRouteManager.voiceCallManager
+        function onCallCountChanged() {
+            if (audioRouteManager.voiceCallManager.callCount === 0)
+                audioRouteManager._videoSpeakerDone = false;
+        }
+    }
+
+    /**
      * What the route button is, as webOS 2.x's ActiveCall
      * updateActiveAudioRouteButtonImage had it. With the handset and the
      * speaker only (a plugged-in headset stands in for the handset) it is
@@ -116,7 +163,10 @@ Item {
     /// Called when a call starts, to pick a sensible route without the user
     /// having to touch anything.
     function applyDefaultRoute() {
-        setRoute(onInductiveCharger ? routeSpeaker : _defaultRoute());
+        if (onInductiveCharger || (_videoCallLive && _speakerForVideo()))
+            setRoute(routeSpeaker);
+        else if (!_videoSpeakerDone)
+            setRoute(_defaultRoute());
     }
 
     // Docking on a Touchstone during a call switches to the back speaker, as on
