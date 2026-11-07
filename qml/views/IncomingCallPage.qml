@@ -15,7 +15,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>
  */
 
-import QtQuick 2.0
+import QtQuick 2.6
+import QtQuick.Window 2.3
 
 import "../services/IncomingCallsService.js" as IncomingCallsService
 
@@ -24,6 +25,42 @@ import "../services/IncomingCallsService.js" as IncomingCallsService
 BasePage {
     id: incommingCallDialog
     pageName: "IncomingCall"
+
+    /*
+     * Nothing on this page is typed into, so no text field may hold the
+     * focus while it is up: the on-screen keyboard comes up for whichever
+     * field has it, over the answer and decline buttons, and comes back each
+     * time the window is activated -- on sargo on 2026-11-07 a call rang out
+     * behind it. The page takes the focus as it is shown, and takes it back
+     * from any field that gets it while the call rings, wherever that field
+     * is in the window (a page under this one, a popup above it).
+     */
+    /// Read by DialerPage, whose keyboard proxy takes the focus back whenever
+    /// it loses it while the dialer shows: not from this page, or the two
+    /// would hand it back and forth while the page is pushed over the dialer.
+    readonly property bool holdsFocusFromFields: true
+
+    function _takeFocus() {
+        // Called later as well (see below), by which time the page may be gone.
+        if (!incommingCallDialog.visible)
+            return;
+        incommingCallDialog.forceActiveFocus();
+        Qt.inputMethod.hide();
+    }
+
+    onVisibleChanged: if (visible) _takeFocus()
+    Component.onCompleted: if (visible) _takeFocus()
+
+    /// Whatever has the focus in this window, followed as it moves.
+    readonly property Item _focusHolder: Window.activeFocusItem
+
+    on_FocusHolderChanged: {
+        var item = _focusHolder;
+        if (visible && item && item.inputMethodHints !== undefined && item.cursorPosition !== undefined)
+            // Not from inside the focus change itself: Qt is still handing
+            // the focus over, and a second change made now is lost.
+            Qt.callLater(_takeFocus);
+    }
 
     IncomingCallView {
         anchors.fill: parent

@@ -16,7 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>
  */
 
-import QtQuick 2.0
+import QtQuick 2.6
 import QtQuick.Controls 2.0
 import QtQuick.Window 2.1
 
@@ -162,7 +162,16 @@ BasePage {
     Timer {
         id: refocusTimer
         interval: 0
-        onTriggered: if (pDialPage.visible && !imProxy.activeFocus) pDialPage.takeKeyFocus();
+        onTriggered: {
+            if (!pDialPage.visible || imProxy.activeFocus)
+                return;
+            // A call screen pushed over the dialer took the focus on purpose
+            // (IncomingCallPage); taking it back would undo that.
+            var holder = pDialPage.Window.activeFocusItem;
+            if (holder && holder.holdsFocusFromFields === true)
+                return;
+            pDialPage.takeKeyFocus();
+        }
     }
 
     function reset() {
