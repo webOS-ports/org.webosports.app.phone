@@ -24,7 +24,9 @@ import LuneOS.Service 1.0
  *
  * Ported from the legacy source/proxInterface.js: the proximity sensor is only
  * enabled while a call is up *and* its audio is on the earpiece, so putting a
- * speakerphone call on the table does not black the screen out.
+ * speakerphone call on the table does not black the screen out. Never during
+ * a video call, even on the earpiece: the user is looking at the screen
+ * (Android's InCallUI ProximitySensor does the same for video calls).
  */
 Item {
     id: proximityManager
@@ -36,7 +38,8 @@ Item {
                                          (!!voiceCallManager.activeVoiceCall ||
                                           voiceCallManager.callCount > 0) &&
                                          (!audioRouteManager ||
-                                          audioRouteManager.currentRoute === audioRouteManager.routeEarpiece)
+                                          (audioRouteManager.currentRoute === audioRouteManager.routeEarpiece &&
+                                           !audioRouteManager.videoCallActive))
 
     property bool _enabled: false
     /// What subscribe() handed back. cancel() lives on that, not on the
