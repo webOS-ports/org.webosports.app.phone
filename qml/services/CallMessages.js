@@ -99,6 +99,21 @@ var dialFailure = {
     "insufficientfunds": qsTr("Insufficient funds.")
 };
 
+// A call we placed over an internet transport that the other side did not
+// take: declined, busy or not answered. The connectors say which, so the
+// alert says it rather than "Unable to connect", which is kept for calls that
+// could not be placed at all. Title, then text.
+var callNotTakenTitle = {
+    "declined": qsTr("Call declined"),
+    "busy": qsTr("Busy"),
+    "noanswer": qsTr("No answer")
+};
+var callNotTaken = {
+    "declined": qsTr("The call was declined."),
+    "busy": qsTr("The other party is in another call."),
+    "noanswer": qsTr("There was no answer.")
+};
+
 // Reasons a call in progress went away by itself.
 var droppedCallTitle = qsTr("Call dropped");
 var droppedCallDefault = qsTr("Call dropped.");

@@ -173,6 +173,11 @@ Item {
                                || line.incomingVideoState === "streaming";
                 _applyVideo(call, line, payload);
 
+                // Before the status: ending the call reads it.
+                if (status === VoiceCall.STATUS_DISCONNECTED && line.disconnectDetails
+                        && typeof line.disconnectDetails.cause === "string")
+                    call.disconnectCause = line.disconnectDetails.cause;
+
                 call.status = status;
             });
         });

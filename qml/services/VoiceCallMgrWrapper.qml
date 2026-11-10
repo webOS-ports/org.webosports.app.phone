@@ -93,6 +93,9 @@ Item {
 
     /// A call could not be placed. `reason` keys into CallMessages.dialFailure.
     signal dialFailed(string number, string reason);
+    /// A call we placed was declined, met a busy line or was not answered.
+    /// `reason` keys into CallMessages.callNotTaken.
+    signal callNotTaken(string number, string reason);
     /// A merge or split was refused. Nothing changed: the calls stay as they
     /// were. `message` is for the user.
     signal callControlFailed(string message);
@@ -901,7 +904,9 @@ Item {
             isEmergency: voiceCall.isEmergency,
             isMultiparty: voiceCall.isMultiparty,
             isForwarded: voiceCall.isForwarded,
-            isRemoteHeld: voiceCall.isRemoteHeld
+            isRemoteHeld: voiceCall.isRemoteHeld,
+            // an internet call's end cause (SynergyCall), "" for a cellular one
+            disconnectCause: voiceCall.disconnectCause || ""
         };
     }
 
@@ -922,8 +927,10 @@ Item {
         // Which of those, and whether a connected one dropped, the reason says.
         if (!endedVoiceCall.isIncoming && endedVoiceCall.duration === 0 && !wentLive &&
             IncomingCallsService.getActionForCall(handlerId) === IncomingCallsService.Missed) {
+            _reportConnectorCause(endedVoiceCall);
             callEndClassifier.callEnded(endedVoiceCall, false);
         } else if (wentLive || endedVoiceCall.duration > 0) {
+            _reportConnectorCause(endedVoiceCall);
             callEndClassifier.callEnded(endedVoiceCall, true);
         }
 
@@ -932,10 +939,20 @@ Item {
 
     property alias _callEnds: callEndClassifier
 
+    // An internet call's connector says why it ended (SynergyCall's
+    // disconnectCause); that stands in for the reason oFono gives a cellular
+    // call. Reported just before the end, so the classifier need not wait.
+    function _reportConnectorCause(endedVoiceCall) {
+        var reason = callEndClassifier.connectorReason(endedVoiceCall.disconnectCause);
+        if (reason.length > 0)
+            callEndClassifier.reasonReported(endedVoiceCall.lineId, reason);
+    }
+
     CallEndClassifier {
         id: callEndClassifier
         reasonsAvailable: callEndReasons.status === Loader.Ready
         onFailed: (call) => root.dialFailed(call.lineId, "callfailed")
+        onNotTaken: (call, reason) => root.callNotTaken(call.lineId, reason)
         onDropped: (call, reason) => root.callDropped(call, reason)
     }
 

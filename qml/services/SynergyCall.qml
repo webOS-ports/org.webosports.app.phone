@@ -56,6 +56,10 @@ QtObject {
     property bool isMultiparty: false
     property bool isForwarded: false
     property bool isRemoteHeld: false
+    /// Why the connector says the call ended (its line's
+    /// disconnectDetails.cause): "rejected", "busy", "missed", "normal", ...
+    /// Set before the status turns disconnected. Empty while the call is up.
+    property string disconnectCause: ""
 
     /// Milliseconds, as the nemo handler reports it.
     property int duration: 0

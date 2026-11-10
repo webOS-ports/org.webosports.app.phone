@@ -36,6 +36,9 @@ QtObject {
     property bool isRemoteHeld: false
     property date startedAt: new Date()
     property int duration: 0
+    // What a SynergyCall carries at its end (disconnectDetails.cause); a
+    // cellular call has none.
+    property string disconnectCause: ""
 
     // OfonoVoiceCallHandler::answer
     function answer() {

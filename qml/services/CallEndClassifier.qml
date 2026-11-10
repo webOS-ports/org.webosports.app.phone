@@ -34,6 +34,10 @@ import QtQuick 2.0
  * - A call that never connected failed, unless we ended it ourselves: that
  *   is someone changing their mind while it rang out. It counts as failed
  *   when the reason does not come, as all of these did before there was one.
+ * - Internet calls have no oFono reason; the connector's cause stands in for
+ *   it (connectorReason). Those tell three more endings of a call that never
+ *   connected apart, which are not failures: "declined", "busy" and
+ *   "noanswer". They come out as notTaken.
  */
 Item {
     id: classifier
@@ -44,6 +48,44 @@ Item {
 
     signal dropped(var call, string reason)
     signal failed(var call)
+    /// A call we placed that the other side declined, was busy for, or did
+    /// not answer. `reason` keys into CallMessages.callNotTaken.
+    signal notTaken(var call, string reason)
+
+    /**
+     * The reason for an internet call's end, from the connector's
+     * disconnectDetails.cause, in the terms callEnded's reasons use: "" when
+     * the cause says nothing we know, and the call is then judged as one
+     * without a reason. A plain end ("normal", "hangup") is taken as ours:
+     * the other side cannot end a call that never connected except by
+     * declining it, and for a connected call ours and theirs read the same.
+     */
+    function connectorReason(cause) {
+        switch (String(cause || "")) {
+        case "rejected":
+        case "declined":
+            return "declined";
+        case "busy":
+            return "busy";
+        case "missed":
+        case "timeout":
+        case "noanswer":
+            return "noanswer";
+        case "normal":
+        case "hangup":
+        case "done":
+        case "answeredElsewhere":
+        case "accepted_elsewhere":
+        case "rejected_elsewhere":
+            return "local";
+        case "error":
+        case "failed":
+        case "offer_failed":
+            return "network";
+        default:
+            return "";
+        }
+    }
 
     property var _ended: []
     property var _reasons: []
@@ -52,11 +94,8 @@ Item {
     function callEnded(call, connected) {
         var entry = { call: call, connected: connected, at: Date.now() };
 
-        if (!reasonsAvailable) {
-            _decide(entry, "");
-            return;
-        }
-
+        // A reason reported already (an internet call's connector reports it
+        // just before the end) counts whether or not oFono's are available.
         for (var i = 0; i < _reasons.length; i++) {
             if (_reasons[i].lineId === call.lineId) {
                 var reason = _reasons[i].reason;
@@ -64,6 +103,11 @@ Item {
                 _decide(entry, reason);
                 return;
             }
+        }
+
+        if (!reasonsAvailable) {
+            _decide(entry, "");
+            return;
         }
 
         _ended.push(entry);
@@ -86,6 +130,8 @@ Item {
         if (entry.connected) {
             if (reason === "network")
                 dropped(entry.call, "networkfailure");
+        } else if (reason === "declined" || reason === "busy" || reason === "noanswer") {
+            notTaken(entry.call, reason);
         } else if (reason !== "local") {
             failed(entry.call);
         }
