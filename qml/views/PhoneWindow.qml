@@ -348,6 +348,10 @@ WebOSWindow {
             dialFailAlert.showDialFailure(number, reason);
         }
 
+        function onCallNotTaken(number, reason) {
+            dialFailAlert.showNotTaken(number, reason);
+        }
+
         function onCallControlFailed(message) {
             messageAlert.showMessage("", message, "");
         }

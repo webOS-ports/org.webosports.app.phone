@@ -66,6 +66,21 @@ MessageAlert {
                     appTheme.image("popup-icon-error.png"));
     }
 
+    /// A call we placed that the other side did not take; `reason` keys into
+    /// CallMessages.callNotTaken ("declined", "busy", "noanswer"). Not a
+    /// failure to connect, so it is titled for what happened.
+    function showNotTaken(number, reason) {
+        console.log("DIALFAIL popup: not taken, reason='" + reason + "'");
+        _pendingNumber = "";
+        if (alertSounds)
+            alertSounds.playAlert();
+        showMessage(CallMessages.lookup(CallMessages.callNotTakenTitle, reason,
+                                        CallMessages.dialFailureTitle),
+                    CallMessages.lookup(CallMessages.callNotTaken, reason,
+                                        CallMessages.dialFailureDefault),
+                    appTheme.image("popup-icon-error.png"));
+    }
+
     function _enableRadioAndRedial() {
         if (!telephonyManager)
             return;
