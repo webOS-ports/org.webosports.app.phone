@@ -55,6 +55,51 @@ BasePage {
     /// on screen, so the picture is hidden until the camera is back.
     readonly property bool farCameraOn: !!voiceCall && voiceCall.incomingVideoState === "streaming"
 
+    /// We send our camera's picture.
+    readonly property bool sendingOurCamera: !!voiceCall && voiceCall.outgoingVideo === true
+
+    /**
+     * Which way the phone is held, in the shell's quarter turns (0 top up,
+     * 1 left edge up, 2 upside down, 3 right edge up), and which way our
+     * screen is turned: the same, unless rotation is locked. Read by
+     * DeviceTilt.qml while we send our camera; without a sensor the phone
+     * counts as upright. Not read-only only so that a test can turn it.
+     */
+    property int deviceTurns: tilt.item ? tilt.item.deviceTurns : 0
+    property int screenTurns: tilt.item ? tilt.item.screenTurns : deviceTurns
+
+    /**
+     * Our own picture's turn in the inset. The connector gives it for the
+     * phone and screen upright; the camera turns with the phone and the
+     * picture is shown on a screen that may have turned too, so it changes
+     * by the screen's turn - with it for the front camera (shown mirrored;
+     * against it, sargo showed it upside down held sideways), the other way
+     * for the back one.
+     */
+    readonly property int previewTurns: {
+        var c = voiceCall;
+        if (!c)
+            return 0;
+        var base = c.videoPreviewOrientation | 0;
+        var turn = c.videoPreviewMirrored === true ? screenTurns : -screenTurns;
+        return ((base + turn) % 4 + 4) % 4;
+    }
+
+    Loader {
+        id: tilt
+        active: videoCallPage.sendingOurCamera
+        source: "DeviceTilt.qml"
+    }
+
+    /// The connector turns the picture it sends as the phone turns: it is
+    /// told on every turn, and when our camera starts.
+    function tellDeviceOrientation() {
+        if (sendingOurCamera && voiceCall.setDeviceOrientation)
+            voiceCall.setDeviceOrientation(deviceTurns);
+    }
+    onDeviceTurnsChanged: tellDeviceOrientation()
+    onSendingOurCameraChanged: tellDeviceOrientation()
+
     /**
      * The call's state, where VideoCall.js puts it under the name: "Starting
      * Video..." until the call is up, then the running time. The far side's
@@ -157,7 +202,7 @@ BasePage {
                 var c = videoCallPage.voiceCall;
                 if (!c)
                     return false;
-                var turned = ((c.videoPreviewOrientation | 0) & 1) === 1;
+                var turned = (videoCallPage.previewTurns & 1) === 1;
                 var w = c.videoPreviewWidth | 0, h = c.videoPreviewHeight | 0;
                 if (w <= 0 || h <= 0)
                     return turned;
@@ -232,7 +277,7 @@ BasePage {
                             return videoCallPage.voiceCall ? (videoCallPage.voiceCall.videoPreviewHeight || 0) : 0;
                         });
                         item.quarterTurns = Qt.binding(function() {
-                            return videoCallPage.voiceCall ? (videoCallPage.voiceCall.videoPreviewOrientation || 0) : 0;
+                            return videoCallPage.previewTurns;
                         });
                         item.mirrored = Qt.binding(function() {
                             return !!videoCallPage.voiceCall && videoCallPage.voiceCall.videoPreviewMirrored === true;

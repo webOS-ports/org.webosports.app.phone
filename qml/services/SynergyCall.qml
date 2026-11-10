@@ -231,4 +231,11 @@ QtObject {
             params.outgoingVideo = outgoing;
         callControlRequested("changeMedia", params);
     }
+
+    /// Which way the phone is held (the shell's quarter turns, 0 top up), so
+    /// the connector can turn the picture it sends with it. Sent alone: no
+    /// video direction changes.
+    function setDeviceOrientation(turns) {
+        callControlRequested("changeMedia", { id: callId, deviceOrientation: turns & 3 });
+    }
 }
