@@ -16,6 +16,7 @@ import QtQuick 2.0
 
 import LunaNext.Common 0.1
 import LuneOS.Components 1.0
+import LuneOS.System 1.0
 
 import org.nemomobile.voicecall 1.0
 
@@ -61,12 +62,12 @@ BasePage {
     /**
      * Which way the phone is held, in the shell's quarter turns (0 top up,
      * 1 left edge up, 2 upside down, 3 right edge up), and which way our
-     * screen is turned: the same, unless rotation is locked. Read by
-     * DeviceTilt.qml while we send our camera; without a sensor the phone
-     * counts as upright. Not read-only only so that a test can turn it.
+     * screen is turned: the same, unless rotation is locked. Read while we
+     * send our camera; without a sensor the phone counts as upright. Not
+     * read-only only so that a test can turn it.
      */
-    property int deviceTurns: tilt.item ? tilt.item.deviceTurns : 0
-    property int screenTurns: tilt.item ? tilt.item.screenTurns : deviceTurns
+    property int deviceTurns: sendingOurCamera ? tilt.turns : 0
+    property int screenTurns: tilt.rotationLocked ? tilt.screenTurns : deviceTurns
 
     /**
      * Our own picture's turn in the inset. The connector gives it for the
@@ -85,10 +86,13 @@ BasePage {
         return ((base + turn) % 4 + 4) % 4;
     }
 
-    Loader {
+    // The shell's rule for which way the phone is held. The accelerometer
+    // and the rotationLock preference are read only while we send.
+    DeviceOrientation {
         id: tilt
         active: videoCallPage.sendingOurCamera
-        source: "DeviceTilt.qml"
+        followRotationLock: videoCallPage.sendingOurCamera
+        clientName: "org.webosports.app.phone"
     }
 
     /// The connector turns the picture it sends as the phone turns: it is

@@ -19,7 +19,7 @@
  * A video call follows the phone as it turns: the connector is told which way
  * the phone is held, so it can turn the picture it sends, and our own inset
  * turns with the screen. The test runner has no sensor; the turns are set on
- * the page as DeviceTilt.qml would.
+ * the page as LuneOS.System's DeviceOrientation would.
  */
 
 import QtQuick 2.0
