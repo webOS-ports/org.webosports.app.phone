@@ -344,7 +344,7 @@ Item {
         // may never send one (a phone without a camera).
         function test_anActiveCallShowsItsTimeBeforeThePictureComes() {
             var page = videoPage({ videoURI: "/tmp/wa-rtc-video", videoWidth: 480,
-                                   videoHeight: 640, duration: 65000 });
+                                   videoHeight: 640, duration: 65 });
             compare(page.stateText, "01:05");
             page.hasRemotePicture = true;
             compare(page.stateText, "01:05");
@@ -368,7 +368,7 @@ Item {
         }
 
         function test_aCallWithoutVideoShowsItsTimeAtOnce() {
-            var page = videoPage({ duration: 65000 });
+            var page = videoPage({ duration: 65 });
             compare(page.stateText, "01:05");
         }
 

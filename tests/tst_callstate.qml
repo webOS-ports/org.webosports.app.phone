@@ -55,6 +55,7 @@ Item {
                 property string statusText: ""
                 property bool isIncoming: true
                 property bool isMultiparty: false
+                property int duration: 0
                 function answer() { status = VoiceCall.STATUS_ACTIVE; }
                 function hangup() { status = VoiceCall.STATUS_DISCONNECTED; }
             }
@@ -163,6 +164,20 @@ Item {
             compare(ended.lineId, "5550100");
             compare(ended.status, VoiceCall.STATUS_DISCONNECTED);
             verify(ended.isIncoming);
+        }
+
+        // The call counts in seconds, the call log in milliseconds.
+        function test_anEndedCallIsLoggedInMilliseconds() {
+            var wrapper = makeWrapperWithSpy();
+            var call = makeCall("timed-1", VoiceCall.STATUS_ACTIVE);
+            call.duration = 14;
+            listCalls(wrapper, [call]);
+            wrapper._updateState(call, true);
+            call.status = VoiceCall.STATUS_DISCONNECTED;
+            wrapper._updateState(call, true);
+
+            compare(endingSpy.count, 1);
+            compare(endingSpy.signalArguments[0][0].duration, 14000);
         }
 
         function test_aCallStillListedIsNotEnded() {

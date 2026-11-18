@@ -899,7 +899,8 @@ Item {
             statusText: voiceCall.statusText,
             lineId:voiceCall.lineId,
             startedAt: voiceCall.startedAt,
-            duration: voiceCall.duration,
+            // The call counts in seconds, the call log in milliseconds.
+            duration: (voiceCall.duration || 0) * 1000,
             isIncoming: isIncoming,
             isEmergency: voiceCall.isEmergency,
             isMultiparty: voiceCall.isMultiparty,

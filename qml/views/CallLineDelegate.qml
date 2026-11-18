@@ -111,7 +111,7 @@ Item {
 
         switch (voiceCall.status) {
         case VoiceCall.STATUS_ACTIVE:
-            return PhoneNumberUtils.formatDuration(lineDuration / 1000);
+            return PhoneNumberUtils.formatDuration(lineDuration);
         case VoiceCall.STATUS_HELD:       return CallMessages.callStateHold;
         case VoiceCall.STATUS_DIALING:
         case VoiceCall.STATUS_ALERTING:   return qsTr("Connecting");
