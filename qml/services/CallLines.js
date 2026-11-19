@@ -63,7 +63,7 @@ function lineOf(lines, call) {
     return null;
 }
 
-/// How long the line has been up: its longest-running call.
+/// How long the line has been up, in seconds: its longest-running call.
 function duration(line) {
     if (!line)
         return 0;

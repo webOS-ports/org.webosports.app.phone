@@ -119,7 +119,7 @@ BasePage {
             // "Starting Video..." is for dialing only; holding it until the far
             // side's picture came kept it up for a whole call with a far side
             // that has no camera.
-            return PhoneNumberUtils.formatDuration(voiceCall.duration / 1000);
+            return PhoneNumberUtils.formatDuration(voiceCall.duration);
         case VoiceCall.STATUS_HELD:
             return CallMessages.callStateHold;
         case VoiceCall.STATUS_DISCONNECTED:

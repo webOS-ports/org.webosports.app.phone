@@ -205,10 +205,11 @@ QtObject {
 
     property var _connectedAt: 0
 
-    /// Recomputed by the transport's tick timer, since the connector reports a
-    /// start time rather than a running duration.
+    /// In seconds, as a cellular call reports it. Recomputed by the transport's
+    /// tick timer, since the connector reports a start time rather than a
+    /// running duration.
     function updateDuration() {
-        duration = _connectedAt ? (Date.now() - _connectedAt) : 0;
+        duration = _connectedAt ? Math.floor((Date.now() - _connectedAt) / 1000) : 0;
     }
 
     // The method names are the call services' - webOS 2.x's CallSynergizer

@@ -118,8 +118,8 @@ Item {
         }
 
         function test_aConferenceHasBeenUpAsLongAsItsLongestCall() {
-            var lines = CallLines.group([makeCall("e1", true, 5000), makeCall("e2", true, 90000)]);
-            compare(CallLines.duration(lines[0]), 90000);
+            var lines = CallLines.group([makeCall("e1", true, 5), makeCall("e2", true, 90)]);
+            compare(CallLines.duration(lines[0]), 90);
         }
 
         // --- who is in it ---
@@ -184,9 +184,9 @@ Item {
         // --- the conference's line next to another call ---
 
         function test_theConferenceLineIsTitledAndTimedAsAWhole() {
-            var a = makeCall("k1", true, 5000);
+            var a = makeCall("k1", true, 5);
             var line = createTemporaryObject(lineComponent, root,
-                                             { voiceCall: a, appTheme: theme, lineDuration: 125000 });
+                                             { voiceCall: a, appTheme: theme, lineDuration: 125 });
             verify(line !== null, "the call line did not load");
             compare(line.displayName, "Conference call");
             compare(line.displayAddress, "");
@@ -194,7 +194,7 @@ Item {
         }
 
         function test_aCallLineStillShowsWhoItIs() {
-            var a = makeCall("l1", false, 5000);
+            var a = makeCall("l1", false, 5);
             var line = createTemporaryObject(lineComponent, root, { voiceCall: a, appTheme: theme });
             verify(line.displayName !== "Conference call");
             verify(line.displayAddress.length > 0);
@@ -220,6 +220,17 @@ Item {
             verify(page.conferenceOnly);
             verify(!page.multipleLines);
             compare(page.lines.length, 1);
+        }
+
+        // The call counts in seconds, and the card shows them as they are.
+        function test_theCardTimesASingleCall() {
+            var page = makePage([makeCall("t1", false, 65)]);
+            compare(findChild(page, "callState").text, "01:05");
+        }
+
+        function test_theCardTimesAConferenceByItsLongestCall() {
+            var page = makePage([makeCall("t2", true, 5), makeCall("t3", true, 90)]);
+            compare(findChild(page, "callState").text, "01:30");
         }
 
         function test_aConferenceAndACallAreTwoLines() {

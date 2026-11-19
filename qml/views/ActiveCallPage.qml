@@ -592,9 +592,9 @@ BasePage {
                         text: root.selectedCall && root.selectedCall.status === VoiceCall.STATUS_HELD
                                   ? CallMessages.callStateHold
                               : root.conferenceOnly
-                                  ? PhoneNumberUtils.formatDuration(CallLines.duration(root.lines[0]) / 1000)
+                                  ? PhoneNumberUtils.formatDuration(CallLines.duration(root.lines[0]))
                               : root.selectedCall
-                                  ? PhoneNumberUtils.formatDuration(root.selectedCall.duration / 1000)
+                                  ? PhoneNumberUtils.formatDuration(root.selectedCall.duration)
                                   : ""
                     }
                 }
