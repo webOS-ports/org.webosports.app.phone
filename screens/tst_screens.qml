@@ -384,6 +384,12 @@ TestCase {
         verify(hangup, "the hang-up button");
         inWindow(hangup, "the hang-up button");
         noTextOffSides("in call");
+        // The same call over IMS
+        vcm.callAt(0).isIms = true;
+        shot("in-call-volte");
+        var volte = findAll(card, function(i) { return i.text === "VoLTE" && shown(i); });
+        verify(volte.length > 0, "the call card says VoLTE");
+        noTextOffSides("in call over VoLTE");
         vcm.hangupAll();
         tryVerify(function() { return vcm.callCount === 0; }, 3000, "the call is over");
         settle();

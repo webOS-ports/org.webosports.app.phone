@@ -32,7 +32,8 @@ import "../qml/services/IncomingCallsService.js" as IncomingCallsService
  *
  * - the call counts as answered, not missed;
  * - the incoming strip goes once the call stops ringing;
- * - a call line shows no label for a provider the registry does not know.
+ * - a call line shows no label for a provider the registry does not know;
+ * - a cellular call over IMS shows "VoLTE", for as long as it is.
  */
 Item {
     id: root
@@ -58,6 +59,19 @@ Item {
                 property int duration: 0
                 function answer() { status = VoiceCall.STATUS_ACTIVE; }
                 function hangup() { status = VoiceCall.STATUS_DISCONNECTED; }
+            }
+        }
+        Component {
+            id: imsCallComponent
+            QtObject {
+                property string handlerId: "ims"
+                property string providerId: "ofono-/ril_0"
+                property string lineId: "5550100"
+                property int status: VoiceCall.STATUS_ACTIVE
+                property bool isIncoming: false
+                property bool isMultiparty: false
+                property bool isIms: true
+                property int duration: 0
             }
         }
         Component {
@@ -388,6 +402,55 @@ Item {
                                              { voiceCall: call, callTransports: transports, appTheme: theme });
             verify(line !== null, "the call line did not load");
             compare(line.serviceLabel, "");
+        }
+
+        function makeLine(call, imsVoice) {
+            var transports = createTemporaryObject(transportsComponent, root);
+            verify(transports !== null, "the transport registry did not load");
+            var line = createTemporaryObject(lineComponent, root,
+                                             { voiceCall: call, callTransports: transports,
+                                               appTheme: theme, imsVoice: imsVoice });
+            verify(line !== null, "the call line did not load");
+            return line;
+        }
+
+        function test_imsCallIsVoLTE() {
+            var call = createTemporaryObject(imsCallComponent, root);
+            var line = makeLine(call, false);
+            compare(line.serviceLabel, "VoLTE");
+
+            // Handed over to the circuit-switched network (SRVCC)
+            call.isIms = false;
+            compare(line.serviceLabel, "");
+        }
+
+        // The modem stays registered with IMS while a call falls back to
+        // the circuit-switched network; the call's own flag wins.
+        function test_circuitSwitchedCallIsNotVoLTE() {
+            var call = createTemporaryObject(imsCallComponent, root, { isIms: false });
+            compare(makeLine(call, true).serviceLabel, "");
+        }
+
+        // A voicecall without isIms: the modem's IMS registration decides.
+        function test_registrationDecidesWithoutTheCallsFlag() {
+            var call = makeCall("label-2", VoiceCall.STATUS_ACTIVE);
+            compare(makeLine(call, true).serviceLabel, "VoLTE");
+            compare(makeLine(call, false).serviceLabel, "");
+        }
+
+        function test_conferenceIsNotLabelled() {
+            var call = createTemporaryObject(imsCallComponent, root, { isMultiparty: true });
+            var line = makeLine(call, true);
+            line.conference = true;
+            compare(line.serviceLabel, "");
+        }
+
+        // A Synergy call has no isIms; the modem's IMS registration is not
+        // about it.
+        function test_synergyCallIsNotVoLTE() {
+            var call = makeCall("label-3", VoiceCall.STATUS_ACTIVE);
+            call.providerId = "com.example.unknown";
+            compare(makeLine(call, true).serviceLabel, "");
         }
     }
 }
