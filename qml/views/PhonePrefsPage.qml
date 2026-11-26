@@ -29,6 +29,27 @@ AppPage {
     // The SIM PIN card offers an emergency dialpad, which places the call
     property VoiceCallMgrWrapper voiceCallMgrWrapper
     property SupplementaryServices supplementaryServices
+
+    // Call forwarding, caller ID, call waiting and barring are read from the
+    // network only while this page is open
+    property SupplementaryServices _heldServices: null
+    onSupplementaryServicesChanged: _holdServices()
+    Component.onCompleted: _holdServices()
+    Component.onDestruction: {
+        if (_heldServices)
+            _heldServices.release();
+        _heldServices = null;
+    }
+
+    function _holdServices() {
+        if (_heldServices === supplementaryServices)
+            return;
+        if (_heldServices)
+            _heldServices.release();
+        _heldServices = supplementaryServices;
+        if (_heldServices)
+            _heldServices.hold();
+    }
     property DialingShortcuts dialingShortcuts
     property CallTransports callTransports
 

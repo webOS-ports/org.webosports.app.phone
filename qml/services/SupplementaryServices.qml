@@ -35,6 +35,28 @@ Item {
 
     property string modemPath: ""
 
+    /*
+     * Reading call forwarding, call settings or call barring is a request to
+     * the network for each setting, not a look at something oFono already
+     * has. With IMS registered the modem asks over XCAP, and where that fails
+     * it falls back to the circuit-switched network, which on LTE means
+     * moving the phone onto 3G for each request and back.
+     *
+     * So the three are only pointed at the modem while something needs them:
+     * the preferences page, between hold() and release(), or an MMI command
+     * until it is answered. Bound at start, as they were, they made seven
+     * such requests every time the app or oFono started.
+     */
+    property int _holds: 0
+    property bool _mmiNeedsNetwork: false
+    readonly property string _networkModemPath:
+        (_holds > 0 || _mmiNeedsNetwork) ? modemPath : ""
+
+    // An MMI command waiting for its object to have read the settings
+    property var _deferred: null
+    // How long it waits for that; a property so the tests can shorten it
+    property int _deferredTimeoutMs: 60000
+
     /// Emitted when a command finished, with a message ready to show the user.
     signal completed(bool success, string message);
     /// The preferences' own writes, each answered on its own so a toggle the
@@ -70,6 +92,82 @@ Item {
         console.log("Supplementary service: " + cmd + " " + JSON.stringify(args));
         _pendingCommand = cmd;
 
+        /*
+         * A query reads what the object has read from the network, and a
+         * change made before the object has its D-Bus interface is dropped
+         * by libqofono without a word, so the command waits until the object
+         * is ready.
+         */
+        var service = _serviceFor(cmd);
+        if (service && !_isReady(service)) {
+            _deferred = { cmd: cmd, args: args, service: service };
+            _mmiNeedsNetwork = true;
+            deferredTimeout.restart();
+            return true;
+        }
+
+        return _run(cmd, args);
+    }
+
+    /// Keeps call forwarding, call settings and call barring read from the
+    /// network until the matching release(), for a page that shows them.
+    function hold() {
+        _holds++;
+    }
+
+    function release() {
+        if (_holds > 0)
+            _holds--;
+    }
+
+    function _serviceFor(cmd) {
+        switch (cmd) {
+        case "forwardActivate":
+        case "forwardRegister":
+        case "forwardQuery":
+            return callForwarding;
+        case "callWaitingSet":
+        case "callWaitingQuery":
+        case "clirSet":
+        case "clirQuery":
+        case "clipQuery":
+        case "cnapQuery":
+            return callSettings;
+        case "barringSet":
+        case "barringQuery":
+        case "barringPasswordChange":
+            return callBarring;
+        }
+        return null;
+    }
+
+    // libqofono's objects all have `ready`; the desktop mock of
+    // OfonoCallBarring does not, and is taken as ready
+    function _isReady(service) {
+        return service.modemPath.length > 0 && service.ready !== false;
+    }
+
+    /*
+     * Called from the objects' modemPathChanged, which the _networkModemPath
+     * binding sets off: run on the next turn, since a command that finishes
+     * at once clears _mmiNeedsNetwork and so re-enters that binding.
+     */
+    function _runDeferred() {
+        if (_deferred)
+            Qt.callLater(_runDeferredNow);
+    }
+
+    function _runDeferredNow() {
+        if (!_deferred || !_isReady(_deferred.service))
+            return;
+
+        var command = _deferred;
+        _deferred = null;
+        deferredTimeout.stop();
+        _run(command.cmd, command.args);
+    }
+
+    function _run(cmd, args) {
         switch (cmd) {
         case "forwardActivate":  return _forwardActivate(args);
         case "forwardRegister":  return _forwardRegister(args);
@@ -167,6 +265,9 @@ Item {
 
     function _done(success, message) {
         _pendingCommand = "";
+        _deferred = null;
+        deferredTimeout.stop();
+        _mmiNeedsNetwork = false;
         completed(success, message);
     }
 
@@ -390,7 +491,7 @@ Item {
 
     OfonoCallForwarding {
         id: callForwarding
-        modemPath: supplementaryServices.modemPath
+        modemPath: supplementaryServices._networkModemPath
 
         onVoiceUnconditionalComplete: (success) => { _onSetComplete(success); forwardingSet(success); }
         onVoiceBusyComplete: (success) => _onSetComplete(success)
@@ -401,7 +502,7 @@ Item {
 
     OfonoCallSettings {
         id: callSettings
-        modemPath: supplementaryServices.modemPath
+        modemPath: supplementaryServices._networkModemPath
 
         onVoiceCallWaitingComplete: (success) => { _onSetComplete(success); callWaitingSet(success); }
         onHideCallerIdComplete: (success) => { _onSetComplete(success); callerIdSet(success); }
@@ -410,7 +511,7 @@ Item {
 
     OfonoCallBarring {
         id: callBarring
-        modemPath: supplementaryServices.modemPath
+        modemPath: supplementaryServices._networkModemPath
 
         onVoiceIncomingComplete: (success) => _onSetComplete(success)
         onVoiceOutgoingComplete: (success) => _onSetComplete(success)
@@ -419,6 +520,39 @@ Item {
                                    : qsTr("Could not change the call barring password."))
         onDisableAllComplete: (success) => _onSetComplete(success)
         onGetPropertiesFailed: _propertiesUnavailable()
+    }
+
+    // A deferred command runs once its object is pointed at the modem and has
+    // read the settings. ignoreUnknownSignals: as above, a mock may have no
+    // `ready`.
+    Connections {
+        target: callForwarding
+        ignoreUnknownSignals: true
+        function onModemPathChanged() { supplementaryServices._runDeferred(); }
+        function onReadyChanged() { supplementaryServices._runDeferred(); }
+    }
+    Connections {
+        target: callSettings
+        ignoreUnknownSignals: true
+        function onModemPathChanged() { supplementaryServices._runDeferred(); }
+        function onReadyChanged() { supplementaryServices._runDeferred(); }
+    }
+    Connections {
+        target: callBarring
+        ignoreUnknownSignals: true
+        function onModemPathChanged() { supplementaryServices._runDeferred(); }
+        function onReadyChanged() { supplementaryServices._runDeferred(); }
+    }
+
+    // The modem never offered the interface: no SIM, or no network yet
+    Timer {
+        id: deferredTimeout
+        interval: supplementaryServices._deferredTimeoutMs
+        onTriggered: {
+            console.log("Supplementary service: " + supplementaryServices._pendingCommand
+                        + " gave up waiting for the network");
+            supplementaryServices._fail(CallMessages.noServiceError);
+        }
     }
 
     OfonoSimManager {
