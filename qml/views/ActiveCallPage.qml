@@ -499,14 +499,22 @@ BasePage {
                     color: '#00000080'
                 }
 
+                // The tones sent so far, and only those: the number is in the
+                // header already. They start over with another call.
                 Text {
                     id: tLineId
+                    objectName: "dtmfDigits"
                     anchors { top: parent.top; horizontalCenter: parent.horizontalCenter }
                     height: Units.gu(3)
                     verticalAlignment: Text.AlignVCenter
                     color: '#ffffff'
                     font.pixelSize: Units.gu(1.6)
-                    text: root.selectedCall ? root.selectedCall.lineId : ""
+                    text: ""
+
+                    Connections {
+                        target: root
+                        function onSelectedCallChanged() { tLineId.text = ""; }
+                    }
                 }
 
                 NumPad {
