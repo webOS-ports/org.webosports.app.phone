@@ -58,6 +58,13 @@ Item {
     property string networkTechnology: netreg.technology
     property int signalStrength: netreg.strength
     property bool roaming: netreg.status === "roaming"
+    /**
+     * The modem is registered with IMS and can make voice calls over it: what
+     * a status bar shows as VoLTE. A call can still go circuit-switched (no
+     * IMS where the phone is, a handover), so a call says for itself where
+     * voicecall can tell; see CallTransports.callBearerLabel().
+     */
+    readonly property bool imsVoice: imsReg.registered && imsReg.voiceCapable
     property bool registered: netreg.status === "registered" || roaming
 
     // Radio. `online === false` is what LuneOS surfaces as airplane mode.
@@ -179,6 +186,14 @@ Item {
         onStatusChanged: console.log("netreg->status:" , JSON.stringify(netreg.status));
         onNameChanged: console.log("netreg->name:" , JSON.stringify(netreg.name));
         onTechnologyChanged: console.log("netreg->technology:" , JSON.stringify(netreg.technology));
+    }
+
+    OfonoIpMultimediaSystem {
+        id: imsReg
+        modemPath: modemManager.defaultModem
+
+        onRegisteredChanged: console.log("ims->registered:" , JSON.stringify(imsReg.registered));
+        onVoiceCapableChanged: console.log("ims->voiceCapable:" , JSON.stringify(imsReg.voiceCapable));
     }
 
     OfonoMessageWaiting {
