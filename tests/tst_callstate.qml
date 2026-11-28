@@ -33,7 +33,8 @@ import "../qml/services/IncomingCallsService.js" as IncomingCallsService
  * - the call counts as answered, not missed;
  * - the incoming strip goes once the call stops ringing;
  * - a call line shows no label for a provider the registry does not know;
- * - a cellular call over IMS shows "VoLTE", for as long as it is.
+ * - a cellular call over IMS shows "VoLTE", for as long as it is, and
+ *   "VoWiFi" while that IMS goes over Wi-Fi.
  */
 Item {
     id: root
@@ -404,12 +405,13 @@ Item {
             compare(line.serviceLabel, "");
         }
 
-        function makeLine(call, imsVoice) {
+        function makeLine(call, imsVoice, imsWifi) {
             var transports = createTemporaryObject(transportsComponent, root);
             verify(transports !== null, "the transport registry did not load");
             var line = createTemporaryObject(lineComponent, root,
                                              { voiceCall: call, callTransports: transports,
-                                               appTheme: theme, imsVoice: imsVoice });
+                                               appTheme: theme, imsVoice: imsVoice,
+                                               imsWifi: imsWifi === true });
             verify(line !== null, "the call line did not load");
             return line;
         }
@@ -422,6 +424,34 @@ Item {
             // Handed over to the circuit-switched network (SRVCC)
             call.isIms = false;
             compare(line.serviceLabel, "");
+        }
+
+        // IMS over Wi-Fi: the same call says VoWiFi, and VoLTE again once
+        // IMS has moved back to LTE.
+        function test_imsCallOverWifiIsVoWiFi() {
+            var call = createTemporaryObject(imsCallComponent, root);
+            var line = makeLine(call, true, true);
+            compare(line.serviceLabel, "VoWiFi");
+
+            line.imsWifi = false;
+            compare(line.serviceLabel, "VoLTE");
+
+            // Wi-Fi says nothing about a call that went circuit-switched
+            line.imsWifi = true;
+            call.isIms = false;
+            compare(line.serviceLabel, "");
+        }
+
+        function test_registrationOverWifiWithoutTheCallsFlag() {
+            var call = makeCall("label-4", VoiceCall.STATUS_ACTIVE);
+            compare(makeLine(call, true, true).serviceLabel, "VoWiFi");
+            compare(makeLine(call, false, true).serviceLabel, "");
+        }
+
+        function test_synergyCallOverWifiIsNotVoWiFi() {
+            var call = makeCall("label-5", VoiceCall.STATUS_ACTIVE);
+            call.providerId = "com.example.unknown";
+            compare(makeLine(call, true, true).serviceLabel, "");
         }
 
         // The modem stays registered with IMS while a call falls back to

@@ -163,16 +163,18 @@ BasePage {
 
     /// The modem is registered with IMS for voice; see TelephonyManager.imsVoice.
     readonly property bool imsVoice: !!telephonyManager && telephonyManager.imsVoice
+    /// That IMS goes over Wi-Fi; see TelephonyManager.imsWifi.
+    readonly property bool imsWifi: !!telephonyManager && telephonyManager.imsWifi === true
 
     /**
      * The network a Synergy call is going over, in caps. For a cellular call
-     * "VoLTE" when it goes over IMS and blank otherwise. Blank for a provider
+     * "VoLTE" when it goes over IMS ("VoWiFi" over Wi-Fi) and blank otherwise. Blank for a provider
      * the transport registry does not know -- otherwise an unrecognised id
      * gets tidied into a label and shown as if it were the name of a service.
      */
     readonly property string serviceLabel: {
         if (!selectedCall || !callTransports) return "";
-        var bearer = callTransports.callBearerLabel(selectedCall, imsVoice);
+        var bearer = callTransports.callBearerLabel(selectedCall, imsVoice, imsWifi);
         if (bearer.length > 0) return bearer;
 
         var provider = selectedCall.providerId || "";
@@ -404,6 +406,7 @@ BasePage {
                         appTheme: root.appTheme
                         callTransports: root.callTransports
                         imsVoice: root.imsVoice
+                        imsWifi: root.imsWifi
                         selected: root.multipleLines && CallLines.lineOf(root.lines, root.selectedCall) === modelData
                         showFooter: root.multipleLines
                         canJoin: root.multipleLines && voiceCallMgrWrapper.canMerge

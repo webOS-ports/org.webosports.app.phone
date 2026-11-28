@@ -45,6 +45,8 @@ Item {
     property CallTransports callTransports
     /// The modem is registered with IMS for voice; see TelephonyManager.imsVoice.
     property bool imsVoice: false
+    /// That IMS goes over Wi-Fi; see TelephonyManager.imsWifi.
+    property bool imsWifi: false
     property bool selected: false
     /// The merge/swap arrow works; the card decides when that is meaningful.
     /// When it does not the arrow stays, greyed: legacy's .disabled.
@@ -93,10 +95,10 @@ Item {
     }
 
     /// "TELEGRAM", "SIGNAL", ... A cellular call is "VoLTE" when it goes over
-    /// IMS and otherwise unlabelled, as on the original.
+    /// IMS ("VoWiFi" over Wi-Fi) and otherwise unlabelled, as on the original.
     readonly property string serviceLabel: {
         if (!voiceCall || !callTransports || conference) return "";
-        var bearer = callTransports.callBearerLabel(voiceCall, imsVoice);
+        var bearer = callTransports.callBearerLabel(voiceCall, imsVoice, imsWifi);
         if (bearer.length > 0) return bearer;
 
         var provider = voiceCall.providerId || "";
