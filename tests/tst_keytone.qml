@@ -151,6 +151,23 @@ Item {
                     JSON.stringify({ name: data.tone, feedbackOnly: true }));
         }
 
+        /// The line above the pad shows the tones, not the caller's number
+        /// with the tones after it.
+        function test_theDigitLineShowsOnlyTheTones() {
+            var page = callPage("off");
+            var digits = findChild(page, "dtmfDigits");
+            verify(digits !== null, "no digit line above the dialpad");
+            compare(digits.text, "");
+
+            press(page, Qt.Key_1);
+            press(page, Qt.Key_2);
+            press(page, Qt.Key_NumberSign);
+            compare(digits.text, "12#");
+
+            page.selectedCall = null;
+            compare(digits.text, "");
+        }
+
         function test_soundOnlyBeepsToo() {
             press(callPage("soundOnly"), Qt.Key_5);
             compare(sent(), "AT+VTS=5 beep");
