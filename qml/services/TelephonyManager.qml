@@ -65,6 +65,14 @@ Item {
      * voicecall can tell; see CallTransports.callBearerLabel().
      */
     readonly property bool imsVoice: imsReg.registered && imsReg.voiceCapable
+    /**
+     * IMS goes over Wi-Fi (VoWiFi) rather than LTE: telephonyd's "vowifi",
+     * which the status bar shows as VoWiFi too. oFono's own
+     * IpMultimediaSystem does not say which bearer IMS uses; telephonyd
+     * reads it from the modem's extension where there is one, and is false
+     * elsewhere.
+     */
+    property bool imsWifi: false
     property bool registered: netreg.status === "registered" || roaming
 
     // Radio. `online === false` is what LuneOS surfaces as airplane mode.
@@ -194,6 +202,42 @@ Item {
 
         onRegisteredChanged: console.log("ims->registered:" , JSON.stringify(imsReg.registered));
         onVoiceCapableChanged: console.log("ims->voiceCapable:" , JSON.stringify(imsReg.voiceCapable));
+    }
+
+    Timer {
+        id: networkStatusResubscribe
+        interval: 2000
+        onTriggered: networkStatusQuery.subscribe(JSON.stringify({"subscribe": true}))
+    }
+
+    // Only for "vowifi"; the rest of the network status comes from oFono.
+    LunaService {
+        id: networkStatusQuery
+        service: "luna://com.palm.telephony"
+        method: "networkStatusQuery"
+
+        onInitialized: networkStatusQuery.subscribe(JSON.stringify({"subscribe": true}))
+
+        onResponse: function (message) {
+            var response;
+            try {
+                response = JSON.parse(message.payload);
+            } catch (e) {
+                return;
+            }
+            if (!response || !response.returnValue) {
+                telephonyManager.imsWifi = false;
+                networkStatusResubscribe.start();
+                return;
+            }
+            if (response.extended && response.extended.vowifi !== undefined)
+                telephonyManager.imsWifi = response.extended.vowifi === true;
+        }
+
+        onError: function (message) {
+            telephonyManager.imsWifi = false;
+            networkStatusResubscribe.start();
+        }
     }
 
     OfonoMessageWaiting {

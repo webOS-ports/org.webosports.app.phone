@@ -292,6 +292,20 @@ BasePage {
     readonly property real keysMinimumShare: 0.7
 
     /**
+     * Enough for four rows of keys a thumb can still hit, five grid units
+     * each (about 7mm at the Q25's 291dpi), plus the pad's own inset. On a
+     * page so short that keysMinimumShare falls below this -- the Q25 with
+     * less than the card its shell hands over -- the keys take more of the
+     * page, up to keysMaximumShare, and the chrome gives way further.
+     */
+    readonly property real keysMinimumHeight: 4 * Units.gu(5) + Units.gu(2)
+    readonly property real keysMaximumShare: 0.8
+    readonly property real keysShare: height > 0
+                                      ? Math.min(keysMaximumShare,
+                                                 Math.max(keysMinimumShare, keysMinimumHeight / height))
+                                      : keysMinimumShare
+
+    /**
      * The keys and the dial button are drawn the same width, always.
      *
      * They are the two things on the page a thumb aims at, sitting one above
@@ -325,7 +339,7 @@ BasePage {
     readonly property real chromeScale: {
         if (!fillsScreen || naturalChromeHeight <= 0)
             return 1;
-        var allowed = height * (1 - keysMinimumShare);
+        var allowed = height * (1 - keysShare);
         return allowed < naturalChromeHeight ? allowed / naturalChromeHeight : 1;
     }
 

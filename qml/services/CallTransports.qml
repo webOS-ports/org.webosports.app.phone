@@ -170,20 +170,22 @@ Item {
     }
 
     /**
-     * "VoLTE" for a cellular call carried over IMS, otherwise blank. The call's
+     * "VoLTE" for a cellular call carried over IMS, "VoWiFi" when that IMS
+     * goes over Wi-Fi (imsWifi, TelephonyManager.imsWifi), otherwise blank. The call's
      * own isIms is exact: a call can fall back to the circuit-switched network
      * while the modem stays registered with IMS, and only voicecall-manager's
      * oFono provider sets it. Only a voicecall without isIms leaves it to
      * imsVoice, the modem's IMS registration with voice, which is what FuriOS
      * goes by, and then just for a call of the oFono provider ("ofono-/ril_0").
      */
-    function callBearerLabel(call, imsVoice) {
+    function callBearerLabel(call, imsVoice, imsWifi) {
         if (!call) return "";
+        var ims = imsWifi === true ? "VoWiFi" : "VoLTE";
         // Synergy calls have no isIms
-        if (call.isIms !== undefined) return call.isIms ? "VoLTE" : "";
+        if (call.isIms !== undefined) return call.isIms ? ims : "";
         var provider = call.providerId || "";
         var oFono = provider === cellularTransport || provider.indexOf("ofono") === 0;
-        return oFono && imsVoice ? "VoLTE" : "";
+        return oFono && imsVoice ? ims : "";
     }
 
     function implementationFor(id) {
